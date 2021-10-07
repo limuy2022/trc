@@ -1,0 +1,5 @@
+# 测试string类型和类型强制转换
+
+a := "opipop"
+println(a)
+println(string(1) + "o")

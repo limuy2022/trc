@@ -1,0 +1,8 @@
+# 计算输出函数:print,println
+
+a := 78
+println(a)
+println(89)
+print(a)
+print(89)
+println("I am string",a)

@@ -1,0 +1,44 @@
+关于Trc的文档索引
+
+
+	- 了解Trc本身见
+	README.md
+
+	- 详细执行步骤请见
+	doc\run.txt
+	
+	- 指令集定义请见
+	doc\instruction.txt
+	
+	- 各个版本的更新日志请见
+	doc\update
+	
+	- 代码编写规范请见
+	doc\use.txt
+	
+	- 异常表见
+	doc\Error.txt
+	
+	- Trc支持的命令行指令请见
+	doc\cmd_instruction.txt
+
+	- 内置工具表见
+	doc\tools.txt
+
+	- 了解Trc已知错误见
+	doc\bug.txt
+
+	- Trc内置函数表见
+	doc\builtin_func.txt
+
+	- Trc内置转义字符见
+	doc\ESC.txt
+
+	- TDB使用方法见
+	doc\TDB.txt
+
+	- 想要二次开发本项目请见
+	doc\developer
+
+
+注：文档如果使用记事本查看会出现错位现象，建议使用代码编辑器查看

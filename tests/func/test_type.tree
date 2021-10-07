@@ -1,0 +1,8 @@
+# 测试数据类型
+
+println(type(90))
+a:=89
+println(type(a))
+println(type("pop"))
+println(type(8.9))
+println(type(9000000000000000000000000000000000000000))

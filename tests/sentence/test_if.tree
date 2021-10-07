@@ -1,0 +1,7 @@
+# 测试语句块：if
+
+a := 0
+if a == 0{
+	println(90)
+	println(a)
+}

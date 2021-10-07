@@ -1,0 +1,6 @@
+# 测试float类型和类型强制转换
+
+c := 1.25
+println(c)
+println(8.99)
+println(float(8))

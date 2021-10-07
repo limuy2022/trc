@@ -1,0 +1,3 @@
+# 测试变量未定义错误
+# 输出：NameErrorError
+print(u)

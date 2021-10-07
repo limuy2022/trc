@@ -1,0 +1,4 @@
+# 测试除零错误
+# 输出：ZeroDivError
+a := 0
+print(1 / a)

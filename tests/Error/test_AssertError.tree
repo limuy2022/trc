@@ -1,0 +1,4 @@
+# 测试断言指令
+# 输出：AssertError
+assert 1 == 1
+assert 2 == 1

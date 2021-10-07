@@ -1,0 +1,8 @@
+# 测试goto语句
+
+a := 90
+println(a)
+if a > 0 {
+	a = a - 1
+	goto 3
+}

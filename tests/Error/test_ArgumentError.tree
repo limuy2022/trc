@@ -1,0 +1,4 @@
+# 测试参数错误
+# 输出：ArgumentError
+a := len("1,2", "1,2")
+print(a)

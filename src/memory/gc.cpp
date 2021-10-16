@@ -10,7 +10,7 @@
  * 此次进行的是较浅的垃圾回收
  * 注：在此种情况下如果仍然不能满足需求，则扩大gc_obj允许的字节数
  * 
- * 当垃圾回收运行时，字节码运行也暂停
+ * 当垃圾回收运行时，字节码运行也暂停，这里并不会采取多线程运行，也不允许出现内存访问错误的现象
  * 
  * 垃圾回收直接由gc_obj完成，由gc_obj链接objs_pool达到
  */
@@ -24,14 +24,16 @@ gc_obj::gc_obj():
     pool_(new objs_pool_TVM(this))
 {}
 
-#define gc_one_pool(now, _pool_)\
-do{\
+#define gc_one_pool(now, _pool_, pointer)\
+do{ /*now:现在要进行gc的内存链表的头指针，_pool_:内存池，pointer:数据需要转换的类型*/\
+    pointer value;\
     while((now) != nullptr) {\
-        if((now) ->data-> refs == 0) {\
+        value = (pointer)((now) ->data);\
+        if(value -> refs == 0) {\
             _pool_->used_head -> next = (now) -> next;\
             now -> next = _pool_->free_head -> next;\
             _pool_->free_head -> next = (now);\
-            (now) -> data -> delete_();\
+            value -> delete_();\
         }\
     }\
 } while(0)
@@ -40,14 +42,14 @@ void gc_obj::gc() {
     /**
      * 垃圾回收
      */
-    objs_pool<trcint>::node_ *now1 = pool_-> int_pool -> used_head;
-    objs_pool<trcfloat>::node_ *now2 = pool_-> float_pool -> used_head;
-    objs_pool<trc_string>::node_ *now3 = pool_-> str_pool -> used_head;
-    objs_pool<BigNum>::node_ *now4 = pool_-> long_pool -> used_head;
-    gc_one_pool(now1, pool_-> int_pool);
-    gc_one_pool(now2, pool_-> float_pool);
-    gc_one_pool(now3, pool_-> str_pool);
-    gc_one_pool(now4, pool_-> long_pool);
+    objs_pool_objs::node_ *now1 = pool_-> int_pool -> used_head;
+    objs_pool_objs::node_ *now2 = pool_-> float_pool -> used_head;
+    objs_pool_objs::node_ *now3 = pool_-> str_pool -> used_head;
+    objs_pool_objs::node_ *now4 = pool_-> long_pool -> used_head;
+    gc_one_pool(now1, pool_-> int_pool, INTOBJ);
+    gc_one_pool(now2, pool_-> float_pool, FLOATOBJ);
+    gc_one_pool(now3, pool_-> str_pool, STRINGOBJ);
+    gc_one_pool(now4, pool_-> long_pool, LONGOBJ);
 }
 
 gc_obj::~gc_obj() {

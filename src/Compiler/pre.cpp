@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 void pre(vecs &result, const string &codes) {
     /**
     * 代码简单初始化，去掉多余字符并且转化格式
@@ -17,21 +16,17 @@ void pre(vecs &result, const string &codes) {
 
     string temp;
     for (const auto& code : codes) {
-        if (code == '\n' && !temp.empty()) {
-            if (temp[0] == '#') {
-                temp = "";
-                result.push_back(temp);
-            } else {
+        if (code == '\n') {
+            if (temp[0] != '#') {
                 result.push_back(temp);
                 temp = "";
             }
-        } else if (code != '\t') {
+        } else if (code != '\t' && code != ' ') {
             temp += code;
         }
     }
     result.push_back(temp);
 }
-
 
 void pre_token_2(vecs2d &tokens) {
     /**
@@ -39,14 +34,9 @@ void pre_token_2(vecs2d &tokens) {
      * 防止grammar出现错误的结果
      */
 
-    size_t n;
-    for (auto &i : tokens) {
-        n = i.size();
-        for (int j = 0; j < n; ++j)
+    for (auto &i : tokens)
+        for (int j = 0, n = i.size(); j < n; ++j)
             if (i[j] == "#")
-                for (; j < n; n--) {
-                    // 去除注释
-                    i.pop_back();
-                }
-    }
+                for (; j < n; n--)
+                    i.pop_back(); // 去除注释
 }

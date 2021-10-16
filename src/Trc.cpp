@@ -11,70 +11,74 @@
 
 using namespace std;
 
-int help() {
-    /**
-     * Trc命令行操作帮助文档
-     */
-    
-    cout << "Trc is a programming language based on stack this project from the\n\
-most basic operators such as arithmetic, the branch structure, circulation structure, \n\
-and then realize the constant folding, has realized the type of high precision operation, \n\
-input and output as well as some commonly used built-in function, then realize the recycling, \n\
-escaping strings, local and global variables,  This paper constructs a perfect error reporting \n\
-system from compiler to interpreter, introduces the concept of module, makes the program can\n\
-be modular programming, and establishes many practical tools, such as compile, run, decompile, \n\
-batch compile, clean up files, code debugging, command line scripts and other functions\n";
-    return 0;
+namespace tools_out {
+    void help() {
+        /**
+         * Trc命令行操作帮助文档，因为代码简单所以放在主文件
+         */
+        
+        cout << "Trc is a programming language based on stack this project from the\n\
+    most basic operators such as arithmetic, the branch structure, circulation structure, \n\
+    and then realize the constant folding, has realized the type of high precision operation, \n\
+    input and output as well as some commonly used built-in function, then realize the recycling, \n\
+    escaping strings, local and global variables,  This paper constructs a perfect error reporting \n\
+    system from compiler to interpreter, introduces the concept of module, makes the program can\n\
+    be modular programming, and establishes many practical tools, such as compile, run, decompile, \n\
+    batch compile, clean up files, code debugging, command line scripts and other functions\n";
+    }
 }
 
+static void run_no_argv_pattern(const string &pattern) {
+    if (pattern == "tdb") {
+        tools_out::tdb(); return;
+    } if (pattern == "help") {
+        tools_out::help(); return;
+    }
+    // 参数不对，未输入文件或者未输入模式
+    cerr << "Trc:no input files.\n";
+}
+
+static void run_yes_argv_pattern(const string &pattern, int argc, char **argv) {
+    if (pattern == "crun") {
+        tools_out::crun(argc, argv); return;
+    } if (pattern == "token") {
+        tools_out::out_token(argc, argv); return;
+    } if (pattern == "dis") {
+        tools_out::dis(argc, argv); return;
+    } if (pattern == "grammar") {
+        tools_out::out_grammar(argc, argv); return;
+    } if (pattern == "brun") {
+        tools_out::brun(argc, argv); return;
+    } if (pattern == "build") {
+        tools_out::build(argc, argv); return;
+    } if (pattern == "run") {
+        tools_out::run(argc, argv); return;
+    } if (pattern == "all") {
+        tools_out::all(argc, argv); return;
+    } if (pattern == "clean") {
+        tools_out::clean(argc, argv); return;
+    }
+    cerr << "Trc:pattern \"" << pattern << "\" is not correct.\n";
+}
 
 int main(int argc, char *argv[]) {
     init_mem();
     // 停止兼容stdio，提升I/O的速度
     ios_base::sync_with_stdio(false);
-
-    string pattern;
     switch (argc) {
         case 1:
             // 不指定模式，没有参数，默认为交互模式
-            return tshell();
+            tools_out::tshell();
+            break;
         case 2:
-            pattern = argv[1];
-            if (pattern == "tdb") {
-                return tdb();
-            } else if (pattern == "help") {
-                return help();
-            } else {
-                // 参数不对，未输入文件或者未输入模式
-                cerr << "Trc:no input files.\n";
-                return 1;
-            }
+            // 指定模式，没有参数
+            run_no_argv_pattern(argv[1]);
+            break;
         default:
-            pattern = argv[1];
             // 检查参数，匹配调用模式
-            if (pattern == "crun") {
-                return crun(argc, argv);
-            } else if (pattern == "token") {
-                return out_token(argc, argv);
-            } else if (pattern == "dis") {
-                return dis(argc, argv);
-            } else if (pattern == "grammar") {
-                return out_grammar(argc, argv);
-            } else if (pattern == "brun") {
-                return brun(argc, argv);
-            } else if (pattern == "build") {
-                return build(argc, argv);
-            } else if (pattern == "run") {
-                return run(argc, argv);
-            } else if (pattern == "all") {
-                return all(argc, argv);
-            } else if (pattern == "clean") {
-                return clean(argc, argv);
-            } else {
-                cerr << "Trc:pattern \"" << pattern << "\" is not correct.\n";
-                return 1;
-            }
+            run_yes_argv_pattern(argv[1], argc, argv);
     }
+    // 执行正常情况下卸载内存，不正常的话就崩溃了
     quit_mem();
     return 0;
 }

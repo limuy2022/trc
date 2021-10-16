@@ -44,11 +44,7 @@ public:
 
     INTOBJ to_int();
 
-    STRINGOBJ to_string();
-
     FLOATOBJ to_float();
-
-    INTOBJ to_bool();
 
     INTOBJ operator==(OBJ value_i);
 
@@ -66,12 +62,6 @@ public:
     
     OBJ operator*(OBJ value_i);
     
-    INTOBJ operator!();
-    
-    INTOBJ operator&&(OBJ value_i);
-
-    INTOBJ operator||(OBJ value_i);
-
     int& gettype();
 
     void delete_();

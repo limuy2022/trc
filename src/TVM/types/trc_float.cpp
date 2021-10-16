@@ -1,5 +1,6 @@
 #include <ostream>
 #include <cmath>
+#include "../../include/type.hpp"
 #include "../../include/share.h"
 #include "../../include/TVM/float.h"
 #include "../../include/TVM/int.h"
@@ -98,19 +99,15 @@ INTOBJ trcfloat::operator||(OBJ value_i) {
 }
 
 STRINGOBJ trcfloat::to_string() {
-
-}
-
-FLOATOBJ trcfloat::to_float() {
-
+	return new trc_string(std::to_string(value));
 }
 
 INTOBJ trcfloat::to_bool() {
-    
+    return (value ? TVM_share::true_: TVM_share::false_);
 }
 
 INTOBJ trcfloat::to_int() {
-
+	return new trcint(to_type<int>(value));
 }
 
 int& trcfloat::gettype() {

@@ -168,15 +168,7 @@ const char * trc_string::c_str() {
     return value;
 }
 
-STRINGOBJ trc_string::to_string() {
-
-}
-
 FLOATOBJ trc_string::to_float() {
-
-}
-
-INTOBJ trc_string::to_bool() {
 
 }
 
@@ -184,24 +176,12 @@ INTOBJ trc_string::to_int() {
 
 }
 
-OBJ trc_string::operator*(OBJ value_i) {
-
-} 
-    
-INTOBJ trc_string::operator!() {
-    
-} 
-    
-INTOBJ trc_string::operator&&(OBJ value_i) {
-
-}
-
-INTOBJ trc_string::operator||(OBJ value_i) {
-
-}
-
 int& trc_string::gettype() {
     return type;
+}
+
+OBJ trc_string::operator*(OBJ value_i) {
+
 }
 
 void trc_string::delete_() {

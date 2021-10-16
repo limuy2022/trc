@@ -16,7 +16,7 @@ class trc_array {
     };
 
 public:
-    listnode *head;
+    listnode *head, *tail = nullptr;
 
     trc_array();
 

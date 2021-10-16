@@ -2,7 +2,7 @@
 
 a := 10
 while a >= 10{
-	println("\\n")
+	println("op\nop")
 	print("tree\n")
 	a = a - 1
 }

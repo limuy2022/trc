@@ -1,10 +1,10 @@
 #ifndef TRC_COMPILE_SHARE_H
 #define TRC_COMPILE_SHARE_H
 
-#include <string>
-#include <map>
 #include <cctype>
 #include "../share.h"
+
+using namespace std;
 
 // 宏，判断是否为数字，包括-和.
 #define is_num(c) (check_in((c), num))

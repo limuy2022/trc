@@ -100,7 +100,7 @@ void TVM::IMPORT() {
      * 模块导入
      * 模块导入规则：
      * 首先检查是否为自定义模块
-     * 其次检查是否为TVM/packages/base_support(由系统原生支持的模块)
+     * 其次检查是否为由系统原生支持的模块(由c++语言支持，定义在importlib动态链接库中)
      * 然后检查TVM/packages/self_support(由语言本身支持的模块)
      * 最后检查TVM/packages/other_support(由第三方支持的模块)
      */

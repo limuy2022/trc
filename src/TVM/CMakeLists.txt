@@ -5,10 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 set(LIBRARY_OUTPUT_PATH "../../bin/")
 
 add_library(TVM SHARED
-        ../loader/code_loader.cpp
         ../loader/ctree_loader.cpp
-        ../loader/func_loader.cpp
-        obj/func.cpp
         TVM.cpp
         TRE.cpp
         ../memory/gc.cpp

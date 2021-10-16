@@ -19,8 +19,6 @@ public:
 
 	trcint(int value);
 
-	INTOBJ to_int();
-
 	STRINGOBJ to_string();
 
 	FLOATOBJ to_float();

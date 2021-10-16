@@ -52,11 +52,9 @@ bool s_check_in_s(const vector<T> &s1, const vector<T> &s2) {
     /**
     * 检查s1里的元素是否都在s2中
     */
-    for (const auto &i : s1) {
-        if (!check_in(i, s2)) {
+    for (const auto &i : s1)
+        if (!check_in(i, s2))
             return false;
-        }
-    }
     return true;
 }
 
@@ -71,37 +69,32 @@ int os_check_in_s_i(const vector<T> &s1, const vector<T> &s2) {
     int u;
     for (const auto &i : s1) {
         u = check_in_i(i, s2);
-        if (u != -1) {
+        if (u != -1)
             return u;
-        }
     }
     return -1;
 }
 
 template<typename T, typename V, typename O>
-bool map_check_in_first(map<T, V> &m1, const O &data) {
+bool map_check_in_first(const map<T, V> &m1, const O &data) {
     /**
      * 检查data是否在map每一项键的里面
      * O之所以不同，是为了防止const char*和string对比的情况发生
      */
-    for (const auto &it : m1) {
-        if (it.first == data) {
+    for (const auto &it : m1)
+        if (it.first == data)
             return true;
-        }
-    }
     return false;
 }
 
 template<typename T, typename V, typename O>
-bool map_check_in_second(map<T, V> &m1, const O &data) {
+bool map_check_in_second(const map<T, V> &m1, const O &data) {
     /**
      * 检查data是否在map每一项值的里面
      */
-    for (const auto &it : m1) {
-        if (it.second == data) {
+    for (const auto &it : m1)
+        if (it.second == data)
             return true;
-        }
-    }
     return false;
 }
 

@@ -6,7 +6,6 @@
 #ifndef TRC_INCLUDE_CFG_H
 #define TRC_INCLUDE_CFG_H
 
-#include <string>
 #include <vector>
 
 using namespace std;

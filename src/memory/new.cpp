@@ -6,9 +6,6 @@
 #include "../include/Error.h"
 #include "../include/TVM/TRE.h"
 #include "../include/TVM/int.h"
-#include "../include/TVM/float.h"
-#include "../include/TVM/bignum.h"
-#include "../include/TVM/string.h"
 #include "../include/memory/mem.h"
 #include "../include/memory/memory_pool.h"
 

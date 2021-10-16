@@ -1,7 +1,6 @@
 #ifndef TRC_UTILS_FILESYS_H
 #define TRC_UTILS_FILESYS_H
 
-#include <string>
 #include "cfg.h"
 
 using namespace std;

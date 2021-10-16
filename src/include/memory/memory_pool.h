@@ -11,7 +11,7 @@
 // 内存池初始大小，实际内存大小，以字节为单位
 #define MEMORY_INIT_SIZE 1024
 
-#include <cstdlib>
+#include <cstddef>
 
 namespace memory_pool_class{
     class node;
@@ -28,11 +28,13 @@ class memory_pool {
      * **********************************************
      * 必看事项：
      * 本内存池底层由malloc分配内存，所以不可以支持任何跟继承扯上关系的类和结构体
-     * （但可以分配非基础数据类型，建议仅仅用于分配基础数据类型）
+     * （但可以分配非基础数据类型，建议仅仅用于分配基础数据类型或者C语言风格的结构体）
      */
 
 public:
     memory_pool(size_t size_ = MEMORY_INIT_SIZE);
+
+    ~memory_pool();
 
     // 效果同malloc，free，realloc
     void *mem_malloc(size_t size_);

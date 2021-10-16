@@ -17,7 +17,7 @@ using namespace std;
 static TVM *vm;
 
 static void var_lex(const string&instruction) {
-    string var_ = instruction.substr(instruction.find("var") + 4, instruction.length() - 3);
+    const string& var_ = instruction.substr(instruction.find("var") + 4, instruction.length() - 3);
     if (!map_check_in_first(vm->var_names, var_)) {
         cout << "var "<<var_ << " is not defined now.\n";
         return;
@@ -43,7 +43,7 @@ static void stack_out() {
     }
 }
 
-void debug(const string &code) {
+static void debug(const string &code) {
     string instruction;
 
     Compiler(vm, code);
@@ -73,21 +73,21 @@ void debug(const string &code) {
     }
 }
 
-
-int tdb() {
-    // tip
-    cout << "trc debugger is running.You can read \'Doc\\TDB.txt to find the help.\'\n\n";
-    string file_path, tmp;
-    vm = create_TVM();
-    for(;;) {
-        // 读取需要debug的文件
-        cout << "file>";
-        getline(cin, file_path);
-        if (file_path == "exit") break;
-        readcode(tmp, file_path);
-        debug(tmp);
-        free_var_vm(vm);
+namespace tools_out {
+    void tdb() {
+        // tip
+        cout << "trc debugger is running.You can read \'Doc\\TDB.txt to find the help.\'\n\n";
+        string file_path, tmp;
+        vm = create_TVM();
+        for(;;) {
+            // 读取需要debug的文件
+            cout << "file>";
+            getline(cin, file_path);
+            if (file_path == "exit") break;
+            readcode(tmp, file_path);
+            debug(tmp);
+            free_var_vm(vm);
+        }
+        delete vm;
     }
-    delete vm;
-    return 0;
 }

@@ -18,16 +18,16 @@ namespace error_env{
 }
 
 // 错误map，<错误名称, 错误模板字符串>
-static string error_map[] = {
+static const string error_map[] = {
         "NameError:name \"$\" is not defined.",
-        "SyntaxError:$",
         "ValueError:\"$\" could not be \"$\"",
+        "TypeError:$",
+        "SyntaxError:$",
         "VersionError:Tree could't run them.Because $ is higher than $",
         "OpenFileError:could't open \"$\".",
         "ModuleNotFoundError:Tree could't find \"$\".",
         "ArgumentError:$.",
         "ZeroDivError:\"$\" division by zero.",
-        "TypeError:$",
         "RunError:$",
         "AssertError:$",
         "IndexError:$ is out of $",
@@ -43,7 +43,7 @@ string make_error_msg(const int error_name, va_list &ap) {
      */
 
     string finally_out = error_map[error_name];
-    size_t index;
+    string::size_type index;
     for(;;) {     
         index = finally_out.find("$");
         if(index == string::npos) return finally_out;

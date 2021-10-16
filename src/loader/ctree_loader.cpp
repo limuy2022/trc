@@ -155,11 +155,10 @@ static void load_functions(ifstream &file, map<string, func_*> &const_funcl) {
      */
 
     int len;
-    string t;
     func_* tmp;
     file.read(RWTYPE &len, sizeof(len));
     for(int i = 0; i < len; ++i) {
-        t = load_string_one(file);
+        const string& t = load_string_one(file);
         tmp = new func_(t);
         const_funcl[t] = tmp;
         load_bytecode(file, tmp -> bytecodes);
@@ -212,6 +211,7 @@ void loader_ctree(TVM *vm, const string &path) {
     file.read(RWTYPE &ver_, sizeof(ver_));
     vm->static_data.ver_ = ver_;
     vm->check_TVM();
+    // 开始正式读写
     LOAD_WRITE(file, vm, load);
     file.close();
 }

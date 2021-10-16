@@ -64,7 +64,7 @@ static short add(TVM *vm, int data_type, const string &data_value) {
 
     if (data_type == STRING_TICK) {
         if (!check_in(data_value, vm->static_data.const_s)) {
-            string fin_str = data_value.substr(1, data_value.length() - 2);
+            const string& fin_str = data_value.substr(1, data_value.length() - 2);
             vm->static_data.const_s.push_back(fin_str);
             return vm->static_data.const_s.size() - 1;
         }
@@ -130,9 +130,8 @@ static short *build_var(const string &data, short index = -1) {
      * index：索引
      */
 
-    if (data == "=") {
+    if (data == "=")
         return new short[2]{codes_int[CHANGE_VALUE], index};
-    }
     return new short[2]{codes_int[STORE_NAME], index};
 }
 
@@ -146,7 +145,7 @@ static void func_lexer(TVM *vm, treenode *head) {
     CHANGE_VALUE = CHANGE_LOCAL_;
     DEL =  DEL_LOCAL_;
 
-    string &name(head->data);
+    const string &name(head->data);
     int end_line = to_type<int>(head->son[0]->data);
 
     func_ *fast = new func_(name);

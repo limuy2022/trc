@@ -36,37 +36,36 @@ static void out(treenode *data) {
     cout << "] ";
 }
 
-void __out_grammar(const string &path) {
-    string file_data;
-    readcode(file_data, path);
-    // 解析
-    vecs start_code_in;
-    pre(start_code_in, file_data);
-    auto token_code = final_token(start_code_in);
-
-    start_code_in.clear();
-
-    vector<treenode *> tree_node;
-    grammar(tree_node, token_code);
-
-    token_code.clear();
-
-    cout << "From file " << path << ":" << "\n";
-
-    size_t n = tree_node.size();
-    for (int i = 0; i < n; ++i) {
-        cout << i << ":";
-        out(tree_node[i]);
-        cout << "\n";
-        free_tree(tree_node[i]);
+namespace tools_in {
+    void __out_grammar(const string &path) {
+        string file_data;
+        readcode(file_data, path);
+        // 解析
+        vecs start_code_in;
+        pre(start_code_in, file_data);
+        const auto& token_code = final_token(start_code_in);
+    
+        vector<treenode *> tree_node;
+        grammar(tree_node, token_code);
+    
+        cout << "From file " << path << ":" << "\n";
+    
+        size_t n = tree_node.size();
+        for (int i = 0; i < n; ++i) {
+            cout << i << ":";
+            out(tree_node[i]);
+            cout << "\n";
+            free_tree(tree_node[i]);
+        }
     }
 }
 
-int out_grammar(int argc, char *argv[]) {
-    /**
-     * 输出语法树
-     */ 
-    for (int i = 2; i < argc; ++i)
-        __out_grammar(argv[i]);
-    return 0;
+namespace tools_out {
+    void out_grammar(int argc, char *argv[]) {
+        /**
+         * 输出语法树
+         */ 
+        for (int i = 2; i < argc; ++i)
+            tools_in::__out_grammar(argv[i]);
+    }
 }

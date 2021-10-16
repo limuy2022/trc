@@ -1,8 +1,6 @@
 #ifndef TRC_SHARE_H
 #define TRC_SHARE_H
 
-#include <vector>
-#include <string>
 #include <map>
 #include "cfg.h"
 

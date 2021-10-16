@@ -36,36 +36,36 @@ static void get_block(string &res) {
     }
 }
 
-
-int tshell() {
-    /*
-    * trc的交互式界面
-    */
-    cout << "Welcome to Trc.This is tshell.you can use \"help()\" to find help.\n"\
-    << "Version:" << version << "\n\n";
-
-    string code;
+namespace tools_out {
+    void tshell() {
+        /*
+        * trc的交互式界面
+        */
+        cout << "Welcome to Trc.This is tshell.you can use \"help()\" to find help.\n"\
+        << "Version:" << version << "\n\n";
     
-    TVM *vm = create_TVM();
-    // tshell报错但不终止程序
-    error_env::quit = false;
-    for(;;) {
-        cout << "\ntshell>";
-        getline(cin, code);
-        if (code == "exit()")
-            break;
-        else if (is_block(code)) {
-            code += "\n";
-            get_block(code);
-        } else
-            code += "\n";
+        string code;
         
-        Compiler(vm, code);
-        vm->run();
+        TVM *vm = create_TVM();
+        // tshell报错但不终止程序
+        error_env::quit = false;
+        for(;;) {
+            cout << "\ntshell>";
+            getline(cin, code);
+            if (code == "exit()")
+                break;
+            else if (is_block(code)) {
+                code += "\n";
+                get_block(code);
+            } else
+                code += "\n";
+            
+            Compiler(vm, code);
+            vm->run();
+        }
+        delete vm;
+        error_env::quit = true;
     }
-    delete vm;
-    error_env::quit = true;
-    return 0;
 }
 
 #undef is_block

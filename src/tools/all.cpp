@@ -14,26 +14,31 @@ using namespace std;
 
 static int files_num;
 
-void __all(TVM *vm, const string &path) {
-    vecs files, dirs;
-    listfiles(path, "\\*.tree", files, dirs);
-    for (const auto& j : files) {
-        string p(path_join(2, path, j));
-        __build(vm, p);
-        cout << "build file " << p << "\n";
-        ++files_num;
+namespace tools_out {
+    void all(int argc, char *argv[]) {
+        files_num = 0;
+        TVM* vm = create_TVM();
+        for (int i = 2; i < argc; ++i)
+            tools_in::__all(vm, argv[i]);
+        cout << "\nbuild " << files_num << " files\n";
+        files_num = 0;
+        delete vm;
     }
-    for (const auto& j : dirs)
-        __all(vm, j);
 }
 
-int all(int argc, char *argv[]) {
-    files_num = 0;
-    TVM* vm = create_TVM();
-    for (int i = 2; i < argc; ++i)
-        __all(vm, argv[i]);
-    cout << "\nbuild " << files_num << " files\n";
-    files_num = 0;
-    delete vm;
-    return 0;
+namespace tools_in {
+    void __all(TVM *vm, const string &path) {
+        vecs files, dirs;
+        listfiles(path, "\\*.tree", files, dirs);
+        for (const auto& j : files) {
+            const string& p(path_join(2, path, j));
+            __build(vm, p);
+            cout << "build file " << p << "\n";
+            ++files_num;
+        }
+        for (const auto& j : dirs)
+            __all(vm, j);
+    }
 }
+
+

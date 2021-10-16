@@ -11,6 +11,7 @@ using namespace std;
 
 class TVM_data {
 	/**
+	 * 静态数据
 	 * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
 	 * 并且降低TVM和Compiler之间的耦合度
 	 */ 

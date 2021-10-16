@@ -1,0 +1,4 @@
+Trc系统架构：
+
+最外层：tools_in和tools_out命名空间，是Trc对外的非调用接口
+

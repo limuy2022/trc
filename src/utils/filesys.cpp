@@ -21,7 +21,7 @@ void listfiles(const string &dir, const string &file, vecs &fileList, vecs &dirL
      */
     
     /* 在目录后面加上file进行第一次搜索. */
-    string dirNew(dir + file); 
+    const string& dirNew(dir + file); 
 
     intptr_t handle;
     /* _finddata_t是存储文件各种信息的结构体 */
@@ -48,7 +48,7 @@ bool check_file_is(const string &path) {
      */ 
 
     ifstream test(path);
-    if(test.good()) {
+    if(test.is_open()) {
         test.close();
         return true;
     }
@@ -74,11 +74,10 @@ string import_to_path(const string &import_name) {
     size_t index;
     for(;;) {     
         index = result.find(".");
-        if(index != string::npos) {
+        if(index != string::npos)
             result.replace(index,1,"/"); 
-        } else {
-            break;     
-        }
+        else
+            break;
     } 
     return result;
 }
@@ -99,7 +98,6 @@ string path_join(int n, ...) {
     va_end(ap);
     return root;
 }
-
 
 string file_last_(const string &path) {
     /**

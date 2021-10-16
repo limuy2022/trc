@@ -103,15 +103,11 @@ STRINGOBJ trcint::to_string() {
 }
 
 FLOATOBJ trcint::to_float() {
-
+	return new trcfloat(value * 1.0);
 }
 
 INTOBJ trcint::to_bool() {
-    
-}
-
-INTOBJ trcint::to_int() {
-
+    return (value? TVM_share::true_: TVM_share::false_);
 }
 
 int& trcint::gettype() {

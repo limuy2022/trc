@@ -1,8 +1,8 @@
-# 计算输出函数:print,println
+# 输出函数:print
 
 a := 78
-println(a)
-println(89)
+print(a, 90, a)
+print(89)
 print(a)
 print(89)
-println("I am string",a)
+print("I am string",a)

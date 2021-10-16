@@ -1,8 +1,6 @@
 #ifndef TRC_CTREE_LOADER_H
 #define TRC_CTREE_LOADER_H
 
-#include <string>
-
 using namespace std;
 
 class TVM;

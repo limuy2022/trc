@@ -8,7 +8,7 @@
 using namespace std;
 
 // 应当分割的符号
-static const vecs symbols = {"(", ")", "[", "]", "{", "}", "#", ",", "."};
+const vecs symbols = {"(", ")", "[", "]", "{", "}", "#", ",", "."};
 
 static void put_in(vecs &in, string &value) {
     /**
@@ -20,7 +20,6 @@ static void put_in(vecs &in, string &value) {
     in.push_back(value);
     value = "";
 }
-
 
 static bool in_all(const string &temp) {
     /**
@@ -125,7 +124,7 @@ void token(vecs2d &result, const vecs &codes) {
 
         // 优化，避免""元素进入其中
         vecs result_temp;
-        auto end_ = add_temp.end();
+        const auto& end_ = add_temp.end();
         for (auto i = add_temp.begin(); i < end_; ++i) {
             if (!(i->empty())) {
                 result_temp.push_back(*i);

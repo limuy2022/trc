@@ -5,8 +5,8 @@
 
 using namespace std;
 
-void readcode(string &file_data, const string &path);
+void readcode(std::string &file_data, const std::string &path);
 
-void readfile(string &file_data, const string &path, const int err, ...);
+void readfile(std::string &file_data, const std::string &path, const int err, ...);
 
 #endif

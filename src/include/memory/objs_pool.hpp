@@ -16,6 +16,16 @@ using namespace std;
 // 对象池初始大小(对象个数，并不是内存大小)，可以在此基础上扩容
 #define OBJS_POOL_SIZE 1000
 
+namespace objs_pool_objs {
+    class node_ {
+    public:
+        node_* next = nullptr;
+        void* data;
+    };
+}
+
+using namespace objs_pool_objs;
+
 template<typename T>
 class objs_pool
 {
@@ -24,13 +34,6 @@ class objs_pool
      * 使用单向链表进行管理
      * 另外，对于该内存池，注重的是分配速度，而不是释放速度，释放会由gc统一管理
      */
-public:
-    class node_ {
-    public:
-        node_* next = nullptr;
-        T* data;
-    };
-
 public:
     // 已申请对象个数
     size_t alloc_objs;
@@ -97,6 +100,10 @@ objs_pool<T>::~objs_pool() {
 
 template<typename T>
 T* objs_pool<T>::malloc_private() {
+    /**
+     * 私有的将实际操作分离
+     */ 
+    
     // 保存需要返回的节点
     node_ *now_use = free_head -> next;
     // 使头结点的下一个节点指向当前节点的下一个节点
@@ -106,7 +113,7 @@ T* objs_pool<T>::malloc_private() {
     // 使头结点的下一个节点指向当前节点
     used_head -> next = now_use;
 
-    return now_use -> data;
+    return (T*)now_use -> data;
 }
 
 template<typename T>
@@ -127,7 +134,7 @@ T* objs_pool<T>::trcmalloc() {
         // 直接将节点连接到使用链表中
         new_n -> next = used_head -> next;
         used_head -> next = new_n;
-        return new_n -> data;
+        return (T*)new_n -> data;
     }
     return malloc_private();
 }

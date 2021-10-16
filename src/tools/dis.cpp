@@ -21,10 +21,10 @@ static void out(TVM &vm, string file_name) {
     // 输出字节码
     cout << "\nCode:\n";
     int line_index = 0;
-    for (auto &line : vm.static_data.byte_codes) {
+    for (const auto &line : vm.static_data.byte_codes) {
         // 行
         cout << "    " << line_index++ << ":";
-        for (auto &value_ : line) {
+        for (const auto &value_ : line) {
             cout << int_code[value_[0]] << "|" << value_[1] << ", ";
         }
         cout << "\n";
@@ -75,21 +75,24 @@ static void out(TVM &vm, string file_name) {
     cout << "\n";
 }
 
-void __dis(TVM *vm, const string &file_path) {
-    if (is_magic(file_path))
-        loader_ctree(vm, file_path);
-    else {
-        string codes;
-        readcode(codes, file_path);
-        Compiler(vm, codes);
-    }
-    out(*vm, file_path);
+namespace tools_in {
+    void __dis(TVM *vm, const string &file_path) {
+        if (is_magic(file_path))
+            loader_ctree(vm, file_path);
+        else {
+            string codes;
+            readcode(codes, file_path);
+            Compiler(vm, codes);
+        }
+        out(*vm, file_path);
+    } 
 }
 
-int dis(int argc, char *argv[]) {
-    TVM *vm = create_TVM();
-    for (int i = 2; i < argc; ++i)
-        __dis(vm, argv[i]);
-    delete vm;
-    return 0;
+namespace tools_out {
+    void dis(int argc, char *argv[]) {
+        TVM *vm = create_TVM();
+        for (int i = 2; i < argc; ++i)
+            tools_in::__dis(vm, argv[i]);
+        delete vm;
+    }
 }

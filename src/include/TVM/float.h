@@ -23,8 +23,6 @@ public:
 
 	STRINGOBJ to_string();
 
-	FLOATOBJ to_float();
-
 	INTOBJ to_bool();
 
 	INTOBJ operator==(OBJ value_i);

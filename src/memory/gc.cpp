@@ -2,7 +2,7 @@
  * 垃圾回收算法采用引用计数回收
  * 至于相互引用的漏洞，将会采用可达性回收算法进行
  *
- * 注意，在垃圾回收中，所有虚拟机中的对象并不存放，而是统一继承于trcobj，以便在TVM析构时进行垃圾回收
+ * 注意，在垃圾回收中，所有虚拟机中的对象统一继承于trcobj，以便在TVM析构时进行垃圾回收
  *
  * 回收条件：
  * 1.当申请的内存达到gc_obj所允许的最大值时，进行垃圾回收
@@ -25,15 +25,24 @@ gc_obj::gc_obj():
 {}
 
 #define gc_one_pool(now, _pool_, pointer)\
-do{ /*now:现在要进行gc的内存链表的头指针，_pool_:内存池，pointer:数据需要转换的类型*/\
+do{ /*now:现在要进行gc的内存链表的头指针，\
+    _pool_:内存池，\
+    pointer:数据需要转换的类型*/\
     pointer value;\
+    auto back = now;\
+    now = now -> next;\
+    /* 引用计数垃圾回收 */\
     while((now) != nullptr) {\
         value = (pointer)((now) ->data);\
-        if(value -> refs == 0) {\
-            _pool_->used_head -> next = (now) -> next;\
-            now -> next = _pool_->free_head -> next;\
-            _pool_->free_head -> next = (now);\
+        if(!value -> refs) {\
+            back -> next = (now) -> next;\
             value -> delete_();\
+            (now) -> next = (_pool_) -> free_head -> next;\
+            (_pool_) -> free_head -> next = (now);\
+            (now) = back -> next;\
+        } else {\
+            (back) = (now);\
+            now = now -> next;\
         }\
     }\
 } while(0)
@@ -42,10 +51,10 @@ void gc_obj::gc() {
     /**
      * 垃圾回收
      */
-    objs_pool_objs::node_ *now1 = pool_-> int_pool -> used_head;
-    objs_pool_objs::node_ *now2 = pool_-> float_pool -> used_head;
-    objs_pool_objs::node_ *now3 = pool_-> str_pool -> used_head;
-    objs_pool_objs::node_ *now4 = pool_-> long_pool -> used_head;
+    auto now1 = pool_-> int_pool -> used_head, \
+    now2 = pool_-> float_pool -> used_head, \
+    now3 = pool_-> str_pool -> used_head, \
+    now4 = pool_-> long_pool -> used_head;
     gc_one_pool(now1, pool_-> int_pool, INTOBJ);
     gc_one_pool(now2, pool_-> float_pool, FLOATOBJ);
     gc_one_pool(now3, pool_-> str_pool, STRINGOBJ);

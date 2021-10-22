@@ -25,4 +25,5 @@ add_library(TVM SHARED
         types/bignum.cpp
         types/bigfloat.cpp
         types/base.cpp
+        types/trc_map.cpp
 )

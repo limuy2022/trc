@@ -17,7 +17,7 @@
 #define AssertError 10
 #define IndexError 11
 #define MemoryError 12
-#define OperError 13
+#define KeyError 13
 
 using namespace std;
 

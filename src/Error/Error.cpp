@@ -32,7 +32,7 @@ static const string error_map[] = {
         "AssertError:$",
         "IndexError:$ is out of $",
         "MemoryError:$",
-        "OperError:$"
+        "KeyError:key is not defined."
 };
 
 string make_error_msg(const int error_name, va_list &ap) {

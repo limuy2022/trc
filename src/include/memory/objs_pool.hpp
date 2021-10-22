@@ -31,7 +31,7 @@ class objs_pool
 {
     /**
      * 对象池，每次默认分配OBJS_POOL_SIZE个对象
-     * 使用单向链表进行管理
+     * 使用双向链表进行管理
      * 另外，对于该内存池，注重的是分配速度，而不是释放速度，释放会由gc统一管理
      */
 public:
@@ -68,7 +68,6 @@ objs_pool<T>::objs_pool(gc_obj *con, size_t obj_num):
     free_head(new node_)
 {
     node_ *now = free_head, *t;
-
     for (int i = 0; i < obj_num; ++i) {
         t = new node_;
         arr[i] = new T;

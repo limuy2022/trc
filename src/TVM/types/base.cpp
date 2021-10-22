@@ -32,59 +32,59 @@ INTOBJ trcobj::to_bool() {
 }
 
 INTOBJ trcobj::operator<(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("<"));
+    send_error(SyntaxError, ERROR_OPER_MSG("<"));
 }
 
 INTOBJ trcobj::operator>(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG(">"));
+    send_error(SyntaxError, ERROR_OPER_MSG(">"));
 }
 
 INTOBJ trcobj::operator<=(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("<="));
+    send_error(SyntaxError, ERROR_OPER_MSG("<="));
 }
 
 INTOBJ trcobj::operator>=(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG(">="));
+    send_error(SyntaxError, ERROR_OPER_MSG(">="));
 }
 
 OBJ trcobj::operator+(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("+"));
+    send_error(SyntaxError, ERROR_OPER_MSG("+"));
 }
 
 OBJ trcobj::operator-(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("-"));
+    send_error(SyntaxError, ERROR_OPER_MSG("-"));
 }
 
 OBJ trcobj::operator*(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("*"));
+    send_error(SyntaxError, ERROR_OPER_MSG("*"));
 }
 
 OBJ trcobj::operator/(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("/"));
+    send_error(SyntaxError, ERROR_OPER_MSG("/"));
 }
 
 OBJ trcobj::operator%(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("%"));
+    send_error(SyntaxError, ERROR_OPER_MSG("%"));
 }
 
 OBJ trcobj::pow_(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("**"));
+    send_error(SyntaxError, ERROR_OPER_MSG("**"));
 }
 
 OBJ trcobj::zdiv(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("//"));
+    send_error(SyntaxError, ERROR_OPER_MSG("//"));
 }
 
 INTOBJ trcobj::operator!() {
-    send_error(OperError, ERROR_OPER_MSG("!"));
+    send_error(SyntaxError, ERROR_OPER_MSG("!"));
 }
 
 INTOBJ trcobj::operator&&(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("&&"));
+    send_error(SyntaxError, ERROR_OPER_MSG("&&"));
 }
 
 INTOBJ trcobj::operator||(OBJ value_i) {
-    send_error(OperError, ERROR_OPER_MSG("||"));
+    send_error(SyntaxError, ERROR_OPER_MSG("||"));
 }
 
 void trcobj::delete_() {}

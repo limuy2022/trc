@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <cstring>
 #include "include/tools.h"
 #include "include/memory/mem.h"
 
@@ -28,38 +29,42 @@ namespace tools_out {
     }
 }
 
-static void run_no_argv_pattern(const string &pattern) {
-    if (pattern == "tdb") {
+#define CMP(str, str2) (!strcmp((str), (str2)))
+
+static void run_no_argv_pattern(const char * pattern) {
+    if (CMP(pattern, "tdb")) {
         tools_out::tdb(); return;
-    } if (pattern == "help") {
+    } if (CMP(pattern, "help")) {
         tools_out::help(); return;
     }
     // 参数不对，未输入文件或者未输入模式
     cerr << "Trc:no input files.\n";
 }
 
-static void run_yes_argv_pattern(const string &pattern, int argc, char **argv) {
-    if (pattern == "crun") {
+static void run_yes_argv_pattern(const char * pattern, int argc, char **argv) {
+    if (CMP(pattern, "crun")) {
         tools_out::crun(argc, argv); return;
-    } if (pattern == "token") {
+    } if (pattern, "token") {
         tools_out::out_token(argc, argv); return;
-    } if (pattern == "dis") {
+    } if (CMP(pattern, "dis")) {
         tools_out::dis(argc, argv); return;
-    } if (pattern == "grammar") {
+    } if (CMP(pattern, "grammar")) {
         tools_out::out_grammar(argc, argv); return;
-    } if (pattern == "brun") {
+    } if (CMP(pattern, "brun")) {
         tools_out::brun(argc, argv); return;
-    } if (pattern == "build") {
+    } if (CMP(pattern, "build")) {
         tools_out::build(argc, argv); return;
-    } if (pattern == "run") {
+    } if (CMP(pattern, "run")) {
         tools_out::run(argc, argv); return;
-    } if (pattern == "all") {
+    } if (CMP(pattern, "all")) {
         tools_out::all(argc, argv); return;
-    } if (pattern == "clean") {
+    } if (CMP(pattern, "clean")) {
         tools_out::clean(argc, argv); return;
     }
-    cerr << "Trc:pattern \"" << pattern << "\" is not correct.\n";
+    cerr << "Trc:mode \"" << pattern << "\" is not correct.\n";
 }
+
+#undef CMP
 
 int main(int argc, char *argv[]) {
     init_mem();

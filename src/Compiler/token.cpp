@@ -78,7 +78,7 @@ void token(vecs2d &result, const vecs &codes) {
     LINE_NOW = 0;
     auto *pointer = &LINE_NOW;
 
-    for (const auto &line : codes) {
+    for (const auto &line: codes) {
         size_t n = line.length();
         for (int j = 0; j < n; ++j) {
             temp += line[j];
@@ -124,7 +124,7 @@ void token(vecs2d &result, const vecs &codes) {
 
         // 优化，避免""元素进入其中
         vecs result_temp;
-        const auto& end_ = add_temp.end();
+        const auto &end_ = add_temp.end();
         for (auto i = add_temp.begin(); i < end_; ++i) {
             if (!(i->empty())) {
                 result_temp.push_back(*i);

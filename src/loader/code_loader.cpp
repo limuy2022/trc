@@ -48,6 +48,7 @@ map<string, short> codes_int = {
         {LOAD_LONG_, 35},
         {LOAD_ARRAY_, 36},
         {CALL_METHOD_, 37},
+        {LOAD_MAP_, 38}
 };
 
 // 在反编译时把字节码转化为助记符
@@ -90,4 +91,5 @@ string int_code[] = {
         LOAD_LONG_,
         LOAD_ARRAY_,
         CALL_METHOD_,
+        LOAD_MAP_
 };

@@ -17,6 +17,7 @@ bool build(){
 		system("strip bin/libTVM.dll");
 		system("strip bin/libCompiler.dll");
 		system("strip bin/libshare.dll");
+		system("strip bin/libimportlib.dll");
 		return true;
 	}
 	return false;

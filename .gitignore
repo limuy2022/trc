@@ -9,4 +9,4 @@ Makefile
 CMakeSettings.json
 *.aps
 *.ctree
-Trc.cbp
+*.cbp

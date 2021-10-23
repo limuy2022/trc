@@ -15,7 +15,7 @@ void pre(vecs &result, const string &codes) {
     */
 
     string temp;
-    for (const auto& code : codes) {
+    for (const auto &code: codes) {
         if (code == '\n') {
             if (temp[0] != '#') {
                 result.push_back(temp);
@@ -34,7 +34,7 @@ void pre_token_2(vecs2d &tokens) {
      * 防止grammar出现错误的结果
      */
 
-    for (auto &i : tokens)
+    for (auto &i: tokens)
         for (int j = 0, n = i.size(); j < n; ++j)
             if (i[j] == "#")
                 for (; j < n; n--)

@@ -1,7 +1,8 @@
 /**
  * 基础数据结构map
  * 采用哈希表加红黑树实现
- * 注意：如果你仔细阅读了这里的代码，你会发现这个哈希表其实实现的很烂，不过有时间再改吧
+ * 注意：如果你仔细阅读了这里的代码，你会发现这个哈希表其实实现的并不复杂，
+ * 效率也只能算是一般，不过有时间再改吧
  */ 
 
 #include <cstdlib>
@@ -48,15 +49,27 @@ OBJ& trc_map::get_value(const OBJ key_) const{
 	 * 通过哈希值取到相应的对象地址(具体实现)
 	 */ 
 	int key = hash_func(key_);
+	data_info& value_ = data_[key];
 	// 判断是否存在数据
-	if(!data_[key].is_data) {
+	if(!value_.is_data) {
 		send_error(KeyError);
 	}
 	// 判断是否存在哈希冲突
-	if(!data_[key].flag) {
+	if(!value_.flag) {
 		return data_[key].value;
 	}
-	
+	data_info* back = &value_, *now = back -> next;
+	while (now != nullptr) {
+		if(now -> key == key_) {
+			data_info* tmp = now;
+			now -> is_data = false;
+			back -> next = now -> next;
+			return tmp -> value;
+		}
+		back = now -> next;
+		now = now -> next;
+	}
+	send_error(KeyError);
 }
 
 trc_map::trc_map():
@@ -110,17 +123,40 @@ void trc_map::delete_value(const OBJ key_) {
 	/**
 	 * 根据键去删除相应的值
 	 */
-	int key = hash_func(key_); 
-	if(!data_[key].is_data) {
+	int key = hash_func(key_);
+	data_info& value_ = data_[key];
+	// 键不存在
+	if(!value_.is_data) {
 		send_error(KeyError);
 	}
+	// 键对上了，判断是否存在链表
+	if(value_.key == key_) {
+		value_.is_data = false;
+		if(value_.flag) {
+			data_[key] = *(value_ .next);
+		}
+	}
+	// 存在值但是键不吻合,存在哈希冲突
+	data_info* back = &value_, *now = back -> next;
+	while (now != nullptr) {
+		if(now -> key == key_) {
+			data_info* tmp = now;
+			now -> is_data = false;
+			back -> next = now -> next;
+			delete tmp;
+			return;
+		}
+		back = now -> next;
+		now = now -> next;
+	}
+	send_error(KeyError);
 }
 
 int trc_map::hash_func(void * value) const {
 	/**
 	 * 哈希函数，目前非常简单
 	 */ 
-	// 通过指针强制转换为整形数据mod哈希表长度
+	// 通过共用体将指针强制转换为整形数据并mod哈希表长度
 	u_tmp.pointer = value;
 	return u_tmp.value % length;
 }

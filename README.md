@@ -96,9 +96,4 @@ println(a * b)
 ### src/TVM:执行字节码的虚拟机
 ### src/utils:开发过程中的工具函数存放模块
 
-## 库文件功能说明
-### share/libshare:trc工具集合
-### Compiler/libCompiler:编译系统
-### TVM/libTVM:虚拟机
-
 注：编译器采用面向过程的思想，而虚拟机采用面向对象的思想

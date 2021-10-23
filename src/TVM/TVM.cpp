@@ -64,6 +64,7 @@ static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[] = {
     TVM::DEL_LOCAL,
     nullptr,
     nullptr,
+    nullptr,
     nullptr
 };
 
@@ -105,10 +106,11 @@ static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
     nullptr,
     TVM::LOAD_LONG,
     TVM::LOAD_ARRAY,
-    TVM::CALL_METHOD
+    TVM::CALL_METHOD,
+    TVM::LOAD_MAP
 };
 
-TVM::TVM(const string &name, const float &ver_in):
+TVM::TVM(const string &name, const float ver_in):
     name(name),
     firsti(mem_control -> pool_ ->int_pool -> trcmalloc()),
     secondi(mem_control -> pool_ ->int_pool -> trcmalloc()),

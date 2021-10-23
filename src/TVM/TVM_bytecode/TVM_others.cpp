@@ -11,6 +11,8 @@
 #include "../../include/TVM/float.h"
 #include "../../include/TVM/string.h"
 #include "../../include/memory/objs_pool.hpp"
+#include "../../include/TVM/lib.h"
+#include "../../include/data.hpp"
 
 using namespace std;
 
@@ -31,6 +33,11 @@ void TVM::LOAD_INT(const short &index) {
     push(firsti);
 }
 
+void TVM::LOAD_MAP(const short & index) {
+    /**
+     * 加载map型变量到栈，参数含义是有几个参数
+     */ 
+}
 
 void TVM::LOAD_FLOAT(const short &index) {
     /**
@@ -73,7 +80,7 @@ void TVM::GOTO(const short &index) {
     run_env::lines[name] = static_data.const_i[index] - 1;
 }
 
-static void fix_path(string &path) {
+static void fix_path(const string &path) {
     /**
      * 检查路径是否正确
      * 如果路径不正确将路径转换成正确的，否则报错
@@ -82,7 +89,7 @@ static void fix_path(string &path) {
     if(check_file_is(path)) {
         return;
     }
-    if(check_file_is(path_join(2, "TVM/packages/base_support", path))) {
+    if(check_in_array(cpp_libs::names, path, cpp_libs::libs_num)) {
         return;
     }
     if(check_file_is(path_join(2, "TVM/packages/self_support", path))) {
@@ -92,7 +99,7 @@ static void fix_path(string &path) {
         return;
     }
 
-    send_error(ModuleNotFoundError, path);
+    send_error(ModuleNotFoundError, path.c_str());
 }
 
 void TVM::IMPORT() {

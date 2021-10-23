@@ -24,28 +24,31 @@ gc_obj::gc_obj():
     pool_(new objs_pool_TVM(this))
 {}
 
-#define gc_one_pool(now, _pool_, pointer)\
-do{ /*now:现在要进行gc的内存链表的头指针，\
-    _pool_:内存池，\
-    pointer:数据需要转换的类型*/\
-    pointer value;\
-    auto back = now;\
-    now = now -> next;\
-    /* 引用计数垃圾回收 */\
-    while((now) != nullptr) {\
-        value = (pointer)((now) ->data);\
-        if(!value -> refs) {\
-            back -> next = (now) -> next;\
-            value -> delete_();\
-            (now) -> next = (_pool_) -> free_head -> next;\
-            (_pool_) -> free_head -> next = (now);\
-            (now) = back -> next;\
-        } else {\
-            (back) = (now);\
-            now = now -> next;\
-        }\
-    }\
-} while(0)
+template<typename pointer, typename T>
+static void gc_one_pool(objs_pool_objs::node_ * now, T & _pool_) {
+    /**
+     * now:现在要进行gc的内存链表的头指针，
+     * _pool_:内存池，
+     * pointer:数据需要转换的类型
+     */
+    pointer value;
+    auto back = now;
+    now = now -> next;
+    /* 引用计数垃圾回收 */
+    while(now != nullptr) {
+        value = (pointer)(now ->data);
+        if(!value -> refs) {
+            back -> next = now -> next;
+            value -> delete_();
+            now -> next = _pool_ -> free_head -> next;
+            _pool_ -> free_head -> next = now;
+            now = back -> next;
+        } else {
+            back = now;
+            now = now -> next;
+        }
+    }
+}
 
 void gc_obj::gc() {
     /**
@@ -55,10 +58,10 @@ void gc_obj::gc() {
     now2 = pool_-> float_pool -> used_head, \
     now3 = pool_-> str_pool -> used_head, \
     now4 = pool_-> long_pool -> used_head;
-    gc_one_pool(now1, pool_-> int_pool, INTOBJ);
-    gc_one_pool(now2, pool_-> float_pool, FLOATOBJ);
-    gc_one_pool(now3, pool_-> str_pool, STRINGOBJ);
-    gc_one_pool(now4, pool_-> long_pool, LONGOBJ);
+    gc_one_pool<INTOBJ>(now1, pool_-> int_pool);
+    gc_one_pool<FLOATOBJ>(now2, pool_-> float_pool);
+    gc_one_pool<STRINGOBJ>(now3, pool_-> str_pool);
+    gc_one_pool<LONGOBJ>(now4, pool_-> long_pool);
 }
 
 gc_obj::~gc_obj() {

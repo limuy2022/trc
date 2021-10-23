@@ -133,7 +133,7 @@ T* objs_pool<T>::trcmalloc() {
         // 直接将节点连接到使用链表中
         new_n -> next = used_head -> next;
         used_head -> next = new_n;
-        return (T*)new_n -> data;
+        return (T*)(new_n -> data);
     }
     return malloc_private();
 }

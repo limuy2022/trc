@@ -64,7 +64,7 @@ static short add(TVM *vm, int data_type, const string &data_value) {
 
     if (data_type == STRING_TICK) {
         if (!check_in(data_value, vm->static_data.const_s)) {
-            const string& fin_str = data_value.substr(1, data_value.length() - 2);
+            const string &fin_str = data_value.substr(1, data_value.length() - 2);
             vm->static_data.const_s.push_back(fin_str);
             return vm->static_data.const_s.size() - 1;
         }
@@ -89,7 +89,7 @@ static short add(TVM *vm, int data_type, const string &data_value) {
             return vm->static_data.const_name.size() - 1;
         }
         return index_vector(vm->static_data.const_name, data_value);
-    } else if(data_type == LONG_TICK) {
+    } else if (data_type == LONG_TICK) {
         if (!check_in(data_value, vm->static_data.const_long)) {
             vm->static_data.const_long.push_back(data_value);
             return vm->static_data.const_long.size() - 1;
@@ -143,7 +143,7 @@ static void func_lexer(TVM *vm, treenode *head) {
     STORE_NAME = STORE_LOCAL_;
     LOAD_NAME = LOAD_LOCAL_;
     CHANGE_VALUE = CHANGE_LOCAL_;
-    DEL =  DEL_LOCAL_;
+    DEL = DEL_LOCAL_;
 
     const string &name(head->data);
     int end_line = to_type<int>(head->son[0]->data);
@@ -153,7 +153,7 @@ static void func_lexer(TVM *vm, treenode *head) {
 
     // 这几行代码并不保存在主字节码区，而是保存在和函数相关的位置
     for (; *lex_num < end_line; ++(*lex_num))
-        fast -> bytecodes.push_back(real_compiler(vm, forest[*lex_num]));
+        fast->bytecodes.push_back(real_compiler(vm, forest[*lex_num]));
     add(vm, VAR_TICK, name);
 
     STORE_NAME = STORE_NAME_;
@@ -201,7 +201,7 @@ static vector<short *> real_compiler(TVM *vm, treenode *head) {
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_FLOAT_], index_argv});
             else if (type_data == VAR_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_NAME], index_argv});
-            else if(type_data == LONG_TICK)
+            else if (type_data == LONG_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_LONG_], index_argv});
         } else if (type == TREE) {
             // 不是数据和传参节点，确认为树

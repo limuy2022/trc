@@ -8,13 +8,12 @@
 #ifndef TRC_INCLUDE_MEMORY_MEMORY_POOL_H
 #define TRC_INCLUDE_MEMORY_MEMORY_POOL_H
 
-// 内存池初始大小，实际内存大小，以字节为单位
-#define MEMORY_INIT_SIZE 1024
-
+#include <vector>
 #include <cstddef>
 
-namespace memory_pool_class{
-    class node;
+using namespace std;
+
+namespace memclass{
     class freespace;
 }
 
@@ -27,24 +26,36 @@ class memory_pool {
      * 而内存池可以申请大小不固定的内存，效率稍低
      * **********************************************
      * 必看事项：
-     * 本内存池底层由malloc分配内存，所以不可以支持任何跟继承扯上关系的类和结构体
+     * 1.本内存池底层由malloc分配内存，所以不可以支持任何跟继承扯上关系的类和结构体
      * （但可以分配非基础数据类型，建议仅仅用于分配基础数据类型或者C语言风格的结构体）
+     * **********************************************
+     * 实现方式：
+     * 小于等于128k的用第二级分配器
+     * 大于128k的用第一级分配器
+     * 
+     * 有16个free-lists。各自管理大小不同的小额区块。
+     * 将不论什么小额区块的内存需求量上调至8的倍数。如需求30，则上调至32。
      */
 
 public:
-    memory_pool(size_t size_ = MEMORY_INIT_SIZE);
+    memory_pool();
 
     ~memory_pool();
 
     // 效果同malloc，free，realloc
     void *mem_malloc(size_t size_);
 
-    void mem_free(void *p);
+    void mem_free(void *p, size_t size_);
 
     void* mem_realoc(void *p, size_t size_);
 
 private:
-    char *mem_base;
+    // 储存各个链表的链表头
+    memclass::freespace *memory_heads;
+    // 储存删除请求
+    vector<void*> delete_reqs;
+    // 已经申请的内存块数
+    void free_pri();
 };
 
 #endif

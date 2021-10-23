@@ -13,7 +13,7 @@ int index_vector(vector<T> &v1, const V &data) {
     /**
      * 获取vector的索引值
      */
-    auto begin = v1.begin();
+    const auto& begin = v1.begin();
     return distance(begin, find(begin, v1.end(), data));
 }
 
@@ -94,6 +94,17 @@ bool map_check_in_second(const map<T, V> &m1, const O &data) {
      */
     for (const auto &it : m1)
         if (it.second == data)
+            return true;
+    return false;
+}
+
+template<typename T, typename O>
+bool check_in_array(const T arr[], const O &data, size_t size_) {
+    /**
+     * 检查data是否在数组每一项值的里面
+     */
+    for (size_t i = 0; i < size_; ++i)
+        if (arr[i] == data)
             return true;
     return false;
 }

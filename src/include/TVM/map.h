@@ -2,6 +2,7 @@
  * 基础数据结构：map
  */ 
 
+#include "base.h"
 #include "../cfg.h"
 
 using namespace std;
@@ -12,7 +13,8 @@ namespace map_space {
 	extern const int MAP_MIN_SIZE;
 }
 
-class trc_map {
+class trc_map :public trcobj
+{
 	/**
 	 * 用作两个OBJ对象的关联
 	 * 具体实现：哈希表加红黑树

@@ -45,6 +45,7 @@
 #define LOAD_LONG_ "LOAD_LONG"
 #define LOAD_ARRAY_ "LOAD_ARRAY"
 #define CALL_METHOD_ "CALL_METHOD"
+#define LOAD_MAP_ "LOAD_MAP"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ private:
     gc_obj* mem_control;
 
 public:
-    TVM(const string &name, const float &ver_in = version);
+    TVM(const string &name, const float ver_in = version);
 
     ~TVM();
 
@@ -167,6 +168,8 @@ public:
     void CALL_METHOD(const short&index);
 
     void LOAD_ARRAY(const short&index);
+
+    void LOAD_MAP(const short & index);
 
     /* 指令集结束定义处 */
 

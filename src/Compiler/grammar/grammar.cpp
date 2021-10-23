@@ -1,22 +1,23 @@
 /**
- * 此处是编译器的核心之一
+ * 此处是编译器的最重要核心之一
  * 主要负责生成供编译器生成字节码的语法树
  * 
  * 语法树描述规则：
  * tree节点不储存数据
  */
 
+#include <cstring>
 #include <string>
 #include <vector>
-#include "../include/share.h"
-#include "../include/node.h"
-#include "../include/Compiler/compile_share.h"
-#include "../include/data.hpp"
-#include "../include/Compiler/optimize.h"
-#include "../include/type.hpp"
-#include "../include/type.h"
-#include "../include/func_loader.h"
-#include "../include/Error.h"
+#include "../../include/share.h"
+#include "../../include/node.h"
+#include "../../include/data.hpp"
+#include "../../include/Compiler/optimize.h"
+#include "../../include/type.hpp"
+#include "../../include/type.h"
+#include "../../include/func_loader.h"
+#include "../../include/Error.h"
+#include "obj.h"
 
 using namespace std;
 
@@ -110,16 +111,6 @@ static size_t count_line() {
     return last_index + 1;
 }
 
-static bool check_in_array(const string arr[], const string &data, size_t size_) {
-    /**
-     * 检查data是否在数组每一项值的里面
-     */
-    for (size_t i = 0; i < size_; ++i)
-        if (arr[i] == data)
-            return true;
-    return false;
-}
-
 static bool in_func(int index_oper, const vecs &code) {
     /**
      * 判断某个符号是否处于语句中
@@ -136,11 +127,11 @@ static bool in_func(int index_oper, const vecs &code) {
             break_num++;
         } else if (code[i] == ")") {
             end_sym = i;
-            break_num--;
+            --break_num;
             if (!break_num) {
                 if (!(start_sym < index_oper && end_sym > index_oper))
                     return false;
-                loop_num--;
+                --loop_num;
                 if (!loop_num) {
                     return true;
                 }
@@ -156,9 +147,9 @@ static void assign(treenode *head, const string &oper, const vecs &code) {
      */
 
     // 申请新的树节点
-    auto *ass = new treenode, \
- *name = new treenode, \
- *opernode = new treenode(VAR_DEFINE, oper);
+    auto ass = new treenode, \
+ name = new treenode, \
+ opernode = new treenode(VAR_DEFINE, oper);
     // 父节点指向
     const vecs& temp = until_cut(code, oper);
     if (temp.size() == 1) {
@@ -350,16 +341,16 @@ static bool block(treenode *head, const vecs &code) {
      * 包括func，if， while等
      */
 
-    const string &name(code[0]);
-    if (name == "if") {
+    const char * name = code[0].c_str();
+    if (!strcmp(name, "if")) {
         if_tree(head, code);
         return true;
     }
-    if (name == "while") {
+    if (!strcmp(name, "while")) {
         while_loop_tree(head, code);
         return true;
     }
-    if (name == "func") {
+    if (!strcmp(name, "func")) {
         func_define(head, code);
         return true;
     }
@@ -490,6 +481,7 @@ void grammar(vector<treenode *> &result_return, const vecs2d &codes) {
         lex_grammar(codes_s[*pointer]);
 
     *pointer = 0;
+    map_arr::clear();
 }
 
 #undef OPER_TREE

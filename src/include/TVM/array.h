@@ -1,11 +1,13 @@
 #ifndef TRC_TVM_ARRAY_H
 #define TRC_TVM_ARRAY_H
 
+#include "base.h"
 #include "../cfg.h"
 
 using namespace std;
 
-class trc_array {
+class trc_array : public trcobj
+{
     /*
     链表
     */

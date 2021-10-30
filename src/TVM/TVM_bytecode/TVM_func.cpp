@@ -1,7 +1,7 @@
-#include "../../include/TVM/TVM.h"
-#include "../../include/TVM/built_in_func.h"
-#include "../../include/share.h"
-#include "../../include/TVM/int.h"
+#include "TVM/TVM.h"
+#include "TVM/built_in_func.h"
+#include "share.h"
+#include "TVM/int.h"
 
 using namespace std;
 
@@ -26,8 +26,7 @@ void TVM::CALL_BUILTIN(const short &name) {
      * 执行内置函数
      */
     pop(firsti);
-    int tmp = firsti->value;
-    builtin_funcs[name](tmp, this);
+    builtin_funcs[name](firsti->value, this);
 }
 
 void TVM::CALL_FUNCTION(const short &index) {

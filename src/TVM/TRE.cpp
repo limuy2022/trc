@@ -1,5 +1,5 @@
-#include "../include/TVM/TRE.h"
-#include "../include/cfg.h"
+#include "TVM/TRE.h"
+#include "cfg.h"
 
 namespace TVM_share {
     /**

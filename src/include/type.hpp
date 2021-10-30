@@ -1,5 +1,5 @@
-#ifndef TRC_UTILS_TYPECHANGE_H
-#define TRC_UTILS_TYPECHANGE_H
+#ifndef TRC_INCLUDE_TYPECHANGE_H
+#define TRC_INCLUDE_TYPECHANGE_H
 
 #include <sstream>
 

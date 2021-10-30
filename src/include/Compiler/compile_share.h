@@ -1,8 +1,8 @@
-#ifndef TRC_COMPILE_SHARE_H
-#define TRC_COMPILE_SHARE_H
+#ifndef TRC_INCLUDE_COMPILER_COMPILE_SHARE_H
+#define TRC_INCLUDE_COMPILER_COMPILE_SHARE_H
 
 #include <cctype>
-#include "../share.h"
+#include "share.h"
 
 using namespace std;
 

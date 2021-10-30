@@ -3,14 +3,11 @@
  */
 
 #include <iostream>
-#include "../../include/Error.h"
-#include "../../include/type.hpp"
-#include "../../include/TVM/TVM.h"
-#include "../../include/TVM/int.h"
-#include "../../include/TVM/float.h"
-#include "../../include/TVM/string.h"
-#include "../../include/TVM/bignum.h"
-#include "../../include/TVM/TRE.h"
+#include "Error.h"
+#include "type.hpp"
+#include "TVM/TVM.h"
+#include "TVM/TRE.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -23,7 +20,7 @@ void LENGTH(int argc, TVM *vm) {
         send_error(ArgumentError, "len only needs one argnment.");
     }
     vm->pop(vm->firsts);
-    vm->push(new trcint(vm->firsts->len()));
+    vm->push(new trc_int(vm->firsts->len()));
 }
 
 void HELP(int argc, TVM *vm) {

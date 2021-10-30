@@ -3,11 +3,11 @@
  */
 #include <string>
 #include <iostream>
-#include "../include/code_loader.h"
-#include "../include/ctree_loader.h"
-#include "../include/read.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/TVM/TVM.h"
+#include "code_loader.h"
+#include "ctree_loader.h"
+#include "read.h"
+#include "Compiler/Compiler.h"
+#include "TVM/TVM.h"
 
 using namespace std;
 

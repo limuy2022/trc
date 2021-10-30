@@ -33,7 +33,6 @@ https://gitee.com/li-muyangangel/trc.git
 
 ## 编译方式
 本项目采用cmake编译程序
-
 windows：
 
     有安装mingw：

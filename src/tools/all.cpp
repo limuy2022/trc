@@ -5,10 +5,10 @@
 
 #include <iostream>
 #include <string>
-#include "../include/TVM/TVM.h"
-#include "../include/tools.h"
-#include "../include/cfg.h"
-#include "../include/filesys.h"
+#include "TVM/TVM.h"
+#include "tools.h"
+#include "cfg.h"
+#include "filesys.h"
 
 using namespace std;
 

@@ -3,8 +3,8 @@
  */ 
 #include <string>
 #include <map>
-#include "../include/share.h"
-#include "../include/cfg.h"
+#include "share.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -14,15 +14,6 @@ const vecc num = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '-'};
 
 // 类型以及它们在虚拟机中的数字代号
 namespace type_int {
-    map<string, int> name_int_s = {
-            {"int",    INT_T},
-            {"bool",   BOOL_T},
-            {"string", STRING_T},
-            {"float",  FLOAT_T},
-            {"long int", BIGNUM_T},
-            {"long float", BIGFLOAT_T},
-    };
-
     string int_name_s[] = {
             "int",
             "bool",

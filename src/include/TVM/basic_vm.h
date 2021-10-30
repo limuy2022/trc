@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <stack>
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 

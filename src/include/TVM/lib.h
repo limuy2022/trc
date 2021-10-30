@@ -2,11 +2,11 @@
  * 与TVM库文件有关的定义
  */ 
 
-#ifndef TRC_SRC_INCLUDE_TVM_LIB_H
-#define TRC_SRC_INCLUDE_TVM_LIB_H
+#ifndef TRC_INCLUDE_TVM_LIB_H
+#define TRC_INCLUDE_TVM_LIB_H
 
 #include <map>
-#include "../../include/cfg.h"
+#include "cfg.h"
 
 using namespace std;
 

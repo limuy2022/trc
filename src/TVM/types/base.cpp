@@ -4,8 +4,8 @@
  * 部分有报出相应错误的功能和职责
  */ 
 
-#include "../../include/TVM/base.h"
-#include "../../include/Error.h"
+#include "TVM/base.h"
+#include "Error.h"
 
 /* 生成固定的类型报错模板 */
 #define ERROR_TYPE_MSG(type_name) "can't turn into "#type_name""

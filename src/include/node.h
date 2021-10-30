@@ -1,5 +1,5 @@
-#ifndef TRC_UTILS_NODE_H
-#define TRC_UTILS_NODE_H
+#ifndef TRC_INCLUDE_NODE_H
+#define TRC_INCLUDE_NODE_H
 
 #include <string>
 #include <vector>

@@ -1,7 +1,6 @@
-#include "../include/Error.h"
-#include "../include/type.hpp"
-#include "../include/Compiler/compile_share.h"
-#include "../include/data.hpp"
+#include "Error.h"
+#include "Compiler/compile_share.h"
+#include "data.hpp"
 
 using namespace std;
 
@@ -13,22 +12,22 @@ int what_type(const string &value) {
     
     size_t n = value.length();
     if (('\'' == value[0] && '\'' == value[n - 1]) || (value[0] == '"' && value[n - 1] == '"'))
-        return STRING_TICK;
+        return string_TICK;
 
     if (check_in(value[0], num)) {
         if (value.find('.') != string::npos) {
             // 小数
             if(n >= 12)
                 return FLOAT_L_TICK;
-            return FLOAT_TICK;
+            return float_TICK;
         }
         // 检查数据,前导零
         if(n >= 2 && value[0] == '0')
-            send_error(SyntaxError, ("number " + to_type<string>(value) + " is incorrect.").c_str());
+            send_error(SyntaxError, ("number " + value + " is incorrect.").c_str());
         if(n >= 12)
             return LONG_TICK;
 
-        return INT_TICK;
+        return int_TICK;
     }
     if(check_in(value, const_values))
         return CONST_TICK;

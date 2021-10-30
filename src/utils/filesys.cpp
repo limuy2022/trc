@@ -7,7 +7,7 @@
 #include <string>
 #include <cstdarg>
 #include <fstream>
-#include "../include/cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -47,12 +47,7 @@ bool check_file_is(const string &path) {
      * 检查文件是否存在
      */ 
 
-    ifstream test(path);
-    if(test.is_open()) {
-        test.close();
-        return true;
-    }
-    return false;
+    return !access(path.c_str(), 0);
 }
 
 string path_last(const string &path, const string &last) {
@@ -64,22 +59,21 @@ string path_last(const string &path, const string &last) {
     return path.substr(0, path.find_last_of('.')) + last;
 }
 
-string import_to_path(const string &import_name) {
+string import_to_path(string import_name) {
     /**
      * 在虚拟机执行过程中，动态加载字节码时路径转换
      * 例如：math.lang -> math/lang
      */
 
-    string result(import_name);
     size_t index;
     for(;;) {     
-        index = result.find(".");
+        index = import_name.find(".");
         if(index != string::npos)
-            result.replace(index,1,"/"); 
+            import_name.replace(index,1,"/"); 
         else
             break;
     } 
-    return result;
+    return import_name;
 }
 
 string path_join(int n, ...) {

@@ -8,8 +8,8 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include "../include/TVM/TVM.h"
-#include "../include/Error.h"
+#include "TVM/TVM.h"
+#include "Error.h"
 
 // 开头标识文件是否为ctree文件的标识，魔数
 #define MAGIC_VALUE 0xACFD
@@ -20,12 +20,19 @@
 // str:load or write
 #define LOAD_WRITE(file, vm, str) \
 do{\
+    /* 整型常量池 */\
     str##_pool((file), (vm)->static_data.const_i);\
+    /* 浮点数常量池 */\
     str##_pool((file), (vm)->static_data.const_f);\
+    /* 字符串常量池 */\
     str##_string_pool((file), (vm)->static_data.const_s);\
+    /* 长整型常量池 */\
     str##_string_pool((file), (vm)->static_data.const_long);\
+    /* 变量名常量池 */\
     str##_string_pool((file), (vm)->static_data.const_name);\
+    /* 字节码常量池 */\
     str##_bytecode((file), (vm)->static_data.byte_codes);\
+    /* 函数字节码常量池 */\
     str##_functions((file), (vm)->static_data.funcs);\
 } while(0)
 
@@ -55,31 +62,29 @@ static void write_string_one(ofstream &file, const string &data) {
     file.write(data.c_str(), n);
 }
 
-namespace {
-    template<typename T>
-    void write_pool(ofstream &file, vector<T> &const_pool) {
-        /**
-         * 写入常量池及常量池大小
-         * 注：基础数据类型，其它数据类型可能导致错误
-         */
-        int size = const_pool.size();
-        file.write(RWTYPE &size, sizeof(int));
-        for (const auto &i:const_pool)
-            file.write(RWTYPE &i, sizeof(i));
-    }
+template<typename T>
+static void write_pool(ofstream &file, vector<T> &const_pool) {
+    /**
+     * 写入常量池及常量池大小
+     * 注：基础数据类型，其它数据类型可能导致错误
+     */
+    int size = const_pool.size();
+    file.write(RWTYPE &size, sizeof(int));
+    for (const auto &i:const_pool)
+        file.write(RWTYPE &i, sizeof(i));
+}
 
-    template<typename T>
-    void load_pool(ifstream &file, vector<T> &const_pool) {
-        /**
-         * 读取常量池到TVM中
-         * 注：基础数据类型，其它数据类型可能导致错误
-         */
-        int size;
-        file.read(RWTYPE &size, sizeof(int));
-        const_pool.resize(size);
-        for (auto &i:const_pool)
-            file.read(RWTYPE &i, sizeof(i));
-    }
+template<typename T>
+static void load_pool(ifstream &file, vector<T> &const_pool) {
+    /**
+     * 读取常量池到TVM中
+     * 注：基础数据类型，其它数据类型可能导致错误
+     */
+    int size;
+    file.read(RWTYPE &size, sizeof(int));
+    const_pool.resize(size);
+    for (auto &i:const_pool)
+        file.read(RWTYPE &i, sizeof(i));
 }
 
 static void write_string_pool(ofstream &file, vector<string> &const_pool) {

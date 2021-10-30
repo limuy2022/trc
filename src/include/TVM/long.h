@@ -1,26 +1,26 @@
 /**
  * 由于c++本身并不支持大整数相加
- * 所以在这里通过BigNum来实现
+ * 所以在这里通过trc_long来实现
  * 注意：该类重载了trc所支持的所有运算符
  * 包括+，-，*，/，==，！=等
  */ 
 
-#ifndef TRC_INCLUDE_BIGNUM_H
-#define TRC_INCLUDE_BIGNUM_H
+#ifndef TRC_INCLUDE_TRC_LONG_H
+#define TRC_INCLUDE_TRC_LONG_H
 
 #include <string>
 #include <ostream>
 #include "base.h"
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
-class BigNum:public trcobj
+class trc_long:public trcobj
 {
 public:
-	BigNum& operator=(const string &a);
+	trc_long& operator=(const string &a);
 
-    BigNum();
+    trc_long();
 
     OBJ operator =(OBJ a);
 
@@ -52,7 +52,7 @@ public:
 
     void putline(ostream& out);
 
-    int& gettype() ;
+    const int& gettype();
 
     INTOBJ operator!();
     
@@ -60,7 +60,7 @@ public:
 
     INTOBJ operator||(OBJ value_i);
 
-    ~BigNum();
+    ~trc_long();
 
     INTOBJ to_int();
 
@@ -71,6 +71,11 @@ public:
     INTOBJ to_bool();
 
     void delete_();
+    
+private:
+    void set_alloc(int size_);
+
+    const static int type = trc_long_T;
 
     // 第一位空出来，标识正负
     //之所以选择char，是因为每一位只需要保存一个数字，不需要int型
@@ -79,12 +84,6 @@ public:
     // 当前大整数长度，注意，符号位也包括在内，正数有默认的符号位
     // 0可以被标识为正数，也可以被标识为负数，不受影响
     int size = 1;
-
-    int type = BIGNUM_T;
-
-private:
-    
-    void set_alloc(int size_);
 };
 
 #endif

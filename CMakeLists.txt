@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.19)
 project(Trc)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_CXX_STANDARD 17)
 set(EXECUTABLE_OUTPUT_PATH "bin/")
+INCLUDE_DIRECTORIES(src/include)
 add_executable(Trc
 src/Trc.cpp
 src/Compiler/check.cpp
@@ -18,9 +20,9 @@ src/loader/ctree_loader.cpp
 src/loader/func_loader.cpp
 src/memory/free_compiler.cpp
 src/memory/free_TVM.cpp
-src/memory/gc.cpp
 src/memory/memory_pool.cpp
 src/memory/new.cpp
+src/memory/objs_pool_TVM.cpp
 src/share/compile_share.cpp
 src/share/share.cpp
 src/tools/all.cpp
@@ -46,11 +48,11 @@ src/TVM/TVM_bytecode/TVM_opers.cpp
 src/TVM/TVM_bytecode/TVM_others.cpp
 src/TVM/TVM_bytecode/TVM_var.cpp
 src/TVM/types/base.cpp
-src/TVM/types/bigfloat.cpp
-src/TVM/types/bignum.cpp
 src/TVM/types/trc_array.cpp
 src/TVM/types/trc_float.cpp
+src/TVM/types/trc_flong.cpp
 src/TVM/types/trc_int.cpp
+src/TVM/types/trc_long.cpp
 src/TVM/types/trc_map.cpp
 src/TVM/types/trc_string.cpp
 src/utils/filesys.cpp

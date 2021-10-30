@@ -9,14 +9,14 @@
 #include <cstring>
 #include <string>
 #include <vector>
-#include "../../include/share.h"
-#include "../../include/node.h"
-#include "../../include/data.hpp"
-#include "../../include/Compiler/optimize.h"
-#include "../../include/type.hpp"
-#include "../../include/type.h"
-#include "../../include/func_loader.h"
-#include "../../include/Error.h"
+#include "share.h"
+#include "node.h"
+#include "data.hpp"
+#include "Compiler/optimize.h"
+#include "type.hpp"
+#include "type.h"
+#include "func_loader.h"
+#include "Error.h"
 #include "obj.h"
 
 using namespace std;
@@ -369,8 +369,8 @@ static void oper_tree(treenode *head, const vecs &code, const string &oper) {
 
     if (left->type == DATA && \
             right->type == DATA && \
-            what_type(left->data) == INT_TICK && \
-            what_type(right->data) == INT_TICK
+            what_type(left->data) == int_TICK && \
+            what_type(right->data) == int_TICK
             ) {
         auto *result_oper = new treenode(DATA);
         // 仅允许整型进行运算符的常量折叠

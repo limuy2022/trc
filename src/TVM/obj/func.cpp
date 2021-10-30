@@ -1,4 +1,4 @@
-#include "../../include/TVM/func.h"
+#include "TVM/func.h"
 
 using namespace std;
 

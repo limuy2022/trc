@@ -2,8 +2,11 @@
  * 基础数据结构：map
  */ 
 
+#ifndef TRC_INCLUDE_TVM_MAP_H
+#define TRC_INCLUDE_TVM_MAP_H
+
 #include "base.h"
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -49,3 +52,5 @@ private:
 
 	void resize();
 };
+
+#endif

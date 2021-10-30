@@ -1,8 +1,8 @@
 #include <cmath>
-#include "../../include/Error.h"
-#include "../../include/type.hpp"
-#include "../../include/TVM/TVM.h"
-#include "../../include/TVM/TRE.h"
+#include "Error.h"
+#include "type.hpp"
+#include "TVM/TVM.h"
+#include "TVM/TRE.h"
 
 using namespace std;
 

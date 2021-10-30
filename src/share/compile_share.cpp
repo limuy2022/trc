@@ -4,7 +4,7 @@
 
 #include <string>
 #include <map>
-#include "../include/Compiler/compile_share.h"
+#include "Compiler/compile_share.h"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
-#ifndef TRC_UTILS_FILESYS_H
-#define TRC_UTILS_FILESYS_H
+#ifndef TRC_INCLUDE_FILESYS_H
+#define TRC_INCLUDE_FILESYS_H
 
 #include "cfg.h"
 
@@ -11,7 +11,7 @@ bool check_file_is(const string &path);
 
 string path_last(const string &path, const string &last);
 
-string import_to_path(const string &import_name);
+string import_to_path(string import_name);
 
 string path_join(int n, ...);
 

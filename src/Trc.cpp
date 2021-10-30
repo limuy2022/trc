@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <cstring>
-#include "include/tools.h"
-#include "include/memory/mem.h"
+#include "tools.h"
+#include "memory/mem.h"
 
 using namespace std;
 

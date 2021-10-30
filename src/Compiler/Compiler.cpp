@@ -5,16 +5,16 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../include/Compiler/compile_share.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/code_loader.h"
-#include "../include/data.hpp"
-#include "../include/type.hpp"
-#include "../include/type.h"
-#include "../include/Error.h"
-#include "../include/memory/mem.h"
-#include "../include/node.h"
-#include "../include/TVM/TVM_data.h"
+#include "Compiler/compile_share.h"
+#include "Compiler/Compiler.h"
+#include "code_loader.h"
+#include "data.hpp"
+#include "type.hpp"
+#include "type.h"
+#include "Error.h"
+#include "memory/mem.h"
+#include "node.h"
+#include "TVM/TVM_data.h"
 
 using namespace std;
 
@@ -62,21 +62,21 @@ static short add(TVM *vm, int data_type, const string &data_value) {
      * 把数据添加进相对应的vm常量池，并且做一些判断和优化，同时返回数据在常量池中所占的索引
      */
 
-    if (data_type == STRING_TICK) {
+    if (data_type == string_TICK) {
         if (!check_in(data_value, vm->static_data.const_s)) {
             const string &fin_str = data_value.substr(1, data_value.length() - 2);
             vm->static_data.const_s.push_back(fin_str);
             return vm->static_data.const_s.size() - 1;
         }
         return index_vector(vm->static_data.const_s, data_value);
-    } else if (data_type == INT_TICK) {
+    } else if (data_type == int_TICK) {
         int afdata = to_type<int>(data_value);
         if (!check_in(afdata, vm->static_data.const_i)) {
             vm->static_data.const_i.push_back(afdata);
             return vm->static_data.const_i.size() - 1;
         }
         return index_vector(vm->static_data.const_i, afdata);
-    } else if (data_type == FLOAT_TICK) {
+    } else if (data_type == float_TICK) {
         double afdata = to_type<double>(data_value);
         if (!check_in(afdata, vm->static_data.const_f)) {
             vm->static_data.const_f.push_back(afdata);
@@ -193,11 +193,11 @@ static vector<short *> real_compiler(TVM *vm, treenode *head) {
             // 数据节点
             int type_data = what_type(nodedata);
             short index_argv = add(vm, type_data, nodedata);
-            if (type_data == STRING_TICK)
+            if (type_data == string_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_STRING_], index_argv});
-            else if (type_data == INT_TICK || type_data == CONST_TICK)
+            else if (type_data == int_TICK || type_data == CONST_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_INT_], index_argv});
-            else if (type_data == FLOAT_TICK)
+            else if (type_data == float_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_FLOAT_], index_argv});
             else if (type_data == VAR_TICK)
                 bytecode_temp.push_back(new short[2]{codes_int[LOAD_NAME], index_argv});

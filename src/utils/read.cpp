@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstdarg>
-#include "../include/Error.h"
+#include "Error.h"
 
 using namespace std;
 
@@ -23,7 +23,6 @@ void readcode(string &file_data, const string &path) {
     }
     file.close();
 }
-
 
 void readfile(string &file_data, const string &path, const int err, ...) {
     /**

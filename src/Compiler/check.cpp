@@ -6,10 +6,10 @@
 #include <stack>
 #include <string>
 #include <map>
-#include "../include/share.h"
-#include "../include/Error.h"
-#include "../include/Compiler/compile_share.h"
-#include "../include/data.hpp"
+#include "share.h"
+#include "Error.h"
+#include "Compiler/compile_share.h"
+#include "data.hpp"
 
 using namespace std;
 

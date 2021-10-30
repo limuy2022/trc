@@ -4,7 +4,7 @@
  */
 
 #include <string>
-#include "../include/share.h"
+#include "share.h"
 
 using namespace std;
 

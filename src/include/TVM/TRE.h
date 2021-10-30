@@ -1,9 +1,9 @@
-#ifndef TRC_TVM_TRE_H
-#define TRC_TVM_TRE_H
+#ifndef TRC_INCLUDE_TVM_TRE_H
+#define TRC_INCLUDE_TVM_TRE_H
 
 #include <string>
 #include "base.h"
-#include "../memory/mem.h"
+#include "memory/mem.h"
 
 // int型缓存起始值
 #define INT_CACHE_BEGIN -5

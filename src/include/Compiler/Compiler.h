@@ -2,10 +2,10 @@
  * 编译器所有供外调的函数
  */
 
-#ifndef TRC_INCLUDE_COMPILER_H
-#define TRC_INCLUDE_COMPILER_H
+#ifndef TRC_INCLUDE_COMPILER_COMPILER_H
+#define TRC_INCLUDE_COMPILER_COMPILER_H
 
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 

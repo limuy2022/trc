@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 #include <cstdarg>
-#include "../include/Error.h"
-#include "../include/share.h"
+#include "Error.h"
+#include "share.h"
 
 using namespace std;
 

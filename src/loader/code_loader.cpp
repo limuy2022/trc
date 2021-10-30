@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include "../include/TVM/TVM.h"
+#include "TVM/TVM.h"
 
 using namespace std;
 

@@ -2,8 +2,8 @@
  * 执行编译好的ctree文件
  */
 
-#include "../include/TVM/TVM.h"
-#include "../include/ctree_loader.h"
+#include "TVM/TVM.h"
+#include "ctree_loader.h"
 
 using namespace std;
 

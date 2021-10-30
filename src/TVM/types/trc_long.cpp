@@ -5,29 +5,31 @@
 #include <string>
 #include <cstring>
 #include <ostream>
-#include "../../include/TVM/bignum.h"
-#include "../../include/Error.h"
-#include "../../include/type.hpp"
-#include "../../include/TVM/base.h"
-#include "../../include/share.h"
-#include "../../include/TVM/TRE.h"
+#include "TVM/long.h"
+#include "Error.h"
+#include "type.hpp"
+#include "TVM/base.h"
+#include "share.h"
+#include "TVM/TRE.h"
 
 using namespace std;
 using namespace TVM_share;
 
-#define NEW_BIGNUM_CHECK \
+#define NEW_trc_long_CHECK \
 do{\
     if (NULL == value) {\
         send_error(MemoryError, "can't get the memory from os.");\
     }\
 }while(0)
 
-BigNum& BigNum::operator=(const string &a) {
+const int trc_long::type;
+
+trc_long& trc_long::operator=(const string &a) {
     int l_s = a.length();
     if(a[0] == '-') {
         size = l_s;
         value = (char *)(malloc(sizeof(char) * size));
-        NEW_BIGNUM_CHECK;
+        NEW_trc_long_CHECK;
         value[0] = 1;
         for(int i = 1; i < l_s; ++i) {
             value[i] = a[l_s - i] - '0';
@@ -36,7 +38,7 @@ BigNum& BigNum::operator=(const string &a) {
     }
     size = l_s + 1;
     value = (char *)(malloc(sizeof(char) * size));
-    NEW_BIGNUM_CHECK;
+    NEW_trc_long_CHECK;
     value[0] = 0;
     for(int i = 1; i <= l_s; ++i) {
         value[i] = a[l_s - i] - '0';
@@ -44,18 +46,18 @@ BigNum& BigNum::operator=(const string &a) {
     return *this;
 }
 
-BigNum::BigNum() :
+trc_long::trc_long() :
     value((char*)(malloc(sizeof(char)))) // 至少申请一个符号位，否则在realloc的过程中会卡死
 {
     // 默认正数
     value = 0;
 }
 
-BigNum::~BigNum() {
+trc_long::~trc_long() {
     free(value);
 }
 
-OBJ BigNum::operator=(OBJ a) {
+OBJ trc_long::operator=(OBJ a) {
     LONGOBJ b = (LONGOBJ)(a);
     if(b != this) {
         set_alloc(b->size);
@@ -64,9 +66,9 @@ OBJ BigNum::operator=(OBJ a) {
     return this;
 }
 
-OBJ BigNum::operator+(OBJ b) {
+OBJ trc_long::operator+(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
-    auto *res = new BigNum();
+    auto *res = new trc_long();
     res->set_alloc(max(a->size, size) + 1);
     memcpy(res->value, value, size * sizeof(char));
     for (int i = 0; i < a->size; ++i) {
@@ -86,9 +88,9 @@ OBJ BigNum::operator+(OBJ b) {
     return res;
 }
 
-OBJ BigNum::operator-(OBJ b) {
+OBJ trc_long::operator-(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
-    auto *res = new BigNum;
+    auto *res = new trc_long;
     res->set_alloc(max(a->size, size));
     memcpy(res->value, value, size * sizeof(char));
     for (int i = 0; i < a->size; ++i) {
@@ -108,9 +110,9 @@ OBJ BigNum::operator-(OBJ b) {
     return res;
 }
 
-OBJ BigNum::operator*(OBJ b) {
+OBJ trc_long::operator*(OBJ b) {
     LONGOBJ v = (LONGOBJ)(b);
-    BigNum *res = new BigNum;
+    trc_long *res = new trc_long;
     res->set_alloc(v->size + size - 1);
     int bit;
     for (int i = 1; i < size; ++i) {
@@ -128,15 +130,15 @@ OBJ BigNum::operator*(OBJ b) {
     return res;
 }
 
-void BigNum::set_alloc(int size_) {
+void trc_long::set_alloc(int size_) {
     value = (char *) realloc(value, size_ * sizeof(char));
-    NEW_BIGNUM_CHECK;
+    NEW_trc_long_CHECK;
     if (size_ > size)
         memset(value + size, 0, (size_ - size) * sizeof(char));
     size = size_;
 }
 
-void BigNum::putline(ostream &out_) {
+void trc_long::putline(ostream &out_) {
     if (value[0])
         out_ << '-';
     int i;
@@ -147,23 +149,23 @@ void BigNum::putline(ostream &out_) {
         out_ << (int)value[i];
 }
 
-OBJ BigNum::operator/(OBJ) {
+OBJ trc_long::operator/(OBJ) {
 
 }
 
-OBJ BigNum::operator%(OBJ) {
+OBJ trc_long::operator%(OBJ) {
 
 }
 
-OBJ BigNum::pow(OBJ) {
+OBJ trc_long::pow(OBJ) {
 
 }
 
-OBJ BigNum::zdiv(OBJ) {
+OBJ trc_long::zdiv(OBJ) {
 
 }
 
-INTOBJ BigNum::operator!=(OBJ b) {
+INTOBJ trc_long::operator!=(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i <min_; ++i)
@@ -172,7 +174,7 @@ INTOBJ BigNum::operator!=(OBJ b) {
     return false_;
 }
 
-INTOBJ BigNum::operator==(OBJ b) {
+INTOBJ trc_long::operator==(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i < min_; ++i)
@@ -181,7 +183,7 @@ INTOBJ BigNum::operator==(OBJ b) {
     return true_;
 }
 
-INTOBJ BigNum::operator<(OBJ b) {
+INTOBJ trc_long::operator<(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i <min_; ++i)
@@ -192,7 +194,7 @@ INTOBJ BigNum::operator<(OBJ b) {
     return false_;
 }
 
-INTOBJ BigNum::operator>(OBJ b) {
+INTOBJ trc_long::operator>(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i <min_; ++i)
@@ -203,7 +205,7 @@ INTOBJ BigNum::operator>(OBJ b) {
     return false_;
 }
 
-INTOBJ BigNum::operator<=(OBJ b) {
+INTOBJ trc_long::operator<=(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i <min_; ++i) {
@@ -216,7 +218,7 @@ INTOBJ BigNum::operator<=(OBJ b) {
     return true_;
 }
 
-INTOBJ BigNum::operator>=(OBJ b) {
+INTOBJ trc_long::operator>=(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
     int min_ = min(size, a->size);
     for(int i = 1; i <min_; ++i) {
@@ -229,38 +231,38 @@ INTOBJ BigNum::operator>=(OBJ b) {
     return true_;
 }
 
-int& BigNum::gettype() {
+const int& trc_long::gettype() {
     return type;
 }
 
-INTOBJ BigNum::operator!() {
+INTOBJ trc_long::operator!() {
 
 }
 
-INTOBJ BigNum::operator&&(OBJ value_i) {
+INTOBJ trc_long::operator&&(OBJ value_i) {
 
 }
 
-INTOBJ BigNum::operator||(OBJ value_i) {
+INTOBJ trc_long::operator||(OBJ value_i) {
 
 }
 
-INTOBJ BigNum::to_int() {
+INTOBJ trc_long::to_int() {
 
 }
 
-STRINGOBJ BigNum::to_string() {
+STRINGOBJ trc_long::to_string() {
 
 }
 
-FLOATOBJ BigNum::to_float() {
+FLOATOBJ trc_long::to_float() {
 
 }
 
-INTOBJ BigNum::to_bool() {
+INTOBJ trc_long::to_bool() {
 
 }
 
-void BigNum::delete_() {
+void trc_long::delete_() {
     set_alloc(1);
 }

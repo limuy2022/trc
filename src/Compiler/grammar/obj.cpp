@@ -2,8 +2,8 @@
  * 关于对象的代码转换为节点以及对象信息保存和识别
  */
 
-#include "../../include/cfg.h"
-#include "../../include/node.h"
+#include "cfg.h"
+#include "node.h"
 
 using namespace std;
 

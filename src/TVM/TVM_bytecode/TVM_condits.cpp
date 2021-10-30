@@ -1,8 +1,7 @@
-#include "../../include/TVM/TVM.h"
-#include "../../include/Error.h"
-#include "../../include/TVM/int.h"
-#include "../../include/TVM/string.h"
-#include "../../include/TVM/TRE.h"
+#include "TVM/TVM.h"
+#include "Error.h"
+#include "cfg.h"
+#include "TVM/TRE.h"
 
 using namespace std;
 

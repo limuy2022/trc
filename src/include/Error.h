@@ -1,5 +1,5 @@
-#ifndef TRC_ERROR_H
-#define TRC_ERROR_H
+#ifndef TRC_INCLUDE_ERROR_H
+#define TRC_INCLUDE_ERROR_H
 
 #include <string>
 

@@ -1,5 +1,5 @@
-#ifndef TRC_SHARE_H
-#define TRC_SHARE_H
+#ifndef TRC_INCLUDE_SHARE_H
+#define TRC_INCLUDE_SHARE_H
 
 #include <map>
 #include "cfg.h"

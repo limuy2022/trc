@@ -2,22 +2,22 @@
 #define TRC_INCLUDE_TVM_INT_H
 
 #include "base.h"
-#include "../../include/cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
-class trcint : public trcobj
+class trc_int : public trcobj
 {
 public:
 	int value = 0;
 
 	void putline(ostream &out);
 
-	~trcint();
+	~trc_int();
 
-	trcint();
+	trc_int();
 
-	trcint(int value);
+	trc_int(int value);
 
 	STRINGOBJ to_string();
 
@@ -57,12 +57,12 @@ public:
 
 	INTOBJ operator||(OBJ value_i);
 
-	int& gettype();
+	const int& gettype();
 
 	void delete_();
 private:
 	// 整型标记类型
-	int type = INT_T;
+	const static int type = int_T;
 };
 
 #endif

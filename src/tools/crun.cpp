@@ -2,10 +2,10 @@
  * 执行，但不生成中间文件
  */
 
-#include "../include/TVM/TVM.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/read.h"
-#include "../include/share.h"
+#include "TVM/TVM.h"
+#include "Compiler/Compiler.h"
+#include "read.h"
+#include "share.h"
 
 using namespace std;
 

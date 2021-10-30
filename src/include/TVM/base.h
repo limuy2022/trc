@@ -6,7 +6,7 @@
 #define TRC_INCLUDE_TVM_BASE_H
 
 #include <ostream>
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -71,7 +71,7 @@ public:
 
 	virtual void putline(ostream& out) = 0;
 
-	virtual int& gettype() = 0;
+	virtual const int& gettype() = 0;
 };
 
 #endif

@@ -1,14 +1,10 @@
-#include "../include/Error.h"
-#include "../include/type.hpp"
-#include "../include/TVM/TRE.h"
-#include "../include/TVM/TVM.h"
-#include "../include/TVM/bignum.h"
-#include "../include/TVM/int.h"
-#include "../include/TVM/string.h"
-#include "../include/TVM/float.h"
-#include "../include/memory/mem.h"
-#include "../include/share.h"
-#include "../include/memory/objs_pool.hpp"
+#include "Error.h"
+#include "type.hpp"
+#include "TVM/TRE.h"
+#include "TVM/TVM.h"
+#include "memory/mem.h"
+#include "share.h"
+#include "memory/objs_pool.hpp"
 
 #define STACK_ERROR_INFO "Stack is empty."
 
@@ -23,10 +19,11 @@ do{\
 }while(0)
 
 using namespace std;
+using namespace memory;
 
 // 利用索引存放函数指针，实现O(1)复杂度的调用算法
 // 不符合的地方用nullptr代替，算是以小部分空间换大部分时间
-static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[] = {
+const static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[] = {
     nullptr,
     TVM::ADD,
     TVM::NOP,
@@ -68,7 +65,7 @@ static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[] = {
     nullptr
 };
 
-static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
+const static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
     TVM::LOAD_INT,
     nullptr,
     nullptr,
@@ -112,15 +109,14 @@ static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
 
 TVM::TVM(const string &name, const float ver_in):
     name(name),
-    firsti(mem_control -> pool_ ->int_pool -> trcmalloc()),
-    secondi(mem_control -> pool_ ->int_pool -> trcmalloc()),
-    firstf(mem_control -> pool_ ->float_pool -> trcmalloc()),
-    secondf(mem_control -> pool_ ->float_pool -> trcmalloc()),
-    firsts(mem_control -> pool_ ->str_pool -> trcmalloc()),
-    seconds(mem_control -> pool_ ->str_pool -> trcmalloc()),
-    firstl(mem_control -> pool_ ->long_pool -> trcmalloc()), 
-    secondl(mem_control -> pool_ ->long_pool -> trcmalloc()),
-    mem_control(new gc_obj)
+    firsti(global_objs_pool ->int_pool -> trcmalloc()),
+    secondi(global_objs_pool ->int_pool -> trcmalloc()),
+    firstf(global_objs_pool ->float_pool -> trcmalloc()),
+    secondf(global_objs_pool ->float_pool -> trcmalloc()),
+    firsts(global_objs_pool ->str_pool -> trcmalloc()),
+    seconds(global_objs_pool ->str_pool -> trcmalloc()),
+    firstl(global_objs_pool ->long_pool -> trcmalloc()), 
+    secondl(global_objs_pool ->long_pool -> trcmalloc())
     {
     static_data.ver_ = ver_in;
     // 对比版本号，并拒绝版本号高于TVM的程序
@@ -144,7 +140,6 @@ TVM::~TVM() {
     // 释放字节码和变量的值
     free_TVM(this);
     // 重置
-    delete mem_control;
     run_env::lines.erase(name);
     for (const auto &i : static_data.funcs) {
         delete i.second;
@@ -165,7 +160,7 @@ void TVM::run() {
     run_env::run_module = parent;
 }
 
-void TVM::run_func(vector<vector<short*> > &bytecodes_, int init_index) {
+void TVM::run_func(const vector<vector<short*> > &bytecodes_, int init_index) {
     /**
      * 执行局部字节码（函数）
      * init_index:代码运行初始化索引
@@ -216,9 +211,8 @@ void TVM::pop_value() {
 }
 
 TVM *create_TVM(const string &name) {
-    TVM *vm = new TVM(name);
     run_env::set_module(name);
-    return vm;
+    return new TVM(name);
 }
 
 #undef STACK_ERROR_INFO

@@ -1,9 +1,9 @@
 #include <vector>
 #include <string>
-#include "../include/Compiler/compile_share.h"
-#include "../include/data.hpp"
-#include "../include/Error.h"
-#include "../include/cfg.h"
+#include "Compiler/compile_share.h"
+#include "data.hpp"
+#include "Error.h"
+#include "cfg.h"
 
 using namespace std;
 

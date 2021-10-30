@@ -3,11 +3,13 @@
  */
 
 #include <new>
-#include "../include/Error.h"
-#include "../include/TVM/TRE.h"
-#include "../include/TVM/int.h"
-#include "../include/memory/mem.h"
-#include "../include/memory/memory_pool.h"
+#include "Error.h"
+#include "TVM/TRE.h"
+#include "TVM/int.h"
+#include "memory/mem.h"
+#include "memory/memory_pool.h"
+
+#define GLOBAL_OBJS_INIT 2000
 
 using namespace std;
 
@@ -15,8 +17,7 @@ namespace memory {
     /**
      * 存放内存池和对象池
      */ 
-    gc_obj* global_gc_obj(new gc_obj);
-    objs_pool_TVM* global_objs_pool(new objs_pool_TVM(global_gc_obj));
+    objs_pool_TVM* global_objs_pool(new objs_pool_TVM(GLOBAL_OBJS_INIT));
     memory_pool* global_memory_pool(new memory_pool);
 }
 
@@ -35,9 +36,9 @@ void init_mem() {
 
     set_new_handler(nomemory);
     // 布尔值初始化
-    TVM_share::true_ = new trcint(1), TVM_share::false_ = new trcint(0);
+    TVM_share::true_ = new trc_int(1), TVM_share::false_ = new trc_int(0);
     // 整型缓存初始化，-5~256
     int index = 0;
     for(int i = INT_CACHE_BEGIN; i <= INT_CACHE_END; ++i)
-        TVM_share::int_cache[index++] = new trcint(i);
+        TVM_share::int_cache[index++] = new trc_int(i);
 }

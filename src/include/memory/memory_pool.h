@@ -54,7 +54,7 @@ private:
     memclass::freespace *memory_heads;
     // 储存删除请求
     vector<void*> delete_reqs;
-    // 已经申请的内存块数
+    // 释放已经申请的内存块数
     void free_pri();
 };
 

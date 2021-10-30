@@ -2,22 +2,22 @@
 #define TRC_INCLUDE_TVM_FLOAT_H
 
 #include "base.h"
-#include "../../include/cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
-class trcfloat : public trcobj
+class trc_float : public trcobj
 {
 public:
 	double value;
 
 	void putline(ostream& out);
 
-	~trcfloat();
+	~trc_float();
 
-	trcfloat();
+	trc_float();
 
-	trcfloat(const double &value);
+	trc_float(const double &value);
 
 	INTOBJ to_int();
 
@@ -57,12 +57,12 @@ public:
 
 	INTOBJ operator||(OBJ value_i);
 
-	int& gettype();
+	const int& gettype();
 	
     void delete_();
 private:
 	// 整型标记类型
-	int type = FLOAT_T;
+	const static int type = float_T;
 };
 
 #endif

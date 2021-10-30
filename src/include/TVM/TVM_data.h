@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../share.h"
+#include "share.h"
 #include "func.h"
 
 using namespace std;

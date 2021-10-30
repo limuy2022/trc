@@ -1,4 +1,4 @@
-#include "../../include/TVM/lib.h"
+#include "TVM/lib.h"
 
 using namespace std;
 

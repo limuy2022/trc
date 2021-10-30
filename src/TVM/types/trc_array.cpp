@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../../include/cfg.h"
-#include "../../include/TVM/array.h"
+#include "cfg.h"
+#include "TVM/array.h"
 
 using namespace std;
 

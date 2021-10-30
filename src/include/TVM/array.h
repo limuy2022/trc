@@ -1,8 +1,8 @@
-#ifndef TRC_TVM_ARRAY_H
-#define TRC_TVM_ARRAY_H
+#ifndef TRC_INCLUDE_TVM_ARRAY_H
+#define TRC_INCLUDE_TVM_ARRAY_H
 
 #include "base.h"
-#include "../cfg.h"
+#include "cfg.h"
 
 using namespace std;
 

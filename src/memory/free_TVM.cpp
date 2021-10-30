@@ -1,9 +1,9 @@
 #include <map>
-#include "../include/TVM/TRE.h"
-#include "../include/TVM/bignum.h"
-#include "../include/TVM/int.h"
-#include "../include/TVM/TVM.h"
-#include "../include/memory/mem.hpp"
+#include "TVM/TRE.h"
+#include "TVM/long.h"
+#include "TVM/int.h"
+#include "TVM/TVM.h"
+#include "memory/mem.hpp"
 
 using namespace std;
 
@@ -39,7 +39,6 @@ void quit_mem() {
     for(int i = 0; i < INT_CACHE_LEN; ++i)
         delete TVM_share::int_cache[i];
     // 全局对象
-    delete memory::global_gc_obj, \
-    memory::global_objs_pool, \
+    delete memory::global_objs_pool, \
     memory::global_memory_pool;
 }

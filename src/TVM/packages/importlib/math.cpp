@@ -4,6 +4,8 @@
  */ 
 
 #include <cmath>
+#include "cfg.h"
+#include "TVM/lib.h"
 
 using namespace std;
 

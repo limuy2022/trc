@@ -1,9 +1,9 @@
-#ifndef TRC_TVM_STRING_H
-#define TRC_TVM_STRING_H
+#ifndef TRC_INCLUDE_TVM_STRING_H
+#define TRC_INCLUDE_TVM_STRING_H
 
 #include <string>
 #include "base.h"
-#include "../../include/cfg.h"
+#include "cfg.h"
 
 using namespace std;
 
@@ -62,7 +62,7 @@ public:
     
     OBJ operator*(OBJ value_i);
     
-    int& gettype();
+    const int& gettype();
 
     void delete_();
 
@@ -70,7 +70,7 @@ private:
     void set_realloc(size_t num);
 
     // 整型标记类型
-    int type = STRING_T;
+    const static int type = string_T;
 };
 
 #endif

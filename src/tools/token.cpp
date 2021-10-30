@@ -3,8 +3,8 @@
 */
 
 #include <iostream>
-#include "../include/Compiler/Compiler.h"
-#include "../include/read.h"
+#include "Compiler/Compiler.h"
+#include "read.h"
 
 using namespace std;
 

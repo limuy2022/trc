@@ -15,36 +15,42 @@ typedef vector<string> vecs;
 typedef vector<vector<string> > vecs2d;
 typedef vector<char> vecc;
 
-class BigNum;
+class trc_long;
 class trcobj;
-class trcint;
-class trcfloat;
+class trc_int;
+class trc_float;
 class trc_string;
 
 typedef trcobj* OBJ;
-typedef trcint* INTOBJ;
-typedef trcfloat* FLOATOBJ;
+typedef trc_int* INTOBJ;
+typedef trc_float* FLOATOBJ;
 typedef trc_string* STRINGOBJ;
-typedef BigNum* LONGOBJ;
+typedef trc_long* LONGOBJ;
 
 // 编译时类型标识
 #define VAR_TICK 1
-#define INT_TICK 2
-#define FLOAT_TICK 3
-#define STRING_TICK 4
+#define int_TICK 2
+#define float_TICK 3
+#define string_TICK 4
 #define LONG_TICK 5
 #define FLOAT_L_TICK 6
 #define CONST_TICK 7
 
 // 运行时类型标识
-#define INT_T 0
-#define BOOL_T 1
-#define STRING_T 2
-#define FLOAT_T 3
-#define BIGNUM_T 4
-#define BIGFLOAT_T 5
+#define int_T 0
+#define bool_T 1
+#define string_T 2
+#define float_T 3
+#define trc_long_T 4
+#define trc_flong_T 5
 
 // 当前模块行号
 #define LINE_NOW run_env::lines[run_env::run_module]
+
+// 申请内存池对象
+#define MALLOCINT global_objs_pool -> int_pool -> trcmalloc
+#define MALLOCFLOAT global_objs_pool -> float_pool -> trcmalloc
+#define MALLOCSTRING global_objs_pool -> str_pool -> trcmalloc
+#define MALLOCLONG global_objs_pool -> long_pool -> trcmalloc
 
 #endif

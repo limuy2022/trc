@@ -11,12 +11,14 @@
 #include <cstring>
 #include <ostream>
 #include <istream>
-#include "../../include/TVM/string.h"
-#include "../../include/TVM/TRE.h"
-#include "../../include/Error.h"
+#include "TVM/string.h"
+#include "TVM/TRE.h"
+#include "Error.h"
 
 using namespace std;
 using namespace TVM_share;
+
+const int trc_string::type;
 
 trc_string::trc_string(const trc_string &init):
     char_num(init.char_num)
@@ -176,7 +178,7 @@ INTOBJ trc_string::to_int() {
 
 }
 
-int& trc_string::gettype() {
+const int& trc_string::gettype() {
     return type;
 }
 

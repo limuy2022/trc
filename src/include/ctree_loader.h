@@ -1,5 +1,5 @@
-#ifndef TRC_CTREE_LOADER_H
-#define TRC_CTREE_LOADER_H
+#ifndef TRC_INCLUDE_CTREE_LOADER_H
+#define TRC_INCLUDE_CTREE_LOADER_H
 
 using namespace std;
 

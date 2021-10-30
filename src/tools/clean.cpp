@@ -4,9 +4,9 @@
  */
 #include <cstdio>
 #include <iostream>
-#include "../include/filesys.h"
-#include "../include/cfg.h"
-#include "../include/filesys.h"
+#include "filesys.h"
+#include "cfg.h"
+#include "filesys.h"
 
 using namespace std;
 

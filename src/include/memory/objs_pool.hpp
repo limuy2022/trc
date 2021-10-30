@@ -1,5 +1,5 @@
 /**
- * 对象池，每个TVM一个，属于gc_pool的一部分
+ * 对象池，所有TVM公用，属于gc_pool的一部分
  * 
  * 原理是首先分配大块内存，然后进行分区
  * 申请内存就是把内存地址返回，释放内存就是标记为空闲
@@ -8,6 +8,7 @@
 #ifndef TRC_INCLUDE_MEMORY_OBJS_POOL_HPP
 #define TRC_INCLUDE_MEMORY_OBJS_POOL_HPP
 
+#include <list>
 #include <vector>
 #include "mem.h"
 
@@ -15,16 +16,6 @@ using namespace std;
 
 // 对象池初始大小(对象个数，并不是内存大小)，可以在此基础上扩容
 #define OBJS_POOL_SIZE 1000
-
-namespace objs_pool_objs {
-    class node_ {
-    public:
-        node_* next = nullptr;
-        void* data;
-    };
-}
-
-using namespace objs_pool_objs;
 
 template<typename T>
 class objs_pool
@@ -35,107 +26,92 @@ class objs_pool
      * 另外，对于该内存池，注重的是分配速度，而不是释放速度，释放会由gc统一管理
      */
 public:
-    // 已申请对象个数
-    size_t alloc_objs;
-
-    objs_pool(gc_obj *con, size_t obj_num = OBJS_POOL_SIZE);
-
-    ~objs_pool();
+    objs_pool(size_t obj_num = OBJS_POOL_SIZE);
 
     T *trcmalloc();
-
-    // 这个链表需要被遍历判断是否为垃圾对象，所以设成public
-    node_ *used_head;
-
-    node_ *free_head;
+    
 private:
-    vector<T*> arr;
-
-    // 对于gc管理者的链接，可以反向调用gc
-    gc_obj* con;
+    vector<T> arr;
 
     // 此函数为真正实现内存分配的函数
     // 而提供外调的接口作用为判断内存是否充足并且调用gc进行垃圾回收
     T* malloc_private();
+
+    void gc();
+
+    list<T*> used_head, free_head;
 };
 
 template<typename T>
-objs_pool<T>::objs_pool(gc_obj *con, size_t obj_num):
-    con(con),
-    alloc_objs(obj_num),
+objs_pool<T>::objs_pool(size_t obj_num):
     arr(obj_num),
-    used_head(new node_),
-    free_head(new node_)
+    free_head(obj_num)
 {
-    node_ *now = free_head, *t;
+    typename list<T*>::iterator tmp = free_head.begin();
     for (int i = 0; i < obj_num; ++i) {
-        t = new node_;
-        arr[i] = new T;
-        t -> data = arr[i];
-        now -> next = t;
-        now = t;
+        *tmp = &arr[i];
+        ++tmp;
     }
 }
-
-#define FREE_LIST(str) \
-do{\
-    node_ *now = (str), *n;\
-    while (now != nullptr) {\
-        n = now -> next;\
-        delete now;\
-        now = n;\
-    }\
-} while(0)
-
-template<typename T>
-objs_pool<T>::~objs_pool() {
-    FREE_LIST(free_head);
-    FREE_LIST(used_head);
-    for(auto &i: arr)
-        delete i;
-}
-
-#undef FREE_LIST
 
 template<typename T>
 T* objs_pool<T>::malloc_private() {
     /**
      * 私有的将实际操作分离
-     */ 
-    
-    // 保存需要返回的节点
-    node_ *now_use = free_head -> next;
-    // 使头结点的下一个节点指向当前节点的下一个节点
-    free_head -> next = now_use -> next;
-    // 使当前节点的下一个节点指向原本头结点的下一个节点
-    now_use -> next = used_head -> next;
-    // 使头结点的下一个节点指向当前节点
-    used_head -> next = now_use;
+     */
 
-    return (T*)now_use -> data;
+    T* tmp = *(free_head.begin());
+    free_head.pop_front();
+    used_head.push_front(tmp);
+    return tmp;
 }
 
 template<typename T>
 T* objs_pool<T>::trcmalloc() {
-    if (free_head->next != nullptr) {
+    if (!free_head.empty()) {
         // 内存充足，可以直接使用
         return malloc_private();
     }
     // 内存不足，启动gc
-    con -> gc();
-    if(free_head -> next == nullptr) {
+    this -> gc();
+    if(free_head.empty()) {
         // 启动gc后内存仍然不足，向操作系统再次申请内存
-        ++alloc_objs;
-        T* tmp = new T;
-        arr.push_back(tmp);
-        node_ *new_n = new node_;
-        new_n -> data = tmp;
-        // 直接将节点连接到使用链表中
-        new_n -> next = used_head -> next;
-        used_head -> next = new_n;
-        return (T*)(new_n -> data);
+        size_t index = arr.size();
+        arr.resize(index + 1);
+        T & tmp = arr[index];
+        used_head.push_front(&tmp);
+        return &tmp;
     }
     return malloc_private();
+}
+
+template<typename T>
+void objs_pool<T>::gc() {
+    /**
+     * 垃圾回收
+     * 垃圾回收算法采用引用计数回收
+     * 至于相互引用的漏洞，将会采用可达性回收算法进行
+     *
+     * 注意，在垃圾回收中，所有虚拟机中的对象统一继承于trcobj，以便在TVM析构时进行垃圾回收
+     *
+     * 回收条件：
+     * 1.当单个对象池处于满状态时
+     * 
+     * 当垃圾回收运行时，字节码运行也暂停，这里并不会采取多线程运行，也不允许出现内存访问错误的现象
+     */
+    T* tmp;
+    typename list<T*>::iterator index_re = used_head.begin();
+    for(int i = 0, n = used_head.size(); i < n; ++i) {
+        tmp = *index_re;
+        if(!tmp -> refs) {
+            tmp -> delete_();
+            typename list<T*>::iterator tmp_iter = index_re++;
+            used_head.erase(tmp_iter);
+            free_head.push_front(tmp);
+        } else{
+            ++index_re;
+        }
+    }
 }
 
 #undef OBJS_POOL_SIZE

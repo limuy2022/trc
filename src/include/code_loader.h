@@ -1,7 +1,7 @@
-#ifndef TRC_CODE_LOADER_H
-#define TRC_CODE_LOADER_H
+#ifndef TRC_INCLUDE_CODE_LOADER_H
+#define TRC_INCLUDE_CODE_LOADER_H
 
-#include "../include/TVM/TVM.h"
+#include "TVM/TVM.h"
 
 using namespace std;
 

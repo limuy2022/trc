@@ -5,8 +5,8 @@
 #include <map>
 #include <string>
 #include <cmath>
-#include "../include/Error.h"
-#include "../include/type.hpp"
+#include "Error.h"
+#include "type.hpp"
 
 using namespace std;
 

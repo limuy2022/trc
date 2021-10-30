@@ -1,11 +1,9 @@
 #include <string>
-#include "../../include/TVM/TVM.h"
-#include "../../include/data.hpp"
-#include "../../include/Error.h"
-#include "../../include/TVM/bignum.h"
-#include "../../include/TVM/int.h"
-#include "../../include/TVM/string.h"
-#include "../../include/TVM/TRE.h"
+#include "TVM/TVM.h"
+#include "data.hpp"
+#include "Error.h"
+#include "cfg.h"
+#include "TVM/TRE.h"
 
 using namespace std;
 
@@ -19,7 +17,7 @@ void TVM::CHANGE_VALUE(const short &index) {
      * 改变变量的值
      */
 
-    string& name_v = static_data.const_name[index];
+    const string& name_v = static_data.const_name[index];
     NAMEERROR(name_v.c_str());
     pop(firstv);
     var_names[name_v] = firstv;
@@ -43,7 +41,7 @@ void TVM::LOAD_NAME(const short &index) {
     /**
      * 读取变量的值
      */
-    string &name(static_data.const_name[index]);
+    const string &name(static_data.const_name[index]);
     NAMEERROR(name.c_str());
     push(var_names[name]);
 }
@@ -69,7 +67,7 @@ void TVM::LOAD_LOCAL(const short &name) {
     /**
      * 读取函数局部变量
      */
-    string &s_name = static_data.const_name[name];
+    const string &s_name = static_data.const_name[name];
     NAMEERROR(s_name.c_str());
     push(frames.top()->var_names[s_name]);
 }
@@ -79,7 +77,7 @@ void TVM::CHANGE_LOCAL(const short &index) {
      * 改变局部变量的值
      */
 
-    string &name_v = static_data.const_name[index];
+    const string &name_v = static_data.const_name[index];
     NAMEERROR(name_v.c_str());
     pop(firstv);
     frames.top()->var_names[name_v] = firstv;

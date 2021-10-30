@@ -4,10 +4,10 @@
 
 #include <string>
 #include <iostream>
-#include "../include/cfg.h"
-#include "../include/TVM/TVM.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/Error.h"
+#include "cfg.h"
+#include "TVM/TVM.h"
+#include "Compiler/Compiler.h"
+#include "Error.h"
 
 // 是否为新的语句块开始
 #define is_block(code) ((code).back() == '{')

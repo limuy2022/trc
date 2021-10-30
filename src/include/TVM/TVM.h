@@ -1,5 +1,5 @@
-#ifndef TRC_TVM_H
-#define TRC_TVM_H
+#ifndef TRC_INCLUDE_TVM_TVM_H
+#define TRC_INCLUDE_TVM_TVM_H
 
 #include <string>
 #include <vector>
@@ -49,7 +49,7 @@
 
 using namespace std;
 
-class BigNum;
+class trc_long;
 
 class gc_obj;
 
@@ -58,11 +58,7 @@ class TVM:public base
     /**
      * TVM：trc的核心部分，负责执行字节码
      */
-
-private:
-    // 内存管理者
-    gc_obj* mem_control;
-
+    
 public:
     TVM(const string &name, const float ver_in = version);
 
@@ -81,7 +77,7 @@ public:
 
     void run();
 
-    void run_func(vector<vector<short*> > &bytecodes_, int init_index);
+    void run_func(const vector<vector<short*> > &bytecodes_, int init_index);
 
     void run_step();
 

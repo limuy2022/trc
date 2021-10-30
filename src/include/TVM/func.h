@@ -1,5 +1,5 @@
-#ifndef TRC_TVM_OBJ_FUNC_H
-#define TRC_TVM_OBJ_FUNC_H
+#ifndef TRC_INCLUDE_TVM_FUNC_H
+#define TRC_INCLUDE_TVM_FUNC_H
 
 #include <string>
 #include <map>

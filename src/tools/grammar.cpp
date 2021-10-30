@@ -4,11 +4,11 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "../include/node.h"
-#include "../include/read.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/memory/mem.h"
-#include "../include/Compiler/compile_share.h"
+#include "node.h"
+#include "read.h"
+#include "Compiler/Compiler.h"
+#include "memory/mem.h"
+#include "Compiler/compile_share.h"
 
 using namespace std; 
 

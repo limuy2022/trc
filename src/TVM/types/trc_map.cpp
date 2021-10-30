@@ -6,8 +6,8 @@
  */ 
 
 #include <cstdlib>
-#include "../../include/TVM/map.h"
-#include "../../include/Error.h"
+#include "TVM/map.h"
+#include "Error.h"
 
 using namespace std;
 

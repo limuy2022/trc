@@ -5,12 +5,12 @@
 #include <iostream>
 #include <string>
 #include <stack>
-#include "../include/TVM/TVM.h"
-#include "../include/Compiler/Compiler.h"
-#include "../include/read.h"
-#include "../include/data.hpp"
-#include "../include/TVM/bignum.h"
-#include "../include/memory/mem.h"
+#include "TVM/TVM.h"
+#include "Compiler/Compiler.h"
+#include "read.h"
+#include "data.hpp"
+#include "TVM/long.h"
+#include "memory/mem.h"
 
 using namespace std;
 

@@ -4,8 +4,8 @@
 
 #include <cstdlib>
 #include <utility>
-#include "../include/memory/memory_pool.h"
-#include "../include/Error.h"
+#include "memory/memory_pool.h"
+#include "Error.h"
 
 // 内存池一二级分配器分界线
 #define MEMORY_CUT_LINE 128 

@@ -1,20 +1,18 @@
-#include "../../include/read.h"
-#include "../../include/filesys.h"
-#include "../../include/Compiler/Compiler.h"
-#include "../../include/Error.h"
-#include "../../include/share.h"
-#include "../../include/TVM/TRE.h"
-#include "../../include/TVM/TVM.h"
-#include "../../include/TVM/bignum.h"
-#include "../../include/filesys.h"
-#include "../../include/TVM/int.h"
-#include "../../include/TVM/float.h"
-#include "../../include/TVM/string.h"
-#include "../../include/memory/objs_pool.hpp"
-#include "../../include/TVM/lib.h"
-#include "../../include/data.hpp"
+#include "read.h"
+#include "filesys.h"
+#include "Compiler/Compiler.h"
+#include "Error.h"
+#include "share.h"
+#include "TVM/TRE.h"
+#include "TVM/TVM.h"
+#include "filesys.h"
+#include "cfg.h"
+#include "memory/objs_pool.hpp"
+#include "TVM/lib.h"
+#include "data.hpp"
 
 using namespace std;
+using namespace memory;
 
 void TVM::LOAD_INT(const short &index) {
     /**
@@ -28,7 +26,7 @@ void TVM::LOAD_INT(const short &index) {
         push(TVM_share::int_cache[value - INT_CACHE_BEGIN]);
         return;
     }
-    firsti = mem_control -> pool_ ->int_pool -> trcmalloc();
+    firsti = global_objs_pool ->int_pool -> trcmalloc();
     firsti -> value = value;
     push(firsti);
 }
@@ -43,7 +41,7 @@ void TVM::LOAD_FLOAT(const short &index) {
     /**
      * 加载浮点型变量到栈
      */
-    firstf = mem_control -> pool_ ->float_pool -> trcmalloc();
+    firstf = global_objs_pool ->float_pool -> trcmalloc();
     firstf -> value = static_data.const_f[index];
     push(firstf);
 }
@@ -52,7 +50,7 @@ void TVM::LOAD_STRING(const short &index) {
     /**
      * 加载字符串变量到栈
      */
-    firsts = mem_control -> pool_ ->str_pool -> trcmalloc();
+    firsts = global_objs_pool ->str_pool -> trcmalloc();
     firsts->operator=(static_data.const_s[index]);
     push(firsts);
 }
@@ -61,7 +59,7 @@ void TVM::LOAD_LONG(const short &index) {
     /**
      * 加载大整数变量到栈
      */
-    firstl = mem_control -> pool_ ->long_pool -> trcmalloc();
+    firstl = global_objs_pool ->long_pool -> trcmalloc();
     firstl -> operator=(static_data.const_long[index]);
     push(firstl);
 }

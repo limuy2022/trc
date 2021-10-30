@@ -1,11 +1,10 @@
 /**
  * 编译器需要使用的释放内存的模块
  * 但这些函数并不是只有编译器才能调用
- * 这只是对dll的适应
  */ 
-#include "../include/node.h"
-#include "../include/memory/mem.hpp"
-#include "../include/TVM/TVM.h"
+#include "node.h"
+#include "memory/mem.hpp"
+#include "TVM/TVM.h"
 
 using namespace std;
 

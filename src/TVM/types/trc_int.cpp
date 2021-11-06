@@ -80,21 +80,18 @@ OBJ trc_int::operator/(OBJ value_i) {
 }
 
 OBJ trc_int::operator%(OBJ value_i) {
-	INTOBJ tick = (INTOBJ)(value_i), tmp = MALLOCINT();
-	tmp -> value = value % tick->value;
-	return (OBJ)tmp;
+	INTOBJ tick = (INTOBJ)(value_i);
+	return (OBJ)MALLOCINT(value % tick->value);
 }
 
 OBJ trc_int::pow_(OBJ value_i) {
-	INTOBJ tick = (INTOBJ)(value_i), tmp = MALLOCINT();
-	tmp -> value = (int)pow((double)value, (double)(tick->value));
-	return (OBJ)tmp;
+	INTOBJ tick = (INTOBJ)(value_i);
+	return (OBJ)MALLOCINT((int)pow((double)value, (double)(tick->value)));
 }
 
 OBJ trc_int::zdiv(OBJ value_i) {
-	INTOBJ tick = (INTOBJ)(value_i), tmp = MALLOCINT();
-	tmp -> value = value / tick->value;
-	return (OBJ)tmp;
+	INTOBJ tick = (INTOBJ)(value_i);
+	return (OBJ)MALLOCINT(value / tick->value);
 }
 
 INTOBJ trc_int::operator!() {
@@ -111,26 +108,18 @@ INTOBJ trc_int::operator||(OBJ value_i) {
 	return (value || value_i? TVM_share::true_: TVM_share::false_);
 }
 
-STRINGOBJ trc_int::to_string() {
-	auto tmp = MALLOCSTRING();
-	strcpy(tmp -> value, std::to_string(value).c_str());
-	return tmp;
+OBJ trc_int::to_string() {
+	return MALLOCSTRING(std::to_string(value).c_str());
 }
 
-FLOATOBJ trc_int::to_float() {
-	auto tmp = MALLOCFLOAT();
-	tmp -> value = value;
-	return tmp;
+OBJ trc_int::to_float() {
+	return MALLOCFLOAT((double)value);
 }
 
-INTOBJ trc_int::to_bool() {
+OBJ trc_int::to_bool() {
     return (value? TVM_share::true_: TVM_share::false_);
 }
 
 const int& trc_int::gettype() {
 	return type;
-}
-
-void trc_int::delete_() {
-	value = 0;
 }

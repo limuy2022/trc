@@ -12,8 +12,8 @@ class trc_string : public trcobj
 public:
     char *value;
 
-    // 字符数
-    size_t char_num;
+    // 字符数(不包括\0)
+    size_t char_num = 0;
 
     trc_string(const trc_string &init);
 
@@ -42,9 +42,9 @@ public:
     friend
     istream& operator>>(istream &in_, trc_string &data_);
 
-    INTOBJ to_int();
+    OBJ to_int();
 
-    FLOATOBJ to_float();
+    OBJ to_float();
 
     INTOBJ operator==(OBJ value_i);
 

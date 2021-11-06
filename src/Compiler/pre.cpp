@@ -19,8 +19,8 @@ void pre(vecs &result, const string &codes) {
         if (code == '\n') {
             if (temp[0] != '#') {
                 result.push_back(temp);
-                temp = "";
             }
+            temp.clear();
         } else if (code != '\t' && code != ' ') {
             temp += code;
         }

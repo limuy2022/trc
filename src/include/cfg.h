@@ -20,12 +20,14 @@ class trcobj;
 class trc_int;
 class trc_float;
 class trc_string;
+class trc_flong;
 
 typedef trcobj* OBJ;
 typedef trc_int* INTOBJ;
 typedef trc_float* FLOATOBJ;
 typedef trc_string* STRINGOBJ;
 typedef trc_long* LONGOBJ;
+typedef trc_flong* FLONGOBJ;
 
 // 编译时类型标识
 #define VAR_TICK 1
@@ -46,11 +48,5 @@ typedef trc_long* LONGOBJ;
 
 // 当前模块行号
 #define LINE_NOW run_env::lines[run_env::run_module]
-
-// 申请内存池对象
-#define MALLOCINT global_objs_pool -> int_pool -> trcmalloc
-#define MALLOCFLOAT global_objs_pool -> float_pool -> trcmalloc
-#define MALLOCSTRING global_objs_pool -> str_pool -> trcmalloc
-#define MALLOCLONG global_objs_pool -> long_pool -> trcmalloc
 
 #endif

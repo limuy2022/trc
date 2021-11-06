@@ -14,77 +14,99 @@
 
 using namespace std;
 
+// 作为返回值返回，尽管会因为报错直接退出函数，根本不需要返回值，
+// 但有些编译器会因为没有返回值无法编译通过，为了能够更好的跨平台，创建此变量
+const static OBJ return_value = nullptr;
+
 trcobj::~trcobj() = default;
-INTOBJ trcobj::to_int() {
+OBJ trcobj::to_int() {
     send_error(TypeError, ERROR_TYPE_MSG("int"));
+    return return_value;
 }
 
-STRINGOBJ trcobj::to_string() {
+OBJ trcobj::to_string() {
     send_error(TypeError, ERROR_TYPE_MSG("string"));
+    return return_value;
 }
 
-FLOATOBJ trcobj::to_float() {
+OBJ trcobj::to_float() {
     send_error(TypeError, ERROR_TYPE_MSG("float"));
+    return return_value;
 }
 
-INTOBJ trcobj::to_bool() {
+OBJ trcobj::to_bool() {
     send_error(TypeError, ERROR_TYPE_MSG("bool"));
+    return return_value;
 }
 
 INTOBJ trcobj::operator<(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("<"));
+    return (INTOBJ)return_value;
 }
 
 INTOBJ trcobj::operator>(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG(">"));
+    return (INTOBJ)return_value;
 }
 
 INTOBJ trcobj::operator<=(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("<="));
+    return (INTOBJ)return_value;
 }
 
 INTOBJ trcobj::operator>=(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG(">="));
+    return (INTOBJ)return_value;
 }
 
 OBJ trcobj::operator+(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("+"));
+    return return_value;
 }
 
 OBJ trcobj::operator-(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("-"));
+    return return_value;
 }
 
 OBJ trcobj::operator*(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("*"));
+    return return_value;
 }
 
 OBJ trcobj::operator/(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("/"));
+    return return_value;
 }
 
 OBJ trcobj::operator%(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("%"));
+    return return_value;
 }
 
 OBJ trcobj::pow_(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("**"));
+    return return_value;
 }
 
 OBJ trcobj::zdiv(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("//"));
+    return return_value;
 }
 
 INTOBJ trcobj::operator!() {
     send_error(SyntaxError, ERROR_OPER_MSG("!"));
+    return (INTOBJ)return_value;
 }
 
 INTOBJ trcobj::operator&&(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("&&"));
+    return (INTOBJ)return_value;
 }
 
 INTOBJ trcobj::operator||(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("||"));
+    return (INTOBJ)return_value;
 }
 
 void trcobj::delete_() {}

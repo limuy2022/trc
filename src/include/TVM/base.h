@@ -29,13 +29,13 @@ public:
 	// 为了内存池的需要，由于内存池并不真正删除对象，所以需要提供一个"伪析构函数"
 	virtual void delete_();
 
-	virtual INTOBJ to_int();
+	virtual OBJ to_int();
 
-	virtual STRINGOBJ to_string();
+	virtual OBJ to_string();
 
-	virtual FLOATOBJ to_float();
+	virtual OBJ to_float();
 
-	virtual INTOBJ to_bool();
+	virtual OBJ to_bool();
 
 	virtual INTOBJ operator==(OBJ value_i) = 0;
 

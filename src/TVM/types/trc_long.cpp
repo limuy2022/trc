@@ -6,11 +6,13 @@
 #include <cstring>
 #include <ostream>
 #include "TVM/long.h"
+#include "TVM/base.h"
+#include "TVM/TRE.h"
 #include "Error.h"
 #include "type.hpp"
-#include "TVM/base.h"
 #include "share.h"
-#include "TVM/TRE.h"
+#include "memory/mem.h"
+#include "memory/objs_pool.hpp"
 
 using namespace std;
 using namespace TVM_share;
@@ -68,7 +70,7 @@ OBJ trc_long::operator=(OBJ a) {
 
 OBJ trc_long::operator+(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
-    auto *res = new trc_long();
+    auto *res = MALLOCLONG();
     res->set_alloc(max(a->size, size) + 1);
     memcpy(res->value, value, size * sizeof(char));
     for (int i = 0; i < a->size; ++i) {
@@ -90,7 +92,7 @@ OBJ trc_long::operator+(OBJ b) {
 
 OBJ trc_long::operator-(OBJ b) {
     LONGOBJ a = (LONGOBJ)(b);
-    auto *res = new trc_long;
+    auto *res = MALLOCLONG();
     res->set_alloc(max(a->size, size));
     memcpy(res->value, value, size * sizeof(char));
     for (int i = 0; i < a->size; ++i) {
@@ -133,6 +135,7 @@ OBJ trc_long::operator*(OBJ b) {
 void trc_long::set_alloc(int size_) {
     value = (char *) realloc(value, size_ * sizeof(char));
     NEW_trc_long_CHECK;
+    /* 将多余的部分初始化为零 */
     if (size_ > size)
         memset(value + size, 0, (size_ - size) * sizeof(char));
     size = size_;
@@ -150,19 +153,27 @@ void trc_long::putline(ostream &out_) {
 }
 
 OBJ trc_long::operator/(OBJ) {
-
+    // TODO
+    LONGOBJ res = MALLOCLONG();
+    return res;
 }
 
 OBJ trc_long::operator%(OBJ) {
-
+    // TODO
+    LONGOBJ res = MALLOCLONG();
+    return res;
 }
 
 OBJ trc_long::pow(OBJ) {
-
+    // TODO
+    LONGOBJ res = MALLOCLONG();
+    return res;
 }
 
 OBJ trc_long::zdiv(OBJ) {
-
+    // TODO
+    LONGOBJ res = MALLOCLONG();
+    return res;
 }
 
 INTOBJ trc_long::operator!=(OBJ b) {
@@ -236,31 +247,38 @@ const int& trc_long::gettype() {
 }
 
 INTOBJ trc_long::operator!() {
-
+    // todo
+    return INTOBJ();
 }
 
 INTOBJ trc_long::operator&&(OBJ value_i) {
-
+    // todo
+    return INTOBJ();
 }
 
 INTOBJ trc_long::operator||(OBJ value_i) {
-
+    // todo
+    return INTOBJ();
 }
 
-INTOBJ trc_long::to_int() {
-
+OBJ trc_long::to_string() {
+    string tmp(value + 1, value + size);
+    if(value[0])
+        tmp = '-' + tmp;
+    auto res = MALLOCSTRING(tmp);
+    return res;
 }
 
-STRINGOBJ trc_long::to_string() {
-
+OBJ trc_long::to_float() {
+    /**
+     * 注意，这里是转成高精度小数
+     */ 
+    FLONGOBJ res = MALLOCFLONG();
+    return res;
 }
 
-FLOATOBJ trc_long::to_float() {
-
-}
-
-INTOBJ trc_long::to_bool() {
-
+OBJ trc_long::to_bool() {
+    return (!value[0] && size > 1 && !value[1]? false_:true_);
 }
 
 void trc_long::delete_() {

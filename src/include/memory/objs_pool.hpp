@@ -28,7 +28,8 @@ class objs_pool
 public:
     objs_pool(size_t obj_num = OBJS_POOL_SIZE);
 
-    T *trcmalloc();
+    template<typename ... P>
+    T *trcmalloc(const P& ... data_argv);
     
 private:
     vector<T> arr;
@@ -60,17 +61,18 @@ T* objs_pool<T>::malloc_private() {
      * 私有的将实际操作分离
      */
 
-    T* tmp = *(free_head.begin());
+    T* tmp = free_head.front();
     free_head.pop_front();
     used_head.push_front(tmp);
     return tmp;
 }
 
 template<typename T>
-T* objs_pool<T>::trcmalloc() {
+template<typename ... P>
+T * objs_pool<T>::trcmalloc(const P& ... data_argv)  {
     if (!free_head.empty()) {
         // 内存充足，可以直接使用
-        return malloc_private();
+        return new(malloc_private()) T(data_argv...);
     }
     // 内存不足，启动gc
     this -> gc();
@@ -78,11 +80,11 @@ T* objs_pool<T>::trcmalloc() {
         // 启动gc后内存仍然不足，向操作系统再次申请内存
         size_t index = arr.size();
         arr.resize(index + 1);
-        T & tmp = arr[index];
-        used_head.push_front(&tmp);
-        return &tmp;
+        T * tmp = &arr[index];
+        used_head.push_front(tmp);
+        return new(tmp) T(data_argv...);
     }
-    return malloc_private();
+    return new(malloc_private()) T(data_argv...);
 }
 
 template<typename T>

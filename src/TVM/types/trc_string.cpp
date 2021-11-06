@@ -14,6 +14,10 @@
 #include "TVM/string.h"
 #include "TVM/TRE.h"
 #include "Error.h"
+#include "memory/mem.h"
+#include "memory/objs_pool.hpp"
+#include "share.h"
+#include "type.hpp"
 
 using namespace std;
 using namespace TVM_share;
@@ -60,9 +64,7 @@ trc_string::~trc_string() {
     free(value);
 }
 
-trc_string::trc_string():
-    char_num(0)
- {
+trc_string::trc_string() {
     value = (char*)(malloc(sizeof(char)));
     if(value == NULL) {
         send_error(MemoryError, "can't get the memory from os.");
@@ -83,7 +85,7 @@ OBJ trc_string::operator=(const trc_string& value_i) {
 }
 
 OBJ trc_string::operator+(trcobj *value_i) {
-    trc_string* tmp = new trc_string(*this);
+    trc_string* tmp = MALLOCSTRING(*this);
     *tmp += value_i;
     return (OBJ)tmp;
 }
@@ -170,12 +172,12 @@ const char * trc_string::c_str() {
     return value;
 }
 
-FLOATOBJ trc_string::to_float() {
-
+OBJ trc_string::to_float() {
+    return MALLOCFLOAT(atof(value));
 }
 
-INTOBJ trc_string::to_int() {
-
+OBJ trc_string::to_int() {
+    return MALLOCINT(to_type<int>(value));
 }
 
 const int& trc_string::gettype() {
@@ -183,7 +185,16 @@ const int& trc_string::gettype() {
 }
 
 OBJ trc_string::operator*(OBJ value_i) {
-
+    if(value_i -> gettype() != int_TICK) {
+        send_error(TypeError, "string can\'t * with " + type_int::int_name_s[value_i -> gettype()]);
+    }
+    INTOBJ tmp = (INTOBJ)(value_i);
+    auto res = MALLOCSTRING();
+    res -> set_realloc(char_num * (tmp -> value));
+    for(int i = 0; i < tmp->value; ++i) {
+        strcat(res -> value, value);
+    }
+    return (OBJ)res;
 }
 
 void trc_string::delete_() {

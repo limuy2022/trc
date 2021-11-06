@@ -5,7 +5,7 @@
 
 using namespace std;
 
-extern map<string, int> codes_int;
+extern map<string, short> codes_int;
 extern string int_code[];
 
 #endif

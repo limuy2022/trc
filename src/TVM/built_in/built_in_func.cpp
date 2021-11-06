@@ -8,6 +8,8 @@
 #include "TVM/TVM.h"
 #include "TVM/TRE.h"
 #include "cfg.h"
+#include "memory/mem.h"
+#include "memory/objs_pool.hpp"
 
 using namespace std;
 
@@ -113,5 +115,5 @@ void TYPE(int argc, TVM *vm) {
      */
 
     vm->pop(vm->firstv);
-    vm->push(new trc_string(type_int::int_name_s[vm->firstv->gettype()]));
+    vm->push(MALLOCSTRING(type_int::int_name_s[vm->firstv->gettype()]));
 }

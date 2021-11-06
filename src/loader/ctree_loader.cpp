@@ -5,16 +5,14 @@
  */
 
 #include <string>
-#include <fstream>
 #include <vector>
 #include <iostream>
+#include <cstdio>
 #include "TVM/TVM.h"
 #include "Error.h"
 
 // 开头标识文件是否为ctree文件的标识，魔数
 #define MAGIC_VALUE 0xACFD
-// 读写时需要转化的类型
-#define RWTYPE (char*)
 
 // 由于读入和写入是相对的，所以用宏定义来简化这一点
 // str:load or write
@@ -38,110 +36,110 @@ do{\
 
 using namespace std;
 
-static string load_string_one(ifstream &file) {
+static string load_string_one(FILE* file) {
     /**
      * 加载单个字符串
      */ 
     int n;
-    file.read(RWTYPE &n, sizeof(int));
+    fread(&n, sizeof(int), 1, file);
     // 临时申请一段空间用于初始化string
     char *tmp = new char[n];
-    file.read(tmp, n);
+    fread(tmp, n, 1, file);
     string a(tmp, n);
     delete []tmp;
     return a;
 }
 
-static void write_string_one(ofstream &file, const string &data) {
+static void write_string_one(FILE *file, const string &data) {
     /**
      * 写入单个字符串
      */ 
     int n = data.length();
     // 写入数据长度
-    file.write(RWTYPE &n, sizeof(int));
-    file.write(data.c_str(), n);
+    fwrite(&n, sizeof(n), 1, file);
+    fwrite(data.c_str(), n, 1, file);
 }
 
 template<typename T>
-static void write_pool(ofstream &file, vector<T> &const_pool) {
+static void write_pool(FILE *file, vector<T> &const_pool) {
     /**
      * 写入常量池及常量池大小
      * 注：基础数据类型，其它数据类型可能导致错误
      */
     int size = const_pool.size();
-    file.write(RWTYPE &size, sizeof(int));
+    fwrite(&size, sizeof(size), 1, file);
     for (const auto &i:const_pool)
-        file.write(RWTYPE &i, sizeof(i));
+        fwrite(&i, sizeof(i), 1, file);
 }
 
 template<typename T>
-static void load_pool(ifstream &file, vector<T> &const_pool) {
+static void load_pool(FILE *file, vector<T> &const_pool) {
     /**
      * 读取常量池到TVM中
      * 注：基础数据类型，其它数据类型可能导致错误
      */
     int size;
-    file.read(RWTYPE &size, sizeof(int));
+    fread(&size, sizeof(int), 1, file);
     const_pool.resize(size);
     for (auto &i:const_pool)
-        file.read(RWTYPE &i, sizeof(i));
+        fread(&i, sizeof(i), 1, file);
 }
 
-static void write_string_pool(ofstream &file, vector<string> &const_pool) {
+static void write_string_pool(FILE* file, vector<string> &const_pool) {
     /**
      * string是可变长数据类型，需要特殊处理
      */
     int size = const_pool.size();
     // 数据长度
-    file.write(RWTYPE &size, sizeof(int));
+    fwrite(&size, sizeof(size), 1, file);
     for (const auto& i : const_pool)
         write_string_one(file, i);
 }
 
-static void write_bytecode(ofstream &file, vector<vector<short *> > &const_opcode) {
+static void write_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
     /**
      * 写入字节码
      */
     // 字节码条数
     int size = const_opcode.size(), line_size;
-    file.write(RWTYPE &size, sizeof(int));
+    fwrite(&size, sizeof(int), 1, file);
     for (const auto& i : const_opcode) {
         line_size = i.size();
-        file.write(RWTYPE &line_size, sizeof(int));
+        fwrite(&line_size, sizeof(int), 1, file);
         for (const auto& j : i) {
-            file.write(RWTYPE &j[0], sizeof(j[0]));
-            file.write(RWTYPE &j[1], sizeof(j[1]));
+            fwrite(&j[0], sizeof(j[0]), 1, file);
+            fwrite(&j[1], sizeof(j[1]), 1, file);
         }
     }
 }
 
-static void load_string_pool(ifstream &file, vecs &const_pool) {
+static void load_string_pool(FILE *file, vecs &const_pool) {
     /**
      * string是可变长数据类型，需要特殊处理
      * 注：会清空vector原有的值
      */
     int size;
     // 数据长度
-    file.read(RWTYPE &size, sizeof(size));
+    fread(&size, sizeof(size), 1, file);
     const_pool.resize(size);
     for (auto &i : const_pool)
         i = load_string_one(file);
 }
 
-static void load_bytecode(ifstream &file, vector<vector<short *> > &const_opcode) {
+static void load_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
     /**
      * 读取字节码
      */
     // 字节码条数
     int size, line_size;
     short name, argv;
-    file.read(RWTYPE &size, sizeof(size));
+    fread(&size, sizeof(size), 1, file);
     for (int i = 0; i < size; ++i) {
-        file.read(RWTYPE &line_size, sizeof(line_size));
+        fread(&line_size, sizeof(line_size), 1, file);
         vector<short *> line;
         for (int j = 0; j < line_size; ++j) {
-            file.read(RWTYPE &name, sizeof(name));
-            file.read(RWTYPE &argv, sizeof(argv));
+            fread(&name, sizeof(name), 1, file);
+            fread(&argv, sizeof(argv), 1, file);
             line.push_back(new short[2]{name, argv});
         }
         const_opcode.push_back(line);
@@ -154,14 +152,14 @@ static void load_bytecode(ifstream &file, vector<vector<short *> > &const_opcode
  * 接着写入起始地址和终止地址
  */
 
-static void load_functions(ifstream &file, map<string, func_*> &const_funcl) {
+static void load_functions(FILE*file, map<string, func_*> &const_funcl) {
     /**
      * 读取函数并创建环境
      */
 
     int len;
     func_* tmp;
-    file.read(RWTYPE &len, sizeof(len));
+    fread(&len, sizeof(len), 1, file);
     for(int i = 0; i < len; ++i) {
         const string& t = load_string_one(file);
         tmp = new func_(t);
@@ -170,7 +168,7 @@ static void load_functions(ifstream &file, map<string, func_*> &const_funcl) {
     }
 }
 
-static void write_functions(ofstream &file, map<string, func_*> &const_funcl) {
+static void write_functions(FILE *file, map<string, func_*> &const_funcl) {
     /**
      * 写入函数及其环境
      */
@@ -186,12 +184,12 @@ bool is_magic(const string &path) {
      * 判断一个文件魔数是否正确
      * 注：此时文件必须未被打开
      */
-    ifstream file(path, ios::binary);
-    if (!file.is_open())
+    FILE * file = fopen(path.c_str(), "rb");
+    if (file == NULL)
         send_error(OpenFileError, path.c_str());
     int magic;
-    file.read(RWTYPE &magic, sizeof(magic));
-    file.close();
+    fread(&magic, sizeof(magic), 1, file);
+    fclose(file);
     return magic == MAGIC_VALUE;
 }
 
@@ -199,13 +197,13 @@ void loader_ctree(TVM *vm, const string &path) {
     /**
      * 读取ctree文件，并对文件进行验证(魔数及版本号)
      */
-    ifstream file(path, ios::binary);
-    if (!file.is_open())
+    FILE *file = fopen(path.c_str(), "rb");
+    if (file == NULL)
         send_error(OpenFileError, path.c_str());
     // 读取魔数
     // ACFD
     int magic;
-    file.read(RWTYPE &magic, sizeof(magic));
+    fread(&magic, sizeof(magic), 1, file);
     if (magic != MAGIC_VALUE) {
         cerr << "Trc:\"" << path << "\" is not a ctree file.Because its magic number is error\n";
         exit(1);
@@ -213,12 +211,12 @@ void loader_ctree(TVM *vm, const string &path) {
 
     // 读取版本号
     float ver_;
-    file.read(RWTYPE &ver_, sizeof(ver_));
+    fread(&ver_, sizeof(ver_), 1, file);
     vm->static_data.ver_ = ver_;
     vm->check_TVM();
     // 开始正式读写
     LOAD_WRITE(file, vm, load);
-    file.close();
+    fclose(file);
 }
 
 void save_ctree(TVM *vm, const string &path) {
@@ -226,20 +224,16 @@ void save_ctree(TVM *vm, const string &path) {
      * 保存虚拟机数据为ctree文件
      * 注意：并不对vm进行任何内存操作
      */
-    ofstream file(path, ios::binary);
-    if (!file.is_open()) {
+    FILE * file = fopen(path.c_str(), "wb");
+    if (file == NULL) {
         send_error(OpenFileError, path.c_str());
     }
     // 写入魔数
     // ACFD
     int magic = MAGIC_VALUE;
-    file.write(RWTYPE &magic, sizeof(magic));
+    fwrite(&magic, sizeof(magic), 1, file);
     // 写入版本号
-    file.write(RWTYPE &version, sizeof(version));
+    fwrite(&version, sizeof(version), 1, file);
     LOAD_WRITE(file, vm, write);
-    file.close();
+    fclose(file);
 }
-
-#undef MAGIC_VALUE
-#undef RWTYPE
-#undef LOAD_WRITE

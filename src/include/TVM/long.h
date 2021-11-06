@@ -62,13 +62,11 @@ public:
 
     ~trc_long();
 
-    INTOBJ to_int();
+    OBJ to_string();
 
-    STRINGOBJ to_string();
+    OBJ to_float();
 
-    FLOATOBJ to_float();
-
-    INTOBJ to_bool();
+    OBJ to_bool();
 
     void delete_();
     

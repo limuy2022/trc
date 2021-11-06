@@ -12,7 +12,15 @@
 #include "TVM/float.h"
 #include "TVM/long.h"
 #include "TVM/string.h"
+#include "TVM/flong.h"
 #include "memory_pool.h"
+
+// 申请内存池对象
+#define MALLOCINT memory::global_objs_pool -> int_pool -> trcmalloc
+#define MALLOCFLOAT memory::global_objs_pool -> float_pool -> trcmalloc
+#define MALLOCSTRING memory::global_objs_pool -> str_pool -> trcmalloc
+#define MALLOCLONG memory::global_objs_pool -> long_pool -> trcmalloc
+#define MALLOCFLONG memory::global_objs_pool -> flong_pool -> trcmalloc
 
 using namespace std;
 
@@ -44,12 +52,11 @@ class objs_pool_TVM {
 public:
     objs_pool_TVM(size_t init_size);
     ~objs_pool_TVM();
-    gc();
-
     objs_pool<trc_int>* int_pool;
     objs_pool<trc_float>* float_pool;
     objs_pool<trc_string>* str_pool;
     objs_pool<trc_long>* long_pool;
+    objs_pool<trc_flong>* flong_pool;
 };
 
 namespace memory {

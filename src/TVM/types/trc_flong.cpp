@@ -7,12 +7,18 @@
 
 using namespace std;
 
+const int trc_flong::type;
+
 trc_flong::trc_flong(const string&) {
 
 }
 
-trc_flong::trc_flong(const double &) {
+trc_flong::trc_flong(double init_data) {
 
+}
+
+trc_flong::trc_flong() {
+    
 }
 
 trc_flong::~trc_flong() {
@@ -23,6 +29,15 @@ void trc_flong::putline(ostream& out) {
     
 }
 
-int& trc_flong::gettype() {
-
+const int& trc_flong::gettype() {
+    return type;
 }
+
+INTOBJ trc_flong::operator==(OBJ value_i) {
+    return INTOBJ();
+}
+
+INTOBJ trc_flong::operator!=(OBJ value_i) {
+    return INTOBJ();
+}
+

@@ -44,7 +44,7 @@ static void run_no_argv_pattern(const char * pattern) {
 static void run_yes_argv_pattern(const char * pattern, int argc, char **argv) {
     if (CMP(pattern, "crun")) {
         tools_out::crun(argc, argv); return;
-    } if (pattern, "token") {
+    } if (CMP(pattern, "token")) {
         tools_out::out_token(argc, argv); return;
     } if (CMP(pattern, "dis")) {
         tools_out::dis(argc, argv); return;

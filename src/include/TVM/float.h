@@ -19,11 +19,11 @@ public:
 
 	trc_float(const double &value);
 
-	INTOBJ to_int();
+	OBJ to_int();
 
-	STRINGOBJ to_string();
+	OBJ to_string();
 
-	INTOBJ to_bool();
+	OBJ to_bool();
 
 	INTOBJ operator==(OBJ value_i);
 
@@ -58,8 +58,6 @@ public:
 	INTOBJ operator||(OBJ value_i);
 
 	const int& gettype();
-	
-    void delete_();
 private:
 	// 整型标记类型
 	const static int type = float_T;

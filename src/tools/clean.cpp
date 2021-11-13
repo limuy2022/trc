@@ -17,10 +17,10 @@ namespace tools_in {
         /**
          * 清除所有中间文件
          */
-    
+
         vecs files, dirs;
         listfiles(path, "\\*.ctree", files, dirs);
-        for (const auto& j : files) {
+        for (const auto &j: files) {
             if (!remove(path_join(2, path, j).c_str())) {
                 cout << "remove file " << j << "\n";
                 ++files_num;
@@ -29,7 +29,7 @@ namespace tools_in {
                 ++error_files;
             }
         }
-        for (const auto& j : dirs) {
+        for (const auto &j: dirs) {
             __clean(j);
         }
     }

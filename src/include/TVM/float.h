@@ -6,61 +6,61 @@
 
 using namespace std;
 
-class trc_float : public trcobj
-{
+class trc_float : public trcobj {
 public:
-	double value;
+    double value;
 
-	void putline(ostream& out);
+    void putline(ostream &out);
 
-	~trc_float();
+    ~trc_float();
 
-	trc_float();
+    trc_float();
 
-	trc_float(const double &value);
+    trc_float(const double &value);
 
-	OBJ to_int();
+    OBJ to_int();
 
-	OBJ to_string();
+    OBJ to_string();
 
-	OBJ to_bool();
+    OBJ to_bool();
 
-	INTOBJ operator==(OBJ value_i);
+    INTOBJ operator==(OBJ value_i);
 
-	INTOBJ operator!=(OBJ value_i);
-	
-	INTOBJ operator<(OBJ value_i);
-	
-	INTOBJ operator>(OBJ value_i);
-	
-	INTOBJ operator<=(OBJ value_i);
-	
-	INTOBJ operator>=(OBJ value_i);
-	
-	OBJ operator+(OBJ value_i);
-	
-	OBJ operator-(OBJ value_i);
-	
-	OBJ operator*(OBJ value_i);
-	
-	OBJ operator/(OBJ value_i);
-	
-	OBJ operator%(OBJ value_i);
-	
-	OBJ pow_(OBJ value_i);
-	
-	OBJ zdiv(OBJ value_i);
-	
-	INTOBJ operator!();
-	
-	INTOBJ operator&&(OBJ value_i);
+    INTOBJ operator!=(OBJ value_i);
 
-	INTOBJ operator||(OBJ value_i);
+    INTOBJ operator<(OBJ value_i);
 
-	const int& gettype();
+    INTOBJ operator>(OBJ value_i);
+
+    INTOBJ operator<=(OBJ value_i);
+
+    INTOBJ operator>=(OBJ value_i);
+
+    OBJ operator+(OBJ value_i);
+
+    OBJ operator-(OBJ value_i);
+
+    OBJ operator*(OBJ value_i);
+
+    OBJ operator/(OBJ value_i);
+
+    OBJ operator%(OBJ value_i);
+
+    OBJ pow_(OBJ value_i);
+
+    OBJ zdiv(OBJ value_i);
+
+    INTOBJ operator!();
+
+    INTOBJ operator&&(OBJ value_i);
+
+    INTOBJ operator||(OBJ value_i);
+
+    const int &gettype();
+
 private:
-	// 整型标记类型
-	const static int type = float_T;
+    // 整型标记类型
+    const static int type = float_T;
 };
 
 #endif

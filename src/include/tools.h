@@ -18,9 +18,9 @@ namespace tools_in {
 
     void __brun(TVM *vm, const string &path);
 
-    void __build(TVM* vm, const string& path);
+    void __build(TVM *vm, const string &path);
 
-    void __all(TVM* vm, const string& path);
+    void __all(TVM *vm, const string &path);
 
     void __clean(const string &path);
 

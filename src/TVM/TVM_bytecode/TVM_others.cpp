@@ -19,30 +19,30 @@ void TVM::LOAD_INT(const short &index) {
      * 加载整型变量到栈
      */
     int value = static_data.const_i[index];
-    if(INT_CACHE_BEGIN <= value && value <= INT_CACHE_END) {
+    if (INT_CACHE_BEGIN <= value && value <= INT_CACHE_END) {
         // 处在缓存范围中
 
         // 减去负数偏移量
         push(TVM_share::int_cache[value - INT_CACHE_BEGIN]);
         return;
     }
-    firsti = global_objs_pool ->int_pool -> trcmalloc();
-    firsti -> value = value;
+    firsti = global_objs_pool->int_pool->trcmalloc();
+    firsti->value = value;
     push(firsti);
 }
 
-void TVM::LOAD_MAP(const short & index) {
+void TVM::LOAD_MAP(const short &index) {
     /**
      * 加载map型变量到栈，参数含义是有几个参数
-     */ 
+     */
 }
 
 void TVM::LOAD_FLOAT(const short &index) {
     /**
      * 加载浮点型变量到栈
      */
-    firstf = global_objs_pool ->float_pool -> trcmalloc();
-    firstf -> value = static_data.const_f[index];
+    firstf = global_objs_pool->float_pool->trcmalloc();
+    firstf->value = static_data.const_f[index];
     push(firstf);
 }
 
@@ -50,7 +50,7 @@ void TVM::LOAD_STRING(const short &index) {
     /**
      * 加载字符串变量到栈
      */
-    firsts = global_objs_pool ->str_pool -> trcmalloc();
+    firsts = global_objs_pool->str_pool->trcmalloc();
     firsts->operator=(static_data.const_s[index]);
     push(firsts);
 }
@@ -59,13 +59,13 @@ void TVM::LOAD_LONG(const short &index) {
     /**
      * 加载大整数变量到栈
      */
-    firstl = global_objs_pool ->long_pool -> trcmalloc();
-    firstl -> operator=(static_data.const_long[index]);
+    firstl = global_objs_pool->long_pool->trcmalloc();
+    firstl->operator=(static_data.const_long[index]);
     push(firstl);
 }
 
-void TVM::LOAD_ARRAY(const short&index) {
-    
+void TVM::LOAD_ARRAY(const short &index) {
+
 }
 
 /* 什么都不做 */
@@ -84,16 +84,16 @@ static void fix_path(const string &path) {
      * 如果路径不正确将路径转换成正确的，否则报错
      */
 
-    if(check_file_is(path)) {
+    if (check_file_is(path)) {
         return;
     }
-    if(check_in_array(cpp_libs::names, path, cpp_libs::libs_num)) {
+    if (check_in_array(cpp_libs::names, path, cpp_libs::libs_num)) {
         return;
     }
-    if(check_file_is(path_join(2, "TVM/packages/self_support", path))) {
+    if (check_file_is(path_join(2, "TVM/packages/self_support", path))) {
         return;
     }
-    if(check_file_is(path_join(2, "TVM/packages/other_support", path))) {
+    if (check_file_is(path_join(2, "TVM/packages/other_support", path))) {
         return;
     }
 

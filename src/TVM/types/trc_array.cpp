@@ -12,7 +12,7 @@ trc_array::trc_array() {
 trc_array::~trc_array() {
     clear();
     delete head;
-};
+}
 
 void trc_array::del(int index) {
     /*
@@ -25,12 +25,12 @@ void trc_array::del(int index) {
     delete p->next;
 }
 
-OBJ trc_array::operator [](int index) {
+OBJ trc_array::operator[](int index) {
     /*
     * 获取index的值
     */
 
-    listnode *p = head -> next;
+    listnode *p = head->next;
     for (int i = 0; i < index; ++i)
         p = p->next;
     return p->data;
@@ -66,7 +66,7 @@ int trc_array::len() {
     * 计算链表长度,不算头结点
     */
     listnode *t = head->next;
-    if (head->next == nullptr)  return 0;    // 为空
+    if (head->next == nullptr) return 0;    // 为空
 
     int length = 1;
     while (t->next != nullptr) {
@@ -93,7 +93,7 @@ void trc_array::print() {
     /*
     *打印整个链表
     */
-    listnode *t = head -> next;
+    listnode *t = head->next;
     if (head->next == nullptr) {
         // 为空
         cout << "[]";
@@ -104,7 +104,7 @@ void trc_array::print() {
         cout << t->data << ',';
         t = t->next;
     }
-    cout << t -> data << "]";
+    cout << t->data << "]";
 }
 
 bool trc_array::check_in(OBJ data) {

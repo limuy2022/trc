@@ -17,8 +17,8 @@ void free_vector(V &f) {
     * 释放容器内所有动态数组的内存，包括但不限于vector
     */
 
-    for (const auto &i : f) {
-        delete []i;
+    for (const auto &i: f) {
+        delete[]i;
     }
     f.clear();
 }

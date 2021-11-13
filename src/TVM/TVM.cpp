@@ -2,21 +2,8 @@
 #include "type.hpp"
 #include "TVM/TRE.h"
 #include "TVM/TVM.h"
-#include "memory/mem.h"
 #include "share.h"
 #include "memory/objs_pool.hpp"
-
-#define STACK_ERROR_INFO "Stack is empty."
-
-#define STACK_RUN_ERROR(stack_)\
-if((stack_).empty()) {\
-    send_error(RunError, STACK_ERROR_INFO);\
-}
-
-#define STACK_TYPE_ERROR(info) \
-do{\
-    send_error(TypeError, "error in "#info" stack.");\
-}while(0)
 
 using namespace std;
 using namespace memory;
@@ -24,105 +11,104 @@ using namespace memory;
 // 利用索引存放函数指针，实现O(1)复杂度的调用算法
 // 不符合的地方用nullptr代替，算是以小部分空间换大部分时间
 const static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[] = {
-    nullptr,
-    &TVM::ADD,
-    &TVM::NOP,
-    &TVM::SUB,
-    &TVM::MUL,
-    &TVM::DIV,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::DEL,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::IMPORT,
-    &TVM::POW,
-    &TVM::ZDIV,
-    &TVM::MOD,
-    nullptr,
-    nullptr,
-    &TVM::EQUAL,
-    &TVM::UNEQUAL,
-    &TVM::GREATER_EQUAL,
-    &TVM::LESS_EQUAL,
-    &TVM::LESS,
-    &TVM::GREATER,
-    &TVM::ASSERT,
-    &TVM::NOT,
-    &TVM::AND,
-    &TVM::OR,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::FREE_FUNCTION,
-    nullptr,
-    &TVM::DEL_LOCAL,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr
+        nullptr,
+        &TVM::ADD,
+        &TVM::NOP,
+        &TVM::SUB,
+        &TVM::MUL,
+        &TVM::DIV,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::DEL,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::IMPORT,
+        &TVM::POW,
+        &TVM::ZDIV,
+        &TVM::MOD,
+        nullptr,
+        nullptr,
+        &TVM::EQUAL,
+        &TVM::UNEQUAL,
+        &TVM::GREATER_EQUAL,
+        &TVM::LESS_EQUAL,
+        &TVM::LESS,
+        &TVM::GREATER,
+        &TVM::ASSERT,
+        &TVM::NOT,
+        &TVM::AND,
+        &TVM::OR,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::FREE_FUNCTION,
+        nullptr,
+        &TVM::DEL_LOCAL,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
 };
 
 const static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
-    &TVM::LOAD_INT,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::GOTO,
-    &TVM::STORE_NAME,
-    &TVM::LOAD_NAME,
-    nullptr,
-    &TVM::LOAD_FLOAT,
-    &TVM::LOAD_STRING,
-    &TVM::CALL_BUILTIN,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::IF_FALSE_GOTO,
-    &TVM::CHANGE_VALUE,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    &TVM::STORE_LOCAL,
-    &TVM::LOAD_LOCAL,
-    &TVM::CALL_FUNCTION,
-    nullptr,
-    &TVM::CHANGE_LOCAL,
-    nullptr,
-    &TVM::LOAD_LONG,
-    &TVM::LOAD_ARRAY,
-    &TVM::CALL_METHOD,
-    &TVM::LOAD_MAP
+        &TVM::LOAD_INT,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::GOTO,
+        &TVM::STORE_NAME,
+        &TVM::LOAD_NAME,
+        nullptr,
+        &TVM::LOAD_FLOAT,
+        &TVM::LOAD_STRING,
+        &TVM::CALL_BUILTIN,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::IF_FALSE_GOTO,
+        &TVM::CHANGE_VALUE,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        &TVM::STORE_LOCAL,
+        &TVM::LOAD_LOCAL,
+        &TVM::CALL_FUNCTION,
+        nullptr,
+        &TVM::CHANGE_LOCAL,
+        nullptr,
+        &TVM::LOAD_LONG,
+        &TVM::LOAD_ARRAY,
+        &TVM::CALL_METHOD,
+        &TVM::LOAD_MAP
 };
 
-TVM::TVM(const string &name, const float ver_in):
-    name(name),
-    firsti(MALLOCINT()),
-    secondi(MALLOCINT()),
-    firstf(MALLOCFLOAT()),
-    secondf(MALLOCFLOAT()),
-    firsts(MALLOCSTRING()),
-    seconds(MALLOCSTRING()),
-    firstl(MALLOCLONG()), 
-    secondl(MALLOCLONG())
-    {
+TVM::TVM(const string &name, const float ver_in) :
+        name(name),
+        firsti(MALLOCINT()),
+        secondi(MALLOCINT()),
+        firstf(MALLOCFLOAT()),
+        secondf(MALLOCFLOAT()),
+        firsts(MALLOCSTRING()),
+        seconds(MALLOCSTRING()),
+        firstl(MALLOCLONG()),
+        secondl(MALLOCLONG()) {
     static_data.ver_ = ver_in;
     // 对比版本号，并拒绝版本号高于TVM的程序
     check_TVM();
     // 新建默认变量
-    var_names["__name__"] = (OBJ)new trc_string(string("__main__"));
+    var_names["__name__"] = (OBJ) new trc_string(string("__main__"));
 }
 
 void TVM::check_TVM() const {
@@ -141,7 +127,7 @@ TVM::~TVM() {
     free_TVM(this);
     // 重置
     run_env::lines.erase(name);
-    for (const auto &i : static_data.funcs) {
+    for (const auto &i: static_data.funcs) {
         delete i.second;
     }
 }
@@ -153,14 +139,14 @@ void TVM::run() {
 
     string &parent = run_env::run_module;
     run_env::run_module = name;
-    
+
     // 将整个程序当成一个函数执行
     this->run_func(static_data.byte_codes, 0);
 
     run_env::run_module = parent;
 }
 
-void TVM::run_func(const vector<vector<short*> > &bytecodes_, int init_index) {
+void TVM::run_func(const vector<vector<short *> > &bytecodes_, int init_index) {
     /**
      * 执行局部字节码（函数）
      * init_index:代码运行初始化索引
@@ -169,11 +155,11 @@ void TVM::run_func(const vector<vector<short*> > &bytecodes_, int init_index) {
     // 原先的代码行数，用于还原索引
     int re_ = LINE_NOW;
     LINE_NOW = init_index;
-    auto* pointer = &LINE_NOW;
+    auto *pointer = &LINE_NOW;
     size_t size = bytecodes_.size();
     while (*pointer < size) {
         for (const auto &i: bytecodes_[*pointer])
-            if(i[1] == -1)
+            if (i[1] == -1)
                 (this->*TVM_RUN_CODE_NOARG_FUNC[i[0]])();
             else
                 (this->*TVM_RUN_CODE_ARG_FUNC[i[0]])(i[1]);
@@ -189,8 +175,8 @@ void TVM::run_step() {
      */
 
     auto *pointer = &LINE_NOW;
-    for (const auto &i : static_data.byte_codes[*pointer])
-        if(i[1] == -1)
+    for (const auto &i: static_data.byte_codes[*pointer])
+        if (i[1] == -1)
             (this->*TVM_RUN_CODE_NOARG_FUNC[i[0]])();
         else
             (this->*TVM_RUN_CODE_ARG_FUNC[i[0]])(i[1]);

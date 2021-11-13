@@ -19,14 +19,14 @@ namespace tools_in {
          * vm：填充的虚拟机
          * path：文件的路径
          */
-    
+
         string scode;
         readcode(scode, path);
         // 设置当前编译模块路径，便于报错
         run_env::set_module(path);
         Compiler(vm, scode);
         save_ctree(vm, path_last(path, ".ctree"));
-    } 
+    }
 }
 
 namespace tools_out {

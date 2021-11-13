@@ -3,7 +3,7 @@
  * 
  * 原理是首先分配大块内存，然后进行分区
  * 申请内存就是把内存地址返回，释放内存就是标记为空闲
- */ 
+ */
 
 #ifndef TRC_INCLUDE_MEMORY_MEMORY_POOL_H
 #define TRC_INCLUDE_MEMORY_MEMORY_POOL_H
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace memclass{
+namespace memclass {
     class freespace;
 }
 
@@ -47,13 +47,14 @@ public:
 
     void mem_free(void *p, size_t size_);
 
-    void* mem_realoc(void *p, size_t size_);
+    void *mem_realoc(void *p, size_t size_);
 
 private:
     // 储存各个链表的链表头
     memclass::freespace *memory_heads;
     // 储存删除请求
-    vector<void*> delete_reqs;
+    vector<void *> delete_reqs;
+
     // 释放已经申请的内存块数
     void free_pri();
 };

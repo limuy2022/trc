@@ -6,10 +6,9 @@
 
 using namespace std;
 
-class trc_flong:public trcobj
-{
+class trc_flong : public trcobj {
 public:
-    trc_flong(const string&);
+    trc_flong(const string &);
 
     trc_flong(double init_data);
 
@@ -17,14 +16,14 @@ public:
 
     ~trc_flong();
 
-    void putline(ostream& out);
+    void putline(ostream &out);
 
-    const int& gettype();
+    const int &gettype();
 
     INTOBJ operator==(OBJ value_i);
 
     INTOBJ operator!=(OBJ value_i);
-    
+
 private:
     void set_realloc(size_t num);
 

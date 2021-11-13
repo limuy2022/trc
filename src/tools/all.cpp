@@ -17,7 +17,7 @@ static int files_num;
 namespace tools_out {
     void all(int argc, char *argv[]) {
         files_num = 0;
-        TVM* vm = create_TVM();
+        TVM *vm = create_TVM();
         for (int i = 2; i < argc; ++i)
             tools_in::__all(vm, argv[i]);
         cout << "\nbuild " << files_num << " files\n";
@@ -30,13 +30,13 @@ namespace tools_in {
     void __all(TVM *vm, const string &path) {
         vecs files, dirs;
         listfiles(path, "\\*.tree", files, dirs);
-        for (const auto& j : files) {
-            const string& p(path_join(2, path, j));
+        for (const auto &j: files) {
+            const string &p(path_join(2, path, j));
             __build(vm, p);
             cout << "build file " << p << "\n";
             ++files_num;
         }
-        for (const auto& j : dirs)
+        for (const auto &j: dirs)
             __all(vm, j);
     }
 }

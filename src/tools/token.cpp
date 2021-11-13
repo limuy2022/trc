@@ -14,11 +14,11 @@ static void out(const string &file_name, const vecs2d &data) {
     */
     cout << "From file " << file_name << ":" << "\n";
     int line_index = 0;
-    for (const auto& line : data) {
+    for (const auto &line: data) {
         // 行
         cout << line_index << ":";
         line_index++;
-        for (const auto& j : line) {
+        for (const auto &j: line) {
             cout << j << ", ";
         }
         cout << "\n";
@@ -32,7 +32,7 @@ namespace tools_in {
         // 解析
         vecs start_temp;
         pre(start_temp, file_data);
-        const auto& temp_token = final_token(start_temp);
+        const auto &temp_token = final_token(start_temp);
         out(path, temp_token);
     }
 }

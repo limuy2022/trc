@@ -53,12 +53,11 @@ class trc_long;
 
 class gc_obj;
 
-class TVM:public base
-{
+class TVM : public base {
     /**
      * TVM：trc的核心部分，负责执行字节码
      */
-    
+
 public:
     TVM(const string &name, const float ver_in = version);
 
@@ -77,12 +76,12 @@ public:
 
     void run();
 
-    void run_func(const vector<vector<short*> > &bytecodes_, int init_index);
+    void run_func(const vector<vector<short *> > &bytecodes_, int init_index);
 
     void run_step();
 
     template<typename T>
-    void pop(T * &a);
+    void pop(T *&a);
 
     void pop_value();
 
@@ -159,13 +158,13 @@ public:
 
     void DEL_LOCAL();
 
-    void LOAD_LONG(const short& index);
+    void LOAD_LONG(const short &index);
 
-    void CALL_METHOD(const short&index);
+    void CALL_METHOD(const short &index);
 
-    void LOAD_ARRAY(const short&index);
+    void LOAD_ARRAY(const short &index);
 
-    void LOAD_MAP(const short & index);
+    void LOAD_MAP(const short &index);
 
     /* 指令集结束定义处 */
 
@@ -185,12 +184,12 @@ public:
 };
 
 template<typename T>
-void TVM::pop(T * &a) {
+void TVM::pop(T *&a) {
     /**
      * 弹出栈顶的数据指针赋给a
      * 注：其实我也很想用void*的，但是用void*就要改好多地方，所以下个版本一定改
-     */ 
-    a = (T*)stack_data.top();
+     */
+    a = (T *) stack_data.top();
     stack_data.pop();
 }
 

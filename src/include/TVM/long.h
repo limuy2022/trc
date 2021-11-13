@@ -3,7 +3,7 @@
  * 所以在这里通过trc_long来实现
  * 注意：该类重载了trc所支持的所有运算符
  * 包括+，-，*，/，==，！=等
- */ 
+ */
 
 #ifndef TRC_INCLUDE_TRC_LONG_H
 #define TRC_INCLUDE_TRC_LONG_H
@@ -15,47 +15,46 @@
 
 using namespace std;
 
-class trc_long:public trcobj
-{
+class trc_long : public trcobj {
 public:
-	trc_long& operator=(const string &a);
+    trc_long &operator=(const string &a);
 
     trc_long();
 
-    OBJ operator =(OBJ a);
+    OBJ operator=(OBJ a);
 
-    OBJ operator +(OBJ a);
+    OBJ operator+(OBJ a);
 
-    OBJ operator -(OBJ a);
+    OBJ operator-(OBJ a);
 
-    OBJ operator *(OBJ v);
+    OBJ operator*(OBJ v);
 
-    OBJ operator /(OBJ);
+    OBJ operator/(OBJ);
 
-    OBJ operator %(OBJ);
+    OBJ operator%(OBJ);
 
     OBJ pow(OBJ);
 
     OBJ zdiv(OBJ);
 
-    INTOBJ operator !=(OBJ a);
+    INTOBJ operator!=(OBJ a);
 
-    INTOBJ operator ==(OBJ);
+    INTOBJ operator==(OBJ);
 
-    INTOBJ operator <(OBJ);
+    INTOBJ operator<(OBJ);
 
-    INTOBJ operator >(OBJ);
+    INTOBJ operator>(OBJ);
 
-    INTOBJ operator <=(OBJ);
+    INTOBJ operator<=(OBJ);
 
-    INTOBJ operator >=(OBJ);
+    INTOBJ operator>=(OBJ);
 
-    void putline(ostream& out);
+    void putline(ostream &out);
 
-    const int& gettype();
+    const int &gettype();
 
     INTOBJ operator!();
-    
+
     INTOBJ operator&&(OBJ value_i);
 
     INTOBJ operator||(OBJ value_i);
@@ -69,7 +68,7 @@ public:
     OBJ to_bool();
 
     void delete_();
-    
+
 private:
     void set_alloc(int size_);
 

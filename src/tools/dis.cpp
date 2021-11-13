@@ -7,11 +7,10 @@
 #include "ctree_loader.h"
 #include "read.h"
 #include "Compiler/Compiler.h"
-#include "TVM/TVM.h"
 
 using namespace std;
 
-static void out(TVM * vm, const string& file_name) {
+static void out(TVM *vm, const string &file_name) {
     /**
      * 输出TVM的值
      */
@@ -21,10 +20,10 @@ static void out(TVM * vm, const string& file_name) {
     // 输出字节码
     cout << "\nCode:\n";
     int line_index = 0;
-    for (const auto &line : vm -> static_data.byte_codes) {
+    for (const auto &line: vm->static_data.byte_codes) {
         // 行
         cout << "    " << line_index++ << ":";
-        for (const auto &value_ : line) {
+        for (const auto &value_: line) {
             cout << int_code[value_[0]] << "|" << value_[1] << ", ";
         }
         cout << "\n";
@@ -34,17 +33,17 @@ static void out(TVM * vm, const string& file_name) {
     // 输出常量池
     // 整型常量池
     // 注意：大整数不在此输出
-    n = vm -> static_data.const_i.size();
+    n = vm->static_data.const_i.size();
     cout << "\nint constant pool:\n";
     for (i = 0; i < n; ++i) {
-        cout << "    " << i << ":" << vm -> static_data.const_i[i] << "\n";
+        cout << "    " << i << ":" << vm->static_data.const_i[i] << "\n";
     }
 
     // 浮点数常量池
-    n = vm -> static_data.const_f.size();
+    n = vm->static_data.const_f.size();
     cout << "\nfloat constant pool:\n";
     for (i = 0; i < n; ++i) {
-        cout << "    " << i << ":" << vm -> static_data.const_f[i] << "\n";
+        cout << "    " << i << ":" << vm->static_data.const_f[i] << "\n";
     }
     // 字符串常量池
     n = vm->static_data.const_s.size();
@@ -85,7 +84,7 @@ namespace tools_in {
             Compiler(vm, codes);
         }
         out(vm, file_path);
-    } 
+    }
 }
 
 namespace tools_out {

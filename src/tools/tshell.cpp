@@ -4,7 +4,6 @@
 
 #include <string>
 #include <iostream>
-#include "cfg.h"
 #include "TVM/TVM.h"
 #include "Compiler/Compiler.h"
 #include "Error.h"
@@ -19,7 +18,7 @@ using namespace std;
 static void get_block(string &res) {
     string temp;
     int break_num = 1;
-    for(;;) {
+    for (;;) {
         for (int i = 0; i <= break_num; ++i)
             cout << "    ";
         cout << "->";
@@ -42,14 +41,14 @@ namespace tools_out {
         * trc的交互式界面
         */
         cout << "Welcome to Trc.This is tshell.you can use \"help()\" to find help.\n"\
-        << "Version:" << version << "\n\n";
-    
+ << "Version:" << version << "\n\n";
+
         string code;
-        
+
         TVM *vm = create_TVM();
         // tshell报错但不终止程序
         error_env::quit = false;
-        for(;;) {
+        for (;;) {
             cout << "\ntshell>";
             getline(cin, code);
             if (code == "exit()")
@@ -59,7 +58,7 @@ namespace tools_out {
                 get_block(code);
             } else
                 code += "\n";
-            
+
             Compiler(vm, code);
             vm->run();
         }

@@ -2,7 +2,7 @@
  * trcobj类型基类的函数实现
  * 部分无实际意义
  * 部分有报出相应错误的功能和职责
- */ 
+ */
 
 #include "TVM/base.h"
 #include "Error.h"
@@ -19,6 +19,7 @@ using namespace std;
 const static OBJ return_value = nullptr;
 
 trcobj::~trcobj() = default;
+
 OBJ trcobj::to_int() {
     send_error(TypeError, ERROR_TYPE_MSG("int"));
     return return_value;
@@ -41,22 +42,22 @@ OBJ trcobj::to_bool() {
 
 INTOBJ trcobj::operator<(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("<"));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 INTOBJ trcobj::operator>(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG(">"));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 INTOBJ trcobj::operator<=(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("<="));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 INTOBJ trcobj::operator>=(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG(">="));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 OBJ trcobj::operator+(OBJ value_i) {
@@ -96,17 +97,17 @@ OBJ trcobj::zdiv(OBJ value_i) {
 
 INTOBJ trcobj::operator!() {
     send_error(SyntaxError, ERROR_OPER_MSG("!"));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 INTOBJ trcobj::operator&&(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("&&"));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 INTOBJ trcobj::operator||(OBJ value_i) {
     send_error(SyntaxError, ERROR_OPER_MSG("||"));
-    return (INTOBJ)return_value;
+    return (INTOBJ) return_value;
 }
 
 void trcobj::delete_() {}

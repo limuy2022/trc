@@ -7,8 +7,7 @@
 
 using namespace std;
 
-class frame_:public base
-{
+class frame_ : public base {
 public:
     frame_();
 };
@@ -19,7 +18,7 @@ public:
     const string name;
 
     // 字节码信息
-    vector<vector<short*> > bytecodes;
+    vector<vector<short *> > bytecodes;
 
     func_(const string &name);
 };

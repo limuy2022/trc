@@ -4,5 +4,5 @@ using namespace std;
 
 frame_::frame_() {}
 
-func_::func_(const string &name) : 
-	name(name) {}
+func_::func_(const string &name) :
+        name(name) {}

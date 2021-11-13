@@ -42,29 +42,32 @@ void quit_mem();
 
 void free_var_vm(TVM *vm);
 
-template<typename T> class objs_pool;
+template<typename T>
+class objs_pool;
 
 class objs_pool_TVM {
     /**
      * 对对象池的基本封装，对象池面向全体对象
      * 而这个类面向TVM用于保存基础类型
-     */ 
+     */
 public:
     objs_pool_TVM(size_t init_size);
+
     ~objs_pool_TVM();
-    objs_pool<trc_int>* int_pool;
-    objs_pool<trc_float>* float_pool;
-    objs_pool<trc_string>* str_pool;
-    objs_pool<trc_long>* long_pool;
-    objs_pool<trc_flong>* flong_pool;
+
+    objs_pool<trc_int> *int_pool;
+    objs_pool<trc_float> *float_pool;
+    objs_pool<trc_string> *str_pool;
+    objs_pool<trc_long> *long_pool;
+    objs_pool<trc_flong> *flong_pool;
 };
 
 namespace memory {
     /**
      * 存放内存池和对象池
-     */ 
-    extern objs_pool_TVM* global_objs_pool;
-    extern memory_pool* global_memory_pool;
+     */
+    extern objs_pool_TVM *global_objs_pool;
+    extern memory_pool *global_memory_pool;
 }
 
 #endif

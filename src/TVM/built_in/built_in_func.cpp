@@ -7,8 +7,6 @@
 #include "type.hpp"
 #include "TVM/TVM.h"
 #include "TVM/TRE.h"
-#include "cfg.h"
-#include "memory/mem.h"
 #include "memory/objs_pool.hpp"
 
 using namespace std;
@@ -29,7 +27,7 @@ void HELP(int argc, TVM *vm) {
     /**
     * 输出帮助
     * 其实这只是个指引，真正的帮助需要查看文档
-    */ 
+    */
     cout << "\nWelcome to Tree!If this is your first time using Tree,you can read the Doc to find help.\n";
 }
 
@@ -46,7 +44,7 @@ void PRINT(int argc, TVM *vm) {
 void PRINTLN(int argc, TVM *vm) {
     /**
     * 打印值并换行
-    */ 
+    */
     for (int i = 0; i < argc; ++i) {
         vm->pop(vm->firstv);
         vm->firstv->putline(cout);
@@ -58,7 +56,7 @@ void INPUT(int argc, TVM *vm) {
     /**
      * 获取输入
      */
-    
+
     for (int i = 0; i < argc; ++i) {
         vm->pop(vm->firsts);
         vm->firsts->putline(cout);

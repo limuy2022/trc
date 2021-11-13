@@ -6,11 +6,11 @@
 
 using namespace std;
 
-namespace error_env{
+namespace error_env {
     /**
      * 报错设置
      * 系统需要知道当前处于什么模式，以合适的模式应对发生的状况
-     */ 
+     */
     // 是否终止程序
     bool quit = true;
     // 是否显示出错误信息，如果为否将会把错误信息存入栈中
@@ -44,10 +44,10 @@ string make_error_msg(const int error_name, va_list &ap) {
 
     string finally_out = error_map[error_name];
     string::size_type index;
-    for(;;) {     
+    for (;;) {
         index = finally_out.find("$");
-        if(index == string::npos) return finally_out;
-        finally_out.replace(index, 1 , va_arg(ap, const char*)); 
+        if (index == string::npos) return finally_out;
+        finally_out.replace(index, 1, va_arg(ap, const char*));
     }
 }
 
@@ -62,7 +62,7 @@ void send_error(const int name, ...) {
     va_start(ap, &name);
     send_error_(make_error_msg(name, ap));
     va_end(ap);
-    if(error_env::quit) exit(1);
+    if (error_env::quit) exit(1);
 }
 
 void error_type(const int name, const string &err_msg, int err_value_type) {
@@ -78,12 +78,12 @@ void error_type(const int name, const string &err_msg, int err_value_type) {
     send_error(name, (err_msg + type_int::int_name_s[err_value_type]).c_str());
 }
 
-void send_error_(const string &error_msg) noexcept{
+void send_error_(const string &error_msg) noexcept {
     /**
      * 不接收可变参数，接受已经处理好的报错信息
      */
-    
+
     cerr << "\n" << "Error from " << run_env::run_module << "\n" \
-    << "Error in line " << LINE_NOW + 1 << ":\n"\
-    << error_msg << "\n";
+ << "Error in line " << LINE_NOW + 1 << ":\n"\
+ << error_msg << "\n";
 }

@@ -16,18 +16,17 @@ using namespace std;
 
 static TVM *vm;
 
-static void var_lex(const string&instruction) {
-    const string& var_ = instruction.substr(instruction.find("var") + 4, instruction.length() - 3);
+static void var_lex(const string &instruction) {
+    const string &var_ = instruction.substr(instruction.find("var") + 4, instruction.length() - 3);
     if (!map_check_in_first(vm->var_names, var_)) {
-        cout << "var "<<var_ << " is not defined now.\n";
+        cout << "var " << var_ << " is not defined now.\n";
         return;
     }
-    vm->var_names[var_] -> putline(cout);
+    vm->var_names[var_]->putline(cout);
     cout << "\n";
 }
 
 static void stack_out() {
-    size_t n;
     int i;
     // 输出栈
     // 整型栈
@@ -35,9 +34,9 @@ static void stack_out() {
     // 注：虽然这是个对性能对着较大影响的方式，但是数据量绝对不会很大，时间损耗基本可以忽略
     // 所以这段代码无需优化
     stack<OBJ> tmp(vm->stack_data);
-    for(int i = 0; !tmp.empty(); ++i) {
-        cout << i << ":" ;
-        tmp.top() -> putline(cout);
+    for (int i = 0; !tmp.empty(); ++i) {
+        cout << i << ":";
+        tmp.top()->putline(cout);
         cout << '\n';
         tmp.pop();
     }
@@ -65,7 +64,7 @@ static void debug(const string &code) {
             cout << "\n";
         } else if (instruction.find("var") != string::npos)
             var_lex(instruction);
-        else if(instruction == "stack")
+        else if (instruction == "stack")
             stack_out();
         else
             cout << "instruction " << instruction << " is not defined.\n";
@@ -79,7 +78,7 @@ namespace tools_out {
         cout << "trc debugger is running.You can read \'Doc\\TDB.txt to find the help.\'\n\n";
         string file_path, tmp;
         vm = create_TVM();
-        for(;;) {
+        for (;;) {
             // 读取需要debug的文件
             cout << "file>";
             getline(cin, file_path);

@@ -2,7 +2,6 @@
 #include "TVM/TVM.h"
 #include "data.hpp"
 #include "Error.h"
-#include "cfg.h"
 #include "TVM/TRE.h"
 
 using namespace std;
@@ -17,7 +16,7 @@ void TVM::CHANGE_VALUE(const short &index) {
      * 改变变量的值
      */
 
-    const string& name_v = static_data.const_name[index];
+    const string &name_v = static_data.const_name[index];
     NAMEERROR(name_v.c_str());
     pop(firstv);
     var_names[name_v] = firstv;
@@ -27,7 +26,7 @@ void TVM::DEL() {
     /**
      * 删除变量
      */
-    
+
     pop(firsti);
     int n = firsti->value;
     for (int i = 0; i < n; ++i) {

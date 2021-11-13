@@ -8,16 +8,15 @@
 #include "read.h"
 #include "Compiler/Compiler.h"
 #include "memory/mem.h"
-#include "Compiler/compile_share.h"
 
-using namespace std; 
+using namespace std;
 
 static void out(treenode *data) {
     /*
     * 格式化输出语法树
     */
     cout << "[";
-    switch(data->type) {
+    switch (data->type) {
         case TREE:
             cout << "tree";
             break;
@@ -43,13 +42,13 @@ namespace tools_in {
         // 解析
         vecs start_code_in;
         pre(start_code_in, file_data);
-        const auto& token_code = final_token(start_code_in);
-    
+        const auto &token_code = final_token(start_code_in);
+
         vector<treenode *> tree_node;
         grammar(tree_node, token_code);
-    
+
         cout << "From file " << path << ":" << "\n";
-    
+
         size_t n = tree_node.size();
         for (int i = 0; i < n; ++i) {
             cout << i << ":";
@@ -64,7 +63,7 @@ namespace tools_out {
     void out_grammar(int argc, char *argv[]) {
         /**
          * 输出语法树
-         */ 
+         */
         for (int i = 2; i < argc; ++i)
             tools_in::__out_grammar(argv[i]);
     }

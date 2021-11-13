@@ -6,7 +6,6 @@
 #include <string>
 #include <cmath>
 #include "Error.h"
-#include "type.hpp"
 
 using namespace std;
 

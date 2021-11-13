@@ -10,9 +10,9 @@ void treenode::connect(treenode *son_connect) {
     son.push_back(son_connect);
 }
 
-treenode::treenode(int type_argv):
-    type(type_argv) {}
+treenode::treenode(int type_argv) :
+        type(type_argv) {}
 
-treenode::treenode(int type_argv, const string &data):
-    data(data), 
-    type(type_argv) {}
+treenode::treenode(int type_argv, const string &data) :
+        data(data),
+        type(type_argv) {}

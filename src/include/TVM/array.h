@@ -6,8 +6,7 @@
 
 using namespace std;
 
-class trc_array : public trcobj
-{
+class trc_array : public trcobj {
     /*
     链表
     */
@@ -26,7 +25,7 @@ public:
 
     void del(int index);
 
-    OBJ operator [](int index);
+    OBJ operator[](int index);
 
     void insert(int index, OBJ data);
 

@@ -1,6 +1,5 @@
 #include <string>
-#include <fstream>
-#include <iostream>
+#include <cstdio>
 #include <cstdarg>
 #include "Error.h"
 
@@ -12,16 +11,15 @@ void readcode(string &file_data, const string &path) {
     */
 
     file_data.clear();
-    ifstream file(path);
-    string temp;
-    if(!file.is_open())
+    FILE *file = fopen(path.c_str(), "r");
+    if (file == NULL)
         send_error(OpenFileError, path.c_str());
-    
-    while (getline(file, temp)) {
-        file_data += temp;
-        file_data += "\n";
+    char tmp = fgetc(file);
+    while (!feof(file)) {
+        file_data += tmp;
+        tmp = fgetc(file);
     }
-    file.close();
+    fclose(file);
 }
 
 void readfile(string &file_data, const string &path, const int err, ...) {
@@ -33,16 +31,16 @@ void readfile(string &file_data, const string &path, const int err, ...) {
     file_data.clear();
     va_list ap;
     va_start(ap, &err);
-    ifstream file(path);
-    string temp;
-    if(!file.is_open()) {
+    FILE *file = fopen(path.c_str(), "r");
+    if (file == NULL) {
         send_error_(make_error_msg(err, ap));
         exit(1);
     }
-    while (getline(file, temp)) {
-        file_data += temp;
-        file_data += "\n";
+    char tmp = fgetc(file);
+    while (!feof(file)) {
+        file_data += tmp;
+        tmp = fgetc(file);
     }
-    file.close();
+    fclose(file);
     va_end(ap);
 }

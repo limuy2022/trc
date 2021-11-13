@@ -15,7 +15,7 @@ namespace tools_in {
          * 执行源代码
          * path：文件路径
          */
-    
+
         string scodes;
         readcode(scodes, path);
         run_env::set_module(path);
@@ -29,7 +29,7 @@ namespace tools_out {
         /*
         *将文件编译后执行
         */
-    
+
         TVM *vm_run = create_TVM();
         for (int i = 2; i < argc; ++i)
             tools_in::__crun(vm_run, argv[i]);

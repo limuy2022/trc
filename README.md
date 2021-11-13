@@ -53,8 +53,8 @@ windows：
     对应make工具（如make,nmake)
 其它操作系统:
 
-    作者也没试过
-    所以不知道能否跨平台
+    Linux:可以跨平台
+    Mac:未知
 
 ## 例子
 

@@ -1,6 +1,5 @@
 #include "TVM/TVM.h"
 #include "Error.h"
-#include "cfg.h"
 #include "TVM/TRE.h"
 
 using namespace std;
@@ -10,7 +9,7 @@ void TVM::EQUAL() {
      * 判断相等，假设两端类型相等
      * 注意：如果不相等，将会在编译期间进行强制转换，不能通过者将会报出类型错误
      */
-    
+
     pop(secondv);
     pop(firstv);
     push(firstv->operator==(secondv));
@@ -47,10 +46,10 @@ void TVM::LESS() {
     /**
      * 判断小于
      */
-    
+
     pop(secondv);
     pop(firstv);
-    push(firstv->operator < (secondv));
+    push(firstv->operator<(secondv));
 }
 
 void TVM::GREATER() {

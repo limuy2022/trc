@@ -17,12 +17,12 @@ namespace tools_in {
     void __brun(TVM *vm, const string &path) {
         string scodes, temp;
         readcode(scodes, path);
-        
+
         run_env::set_module(path);
         Compiler(vm, scodes);
         vm->run();
         save_ctree(vm, path_last(path, ".ctree"));
-    } 
+    }
 }
 
 namespace tools_out {

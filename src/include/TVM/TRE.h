@@ -13,7 +13,8 @@
 #define INT_CACHE_LEN 262
 
 // 有参数字节码调用
-typedef void (TVM::*ARGV_TVM_METHOD)(const short&);
+typedef void (TVM::*ARGV_TVM_METHOD)(const short &);
+
 // 与参数字节码调用
 typedef void (TVM::*NOARGV_TVM_METHOD)();
 
@@ -34,7 +35,7 @@ namespace TRE {
 namespace TVM_share {
     /**
      * TVM类型数据缓存
-     */ 
+     */
 
     // 布尔值
     extern INTOBJ true_, false_;

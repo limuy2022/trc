@@ -1,5 +1,4 @@
 #include <cmath>
-#include "Error.h"
 #include "type.hpp"
 #include "TVM/TVM.h"
 #include "TVM/TRE.h"
@@ -21,7 +20,7 @@ void TVM::SUB() {
      */
     pop(secondv);
     pop(firstv);
-    push(firstv->operator- (secondv));
+    push(firstv->operator-(secondv));
 }
 
 void TVM::MUL() {

@@ -37,23 +37,13 @@ static const vecs func_symbol = {"(", ")"};
 
 static treenode *real_grammar(treenode *head, const vecs &code);
 
-static vecs cut(const vector<string> &origin, int start, int end) {
-    /**
-     *功能性函数，切取start到end的距离，具体规则参考python的切片
-     *“切头不切尾”
-    */
-
-    const auto& tmp = origin.begin();
-    return vecs(tmp + start, tmp + end);
-}
-
 static vecs cut(const vector<string> &origin, const string &start, const string &end) {
     /**
      *功能性函数，切取start到end的距离，具体规则参考python的切片
      *“切头不切尾”
     */
 
-    const auto& start_iter = origin.begin(), &end_iter = origin.end();
+    const auto &start_iter = origin.begin(), &end_iter = origin.end();
     return vecs(find(start_iter, end_iter, start), find(start_iter, end_iter, end));
 }
 
@@ -71,7 +61,7 @@ static vecs from_cut_until(const vecs &code, const string &cut_sym) {
      * 从某个字符串开始切到末尾
     */
 
-    const auto& end = code.end(), &start = find(code.begin(), end, cut_sym) + 1;
+    const auto &end = code.end(), &start = find(code.begin(), end, cut_sym) + 1;
     return vecs(start, end);
 }
 
@@ -151,7 +141,7 @@ static void assign(treenode *head, const string &oper, const vecs &code) {
  name = new treenode, \
  opernode = new treenode(VAR_DEFINE, oper);
     // 父节点指向
-    const vecs& temp = until_cut(code, oper);
+    const vecs &temp = until_cut(code, oper);
     if (temp.size() == 1) {
         // 数组之类的名字比一个长
         name->data = temp[0];
@@ -168,7 +158,7 @@ static void assign(treenode *head, const string &oper, const vecs &code) {
     ass->connect(opernode);
 }
 
-static void function(treenode *head, const vecs &code) {
+static void callfunction(treenode *head, const vecs &code) {
     /**
      * 生成函数调用节点
      */
@@ -183,7 +173,7 @@ static void function(treenode *head, const vecs &code) {
     const auto &argv = from_cut_until(code, "(");
     size_t argv_n = argv.size(), break_num = 0;
     if (argv_n != 1) {
-        for (const auto &i : argv) {
+        for (const auto &i: argv) {
             if (i == "(")
                 break_num++;
             if ((i == "," || i == ")") && break_num == 0) {
@@ -241,7 +231,7 @@ static void sentence_tree(treenode *head, const vecs &code) {
      */
 
     auto *argv_node = new treenode;
-    const string& sentence_name = code[0];
+    const string &sentence_name = code[0];
     size_t n = code.size(), argc = 0;
     if (n == 1) {
         // 单个语句
@@ -257,7 +247,7 @@ static void sentence_tree(treenode *head, const vecs &code) {
     }
     auto *snode = new treenode;
 
-    const vecs& argv = from_cut_until(code, code[0]);
+    const vecs &argv = from_cut_until(code, code[0]);
     vecs add_temp;
     size_t argv_n = argv.size();
 
@@ -286,10 +276,10 @@ static void while_loop_tree(treenode *head, const vecs &code) {
      * 循环通过跳转实现
      */
 
-    const auto& begin_ = code.begin(), \
+    const auto &begin_ = code.begin(), \
  &end_ = code.end();
     // 条件表达式
-    const vecs& bool_sen = cut(code, *(find(begin_, end_, "while") + 1), "{");
+    const vecs &bool_sen = cut(code, *(find(begin_, end_, "while") + 1), "{");
     // 将条件表达式解析为语法树
     size_t line = count_line();
     // 设置循环结束时跳转
@@ -312,7 +302,7 @@ static void if_tree(treenode *head, const vecs &code) {
     const auto &begin_ = code.begin(), \
  &end_ = code.end();
     // 条件表达式
-    const vecs& bool_sen = cut(code, *(find(begin_, end_, "if") + 1), "{");
+    const vecs &bool_sen = cut(code, *(find(begin_, end_, "if") + 1), "{");
     // 将条件表达式解析为语法树
     size_t line = count_line();
     auto *opcode_ = new treenode(OPCODE_ARGV, "if"), \
@@ -341,7 +331,7 @@ static bool block(treenode *head, const vecs &code) {
      * 包括func，if， while等
      */
 
-    const char * name = code[0].c_str();
+    const char *name = code[0].c_str();
     if (!strcmp(name, "if")) {
         if_tree(head, code);
         return true;
@@ -363,9 +353,9 @@ static void oper_tree(treenode *head, const vecs &code, const string &oper) {
      */
 
     auto oper_node = new treenode(TREE), \
-        oper_data = new treenode(OPCODE, oper),\
-        left = ifis(until_cut(code, oper)), \
-        right = ifis(from_cut_until(code, oper));
+ oper_data = new treenode(OPCODE, oper), \
+ left = ifis(until_cut(code, oper)), \
+ right = ifis(from_cut_until(code, oper));
 
     if (left->type == DATA && \
             right->type == DATA && \
@@ -411,7 +401,7 @@ static treenode *real_grammar(treenode *head, const vecs &code) {
     size_t n = code.size();
     if (!n) return head;
 
-    for (const auto& i : aslist) {
+    for (const auto &i: aslist) {
         // 赋值运算
         if (check_in(i, code)) {
             assign(head, i, code);
@@ -434,30 +424,29 @@ static treenode *real_grammar(treenode *head, const vecs &code) {
     if ((s_check_in_s(func_symbol, code)) && (oper_i == -1 || in_func(oper_i, code))) {
         // 函数
         // 考虑函数调用特殊情况，函数返回值作为运算符参数
-        function(head, code);
+        callfunction(head, code);
         return head;
     }
 
-    OPER_TREE(highest_condits, code);
+    OPER_TREE(highest_condits, code)
     // 特殊判断， not
     if (check_in(string("not"), code)) {
         not_tree(head, code);
         return head;
     }
-    OPER_TREE(other_condits, code);
+    OPER_TREE(other_condits, code)
 
-    OPER_TREE(opers, code);
+    OPER_TREE(opers, code)
     // 无法匹配且为字符开头，报错
     string tmp;
-    for(const auto& j : code)
+    for (const auto &j: code)
         tmp += j;
-    if(tmp.length() >= 1 && is_english(tmp[0]))
+    if (tmp.length() >= 1 && is_english(tmp[0]))
         send_error(NameError, tmp.c_str());
     return head;
 }
 
-static void lex_grammar(const vecs &code)
-{
+static void lex_grammar(const vecs &code) {
     /**
      * 该函数用于解析行
      * 当遇到;符号时，不断递归直到没有；为止
@@ -474,7 +463,7 @@ void grammar(vector<treenode *> &result_return, const vecs2d &codes) {
     LINE_NOW = 0;
     size_t n = codes.size();
 
-    auto* pointer = &LINE_NOW;
+    auto *pointer = &LINE_NOW;
     result = &result_return;
     codes_s = codes;
     for (; *pointer < n; ++(*pointer))

@@ -36,24 +36,24 @@ do{\
 
 using namespace std;
 
-static string load_string_one(FILE* file) {
+static string load_string_one(FILE *file) {
     /**
      * 加载单个字符串
-     */ 
+     */
     int n;
     fread(&n, sizeof(int), 1, file);
     // 临时申请一段空间用于初始化string
     char *tmp = new char[n];
     fread(tmp, n, 1, file);
     string a(tmp, n);
-    delete []tmp;
+    delete[]tmp;
     return a;
 }
 
 static void write_string_one(FILE *file, const string &data) {
     /**
      * 写入单个字符串
-     */ 
+     */
     int n = data.length();
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
@@ -68,7 +68,7 @@ static void write_pool(FILE *file, vector<T> &const_pool) {
      */
     int size = const_pool.size();
     fwrite(&size, sizeof(size), 1, file);
-    for (const auto &i:const_pool)
+    for (const auto &i: const_pool)
         fwrite(&i, sizeof(i), 1, file);
 }
 
@@ -81,18 +81,18 @@ static void load_pool(FILE *file, vector<T> &const_pool) {
     int size;
     fread(&size, sizeof(int), 1, file);
     const_pool.resize(size);
-    for (auto &i:const_pool)
+    for (auto &i: const_pool)
         fread(&i, sizeof(i), 1, file);
 }
 
-static void write_string_pool(FILE* file, vector<string> &const_pool) {
+static void write_string_pool(FILE *file, vector<string> &const_pool) {
     /**
      * string是可变长数据类型，需要特殊处理
      */
     int size = const_pool.size();
     // 数据长度
     fwrite(&size, sizeof(size), 1, file);
-    for (const auto& i : const_pool)
+    for (const auto &i: const_pool)
         write_string_one(file, i);
 }
 
@@ -103,10 +103,10 @@ static void write_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
     // 字节码条数
     int size = const_opcode.size(), line_size;
     fwrite(&size, sizeof(int), 1, file);
-    for (const auto& i : const_opcode) {
+    for (const auto &i: const_opcode) {
         line_size = i.size();
         fwrite(&line_size, sizeof(int), 1, file);
-        for (const auto& j : i) {
+        for (const auto &j: i) {
             fwrite(&j[0], sizeof(j[0]), 1, file);
             fwrite(&j[1], sizeof(j[1]), 1, file);
         }
@@ -122,7 +122,7 @@ static void load_string_pool(FILE *file, vecs &const_pool) {
     // 数据长度
     fread(&size, sizeof(size), 1, file);
     const_pool.resize(size);
-    for (auto &i : const_pool)
+    for (auto &i: const_pool)
         i = load_string_one(file);
 }
 
@@ -152,30 +152,30 @@ static void load_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
  * 接着写入起始地址和终止地址
  */
 
-static void load_functions(FILE*file, map<string, func_*> &const_funcl) {
+static void load_functions(FILE *file, map<string, func_ *> &const_funcl) {
     /**
      * 读取函数并创建环境
      */
 
     int len;
-    func_* tmp;
+    func_ *tmp;
     fread(&len, sizeof(len), 1, file);
-    for(int i = 0; i < len; ++i) {
-        const string& t = load_string_one(file);
+    for (int i = 0; i < len; ++i) {
+        const string &t = load_string_one(file);
         tmp = new func_(t);
         const_funcl[t] = tmp;
-        load_bytecode(file, tmp -> bytecodes);
+        load_bytecode(file, tmp->bytecodes);
     }
 }
 
-static void write_functions(FILE *file, map<string, func_*> &const_funcl) {
+static void write_functions(FILE *file, map<string, func_ *> &const_funcl) {
     /**
      * 写入函数及其环境
      */
 
-    for(const auto& i : const_funcl) {
+    for (const auto &i: const_funcl) {
         write_string_one(file, i.first);
-        write_bytecode(file, i.second -> bytecodes);
+        write_bytecode(file, i.second->bytecodes);
     }
 }
 
@@ -184,7 +184,7 @@ bool is_magic(const string &path) {
      * 判断一个文件魔数是否正确
      * 注：此时文件必须未被打开
      */
-    FILE * file = fopen(path.c_str(), "rb");
+    FILE *file = fopen(path.c_str(), "rb");
     if (file == NULL)
         send_error(OpenFileError, path.c_str());
     int magic;
@@ -224,7 +224,7 @@ void save_ctree(TVM *vm, const string &path) {
      * 保存虚拟机数据为ctree文件
      * 注意：并不对vm进行任何内存操作
      */
-    FILE * file = fopen(path.c_str(), "wb");
+    FILE *file = fopen(path.c_str(), "wb");
     if (file == NULL) {
         send_error(OpenFileError, path.c_str());
     }

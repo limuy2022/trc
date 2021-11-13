@@ -1,6 +1,6 @@
 /**
  * 共享数据
- */ 
+ */
 #include <string>
 #include <map>
 #include "share.h"
@@ -36,8 +36,8 @@ namespace run_env {
         /**
          * 设置当前编译模块(新建)
          * name:模块名
-         */ 
-    
+         */
+
         run_env::run_module = name;
         run_env::lines[name] = 0;
     }

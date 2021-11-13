@@ -1,7 +1,7 @@
 /**
  * 项目配置文件，包括大量基本类型定义
  * 注意：由于大量源文件都引用了本文件，所以尽量不要修改此文件，否则可能会造成编译时间过长
- */ 
+ */
 
 #ifndef TRC_INCLUDE_CFG_H
 #define TRC_INCLUDE_CFG_H
@@ -16,18 +16,23 @@ typedef vector<vector<string> > vecs2d;
 typedef vector<char> vecc;
 
 class trc_long;
+
 class trcobj;
+
 class trc_int;
+
 class trc_float;
+
 class trc_string;
+
 class trc_flong;
 
-typedef trcobj* OBJ;
-typedef trc_int* INTOBJ;
-typedef trc_float* FLOATOBJ;
-typedef trc_string* STRINGOBJ;
-typedef trc_long* LONGOBJ;
-typedef trc_flong* FLONGOBJ;
+typedef trcobj *OBJ;
+typedef trc_int *INTOBJ;
+typedef trc_float *FLOATOBJ;
+typedef trc_string *STRINGOBJ;
+typedef trc_long *LONGOBJ;
+typedef trc_flong *FLONGOBJ;
 
 // 编译时类型标识
 #define VAR_TICK 1

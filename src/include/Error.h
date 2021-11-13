@@ -24,7 +24,7 @@ using namespace std;
 namespace error_env {
     /**
      * 报错系统需要知道当前处于什么模式，合理应对发生的状况
-     */ 
+     */
     extern bool quit;
     extern bool out_msg;
 }

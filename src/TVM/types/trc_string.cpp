@@ -24,11 +24,10 @@ using namespace TVM_share;
 
 const int trc_string::type;
 
-trc_string::trc_string(const trc_string &init):
-    char_num(init.char_num)
- {
-    value = (char*)(malloc(sizeof(char) * (char_num + 1)));
-    if(value == NULL) {
+trc_string::trc_string(const trc_string &init) :
+        char_num(init.char_num) {
+    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
+    if (value == NULL) {
         send_error(MemoryError, "can't get the memory from os.");
     }
     strcpy(value, init.value);
@@ -37,10 +36,10 @@ trc_string::trc_string(const trc_string &init):
 trc_string &trc_string::operator=(const string &init) {
     /**
      * 由于常量池，所以兼容string
-     */ 
+     */
     char_num = init.length();
-    value = (char*)(malloc(sizeof(char) * (char_num + 1)));
-    if(value == NULL) {
+    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
+    if (value == NULL) {
         send_error(MemoryError, "can't get the memory from os.");
     }
     strcpy(value, init.c_str());
@@ -48,13 +47,12 @@ trc_string &trc_string::operator=(const string &init) {
 }
 
 trc_string::trc_string(const string &init) :
-    char_num(init.length())
-{
+        char_num(init.length()) {
     /**
      * 由于常量池，所以兼容string
-     */ 
-    value = (char*)(malloc(sizeof(char) * (char_num + 1)));
-    if(value == NULL) {
+     */
+    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
+    if (value == NULL) {
         send_error(MemoryError, "can't get the memory from os.");
     }
     strcpy(value, init.c_str());
@@ -65,8 +63,8 @@ trc_string::~trc_string() {
 }
 
 trc_string::trc_string() {
-    value = (char*)(malloc(sizeof(char)));
-    if(value == NULL) {
+    value = (char *) (malloc(sizeof(char)));
+    if (value == NULL) {
         send_error(MemoryError, "can't get the memory from os.");
     }
     value[0] = '\0';
@@ -76,32 +74,32 @@ size_t trc_string::len() {
     return char_num;
 }
 
-OBJ trc_string::operator=(const trc_string& value_i) {
-    if(&value_i != this) {
+OBJ trc_string::operator=(const trc_string &value_i) {
+    if (&value_i != this) {
         set_realloc(value_i.char_num);
         strcpy(value, value_i.value);
     }
-    return (OBJ)this;
+    return (OBJ) this;
 }
 
 OBJ trc_string::operator+(trcobj *value_i) {
-    trc_string* tmp = MALLOCSTRING(*this);
+    trc_string *tmp = MALLOCSTRING(*this);
     *tmp += value_i;
-    return (OBJ)tmp;
+    return (OBJ) tmp;
 }
 
-OBJ trc_string::operator+=(trcobj* value_i) {
-    trc_string *value_i_ = (STRINGOBJ)(value_i);
+OBJ trc_string::operator+=(trcobj *value_i) {
+    trc_string *value_i_ = (STRINGOBJ) (value_i);
     set_realloc(value_i_->char_num + char_num);
     strcat(value, value_i_->value);
-    return (OBJ)this;
+    return (OBJ) this;
 }
 
 char &trc_string::operator[](unsigned int index) {
     return value[index];
 }
 
-const char& trc_string::operator[](unsigned int index) const {
+const char &trc_string::operator[](unsigned int index) const {
     return value[index];
 }
 
@@ -109,7 +107,7 @@ void trc_string::putline(ostream &out_) {
     out_ << value;
 }
 
-istream& operator>>(istream &in_, trc_string &data_) {
+istream &operator>>(istream &in_, trc_string &data_) {
     /**
      * 输入与标准库的方式不同，并不是读到空格停止，而是读到换行符停止
      */
@@ -117,9 +115,9 @@ istream& operator>>(istream &in_, trc_string &data_) {
     // 置空
     data_.set_realloc(0);
     char ch;
-    for(;;) {
+    for (;;) {
         ch = in_.get();
-        if(ch == '\n') return in_;
+        if (ch == '\n') return in_;
         data_.set_realloc(data_.char_num + 1);
         data_.value[data_.char_num - 1] = ch;
     }
@@ -130,45 +128,39 @@ void trc_string::set_realloc(size_t num) {
      * 重新申请字符数，不包括\0
      */
 
-    value = (char*)realloc(value, sizeof(char) * (num + 1));
-    if(value == NULL)
+    value = (char *) realloc(value, sizeof(char) * (num + 1));
+    if (value == NULL)
         send_error(MemoryError, "can't get the memory from os.");
     char_num = num;
 }
 
 INTOBJ trc_string::operator==(trcobj *value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    return (!strcmp(value, tmp_->value)? true_: false_);
+    return (!strcmp(value, ((STRINGOBJ) value_i)->value) ? true_ : false_);
 }
 
 INTOBJ trc_string::operator<(trcobj *value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    return (strcmp(value, tmp_->value) < 0? true_: false_);
+    return (strcmp(value, ((STRINGOBJ) value_i)->value) < 0 ? true_ : false_);
 }
 
 INTOBJ trc_string::operator>(trcobj *value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    return (strcmp(value, tmp_->value) > 0? true_: false_);
+    return (strcmp(value, ((STRINGOBJ) value_i)->value) > 0 ? true_ : false_);
 }
 
 INTOBJ trc_string::operator<=(trcobj *value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    int tmp = strcmp(value, tmp_->value);
-    return (tmp < 0 || !tmp? true_: false_);
+    int tmp = strcmp(value, ((STRINGOBJ) value_i)->value);
+    return (tmp < 0 || !tmp ? true_ : false_);
 }
 
-INTOBJ trc_string::operator>=(trcobj * value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    int tmp = strcmp(value, tmp_->value);
-    return (tmp > 0 || !tmp? true_: false_);
+INTOBJ trc_string::operator>=(trcobj *value_i) {
+    int tmp = strcmp(value, ((STRINGOBJ) value_i)->value);
+    return (tmp > 0 || !tmp ? true_ : false_);
 }
 
-INTOBJ trc_string::operator!=(trcobj * value_i) {
-    STRINGOBJ tmp_ = (trc_string*)value_i;
-    return (strcmp(value, tmp_->value)? true_: false_);
+INTOBJ trc_string::operator!=(trcobj *value_i) {
+    return (strcmp(value, ((STRINGOBJ) value_i)->value) ? true_ : false_);
 }
 
-const char * trc_string::c_str() {
+const char *trc_string::c_str() {
     return value;
 }
 
@@ -180,23 +172,23 @@ OBJ trc_string::to_int() {
     return MALLOCINT(to_type<int>(value));
 }
 
-const int& trc_string::gettype() {
+const int &trc_string::gettype() {
     return type;
 }
 
 OBJ trc_string::operator*(OBJ value_i) {
-    if(value_i -> gettype() != int_TICK) {
-        send_error(TypeError, "string can\'t * with " + type_int::int_name_s[value_i -> gettype()]);
+    if (value_i->gettype() != int_TICK) {
+        send_error(TypeError, ("string can\'t * with " + type_int::int_name_s[value_i->gettype()]).c_str());
     }
-    INTOBJ tmp = (INTOBJ)(value_i);
+    int tmp = ((INTOBJ) (value_i)) -> value;
     auto res = MALLOCSTRING();
-    res -> set_realloc(char_num * (tmp -> value));
-    for(int i = 0; i < tmp->value; ++i) {
-        strcat(res -> value, value);
+    res->set_realloc(char_num * tmp);
+    for (int i = 0; i < tmp; ++i) {
+        strcat(res->value, value);
     }
-    return (OBJ)res;
+    return res;
 }
 
 void trc_string::delete_() {
-	set_realloc(1);
+    set_realloc(1);
 }

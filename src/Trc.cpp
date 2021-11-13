@@ -17,49 +17,69 @@ namespace tools_out {
         /**
          * Trc命令行操作帮助文档，因为代码简单所以放在主文件
          */
-        
+
         cout << "Trc is a programming language based on stack this project from the\n\
-    most basic operators such as arithmetic, the branch structure, circulation structure, \n\
-    and then realize the constant folding, has realized the type of high precision operation, \n\
-    input and output as well as some commonly used built-in function, then realize the recycling, \n\
-    escaping strings, local and global variables,  This paper constructs a perfect error reporting \n\
-    system from compiler to interpreter, introduces the concept of module, makes the program can\n\
-    be modular programming, and establishes many practical tools, such as compile, run, decompile, \n\
-    batch compile, clean up files, code debugging, command line scripts and other functions\n";
+most basic operators such as arithmetic, the branch structure, circulation structure, \n\
+and then realize the constant folding, has realized the type of high precision operation, \n\
+input and output as well as some commonly used built-in function, then realize the recycling, \n\
+escaping strings, local and global variables,  This paper constructs a perfect error reporting \n\
+system from compiler to interpreter, introduces the concept of module, makes the program can\n\
+be modular programming, and establishes many practical tools, such as compile, run, decompile, \n\
+batch compile, clean up files, code debugging, command line scripts and other functions\n";
     }
 }
 
 #define CMP(str, str2) (!strcmp((str), (str2)))
 
-static void run_no_argv_pattern(const char * pattern) {
+static void run_no_argv_pattern(const char *pattern) {
     if (CMP(pattern, "tdb")) {
-        tools_out::tdb(); return;
-    } if (CMP(pattern, "help")) {
-        tools_out::help(); return;
+        tools_out::tdb();
+        return;
+    }
+    if (CMP(pattern, "help")) {
+        tools_out::help();
+        return;
     }
     // 参数不对，未输入文件或者未输入模式
     cerr << "Trc:no input files.\n";
 }
 
-static void run_yes_argv_pattern(const char * pattern, int argc, char **argv) {
+static void run_yes_argv_pattern(const char *pattern, int argc, char **argv) {
     if (CMP(pattern, "crun")) {
-        tools_out::crun(argc, argv); return;
-    } if (CMP(pattern, "token")) {
-        tools_out::out_token(argc, argv); return;
-    } if (CMP(pattern, "dis")) {
-        tools_out::dis(argc, argv); return;
-    } if (CMP(pattern, "grammar")) {
-        tools_out::out_grammar(argc, argv); return;
-    } if (CMP(pattern, "brun")) {
-        tools_out::brun(argc, argv); return;
-    } if (CMP(pattern, "build")) {
-        tools_out::build(argc, argv); return;
-    } if (CMP(pattern, "run")) {
-        tools_out::run(argc, argv); return;
-    } if (CMP(pattern, "all")) {
-        tools_out::all(argc, argv); return;
-    } if (CMP(pattern, "clean")) {
-        tools_out::clean(argc, argv); return;
+        tools_out::crun(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "token")) {
+        tools_out::out_token(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "dis")) {
+        tools_out::dis(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "grammar")) {
+        tools_out::out_grammar(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "brun")) {
+        tools_out::brun(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "build")) {
+        tools_out::build(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "run")) {
+        tools_out::run(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "all")) {
+        tools_out::all(argc, argv);
+        return;
+    }
+    if (CMP(pattern, "clean")) {
+        tools_out::clean(argc, argv);
+        return;
     }
     cerr << "Trc:mode \"" << pattern << "\" is not correct.\n";
 }

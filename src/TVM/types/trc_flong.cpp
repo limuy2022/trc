@@ -9,7 +9,7 @@ using namespace std;
 
 const int trc_flong::type;
 
-trc_flong::trc_flong(const string&) {
+trc_flong::trc_flong(const string &) {
 
 }
 
@@ -18,18 +18,18 @@ trc_flong::trc_flong(double init_data) {
 }
 
 trc_flong::trc_flong() {
-    
+
 }
 
 trc_flong::~trc_flong() {
 
 }
 
-void trc_flong::putline(ostream& out) {
-    
+void trc_flong::putline(ostream &out) {
+
 }
 
-const int& trc_flong::gettype() {
+const int &trc_flong::gettype() {
     return type;
 }
 

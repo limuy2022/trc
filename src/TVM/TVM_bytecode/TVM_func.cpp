@@ -7,18 +7,18 @@ using namespace std;
 
 typedef void (*TVM_BUILTINS_FUNC)(int argc, TVM *vm);
 
-static TVM_BUILTINS_FUNC builtin_funcs[] {
-    EXIT,
-    PRINT,
-    PRINTLN,
-    INPUT,
-    LENGTH,
-    HELP,
-    STRING_,
-    INT_,
-    BOOL_,
-    FLOAT_,
-    TYPE
+static TVM_BUILTINS_FUNC builtin_funcs[]{
+        EXIT,
+        PRINT,
+        PRINTLN,
+        INPUT,
+        LENGTH,
+        HELP,
+        STRING_,
+        INT_,
+        BOOL_,
+        FLOAT_,
+        TYPE
 };
 
 void TVM::CALL_BUILTIN(const short &name) {
@@ -48,12 +48,12 @@ void TVM::FREE_FUNCTION() {
     /**
     * 还原到调用函数前
     */
-    
+
     delete frames.top();
     frames.pop();
 }
 
-void TVM::CALL_METHOD(const short&index) {
-    
+void TVM::CALL_METHOD(const short &index) {
+
 }
 

@@ -4,6 +4,7 @@
 #include "TVM/int.h"
 
 using namespace std;
+using namespace TVM_temp;
 
 typedef void (*TVM_BUILTINS_FUNC)(int argc, TVM *vm);
 

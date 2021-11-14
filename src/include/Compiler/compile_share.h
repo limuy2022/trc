@@ -36,7 +36,6 @@ using namespace std;
 extern const vecs sentences;
 extern const vecs sentences_yes_argv;
 extern const vecs keywords;
-extern const vecs str;
 extern const vecs opti_opers;
 extern const vecs opti_condits;
 extern const vecs condits;

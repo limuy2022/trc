@@ -53,6 +53,19 @@ class trc_long;
 
 class gc_obj;
 
+namespace TVM_temp {
+    // 中间变量，便于使用
+    extern OBJ firstv, secondv;
+
+    extern INTOBJ firsti, secondi;
+
+    extern FLOATOBJ firstf, secondf;
+
+    extern STRINGOBJ firsts, seconds;
+
+    extern LONGOBJ firstl, secondl;
+}
+
 class TVM : public base {
     /**
      * TVM：trc的核心部分，负责执行字节码
@@ -81,7 +94,7 @@ public:
     void run_step();
 
     template<typename T>
-    void pop(T *&a);
+    void pop(T &a);
 
     void pop_value();
 
@@ -167,29 +180,17 @@ public:
     void LOAD_MAP(const short &index);
 
     /* 指令集结束定义处 */
-
-    // 中间变量
-    OBJ firstv, secondv;
-
-    INTOBJ firsti, secondi;
-
-    FLOATOBJ firstf, secondf;
-
-    STRINGOBJ firsts, seconds;
-
-    LONGOBJ firstl, secondl;
-
+    
     // 静态数据，编译时生成
     TVM_data static_data;
 };
 
-template<typename T>
-void TVM::pop(T *&a) {
+template <typename T>
+void TVM::pop(T &a) {
     /**
      * 弹出栈顶的数据指针赋给a
-     * 注：其实我也很想用void*的，但是用void*就要改好多地方，所以下个版本一定改
      */
-    a = (T *) stack_data.top();
+    a = (T)stack_data.top();
     stack_data.pop();
 }
 

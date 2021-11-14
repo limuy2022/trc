@@ -1,5 +1,6 @@
 /**
  * 内存池实现
+ * 有点像stl中的内存分配模式
  */
 
 #include <cstdlib>
@@ -52,7 +53,7 @@ namespace memclass {
     freespace::freespace() :
             membase((char *) (malloc(sizeof(char) * MEMORY_BASE_SIZE))),
             head(new node_mem(size_block_now)) {
-        if (membase == NULL)
+        if (membase == nullptr)
             send_error(MemoryError, "can't get the memory from os.");
         /*为实际的内存链表分配地址*/
         int end_condit = MEMORY_BASE_SIZE / size_block_now;

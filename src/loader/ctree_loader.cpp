@@ -1,7 +1,7 @@
 /**
  * ctree文件的读取与写入
  * 类似Java的方式，把空间利用最大化
- * 注:写入时随着系统和编译器而改变字节序,大端小端难以确定,因此不具备跨平台能力(包括编译器)
+ * 注:大端小端将被统一为大端,因此具备跨平台能力
  */
 
 #include <string>
@@ -10,9 +10,11 @@
 #include <cstdio>
 #include "TVM/TVM.h"
 #include "Error.h"
+#include "platform.h"
+#include "bytes.h"
 
 // 开头标识文件是否为ctree文件的标识，魔数
-#define MAGIC_VALUE 0xACFD
+static int MAGIC_VALUE = 0xACFD;
 
 // 由于读入和写入是相对的，所以用宏定义来简化这一点
 // str:load or write
@@ -33,6 +35,26 @@ do{\
     /* 函数字节码常量池 */\
     str##_functions((file), (vm)->static_data.funcs);\
 } while(0)
+
+// 由于大小端统一，要做很多判断，设立函数来简化这一过程，包装fread和fwrite两个函数
+void fread_all(void * a, int b, int c, FILE * d) {
+    fread(a, b, c, d);
+    /*为大端则转成小端*/
+    if(!byte_order) {
+        bytes_order_change((char*)a, b * c);
+    }
+}
+
+void fwrite_all(const void * a, int b, int c, FILE * d) {
+    fwrite(a, b, c, d);
+    /*为小端则转成大端*/
+    if(!byte_order) {
+        bytes_order_change((char*)a, b * c);
+    }
+}
+
+#define fread fread_all
+#define fwrite fwrite_all
 
 using namespace std;
 
@@ -185,7 +207,7 @@ bool is_magic(const string &path) {
      * 注：此时文件必须未被打开
      */
     FILE *file = fopen(path.c_str(), "rb");
-    if (file == NULL)
+    if (file == nullptr)
         send_error(OpenFileError, path.c_str());
     int magic;
     fread(&magic, sizeof(magic), 1, file);
@@ -198,7 +220,7 @@ void loader_ctree(TVM *vm, const string &path) {
      * 读取ctree文件，并对文件进行验证(魔数及版本号)
      */
     FILE *file = fopen(path.c_str(), "rb");
-    if (file == NULL)
+    if (file == nullptr)
         send_error(OpenFileError, path.c_str());
     // 读取魔数
     // ACFD
@@ -225,13 +247,12 @@ void save_ctree(TVM *vm, const string &path) {
      * 注意：并不对vm进行任何内存操作
      */
     FILE *file = fopen(path.c_str(), "wb");
-    if (file == NULL) {
+    if (file == nullptr) {
         send_error(OpenFileError, path.c_str());
     }
     // 写入魔数
     // ACFD
-    int magic = MAGIC_VALUE;
-    fwrite(&magic, sizeof(magic), 1, file);
+    fwrite(&MAGIC_VALUE, sizeof(MAGIC_VALUE), 1, file);
     // 写入版本号
     fwrite(&version, sizeof(version), 1, file);
     LOAD_WRITE(file, vm, write);

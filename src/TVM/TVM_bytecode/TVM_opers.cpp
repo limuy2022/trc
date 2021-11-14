@@ -4,6 +4,7 @@
 #include "TVM/TRE.h"
 
 using namespace std;
+using namespace TVM_temp;
 
 void TVM::ADD() {
     /**

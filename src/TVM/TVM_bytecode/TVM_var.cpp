@@ -5,6 +5,7 @@
 #include "TVM/TRE.h"
 
 using namespace std;
+using namespace TVM_temp;
 
 #define NAMEERROR(name)\
 if(!map_check_in_first(var_names, name)) {\

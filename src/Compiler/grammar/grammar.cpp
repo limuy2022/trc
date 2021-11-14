@@ -75,9 +75,9 @@ static treenode *ifis(const vecs &code) {
 
     if (code.size() == 1)
         return new treenode(DATA, code[0]);
-    auto *result = new treenode;
-    real_grammar(result, code);
-    return result;
+    auto *tree_result = new treenode;
+    real_grammar(tree_result, code);
+    return tree_result;
 }
 
 static size_t count_line() {
@@ -90,11 +90,11 @@ static size_t count_line() {
     for (;;) {
         const vecs &line = codes_s[last_index];
 
-        if (check_in(string("}"), line)) {
+        if (check_in("}", line)) {
             break_num--;
             if (!break_num)
                 break;
-        } else if (check_in(string("{"), line))
+        } else if (check_in("{", line))
             break_num++;
         ++last_index;
     }
@@ -430,7 +430,7 @@ static treenode *real_grammar(treenode *head, const vecs &code) {
 
     OPER_TREE(highest_condits, code)
     // 特殊判断， not
-    if (check_in(string("not"), code)) {
+    if (check_in("not", code)) {
         not_tree(head, code);
         return head;
     }

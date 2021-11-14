@@ -13,6 +13,7 @@
 
 using namespace std;
 using namespace memory;
+using namespace TVM_temp;
 
 void TVM::LOAD_INT(const short &index) {
     /**

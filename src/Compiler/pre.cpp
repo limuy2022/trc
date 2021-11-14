@@ -35,7 +35,7 @@ void pre_token_2(vecs2d &tokens) {
      */
 
     for (auto &i: tokens)
-        for (int j = 0, n = i.size(); j < n; ++j)
+        for (size_t j = 0, n = i.size(); j < n; ++j)
             if (i[j] == "#")
                 for (; j < n; n--)
                     i.pop_back(); // 去除注释

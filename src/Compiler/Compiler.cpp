@@ -147,7 +147,7 @@ static void func_lexer(TVM *vm, treenode *head) {
     const string &name(head->data);
     int end_line = to_type<int>(head->son[0]->data);
 
-    func_ *fast = new func_(name);
+    auto *fast = new func_(name);
     vm->static_data.funcs[name] = fast;
 
     // 这几行代码并不保存在主字节码区，而是保存在和函数相关的位置

@@ -94,16 +94,22 @@ const static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[] = {
         &TVM::LOAD_MAP
 };
 
+namespace TVM_temp {
+    // 中间变量，便于使用
+    OBJ firstv, secondv;
+
+    INTOBJ firsti = MALLOCINT(), secondi = MALLOCINT();
+
+    FLOATOBJ firstf = MALLOCFLOAT(), secondf = MALLOCFLOAT();
+
+    STRINGOBJ firsts = MALLOCSTRING(), seconds = MALLOCSTRING();
+
+    LONGOBJ firstl = MALLOCLONG(), secondl = MALLOCLONG();
+}
+
 TVM::TVM(const string &name, const float ver_in) :
-        name(name),
-        firsti(MALLOCINT()),
-        secondi(MALLOCINT()),
-        firstf(MALLOCFLOAT()),
-        secondf(MALLOCFLOAT()),
-        firsts(MALLOCSTRING()),
-        seconds(MALLOCSTRING()),
-        firstl(MALLOCLONG()),
-        secondl(MALLOCLONG()) {
+        name(name)
+{
     static_data.ver_ = ver_in;
     // 对比版本号，并拒绝版本号高于TVM的程序
     check_TVM();

@@ -1,3 +1,7 @@
+/**
+ * 该头文件是私有头文件，不是公有头文件
+ */ 
+
 #ifndef TRC_SRC_COMPILER_GRAMMAR_OBJ_H
 #define TRC_SRC_COMPILER_GRAMMAR_OBJ_H
 

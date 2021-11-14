@@ -12,11 +12,8 @@ using namespace std;
 const vecs sentences = {"import", "goto", "del", "assert"};
 // 带有参数的语句（满足有且只有一个的语句）
 const vecs sentences_yes_argv = {"goto"};
-
 // 关键字
 const vecs keywords = {"if", "while", "for", "func", "class"};
-// 字符串关于
-const vecs str = {"\"", "'"};
 // 条件运算符
 // 最高级运算符
 const vecs highest_condits = {"and", "or"};

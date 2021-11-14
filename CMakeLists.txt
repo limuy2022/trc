@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.19)
 project(Trc)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
@@ -57,8 +57,10 @@ add_executable(Trc
     src/TVM/types/trc_long.cpp
     src/TVM/types/trc_map.cpp
     src/TVM/types/trc_string.cpp
+    src/utils/bytes.cpp
     src/utils/filesys.cpp
     src/utils/node.cpp
+    src/utils/platform.cpp
     src/utils/read.cpp
     src/utils/type.cpp
     src/Trc_logo.rc

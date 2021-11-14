@@ -29,15 +29,6 @@ namespace map_space {
         void *key;
     };
 
-    /**
-     * 由于c++不提供指针到整型的转换，所以使用共用体转换
-     * 对于这个问题还有另一种解决方案，就是采用类似print中%x的手段强制读取，但显然效率很低
-     */
-    union chang_pointer_to_int {
-        void *pointer;
-        int value;
-    } u_tmp;
-
     // 哈希表大小
     const int MAP_MIN_SIZE = 50;
 }
@@ -73,8 +64,8 @@ OBJ &trc_map::get_value(const OBJ key_) const {
 }
 
 trc_map::trc_map() :
-        data_((data_info *) (malloc(sizeof(data_info) * length))) {
-    if (data_ == NULL) {
+        data_((data_info *) malloc(sizeof(data_info) * length)) {
+    if (data_ == nullptr) {
         send_error(MemoryError, "can't get the memory from os.");
     }
 }
@@ -99,8 +90,8 @@ void trc_map::resize() {
     if (objs_in * 1.0 / length >= 0.75) {
         /* 扩容 */
         data_ = (data_info *) (realloc(data_, sizeof(data_info) * length * 2));
-        if (data_ == NULL) {
-            send_error(MemoryError, "can't get the memory from os.");;
+        if (data_ == nullptr) {
+            send_error(MemoryError, "can't get the memory from os.");
         }
         // 遍历原先的哈希表长度,做一个记录
         int tmp = length;
@@ -155,7 +146,5 @@ int trc_map::hash_func(void *value) const {
     /**
      * 哈希函数，目前非常简单
      */
-    // 通过共用体将指针强制转换为整形数据并mod哈希表长度
-    u_tmp.pointer = value;
-    return u_tmp.value % length;
+    return *(int*)value % length;
 }

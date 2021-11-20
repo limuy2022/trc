@@ -2,7 +2,7 @@
 #define TRC_INCLUDE_TVM_ARRAY_H
 
 #include "base.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

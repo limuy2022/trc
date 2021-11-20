@@ -6,7 +6,7 @@
 #define TRC_INCLUDE_TVM_BASE_H
 
 #include <ostream>
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

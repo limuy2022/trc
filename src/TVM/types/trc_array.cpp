@@ -1,5 +1,5 @@
 #include <iostream>
-#include "cfg.h"
+#include "trcdef.h"
 #include "TVM/array.h"
 
 using namespace std;

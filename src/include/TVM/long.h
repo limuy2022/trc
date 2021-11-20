@@ -11,13 +11,13 @@
 #include <string>
 #include <ostream>
 #include "base.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 
 class trc_long : public trcobj {
 public:
-    trc_long &operator=(const string &a);
+    trc_long(const string &a);
 
     trc_long();
 

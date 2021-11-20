@@ -1,5 +1,5 @@
 #include "Error.h"
-#include "type.hpp"
+#include "utils/type.hpp"
 #include "TVM/TRE.h"
 #include "TVM/TVM.h"
 #include "share.h"
@@ -98,17 +98,17 @@ namespace TVM_temp {
     // 中间变量，便于使用
     OBJ firstv, secondv;
 
-    INTOBJ firsti = MALLOCINT(), secondi = MALLOCINT();
+    INTOBJ firsti, secondi;
 
-    FLOATOBJ firstf = MALLOCFLOAT(), secondf = MALLOCFLOAT();
+    FLOATOBJ firstf, secondf;
 
-    STRINGOBJ firsts = MALLOCSTRING(), seconds = MALLOCSTRING();
+    STRINGOBJ firsts, seconds;
 
-    LONGOBJ firstl = MALLOCLONG(), secondl = MALLOCLONG();
+    LONGOBJ firstl, secondl;
 }
 
-TVM::TVM(const string &name, const float ver_in) :
-        name(name)
+TVM::TVM(string name, float ver_in) :
+        name(std::move(name))
 {
     static_data.ver_ = ver_in;
     // 对比版本号，并拒绝版本号高于TVM的程序
@@ -152,7 +152,7 @@ void TVM::run() {
     run_env::run_module = parent;
 }
 
-void TVM::run_func(const vector<vector<short *> > &bytecodes_, int init_index) {
+void TVM::run_func(const struct_codes &bytecodes_, int init_index) {
     /**
      * 执行局部字节码（函数）
      * init_index:代码运行初始化索引
@@ -165,10 +165,10 @@ void TVM::run_func(const vector<vector<short *> > &bytecodes_, int init_index) {
     size_t size = bytecodes_.size();
     while (*pointer < size) {
         for (const auto &i: bytecodes_[*pointer])
-            if (i[1] == -1)
-                (this->*TVM_RUN_CODE_NOARG_FUNC[i[0]])();
+            if (i -> index == -1)
+                (this->*TVM_RUN_CODE_NOARG_FUNC[i->bycode])();
             else
-                (this->*TVM_RUN_CODE_ARG_FUNC[i[0]])(i[1]);
+                (this->*TVM_RUN_CODE_ARG_FUNC[i->bycode])(i->index);
         (*pointer)++;
     }
     *pointer = re_;
@@ -182,10 +182,10 @@ void TVM::run_step() {
 
     auto *pointer = &LINE_NOW;
     for (const auto &i: static_data.byte_codes[*pointer])
-        if (i[1] == -1)
-            (this->*TVM_RUN_CODE_NOARG_FUNC[i[0]])();
+        if (i->index == -1)
+            (this->*TVM_RUN_CODE_NOARG_FUNC[i->bycode])();
         else
-            (this->*TVM_RUN_CODE_ARG_FUNC[i[0]])(i[1]);
+            (this->*TVM_RUN_CODE_ARG_FUNC[i->bycode])(i->index);
     (*pointer)++;
 }
 

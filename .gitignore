@@ -2,6 +2,8 @@
 .idea/
 CMakeFiles/
 Testing/
+coverage/
+build/
 *.py
 cmake_install.cmake
 CMakeCache.txt

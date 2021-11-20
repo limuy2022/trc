@@ -2,7 +2,7 @@
 
 using namespace std;
 
-frame_::frame_() {}
+frame_::frame_() = default;
 
-func_::func_(const string &name) :
-        name(name) {}
+func_::func_(string name) :
+        name(std::move(name)) {}

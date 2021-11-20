@@ -12,8 +12,8 @@
 #endif
 
 // 字节序，true为大端，false为小端
-extern bool byte_order;
+extern const bool byte_order;
 
-bool get_byte_order();
+constexpr bool get_byte_order();
 
 #endif

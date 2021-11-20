@@ -9,7 +9,7 @@
 using namespace std;
 
 // 在编译时将助记符转化为字节码
-map<string, short> codes_int = {
+map<string, bytecode_t> codes_int = {
         {LOAD_INT_,      0},
         {ADD_,           1},
         {NOP_,           2},

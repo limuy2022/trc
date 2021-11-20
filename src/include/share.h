@@ -2,7 +2,7 @@
 #define TRC_INCLUDE_SHARE_H
 
 #include <map>
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 
@@ -22,6 +22,6 @@ namespace run_env {
     extern map<string, int> lines;
 
     void set_module(const std::string &name);
-};
+}
 
 #endif

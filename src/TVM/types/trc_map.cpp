@@ -144,7 +144,7 @@ void trc_map::delete_value(const OBJ key_) {
 
 int trc_map::hash_func(void *value) const {
     /**
-     * 哈希函数，目前非常简单
+     * 哈希函数
      */
-    return *(int*)value % length;
+    return *(int*)(&value) % length;
 }

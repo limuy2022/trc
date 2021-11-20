@@ -10,11 +10,11 @@
 #include <string>
 #include <vector>
 #include "share.h"
-#include "node.h"
-#include "data.hpp"
+#include "utils/node.h"
+#include "utils/data.hpp"
 #include "Compiler/optimize.h"
-#include "type.hpp"
-#include "type.h"
+#include "utils/type.hpp"
+#include "utils/type.h"
 #include "func_loader.h"
 #include "Error.h"
 #include "obj.h"

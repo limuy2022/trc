@@ -1,9 +1,9 @@
 #include <vector>
 #include <string>
 #include "Compiler/compile_share.h"
-#include "data.hpp"
+#include "utils/data.hpp"
 #include "Error.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 
@@ -40,8 +40,7 @@ static string lex_string(const string &var) {
      * 解析string，并把特殊字符转义，例如特殊字符\n等
      */
     string result;
-    size_t n = var.length();
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0, n = var.length(); i < n; ++i)
         if (var[i] == '\\') {
             if (i == n - 2) {
                 // 如果i为var最后一个值
@@ -79,8 +78,7 @@ void token(vecs2d &result, const vecs &codes) {
     auto *pointer = &LINE_NOW;
 
     for (const auto &line: codes) {
-        size_t n = line.length();
-        for (int j = 0; j < n; ++j) {
+        for (size_t j = 0, n = line.length(); j < n; ++j) {
             temp += line[j];
             t_len = temp.length();
             if ((temp[0] == '\'' || temp[0] == '"') && \
@@ -137,7 +135,3 @@ void token(vecs2d &result, const vecs &codes) {
     }
     *pointer = 0;
 }
-
-#undef is_num
-#undef is_english_num
-#undef is_english

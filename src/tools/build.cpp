@@ -5,9 +5,9 @@
 #include <string>
 #include "TVM/TVM.h"
 #include "ctree_loader.h"
-#include "read.h"
+#include "utils/read.h"
 #include "Compiler/Compiler.h"
-#include "filesys.h"
+#include "utils/filesys.h"
 #include "share.h"
 
 using namespace std;

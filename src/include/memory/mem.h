@@ -7,6 +7,7 @@
  */
 
 #include <map>
+#include "objs_pool.hpp"
 #include "TVM/base.h"
 #include "TVM/int.h"
 #include "TVM/float.h"
@@ -15,12 +16,17 @@
 #include "TVM/flong.h"
 #include "memory_pool.h"
 
-// 申请内存池对象
-#define MALLOCINT memory::global_objs_pool -> int_pool -> trcmalloc
-#define MALLOCFLOAT memory::global_objs_pool -> float_pool -> trcmalloc
-#define MALLOCSTRING memory::global_objs_pool -> str_pool -> trcmalloc
-#define MALLOCLONG memory::global_objs_pool -> long_pool -> trcmalloc
-#define MALLOCFLONG memory::global_objs_pool -> flong_pool -> trcmalloc
+// 申请对象池
+#define MALLOCINT memory::global_objs_pool->int_pool.trcmalloc
+#define MALLOCFLOAT memory::global_objs_pool->float_pool.trcmalloc
+#define MALLOCSTRING memory::global_objs_pool->str_pool.trcmalloc
+#define MALLOCLONG memory::global_objs_pool->long_pool.trcmalloc
+#define MALLOCFLONG memory::global_objs_pool->flong_pool.trcmalloc
+
+// 申请内存池
+#define MALLOC memory::global_memory_pool.mem_malloc
+#define REALLOC memory::global_memory_pool.mem_realloc
+#define FREE memory::global_memory_pool.mem_free
 
 using namespace std;
 
@@ -42,32 +48,24 @@ void quit_mem();
 
 void free_var_vm(TVM *vm);
 
-template<typename T>
-class objs_pool;
-
-class objs_pool_TVM {
+struct objs_pool_TVM {
     /**
      * 对对象池的基本封装，对象池面向全体对象
      * 而这个类面向TVM用于保存基础类型
      */
-public:
-    objs_pool_TVM(size_t init_size);
-
-    ~objs_pool_TVM();
-
-    objs_pool<trc_int> *int_pool;
-    objs_pool<trc_float> *float_pool;
-    objs_pool<trc_string> *str_pool;
-    objs_pool<trc_long> *long_pool;
-    objs_pool<trc_flong> *flong_pool;
+    objs_pool<trc_int> int_pool;
+    objs_pool<trc_float> float_pool;
+    objs_pool<trc_string> str_pool;
+    objs_pool<trc_long> long_pool;
+    objs_pool<trc_flong> flong_pool;
 };
 
 namespace memory {
     /**
      * 存放内存池和对象池
      */
-    extern objs_pool_TVM *global_objs_pool;
-    extern memory_pool *global_memory_pool;
+    extern memory_pool global_memory_pool;
+    extern objs_pool_TVM * global_objs_pool;
 }
 
 #endif

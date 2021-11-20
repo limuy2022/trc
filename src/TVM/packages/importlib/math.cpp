@@ -4,7 +4,7 @@
  */
 
 #include <cmath>
-#include "cfg.h"
+#include "trcdef.h"
 #include "TVM/lib.h"
 
 using namespace std;

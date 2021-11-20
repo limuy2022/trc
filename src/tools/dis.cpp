@@ -5,7 +5,7 @@
 #include <iostream>
 #include "code_loader.h"
 #include "ctree_loader.h"
-#include "read.h"
+#include "utils/read.h"
 #include "Compiler/Compiler.h"
 
 using namespace std;
@@ -24,7 +24,7 @@ static void out(TVM *vm, const string &file_name) {
         // 行
         cout << "    " << line_index++ << ":";
         for (const auto &value_: line) {
-            cout << int_code[value_[0]] << "|" << value_[1] << ", ";
+            cout << int_code[value_->bycode] << "|" << value_->index << ", ";
         }
         cout << "\n";
     }

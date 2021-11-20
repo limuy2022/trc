@@ -21,7 +21,7 @@ https://gitee.com/li-muyangangel/trc.git
 本项目100%开源，所有源码都可以在gitee上找到
 
 ## 系统要求
-编译器：g++8.1.0是最好的，但并不是强制要求,在其它编译器上结果可能有所不同
+编译器：g++是最好的，但并不是强制要求,在其它编译器上结果可能有所不同
 
 注：同样支持VS2019
 
@@ -34,17 +34,15 @@ https://gitee.com/li-muyangangel/trc.git
 ## 编译方式
 本项目采用cmake编译程序，需要安装cmake并使用对应的工具链
 buildtrc(一个帮助编译trc的工具)
+注：该工具以及cmake配置都使用release选项
 windows：
 
     有安装mingw：
     buildtrc gcc
-    build
     有安装vs：
     buildtrc vs
-    build
-    有安装vs且使用nmake进行编译:（不要在普通的命令行下运行，要在vs提供的命令行下运行)
+    有安装vs且使用nmake进行编译:(默认生成x64平台代码，有其它需求可以自己改build.cpp)
     buildtrc msvc
-    build
 
 注：这是buildtrc绝对支持的方式，但用户也可以自由选择其他工具链进行编译
 方法如下：

@@ -4,8 +4,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "node.h"
-#include "read.h"
+#include "utils/node.h"
+#include "utils/read.h"
 #include "Compiler/Compiler.h"
 #include "memory/mem.h"
 
@@ -49,8 +49,7 @@ namespace tools_in {
 
         cout << "From file " << path << ":" << "\n";
 
-        size_t n = tree_node.size();
-        for (int i = 0; i < n; ++i) {
+        for (size_t i = 0, n = tree_node.size(); i < n; ++i) {
             cout << i << ":";
             out(tree_node[i]);
             cout << "\n";

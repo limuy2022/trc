@@ -1,6 +1,6 @@
 #include <string>
 #include "TVM/TVM.h"
-#include "data.hpp"
+#include "utils/data.hpp"
 #include "Error.h"
 #include "TVM/TRE.h"
 

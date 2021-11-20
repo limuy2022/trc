@@ -6,7 +6,7 @@
 #define TRC_INCLUDE_TVM_MAP_H
 
 #include "base.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

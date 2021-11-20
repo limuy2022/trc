@@ -18,7 +18,7 @@ namespace error_env {
 }
 
 // 错误map，<错误名称, 错误模板字符串>
-static const string error_map[] = {
+static const char * error_map[] = {
         "NameError:name \"$\" is not defined.",
         "ValueError:\"$\" could not be \"$\"",
         "TypeError:$",

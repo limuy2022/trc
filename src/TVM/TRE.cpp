@@ -1,5 +1,5 @@
 #include "TVM/TRE.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 namespace TVM_share {
     /**

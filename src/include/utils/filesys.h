@@ -1,7 +1,7 @@
-#ifndef TRC_INCLUDE_FILESYS_H
-#define TRC_INCLUDE_FILESYS_H
+#ifndef TRC_INCLUDE_UTILS_FILESYS_H
+#define TRC_INCLUDE_UTILS_FILESYS_H
 
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

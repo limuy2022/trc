@@ -8,13 +8,12 @@
 #ifndef TRC_INCLUDE_MEMORY_MEMORY_POOL_H
 #define TRC_INCLUDE_MEMORY_MEMORY_POOL_H
 
-#include <vector>
 #include <cstddef>
 
 using namespace std;
 
 namespace memclass {
-    class freespace;
+    union node_mem;
 }
 
 class memory_pool {
@@ -47,16 +46,24 @@ public:
 
     void mem_free(void *p, size_t size_);
 
-    void *mem_realoc(void *p, size_t size_);
+    void *mem_realloc(void *p, size_t before, size_t size_);
 
 private:
-    // 储存各个链表的链表头
-    memclass::freespace *memory_heads;
-    // 储存删除请求
-    vector<void *> delete_reqs;
+    void full_gc();
 
-    // 释放已经申请的内存块数
-    void free_pri();
+    // 储存各个链表的链表头
+    memclass::node_mem ** memory_heads;
+    // 储存每个链表的node_mem个数
+    int *size_of_node;
+
+    void malloc_more(int);
+
+    void delete_list(int num);
+
+    void init_list(int num);
+
+    // 向外申请内存的次数，达到一定程度就启动full_gc
+    int malloc_from_os = 0;
 };
 
 #endif

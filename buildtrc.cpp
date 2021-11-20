@@ -18,7 +18,7 @@ bool build_vs() {
 }
 
 bool build_gcc() {
-    if (system("cmake . -G \"MinGW Makefiles\"") || system("make")) {
+    if (system("cmake . -G \"MinGW Makefiles\"") || system("cmake --build  . --config Release")) {
         return 0;
     }
     system("strip bin/trc.exe");
@@ -26,7 +26,8 @@ bool build_gcc() {
 }
 
 bool build_msvc() {
-    if (system("cmake . -G \"NMake Makefiles\"") || system("nmake")) {
+    system("vcvarsall.bat amd64");
+    if (system("cmake . -G \"NMake Makefiles\"") || system("cmake --build  . --config Release")) {
         return 0;
     }
     return 1;

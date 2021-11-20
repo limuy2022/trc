@@ -7,8 +7,8 @@
 #include <stack>
 #include "TVM/TVM.h"
 #include "Compiler/Compiler.h"
-#include "read.h"
-#include "data.hpp"
+#include "utils/read.h"
+#include "utils/data.hpp"
 #include "TVM/long.h"
 #include "memory/mem.h"
 
@@ -27,7 +27,6 @@ static void var_lex(const string &instruction) {
 }
 
 static void stack_out() {
-    int i;
     // 输出栈
     // 整型栈
     // 要输出就要先将数据备份

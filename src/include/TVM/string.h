@@ -3,16 +3,16 @@
 
 #include <string>
 #include "base.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 
 class trc_string : public trcobj {
 public:
-    char *value;
-
     // 字符数(不包括\0)
     size_t char_num = 0;
+
+    char *value;
 
     trc_string(const trc_string &init);
 

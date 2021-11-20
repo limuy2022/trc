@@ -7,56 +7,45 @@
 #include <ostream>
 #include "TVM/long.h"
 #include "TVM/TRE.h"
-#include "Error.h"
 #include "memory/objs_pool.hpp"
 
 using namespace std;
 using namespace TVM_share;
 
-#define NEW_trc_long_CHECK \
-do{\
-    if (NULL == value) {\
-        send_error(MemoryError, "can't get the memory from os.");\
-    }\
-}while(0)
-
 const int trc_long::type;
 
-trc_long &trc_long::operator=(const string &a) {
+trc_long::trc_long(const string &a) {
     int l_s = a.length();
     if (a[0] == '-') {
         size = l_s;
-        value = (char *) (malloc(sizeof(char) * size));
-        NEW_trc_long_CHECK;
+        value = (char *) (MALLOC(sizeof(char) * size));
         value[0] = 1;
         for (int i = 1; i < l_s; ++i) {
             value[i] = a[l_s - i] - '0';
         }
-        return *this;
+        return;
     }
     size = l_s + 1;
-    value = (char *) (malloc(sizeof(char) * size));
-    NEW_trc_long_CHECK;
+    value = (char *) (MALLOC(sizeof(char) * size));
     value[0] = 0;
     for (int i = 1; i <= l_s; ++i) {
         value[i] = a[l_s - i] - '0';
     }
-    return *this;
 }
 
 trc_long::trc_long() :
-        value((char *) (malloc(sizeof(char)))) // 至少申请一个符号位，否则在realloc的过程中会卡死
+        value((char *) (MALLOC(sizeof(char)))) // 至少申请一个符号位，否则在realloc的过程中会卡死
 {
     // 默认正数
-    value = 0;
+    *value = 0;
 }
 
 trc_long::~trc_long() {
-    free(value);
+    FREE(value, size);
 }
 
 OBJ trc_long::operator=(OBJ a) {
-    LONGOBJ b = (LONGOBJ) (a);
+    auto b = (LONGOBJ) (a);
     if (b != this) {
         set_alloc(b->size);
         memcpy(value, b->value, sizeof(char) * b->size);
@@ -65,7 +54,7 @@ OBJ trc_long::operator=(OBJ a) {
 }
 
 OBJ trc_long::operator+(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     auto *res = MALLOCLONG();
     res->set_alloc(max(a->size, size) + 1);
     memcpy(res->value, value, size * sizeof(char));
@@ -87,7 +76,7 @@ OBJ trc_long::operator+(OBJ b) {
 }
 
 OBJ trc_long::operator-(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     auto *res = MALLOCLONG();
     res->set_alloc(max(a->size, size));
     memcpy(res->value, value, size * sizeof(char));
@@ -109,8 +98,8 @@ OBJ trc_long::operator-(OBJ b) {
 }
 
 OBJ trc_long::operator*(OBJ b) {
-    LONGOBJ v = (LONGOBJ) (b);
-    trc_long *res = new trc_long;
+    auto v = (LONGOBJ) (b);
+    auto res = new trc_long;
     res->set_alloc(v->size + size - 1);
     int bit;
     for (int i = 1; i < size; ++i) {
@@ -129,8 +118,7 @@ OBJ trc_long::operator*(OBJ b) {
 }
 
 void trc_long::set_alloc(int size_) {
-    value = (char *) realloc(value, size_ * sizeof(char));
-    NEW_trc_long_CHECK;
+    value = (char *) REALLOC(value, size, size_ * sizeof(char));
     /* 将多余的部分初始化为零 */
     if (size_ > size)
         memset(value + size, 0, (size_ - size) * sizeof(char));
@@ -173,7 +161,7 @@ OBJ trc_long::zdiv(OBJ) {
 }
 
 INTOBJ trc_long::operator!=(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i)
         if (a->value[i] != value[i])
@@ -182,7 +170,7 @@ INTOBJ trc_long::operator!=(OBJ b) {
 }
 
 INTOBJ trc_long::operator==(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i)
         if (a->value[i] != value[i])
@@ -191,7 +179,7 @@ INTOBJ trc_long::operator==(OBJ b) {
 }
 
 INTOBJ trc_long::operator<(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i)
         if (a->value[i] < value[i])
@@ -202,7 +190,7 @@ INTOBJ trc_long::operator<(OBJ b) {
 }
 
 INTOBJ trc_long::operator>(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i)
         if (a->value[i] > value[i])
@@ -213,7 +201,7 @@ INTOBJ trc_long::operator>(OBJ b) {
 }
 
 INTOBJ trc_long::operator<=(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i) {
         if (a->value[i] < value[i]) {
@@ -226,7 +214,7 @@ INTOBJ trc_long::operator<=(OBJ b) {
 }
 
 INTOBJ trc_long::operator>=(OBJ b) {
-    LONGOBJ a = (LONGOBJ) (b);
+    auto a = (LONGOBJ) (b);
     int min_ = min(size, a->size);
     for (int i = 1; i < min_; ++i) {
         if (a->value[i] > value[i]) {

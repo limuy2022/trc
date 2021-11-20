@@ -7,9 +7,8 @@
 #include <cstdarg>
 #include <fstream>
 #include "Error.h"
-#include "cfg.h"
+#include "trcdef.h"
 #include "platform.h"
-#include "unistd.h"
 #ifdef WINDOWS_PLAT
     #include <io.h>
 #elif defined(LINUX_PLAT)

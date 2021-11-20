@@ -3,8 +3,8 @@
  * 其实就相当于编译时的解释器，负责解析代码并把变量的作用域和类型做出标识，用于各种判断
  */
 
-#include "cfg.h"
-#include "node.h"
+#include "trcdef.h"
+#include "utils/node.h"
 
 using namespace std;
 

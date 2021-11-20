@@ -11,10 +11,10 @@
 #include "TVM/TVM.h"
 #include "Error.h"
 #include "platform.h"
-#include "bytes.h"
+#include "utils/bytes.h"
 
 // 开头标识文件是否为ctree文件的标识，魔数
-static int MAGIC_VALUE = 0xACFD;
+static const int MAGIC_VALUE = 0xACFD;
 
 // 由于读入和写入是相对的，所以用宏定义来简化这一点
 // str:load or write
@@ -41,7 +41,7 @@ void fread_all(void * a, int b, int c, FILE * d) {
     fread(a, b, c, d);
     /*为大端则转成小端*/
     if(!byte_order) {
-        bytes_order_change((char*)a, b * c);
+        bytes_order_change((byte_t *)a, b * c);
     }
 }
 
@@ -49,7 +49,7 @@ void fwrite_all(const void * a, int b, int c, FILE * d) {
     fwrite(a, b, c, d);
     /*为小端则转成大端*/
     if(!byte_order) {
-        bytes_order_change((char*)a, b * c);
+        bytes_order_change((byte_t *)a, b * c);
     }
 }
 
@@ -63,7 +63,7 @@ static string load_string_one(FILE *file) {
      * 加载单个字符串
      */
     int n;
-    fread(&n, sizeof(int), 1, file);
+    fread(&n, sizeof(n), 1, file);
     // 临时申请一段空间用于初始化string
     char *tmp = new char[n];
     fread(tmp, n, 1, file);
@@ -101,7 +101,7 @@ static void load_pool(FILE *file, vector<T> &const_pool) {
      * 注：基础数据类型，其它数据类型可能导致错误
      */
     int size;
-    fread(&size, sizeof(int), 1, file);
+    fread(&size, sizeof(size), 1, file);
     const_pool.resize(size);
     for (auto &i: const_pool)
         fread(&i, sizeof(i), 1, file);
@@ -118,19 +118,19 @@ static void write_string_pool(FILE *file, vector<string> &const_pool) {
         write_string_one(file, i);
 }
 
-static void write_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
+static void write_bytecode(FILE *file, struct_codes &const_opcode) {
     /**
      * 写入字节码
      */
     // 字节码条数
     int size = const_opcode.size(), line_size;
-    fwrite(&size, sizeof(int), 1, file);
+    fwrite(&size, sizeof(size), 1, file);
     for (const auto &i: const_opcode) {
         line_size = i.size();
-        fwrite(&line_size, sizeof(int), 1, file);
+        fwrite(&line_size, sizeof(line_size), 1, file);
         for (const auto &j: i) {
-            fwrite(&j[0], sizeof(j[0]), 1, file);
-            fwrite(&j[1], sizeof(j[1]), 1, file);
+            fwrite(&j -> bycode, sizeof(j -> bycode), 1, file);
+            fwrite(&j -> index, sizeof(j -> index), 1, file);
         }
     }
 }
@@ -148,7 +148,7 @@ static void load_string_pool(FILE *file, vecs &const_pool) {
         i = load_string_one(file);
 }
 
-static void load_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
+static void load_bytecode(FILE *file, struct_codes &const_opcode) {
     /**
      * 读取字节码
      */
@@ -158,11 +158,11 @@ static void load_bytecode(FILE *file, vector<vector<short *> > &const_opcode) {
     fread(&size, sizeof(size), 1, file);
     for (int i = 0; i < size; ++i) {
         fread(&line_size, sizeof(line_size), 1, file);
-        vector<short *> line;
+        vector<TVM_bytecode *> line;
         for (int j = 0; j < line_size; ++j) {
             fread(&name, sizeof(name), 1, file);
             fread(&argv, sizeof(argv), 1, file);
-            line.push_back(new short[2]{name, argv});
+            line.push_back(new TVM_bytecode(name, argv));
         }
         const_opcode.push_back(line);
     }

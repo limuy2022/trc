@@ -5,7 +5,7 @@
 #ifndef TRC_INCLUDE_COMPILER_COMPILER_H
 #define TRC_INCLUDE_COMPILER_COMPILER_H
 
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

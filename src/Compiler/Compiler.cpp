@@ -8,12 +8,12 @@
 #include "Compiler/compile_share.h"
 #include "Compiler/Compiler.h"
 #include "code_loader.h"
-#include "data.hpp"
-#include "type.hpp"
-#include "type.h"
+#include "utils/data.hpp"
+#include "utils/type.hpp"
+#include "utils/type.h"
 #include "Error.h"
 #include "memory/mem.h"
-#include "node.h"
+#include "utils/node.h"
 
 using namespace std;
 
@@ -54,7 +54,7 @@ static string LOAD_NAME = LOAD_NAME_, \
  STORE_NAME = STORE_NAME_, \
  DEL = DEL_;
 
-static vector<short *> real_compiler(TVM *vm, treenode *head);
+static vector<TVM_bytecode*> real_compiler(TVM *vm, treenode *head);
 
 static short add(TVM *vm, int data_type, const string &data_value) {
     /**
@@ -104,25 +104,25 @@ static short add(TVM *vm, int data_type, const string &data_value) {
     }
 }
 
-static short *build_opcode(const string &data, short index = -1) {
+static TVM_bytecode *build_opcode(const string &data, short index = -1) {
     /**
     * 构建字节码，以data在opcodesym_int中的值和index初始化数组
     * data：符号
     * index：索引
     */
-    return new short[2]{codes_int[opcodesym_int[data]], index};
+    return new TVM_bytecode(codes_int[opcodesym_int[data]], index);
 }
 
-static short *build_origin(const string &data, short index = -1) {
+static TVM_bytecode *build_origin(const string &data, short index = -1) {
     /**
     * 建造无需通过符号转化的字节码，助记符
     * data:助记符
     * index：索引
     */
-    return new short[2]{codes_int[data], index};
+    return new TVM_bytecode(codes_int[data], index);
 }
 
-static short *build_var(const string &data, short index = -1) {
+static TVM_bytecode *build_var(const string &data, short index = -1) {
     /**
      * 构建有关变量的字节码
      * data：符号
@@ -130,8 +130,8 @@ static short *build_var(const string &data, short index = -1) {
      */
 
     if (data == "=")
-        return new short[2]{codes_int[CHANGE_VALUE], index};
-    return new short[2]{codes_int[STORE_NAME], index};
+        return new TVM_bytecode(codes_int[CHANGE_VALUE], index);
+    return new TVM_bytecode(codes_int[STORE_NAME], index);
 }
 
 static void func_lexer(TVM *vm, treenode *head) {
@@ -174,12 +174,12 @@ vecs2d final_token(const vecs &codes) {
     return token_code;
 }
 
-static vector<short *> real_compiler(TVM *vm, treenode *head) {
+static vector<TVM_bytecode*> real_compiler(TVM *vm, treenode *head) {
     /**
      * head:每一行的头指针
      * vm：当时编译的虚拟机
      */
-    vector<short *> bytecode_temp;
+    vector<TVM_bytecode*> bytecode_temp;
     size_t n = head->son.size();
     treenode *tree;
     int type;
@@ -193,15 +193,15 @@ static vector<short *> real_compiler(TVM *vm, treenode *head) {
             int type_data = what_type(nodedata);
             short index_argv = add(vm, type_data, nodedata);
             if (type_data == string_TICK)
-                bytecode_temp.push_back(new short[2]{codes_int[LOAD_STRING_], index_argv});
+                bytecode_temp.push_back(new TVM_bytecode(codes_int[LOAD_STRING_], index_argv));
             else if (type_data == int_TICK || type_data == CONST_TICK)
-                bytecode_temp.push_back(new short[2]{codes_int[LOAD_INT_], index_argv});
+                bytecode_temp.push_back(new TVM_bytecode(codes_int[LOAD_INT_], index_argv));
             else if (type_data == float_TICK)
-                bytecode_temp.push_back(new short[2]{codes_int[LOAD_FLOAT_], index_argv});
+                bytecode_temp.push_back(new TVM_bytecode(codes_int[LOAD_FLOAT_], index_argv));
             else if (type_data == VAR_TICK)
-                bytecode_temp.push_back(new short[2]{codes_int[LOAD_NAME], index_argv});
+                bytecode_temp.push_back(new TVM_bytecode(codes_int[LOAD_NAME_], index_argv));
             else if (type_data == LONG_TICK)
-                bytecode_temp.push_back(new short[2]{codes_int[LOAD_LONG_], index_argv});
+                bytecode_temp.push_back(new TVM_bytecode(codes_int[LOAD_LONG_], index_argv));
         } else if (type == TREE) {
             // 不是数据和传参节点，确认为树
             // 是树则递归，重新生成字节码，进行合并

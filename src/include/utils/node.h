@@ -1,5 +1,5 @@
-#ifndef TRC_INCLUDE_NODE_H
-#define TRC_INCLUDE_NODE_H
+#ifndef TRC_INCLUDE_UTILS_NODE_H
+#define TRC_INCLUDE_UTILS_NODE_H
 
 #include <string>
 #include <vector>
@@ -19,7 +19,7 @@ public:
 
     treenode(int type_argv = TREE);
 
-    treenode(int type_argv, const string &data);
+    treenode(int type_argv, string data);
 
     void connect(treenode *son_connect);
 };

@@ -27,10 +27,10 @@ public:
 private:
     void set_realloc(size_t num);
 
-    // trc_flong在底层是通过int型的动态数组实现的,动态改变大小，
+    // trc_flong在底层是通过char型的动态数组实现的,动态改变大小，
     // 数组大小可能不会刚好对应数位，因为出于效率的考虑，内存会按最多分配
     // 小数点以-1标识
-    int *value;
+    char *value;
     size_t n;
     const static int type = float_T;
 };

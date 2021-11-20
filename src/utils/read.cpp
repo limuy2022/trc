@@ -12,7 +12,7 @@ void readcode(string &file_data, const string &path) {
 
     file_data.clear();
     FILE *file = fopen(path.c_str(), "r");
-    if (file == NULL)
+    if (file == nullptr)
         send_error(OpenFileError, path.c_str());
     char tmp = fgetc(file);
     while (!feof(file)) {
@@ -32,7 +32,7 @@ void readfile(string &file_data, const string &path, const int err, ...) {
     va_list ap;
     va_start(ap, &err);
     FILE *file = fopen(path.c_str(), "r");
-    if (file == NULL) {
+    if (file == nullptr) {
         send_error_(make_error_msg(err, ap));
         exit(1);
     }

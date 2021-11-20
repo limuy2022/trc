@@ -4,11 +4,11 @@
  */
 
 #include <string>
-#include "read.h"
+#include "utils/read.h"
 #include "TVM/TVM.h"
 #include "Compiler/Compiler.h"
 #include "ctree_loader.h"
-#include "filesys.h"
+#include "utils/filesys.h"
 #include "share.h"
 
 using namespace std;

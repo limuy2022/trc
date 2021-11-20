@@ -34,6 +34,8 @@ typedef trc_string *STRINGOBJ;
 typedef trc_long *LONGOBJ;
 typedef trc_flong *FLONGOBJ;
 
+typedef unsigned char byte_t;
+
 // 编译时类型标识
 #define VAR_TICK 1
 #define int_TICK 2

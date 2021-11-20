@@ -1,5 +1,5 @@
 #include <cmath>
-#include "type.hpp"
+#include "utils/type.hpp"
 #include "TVM/float.h"
 #include "TVM/int.h"
 #include "TVM/TRE.h"

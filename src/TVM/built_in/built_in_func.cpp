@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "Error.h"
-#include "type.hpp"
+#include "utils/type.hpp"
 #include "TVM/TVM.h"
 #include "TVM/TRE.h"
 #include "memory/objs_pool.hpp"

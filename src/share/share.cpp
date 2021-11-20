@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include "share.h"
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 
@@ -41,4 +41,4 @@ namespace run_env {
         run_env::run_module = name;
         run_env::lines[name] = 0;
     }
-};
+}

@@ -2,8 +2,8 @@
  * 关于类型的操作
  */
 
-#ifndef TRC_INCLUDE_TYPE_H
-#define TRC_INCLUDE_TYPE_H
+#ifndef TRC_INCLUDE_UTILS_TYPE_H
+#define TRC_INCLUDE_UTILS_TYPE_H
 
 using namespace std;
 

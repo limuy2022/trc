@@ -10,14 +10,12 @@
 
 #include <cstring>
 #include <ostream>
-#include <istream>
 #include "TVM/string.h"
 #include "TVM/TRE.h"
 #include "Error.h"
-#include "memory/mem.h"
 #include "memory/objs_pool.hpp"
 #include "share.h"
-#include "type.hpp"
+#include "utils/type.hpp"
 
 using namespace std;
 using namespace TVM_share;
@@ -25,11 +23,8 @@ using namespace TVM_share;
 const int trc_string::type;
 
 trc_string::trc_string(const trc_string &init) :
-        char_num(init.char_num) {
-    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
-    if (value == NULL) {
-        send_error(MemoryError, "can't get the memory from os.");
-    }
+        char_num(init.char_num),
+        value((char *) (MALLOC(sizeof(char) * (char_num + 1)))) {
     strcpy(value, init.value);
 }
 
@@ -38,36 +33,28 @@ trc_string &trc_string::operator=(const string &init) {
      * 由于常量池，所以兼容string
      */
     char_num = init.length();
-    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
-    if (value == NULL) {
-        send_error(MemoryError, "can't get the memory from os.");
-    }
+    value = (char *) (MALLOC(sizeof(char) * (char_num + 1)));
     strcpy(value, init.c_str());
     return *this;
 }
 
 trc_string::trc_string(const string &init) :
-        char_num(init.length()) {
+        char_num(init.length()),
+        value((char *) (MALLOC(sizeof(char) * (char_num + 1)))) {
     /**
      * 由于常量池，所以兼容string
      */
-    value = (char *) (malloc(sizeof(char) * (char_num + 1)));
-    if (value == NULL) {
-        send_error(MemoryError, "can't get the memory from os.");
-    }
     strcpy(value, init.c_str());
 }
 
 trc_string::~trc_string() {
-    free(value);
+    FREE(value, char_num + 1);
 }
 
-trc_string::trc_string() {
-    value = (char *) (malloc(sizeof(char)));
-    if (value == NULL) {
-        send_error(MemoryError, "can't get the memory from os.");
-    }
-    value[0] = '\0';
+trc_string::trc_string() :
+    value((char *) (MALLOC(sizeof(char))))
+{
+    *value = '\0';
 }
 
 size_t trc_string::len() {
@@ -89,7 +76,7 @@ OBJ trc_string::operator+(trcobj *value_i) {
 }
 
 OBJ trc_string::operator+=(trcobj *value_i) {
-    trc_string *value_i_ = (STRINGOBJ) (value_i);
+    auto value_i_ = (STRINGOBJ) (value_i);
     set_realloc(value_i_->char_num + char_num);
     strcat(value, value_i_->value);
     return (OBJ) this;
@@ -128,9 +115,7 @@ void trc_string::set_realloc(size_t num) {
      * 重新申请字符数，不包括\0
      */
 
-    value = (char *) realloc(value, sizeof(char) * (num + 1));
-    if (value == NULL)
-        send_error(MemoryError, "can't get the memory from os.");
+    value = (char *) REALLOC(value, char_num, sizeof(char) * (num + 1));
     char_num = num;
 }
 

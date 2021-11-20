@@ -1,15 +1,15 @@
-#include "read.h"
-#include "filesys.h"
+#include "utils/read.h"
+#include "utils/filesys.h"
 #include "Compiler/Compiler.h"
 #include "Error.h"
 #include "share.h"
 #include "TVM/TRE.h"
 #include "TVM/TVM.h"
-#include "filesys.h"
-#include "cfg.h"
+#include "utils/filesys.h"
+#include "trcdef.h"
 #include "memory/objs_pool.hpp"
 #include "TVM/lib.h"
-#include "data.hpp"
+#include "utils/data.hpp"
 
 using namespace std;
 using namespace memory;
@@ -27,8 +27,7 @@ void TVM::LOAD_INT(const short &index) {
         push(TVM_share::int_cache[value - INT_CACHE_BEGIN]);
         return;
     }
-    firsti = global_objs_pool->int_pool->trcmalloc();
-    firsti->value = value;
+    firsti = MALLOCINT(value);
     push(firsti);
 }
 
@@ -42,8 +41,7 @@ void TVM::LOAD_FLOAT(const short &index) {
     /**
      * 加载浮点型变量到栈
      */
-    firstf = global_objs_pool->float_pool->trcmalloc();
-    firstf->value = static_data.const_f[index];
+    firstf = MALLOCFLOAT(static_data.const_f[index]);
     push(firstf);
 }
 
@@ -51,8 +49,7 @@ void TVM::LOAD_STRING(const short &index) {
     /**
      * 加载字符串变量到栈
      */
-    firsts = global_objs_pool->str_pool->trcmalloc();
-    firsts->operator=(static_data.const_s[index]);
+    firsts = MALLOCSTRING(static_data.const_s[index]);
     push(firsts);
 }
 
@@ -60,8 +57,7 @@ void TVM::LOAD_LONG(const short &index) {
     /**
      * 加载大整数变量到栈
      */
-    firstl = global_objs_pool->long_pool->trcmalloc();
-    firstl->operator=(static_data.const_long[index]);
+    firstl = MALLOCLONG(static_data.const_long[index]);
     push(firstl);
 }
 

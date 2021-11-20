@@ -7,6 +7,8 @@
 
 using namespace std;
 
+struct TVM_bytecode;
+
 class frame_ : public base {
 public:
     frame_();
@@ -18,9 +20,9 @@ public:
     const string name;
 
     // 字节码信息
-    vector<vector<short *> > bytecodes;
+    vector<vector<TVM_bytecode *> > bytecodes;
 
-    func_(const string &name);
+    func_(string name);
 };
 
 #endif

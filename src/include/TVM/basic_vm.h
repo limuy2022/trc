@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <stack>
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

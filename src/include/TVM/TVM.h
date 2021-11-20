@@ -6,6 +6,7 @@
 #include <stack>
 #include "basic_vm.h"
 #include "TVM_data.h"
+#include "utils/bytes.h"
 
 #define LOAD_INT_ "LOAD_INT"
 #define ADD_ "ADD"
@@ -51,8 +52,6 @@ using namespace std;
 
 class trc_long;
 
-class gc_obj;
-
 namespace TVM_temp {
     // 中间变量，便于使用
     extern OBJ firstv, secondv;
@@ -72,7 +71,7 @@ class TVM : public base {
      */
 
 public:
-    TVM(const string &name, const float ver_in = version);
+    TVM(string name, float ver_in = version);
 
     ~TVM();
 
@@ -89,7 +88,7 @@ public:
 
     void run();
 
-    void run_func(const vector<vector<short *> > &bytecodes_, int init_index);
+    void run_func(const struct_codes &bytecodes_, int init_index);
 
     void run_step();
 

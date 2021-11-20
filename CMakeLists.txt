@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.19)
 project(Trc)
 
+#release
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+#debug
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
+
 set(CMAKE_CXX_STANDARD 17)
 set(EXECUTABLE_OUTPUT_PATH "bin/")
 INCLUDE_DIRECTORIES(src/include)
@@ -20,11 +25,9 @@ add_executable(Trc
     src/loader/code_loader.cpp
     src/loader/ctree_loader.cpp
     src/loader/func_loader.cpp
-    src/memory/free_compiler.cpp
-    src/memory/free_TVM.cpp
+    src/memory/free.cpp
     src/memory/memory_pool.cpp
     src/memory/new.cpp
-    src/memory/objs_pool_TVM.cpp
     src/share/compile_share.cpp
     src/share/share.cpp
     src/tools/all.cpp
@@ -40,6 +43,7 @@ add_executable(Trc
     src/tools/tshell.cpp
     src/TVM/TRE.cpp
     src/TVM/TVM.cpp
+    src/TVM/TVM_data.cpp
     src/TVM/built_in/built_in_func.cpp
     src/TVM/obj/func.cpp
     src/TVM/packages/lib.cpp

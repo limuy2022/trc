@@ -5,7 +5,7 @@
 #ifndef TRC_SRC_COMPILER_GRAMMAR_OBJ_H
 #define TRC_SRC_COMPILER_GRAMMAR_OBJ_H
 
-#include "cfg.h"
+#include "trcdef.h"
 
 using namespace std;
 

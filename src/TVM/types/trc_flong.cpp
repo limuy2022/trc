@@ -41,3 +41,7 @@ INTOBJ trc_flong::operator!=(OBJ value_i) {
     return INTOBJ();
 }
 
+void trc_flong::set_realloc(size_t num) {
+
+}
+

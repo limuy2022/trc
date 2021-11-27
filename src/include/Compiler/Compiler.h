@@ -1,30 +1,75 @@
-/**
+﻿/**
  * 编译器所有供外调的函数
  */
 
-#ifndef TRC_INCLUDE_COMPILER_COMPILER_H
-#define TRC_INCLUDE_COMPILER_COMPILER_H
+#pragma once
 
-#include "trcdef.h"
+#include "base/trcdef.h"
+#include "compile_def.hpp"
+#include "TVM/TVM.h"
+#include "dll.h"
 
 using namespace std;
 
-class TVM;
+namespace trc
+{
+    namespace compiler
+    {
+        class grammar_data_control;
+        class detail_grammar;
 
-class treenode;
+        class TRC_Compiler_api token_lex
+        {
+        public:
+            token_lex(const string &code);
 
-void pre(vecs &result, const string &codes);
+            ~token_lex();
 
-void pre_token_2(vecs2d &tokens);
+            vecs get_line();
 
-vecs2d final_token(const vecs &codes);
+        private:
+            const string code;
 
-void grammar(vector<treenode *> &result_return, const vecs2d &codes);
+            // 当前正在解析的行
+            int *line;
+            // 上一行的换行符的索引
+            char *char_ptr;
+        };
 
-void Compiler(TVM *vm, const string &codes);
+        class TRC_Compiler_api grammar_lex
+        {
+        public:
+            grammar_lex(const string &codes_str);
 
-void check(const vecs2d &code);
+            ~grammar_lex();
 
-void token(vecs2d &result, const vecs &codes);
+            vector<treenode *> *compile_nodes();
 
-#endif
+        private:
+            token_lex token_;
+
+            grammar_data_control *env;
+
+            // 这是解析的实现细节
+            detail_grammar *lex;
+
+            vector<treenode *> codes;
+        };
+
+        class TRC_Compiler_api compiler_t
+        {
+        public:
+            void operator()(TVM_space::TVM *vm, const string &codes);
+
+        private:
+            // 语法解析器
+            grammar_lex *grammar_;
+            vector<treenode *> *gline;
+            int *lex_num;
+        };
+
+        TRC_Compiler_api extern compiler_t Compiler;
+
+        TRC_Compiler_api void free_tree(const compiler::treenode *head);
+    }
+}

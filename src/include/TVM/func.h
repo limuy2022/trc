@@ -1,28 +1,27 @@
-#ifndef TRC_INCLUDE_TVM_FUNC_H
-#define TRC_INCLUDE_TVM_FUNC_H
+﻿#pragma once
 
 #include <string>
 #include <map>
-#include "basic_vm.h"
+#include "TVMbase/TVM_data.h"
+#include "TVMdef.h"
 
 using namespace std;
 
-struct TVM_bytecode;
+namespace trc {
+    namespace TVM_space {
+        class frame_{
+        public:
+            TVM_dyna_data dyna_data;
+            frame_();
+        };
 
-class frame_ : public base {
-public:
-    frame_();
-};
+        class func_ {
+        public:
+            // 函数名
+            const string name;
 
-class func_ {
-public:
-    // 函数名
-    const string name;
-
-    // 字节码信息
-    vector<vector<TVM_bytecode *> > bytecodes;
-
-    func_(string name);
-};
-
-#endif
+            // 字节码信息
+            vector<vector<TVM_bytecode *> > bytecodes;
+        };
+    }
+}

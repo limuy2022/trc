@@ -2,7 +2,8 @@
 
 using namespace std;
 
-frame_::frame_() = default;
-
-func_::func_(string name) :
-        name(std::move(name)) {}
+namespace trc {
+    namespace TVM_space {
+        frame_::frame_() = default;
+    }
+}

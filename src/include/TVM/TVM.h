@@ -1,12 +1,16 @@
-#ifndef TRC_INCLUDE_TVM_TVM_H
-#define TRC_INCLUDE_TVM_TVM_H
+﻿/**
+ * 虚拟机，执行TVM字节码的地方
+ * 这里负责存放它的接口
+ */
+
+#pragma once
 
 #include <string>
 #include <vector>
 #include <stack>
-#include "basic_vm.h"
-#include "TVM_data.h"
-#include "utils/bytes.h"
+#include "TVMbase/TVM_data.h"
+#include "base/utils/bytes.h"
+#include "TVM/dll.h"
 
 #define LOAD_INT_ "LOAD_INT"
 #define ADD_ "ADD"
@@ -50,149 +54,129 @@
 
 using namespace std;
 
-class trc_long;
+namespace trc
+{
+    namespace TVM_space
+    {
+        class TRC_TVM_api TVM
+        {
+            /**
+             * TVM：trc的核心部分，负责执行字节码
+             */
 
-namespace TVM_temp {
-    // 中间变量，便于使用
-    extern OBJ firstv, secondv;
+        public:
+            TVM(const string &name, float ver_in = def::version);
 
-    extern INTOBJ firsti, secondi;
+            ~TVM();
 
-    extern FLOATOBJ firstf, secondf;
+            // 模块名
+            string name;
+            // 运行函数模块名
+            string run_func_str;
+            // 调用函数的字节码所在的行
+            int call_func_index;
 
-    extern STRINGOBJ firsts, seconds;
+            map<string, TVM *> modules;
 
-    extern LONGOBJ firstl, secondl;
+            void run();
+
+            void run_func(const struct_codes &bytecodes_, int init_index);
+
+            void run_step();
+
+            def::OBJ pop();
+
+            void pop_value();
+
+            void push(def::OBJ a);
+
+            /* 指令集开始定义处 */
+            void LOAD_INT(const short &index);
+
+            void LOAD_FLOAT(const short &index);
+
+            void LOAD_STRING(const short &index);
+
+            void ADD();
+
+            void SUB();
+
+            void MUL();
+
+            void DIV();
+
+            void ZDIV();
+
+            void POW();
+
+            void MOD();
+
+            void NOP();
+
+            void GOTO(const short &index);
+
+            void STORE_NAME(const short &index);
+
+            void LOAD_NAME(const short &index);
+
+            void DEL();
+
+            void CALL_BUILTIN(const short &name);
+
+            void IMPORT();
+
+            void IF_FALSE_GOTO(const short &index);
+
+            void CHANGE_VALUE(const short &index);
+
+            void EQUAL();
+
+            void UNEQUAL();
+
+            void GREATER_EQUAL();
+
+            void LESS_EQUAL();
+
+            void LESS();
+
+            void GREATER();
+
+            void NOT();
+
+            void AND();
+
+            void OR();
+
+            void ASSERT();
+
+            void STORE_LOCAL(const short &name);
+
+            void LOAD_LOCAL(const short &name);
+
+            void CALL_FUNCTION(const short &index);
+
+            void FREE_FUNCTION();
+
+            void CHANGE_LOCAL(const short &index);
+
+            void DEL_LOCAL();
+
+            void LOAD_LONG(const short &index);
+
+            void CALL_METHOD(const short &index);
+
+            void LOAD_ARRAY(const short &index);
+
+            void LOAD_MAP(const short &index);
+
+            /* 指令集结束定义处 */
+
+            // 静态数据，编译时生成
+            TVM_data static_data;
+
+            TVM_dyna_data dyna_data;
+        };
+
+        TRC_TVM_api TVM *create_TVM(const string &name = "__main__");
+    }
 }
-
-class TVM : public base {
-    /**
-     * TVM：trc的核心部分，负责执行字节码
-     */
-
-public:
-    TVM(string name, float ver_in = version);
-
-    ~TVM();
-
-    void check_TVM() const;
-
-    // 模块名
-    string name;
-    // 运行函数模块名
-    string run_func_str;
-    // 调用函数的字节码所在的行
-    int call_func_index;
-
-    map<string, TVM *> modules;
-
-    void run();
-
-    void run_func(const struct_codes &bytecodes_, int init_index);
-
-    void run_step();
-
-    template<typename T>
-    void pop(T &a);
-
-    void pop_value();
-
-    void push(OBJ a);
-
-    /* 指令集开始定义处 */
-    void LOAD_INT(const short &index);
-
-    void LOAD_FLOAT(const short &index);
-
-    void LOAD_STRING(const short &index);
-
-    void ADD();
-
-    void SUB();
-
-    void MUL();
-
-    void DIV();
-
-    void ZDIV();
-
-    void POW();
-
-    void MOD();
-
-    void NOP();
-
-    void GOTO(const short &index);
-
-    void STORE_NAME(const short &index);
-
-    void LOAD_NAME(const short &index);
-
-    void DEL();
-
-    void CALL_BUILTIN(const short &name);
-
-    void IMPORT();
-
-    void IF_FALSE_GOTO(const short &index);
-
-    void CHANGE_VALUE(const short &index);
-
-    void EQUAL();
-
-    void UNEQUAL();
-
-    void GREATER_EQUAL();
-
-    void LESS_EQUAL();
-
-    void LESS();
-
-    void GREATER();
-
-    void NOT();
-
-    void AND();
-
-    void OR();
-
-    void ASSERT();
-
-    void STORE_LOCAL(const short &name);
-
-    void LOAD_LOCAL(const short &name);
-
-    void CALL_FUNCTION(const short &index);
-
-    void FREE_FUNCTION();
-
-    void CHANGE_LOCAL(const short &index);
-
-    void DEL_LOCAL();
-
-    void LOAD_LONG(const short &index);
-
-    void CALL_METHOD(const short &index);
-
-    void LOAD_ARRAY(const short &index);
-
-    void LOAD_MAP(const short &index);
-
-    /* 指令集结束定义处 */
-    
-    // 静态数据，编译时生成
-    TVM_data static_data;
-};
-
-template <typename T>
-void TVM::pop(T &a) {
-    /**
-     * 弹出栈顶的数据指针赋给a
-     */
-    a = (T)stack_data.top();
-    stack_data.pop();
-}
-
-TVM *create_TVM(const string &name = "__main__");
-
-#endif

@@ -1,5 +1,0 @@
-Trc系统架构：
-
-最外层：tools_in和tools_out命名空间，是Trc对外的命令行调用接口
-
-标准库文件：src/TVM/packages/importlib/

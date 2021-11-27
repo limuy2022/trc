@@ -1,10 +1,20 @@
 /**
  * 声明编译中的优化函数
  */
-#ifndef TRC_INCLUDE_COMPILER_OPTIMIZE_H
-#define TRC_INCLUDE_COMPILER_OPTIMIZE_H
+#pragma once
 
-extern std::map<std::string, bool (*)(const int &, const int &)> optimize_condit;
-extern std::map<std::string, int (*)(const int &, const int &)> optimize_number;
+#include <map>
+#include <string>
 
-#endif
+using namespace std;
+
+namespace trc {
+    namespace compiler {
+        typedef int (*ip)(const int &, const int &);
+
+        typedef bool (*bp)(const int &, const int &);
+        
+        extern map<string, bp> optimize_condit;
+        extern map<string, ip> optimize_number;
+    }
+}

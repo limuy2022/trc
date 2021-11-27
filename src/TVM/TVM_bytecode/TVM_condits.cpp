@@ -1,116 +1,134 @@
-#include "TVM/TVM.h"
-#include "Error.h"
-#include "TVM/TRE.h"
+﻿#include "TVM/TVM.h"
+#include "base/Error.h"
+#include "TVMbase/TRE.h"
+#include "base/trcdef.h"
+#include "TVMbase/types/string.h"
 
 using namespace std;
-using namespace TVM_temp;
 
-void TVM::EQUAL() {
-    /**
-     * 判断相等，假设两端类型相等
-     * 注意：如果不相等，将会在编译期间进行强制转换，不能通过者将会报出类型错误
-     */
+namespace trc
+{
+    namespace TVM_space
+    {
+        void TVM::EQUAL()
+        {
+            /**
+             * 判断相等，假设两端类型相等
+             * 注意：如果不相等，将会在编译期间进行强制转换，不能通过者将会报出类型错误
+             */
 
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator==(secondv));
-}
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator==(secondv));
+        }
 
-void TVM::UNEQUAL() {
-    /**
-     * 判断不相等
-     */
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator!=(secondv));
-}
+        void TVM::UNEQUAL()
+        {
+            /**
+             * 判断不相等
+             */
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator!=(secondv));
+        }
 
-void TVM::GREATER_EQUAL() {
-    /**
-     * 判断大于等于
-     */
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator>=(secondv));
-}
+        void TVM::GREATER_EQUAL()
+        {
+            /**
+             * 判断大于等于
+             */
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator>=(secondv));
+        }
 
-void TVM::LESS_EQUAL() {
-    /**
-     * 判断小于等于
-     */
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator<=(secondv));
-}
+        void TVM::LESS_EQUAL()
+        {
+            /**
+             * 判断小于等于
+             */
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator<=(secondv));
+        }
 
-void TVM::LESS() {
-    /**
-     * 判断小于
-     */
+        void TVM::LESS()
+        {
+            /**
+             * 判断小于
+             */
 
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator<(secondv));
-}
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator<(secondv));
+        }
 
-void TVM::GREATER() {
-    /**
-     * 判断大于
-     */
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator>(secondv));
-}
+        void TVM::GREATER()
+        {
+            /**
+             * 判断大于
+             */
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator>(secondv));
+        }
 
+        void TVM::IF_FALSE_GOTO(const short &index)
+        {
+            /**
+             * 如果为否，跳转代码
+             */
 
-void TVM::IF_FALSE_GOTO(const short &index) {
-    /**
-     * 如果为否，跳转代码
-     */
+            firsti = (def::INTOBJ)(pop());
+            if (!firsti->value)
+                GOTO(index);
+        }
 
-    pop(firsti);
-    if (!firsti->value)
-        GOTO(index);
-}
+        void TVM::ASSERT()
+        {
+            /**
+             * 断言，判断表达式是否为假
+             */
 
+            firsti = (def::INTOBJ)pop();
+            secondi = (def::INTOBJ)pop();
+            int tmp_i = firsti->value;
+            if (!secondi->value)
+            {
+                if (tmp_i > 2)
+                    error::send_error(error::ArgumentError, "assert needs one or two arguments.");
 
-void TVM::ASSERT() {
-    /**
-     * 断言，判断表达式是否为假
-     */
+                switch (tmp_i)
+                {
+                case 1:
+                    error::send_error(error::AssertError, "assert.");
+                    break;
+                case 2:
+                    firsts = (def::STRINGOBJ)pop();
+                    error::send_error(error::AssertError, firsts->c_str());
+                    break;
+                }
+            }
+        }
 
-    pop(firsti);
-    pop(secondi);
-    int tmp_i = firsti->value;
-    if (!secondi->value) {
-        if (tmp_i > 2)
-            send_error(ArgumentError, "assert needs one or two arguments.");
+        void TVM::NOT()
+        {
+            firstv = pop();
+            push(firstv->operator!());
+        }
 
-        switch (tmp_i) {
-            case 1:
-                send_error(AssertError, "assert.");
-            case 2:
-                pop(firsts);
-                send_error(AssertError, firsts->c_str());
+        void TVM::AND()
+        {
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator&&(secondv));
+        }
+
+        void TVM::OR()
+        {
+            secondv = pop();
+            firstv = pop();
+            push(firstv->operator||(secondv));
         }
     }
-}
-
-
-void TVM::NOT() {
-    pop(firstv);
-    push(firstv->operator!());
-}
-
-
-void TVM::AND() {
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator&&(secondv));
-}
-
-void TVM::OR() {
-    pop(secondv);
-    pop(firstv);
-    push(firstv->operator||(secondv));
 }

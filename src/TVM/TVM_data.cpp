@@ -1,9 +1,11 @@
-#include "TVM/TVM_data.h"
+#include "TVMbase/TVM_data.h"
 
 using namespace std;
 
-TVM_bytecode::TVM_bytecode(bytecode_t a, index_t b) :
-    bycode(a),
-    index(b)
-{}
-
+namespace trc {
+    namespace TVM_space {
+        symbol_form::~symbol_form() {
+            delete []vars;
+        }
+    }
+}

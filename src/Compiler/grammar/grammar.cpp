@@ -244,7 +244,9 @@ namespace trc
                 {
                     // 内置函数
                     auto *builtin = new treenode(BUILTIN_FUNC), *bycode = new treenode(DATA), *nodeargv = new treenode(DATA);
-                    bycode->data = "CALL_BUILTIN";
+                    const char* msg = "CALL_BUILTIN";
+                    bycode->set_alloc(strlen(msg));
+                    strcpy(bycode->data, msg);
                     int tmp = loader::func_num[name[0]];
                     nodeargv->set_alloc(utils::len(tmp) + 1);
                     itoa(tmp, nodeargv->data, 10);
@@ -255,7 +257,9 @@ namespace trc
                 else
                 {
                     auto *builtin = new treenode(CALL_FUNC), *bycode = new treenode(DATA), *nodeargv = new treenode(DATA);
-                    bycode->data = "CALL_FUNCTION";
+                    const char* msg = "CALL_FUNCTION";
+                    bycode->set_alloc(strlen(msg));
+                    strcpy(bycode->data, msg);
                     int tmp = loader::func_num[name[0]];
                     nodeargv->set_alloc(utils::len(tmp) + 1);
                     itoa(tmp, nodeargv->data, 10);

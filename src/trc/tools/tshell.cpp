@@ -60,7 +60,6 @@ namespace trc {
                 getline(cin, code);
                 if (code == "exit()")
                     break;
-                code += "\n";
                 if (is_block(code)) {
                     get_block(code);
                 }

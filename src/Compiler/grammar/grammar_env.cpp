@@ -77,6 +77,7 @@ namespace trc
             /**
              * 将一行中缀表达式转换成后缀表达式
              */
+            vecs res;
             // vector<node*> st;
             // stack<char> oper_tmp;
             // for(int i = 0, n = line.length(); i < n; ++i) {
@@ -110,6 +111,7 @@ namespace trc
             //     st.push_back(new node{oper, oper_tmp.top()});
             //     oper_tmp.pop();
             // }
+            return res;
         }
     }
 }

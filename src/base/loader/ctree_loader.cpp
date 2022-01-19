@@ -15,9 +15,6 @@
 #include "TVM/func.h"
 #include "base/ctree_loader.h"
 
-#define fread fread_all
-#define fwrite fwrite_all
-
 using namespace std;
 
 // 开头标识文件是否为ctree文件的标识，魔数
@@ -28,19 +25,19 @@ static const int MAGIC_VALUE = 0xACFD;
 #define LOAD_WRITE(file, vm, str)                                \
     do                                                           \
     {                                                            \
-        /* 整型常量池 */                                    \
+        /* 整型常量池 */                                          \
         str##_pool((file), (vm)->static_data.const_i);           \
-        /* 浮点数常量池 */                                 \
+        /* 浮点数常量池 */                                        \
         str##_pool((file), (vm)->static_data.const_f);           \
-        /* 字符串常量池 */                                 \
+        /* 字符串常量池 */                                        \
         str##_string_pool((file), (vm)->static_data.const_s);    \
-        /* 长整型常量池 */                                 \
+        /* 长整型常量池 */                                        \
         str##_string_pool((file), (vm)->static_data.const_long); \
-        /* 变量名常量池 */                                 \
+        /* 变量名常量池 */                                        \
         str##_string_pool((file), (vm)->static_data.const_name); \
-        /* 字节码常量池 */                                 \
+        /* 字节码常量池 */                                        \
         str##_bytecode((file), (vm)->static_data.byte_codes);    \
-        /* 函数字节码常量池 */                           \
+        /* 函数字节码常量池 */                                    \
         str##_functions((file), (vm)->static_data.funcs);        \
     } while (0)
 
@@ -64,6 +61,9 @@ static void fwrite_all(const void *a, int b, int c, FILE *d)
         trc::utils::bytes_order_change((trc::def::byte_t *)a, b * c);
     }
 }
+
+#define fread fread_all
+#define fwrite fwrite_all
 
 static string load_string_one(FILE *file)
 {

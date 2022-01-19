@@ -99,6 +99,8 @@ namespace trc
     {
         TVM::TVM(const string &name, float ver_in) : name(name)
         {
+            // 初始化TVM
+            init_mem();
             static_data.ver_ = ver_in;
             // 新建默认变量
             dyna_data.var_names["__name__"] = new types::trc_string("__main__");
@@ -115,13 +117,11 @@ namespace trc
                 delete i.second;
             }
         }
-
         void TVM::run()
         {
             /**
              * 从头开始，执行所有字节码
              */
-
             string &parent = run_env::run_module;
             run_env::run_module = name;
 
@@ -142,15 +142,13 @@ namespace trc
             int re_ = LINE_NOW;
             LINE_NOW = init_index;
             auto *pointer = &LINE_NOW;
-            size_t size = bytecodes_.size();
-            while (*pointer < size)
+            for (size_t size = bytecodes_.size(); *pointer < size; (*pointer)++)
             {
                 for (const auto &i : bytecodes_[*pointer])
                     if (i->index == -1)
                         (this->*TVM_RUN_CODE_NOARG_FUNC[i->bycode])();
                     else
                         (this->*TVM_RUN_CODE_ARG_FUNC[i->bycode])(i->index);
-                (*pointer)++;
             }
             *pointer = re_;
         }
@@ -180,9 +178,8 @@ namespace trc
         {
             /**
              * 弹出栈顶的值
-             * 注意：作为一个不可能被利用的值，在这里会被直接析构
+             * 注意：作为一个不可能被利用的值，也不能被析构，因为它可能是int或bool的缓存
              */
-            delete dyna_data.stack_data.top();
             dyna_data.stack_data.pop();
         }
 

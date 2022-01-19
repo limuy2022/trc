@@ -14,9 +14,12 @@ namespace trc
 {
     namespace compiler
     {
-        treenode::treenode(grammar_type type_argv, const string &data) : data((char *)malloc(sizeof(char) + data.length() + 1)),
+        treenode::treenode(grammar_type type_argv, const string &data) : data((char *)malloc(sizeof(char) * (data.length() + 1))),
                                                                          type(type_argv),
-                                                                         is_alloc(true) {}
+                                                                         is_alloc(true)
+        {
+            strcpy(this->data, data.c_str());
+        }
 
         treenode::treenode(grammar_type type) : type(type) {}
 

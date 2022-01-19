@@ -1,6 +1,6 @@
 ﻿#include "base/trcdef.h"
 #include "grammar_env.h"
-#include "Compiler/pri_Compiler.h"
+#include "Compiler/pri_compiler.h"
 
 using namespace std;
 

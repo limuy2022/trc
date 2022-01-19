@@ -9,10 +9,10 @@
 
 using namespace std;
 
-typedef string error_t;
-
 namespace trc {
     namespace error {
+        typedef string error_t;
+        
         namespace error_env {
             /**
              * 报错设置

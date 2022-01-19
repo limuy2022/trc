@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <array>
+#include <cstring>
 #include "Compiler/compile_def.hpp"
 #include "base/Error.h"
 

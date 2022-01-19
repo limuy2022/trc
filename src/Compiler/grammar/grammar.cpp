@@ -240,29 +240,41 @@ namespace trc
             // 函数名问题：判断内置函数和自定义函数
             if (name.size() == 1)
             {
+                treenode *builtin, *bycode, *nodeargv;
                 if (utils::check_in(name[0], loader::num_func))
                 {
                     // 内置函数
-                    auto *builtin = new treenode(BUILTIN_FUNC), *bycode = new treenode(DATA), *nodeargv = new treenode(DATA);
-                    const char* msg = "CALL_BUILTIN";
+                    builtin = new treenode(BUILTIN_FUNC);
+                    bycode = new treenode(DATA);
+                    nodeargv = new treenode(DATA);
+
+                    const char *msg = "CALL_BUILTIN";
                     bycode->set_alloc(strlen(msg));
                     strcpy(bycode->data, msg);
-                    int tmp = loader::func_num[name[0]];
-                    nodeargv->set_alloc(utils::len(tmp) + 1);
-                    itoa(tmp, nodeargv->data, 10);
+
+                    const string &tmp = to_string(loader::func_num[name[0]]);
+                    nodeargv->set_alloc(tmp.length());
+                    strcpy(nodeargv->data, tmp.c_str());
+
                     builtin->connect(bycode);
                     builtin->connect(nodeargv);
                     functree->connect(builtin);
                 }
                 else
                 {
-                    auto *builtin = new treenode(CALL_FUNC), *bycode = new treenode(DATA), *nodeargv = new treenode(DATA);
-                    const char* msg = "CALL_FUNCTION";
+                    // 自定义函数
+                    builtin = new treenode(CALL_FUNC);
+                    bycode = new treenode(DATA);
+                    nodeargv = new treenode(DATA);
+
+                    const char *msg = "CALL_FUNCTION";
                     bycode->set_alloc(strlen(msg));
                     strcpy(bycode->data, msg);
-                    int tmp = loader::func_num[name[0]];
-                    nodeargv->set_alloc(utils::len(tmp) + 1);
-                    itoa(tmp, nodeargv->data, 10);
+
+                    const string &tmp = to_string(loader::func_num[name[0]]);
+                    nodeargv->set_alloc(tmp.length());
+                    strcpy(nodeargv->data, tmp.c_str());
+
                     builtin->connect(bycode);
                     builtin->connect(nodeargv);
                     functree->connect(builtin);
@@ -424,9 +436,9 @@ namespace trc
                 if (utils::check_in(oper, opti_condits))
                 {
                     // 布尔值
-                    int res_tmp = optimize_condit[oper](atoi(left->data), atoi(right->data));
-                    result_oper->set_alloc(utils::len(res_tmp) + 1);
-                    itoa(res_tmp, result_oper->data, 10);
+                    const string &res_tmp = to_string(optimize_condit[oper](atoi(left->data), atoi(right->data)));
+                    result_oper->set_alloc(res_tmp.length());
+                    strcpy(result_oper->data, res_tmp.c_str());
                     head->connect(result_oper);
                     return;
                 }
@@ -494,15 +506,17 @@ namespace trc
                 {
                     head = ifis({"goto", to_string(start_line)});
                     // 覆盖当时的占位符
-                    head->son[1]->son[0]->set_alloc(utils::len(*line_));
-                    itoa(*line_, head->son[1]->son[0]->data, 10);
+                    const string &tmp = to_string(*line_);
+                    head->son[1]->son[0]->set_alloc(tmp.length());
+                    strcpy(head->son[1]->son[0]->data, tmp.c_str());
                     break;
                 }
                 case blocks_type::IF_TYPE:
                 {
                     // 覆盖当时的占位符
-                    head->son[1]->son[0]->set_alloc(utils::len(*line_));
-                    itoa(*line_, head->son[1]->son[0]->data, 10);
+                    const string &tmp = to_string(*line_);
+                    head->son[1]->son[0]->set_alloc(tmp.length());
+                    strcpy(head->son[1]->son[0]->data, tmp.c_str());
                     break;
                 }
                 }

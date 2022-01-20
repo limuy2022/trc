@@ -1,594 +1,449 @@
-﻿/**
- * 此处是编译器的最重要核心之一
- * 主要负责生成供编译器生成字节码的语法树
- *
- * 语法树描述规则：
- * tree节点不储存数据
- */
-
-#include <cstring>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <array>
-#include <stack>
+﻿#include "Compiler/grammar.h"
+#include "Compiler/Compiler.h"
+#include "Compiler/optimize.h"
+#include "Compiler/pri_compiler.hpp"
+#include "base/Error.h"
+#include "base/func_loader.h"
+#include "base/memory/memory.hpp"
 #include "base/trcdef.h"
 #include "base/utils/data.hpp"
-#include "Compiler/optimize.h"
 #include "base/utils/type.hpp"
-#include "base/func_loader.h"
-#include "base/Error.h"
-#include "grammar_env.h"
-#include "Compiler/Compiler.h"
 #include "base/utils/types.h"
+#include "language/error.h"
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstring>
+#include <stack>
+#include <string>
+#include <vector>
 
-using namespace std;
+namespace trc::compiler {
+/**
+ * @brief
+ * 关于对象的代码转换为节点以及对象信息保存和识别
+ * @details
+ * 其实就相当于编译时的解释器，负责解析代码并把变量的作用域和类型做出标识，用于各种判断
+ */
+class grammar_data_control {
+public:
+    /**
+     * @brief 编译从map或者从array中取值的代码
+     */
+    void compile_get_value(
+        treenode* head, const vecs& code);
 
-// 运算符和条件解析
-#define OPER_TREE(list_var_, __code_)      \
-    for (auto &i : (list_var_))            \
-    {                                      \
-        if (utils::check_in(i, (__code_))) \
-        {                                  \
-            oper_tree(head, (__code_), i); \
-            return head;                   \
-        }                                  \
+    /**
+     * @brief 编译从map或者从array中创建对象的代码
+     */
+    void compile_create_obj(
+        treenode* head, const vecs& code);
+
+    ~grammar_data_control();
+
+private:
+    vecs array_list;
+
+    vecs map_list;
+
+    // 由于map和array获取值的方式相同但是生成的字节码不同，需要在定义时予以区分
+
+    /**
+     * @brief 生成从数组中获取值的节点
+     */
+    void array_get_value(treenode* head);
+
+    /**
+     * @brief 生成创建数组的节点
+     */
+    void create_array(treenode* head, const vecs& code);
+
+    /**
+     * @brief 生成从map中获取值的节点
+     */
+    void map_get_value(treenode* head);
+
+    /**
+     * @brief 生成创建map的节点
+     */
+    void create_map(treenode* head, const vecs& code);
+};
+
+void grammar_data_control::array_get_value(treenode* head) {
+}
+
+void grammar_data_control::create_array(
+    treenode* head, const vecs& code) {
+}
+
+void grammar_data_control::map_get_value(treenode* head) {
+}
+
+void grammar_data_control::create_map(
+    treenode* head, const vecs& code) {
+}
+
+void grammar_data_control::compile_get_value(
+    treenode* head, const vecs& code) {
+}
+
+void grammar_data_control::compile_create_obj(
+    treenode* head, const vecs& code) {
+}
+
+grammar_data_control::~grammar_data_control() {
+    array_list.clear();
+    map_list.clear();
+}
+
+grammar_lex::~grammar_lex() {
+    delete env;
+}
+
+void grammar_lex::assign(is_not_end_node* head,
+    trc::compiler::token_ticks oper,
+    const code_type& code) {
+    // 申请新的树节点
+    auto ass = new trc::compiler::node_base_tick(
+        trc::compiler::TREE, oper);
+    auto name = new trc::compiler::node_base_data;
+    if (code.size() == 1) {
+        // 数组之类的名字比一个长
+        auto quicktmp = code.front();
+        name->set(quicktmp->data);
+        name->type = trc::compiler::DATA;
+    } else {
     }
 
-// 函数标志
-static array<string, 2> func_symbol = {"(", ")"};
-
-static vecs cut(const vecs &origin, const string &start, const string &end)
-{
-    /**
-     *功能性函数，切取start到end的距离，具体规则参考python的切片
-     *“切头不切尾”
-     */
-
-    const auto &start_iter = origin.begin(), &end_iter = origin.end();
-    return vecs(find(start_iter, end_iter, start), find(start_iter, end_iter, end));
+    // 父节点留下子节点记录
+    head->connect(ass);
+    ass->connect(name);
+    // 存放等号右边的值
+    ass->connect(get_node());
 }
 
-static vecs until_cut(const vecs &code, const string &cut_sym)
-{
-    /**
-     * 切除直到遇到某个字符串
-     */
+void grammar_lex::callfunction(
+    node_base_data* functree, const code_type& funcname) {
+    auto argv_node = new is_not_end_node;
+    functree->connect(argv_node);
 
-    const auto &start = code.begin();
-    return vecs(start, find(start, code.end(), cut_sym));
-}
+    // 这一段是在切割参数，划分好自己的参数
 
-static vecs from_cut_until(const vecs &code, const string &cut_sym)
-{
-    /**
-     * 从某个字符串开始切到末尾
-     */
-
-    const auto &end = code.end(), &start = find(code.begin(), end, cut_sym) + 1;
-    return vecs(start, end);
-}
-
-static bool in_func(int index_oper, const vecs &code)
-{
-    /**
-     * 判断某个符号是否处于函数括号中
-     * @param index_oper : 符号所在的索引
-     * @param code : 符号所在的语句
-     */
-
-    const auto &start_iter = code.rbegin(), &end_iter = code.rend();
-    int start_sym = trc::utils::index_vector(code, "("),
-        end_sym = abs(distance(end_iter, (find(start_iter, end_iter, ")")))) - 1;
-    return (start_sym < index_oper && end_sym > index_oper);
-}
-
-namespace trc
-{
-    namespace compiler
-    {
-        class detail_grammar
-        {
-            /**
-             * 语言的解析细节
-             */
-        public:
-            treenode *get_node(const vecs &);
-
-            detail_grammar(vector<treenode *> *line);
-
-        private:
-            inline void save_line(trc::compiler::blocks_type type)
-            {
-                /**
-                 * 保存行及信息
-                 * 例如while将保存while和while所在的行数
-                 */
-                blocks_st.push(type);
-                lines_save.push(*line_);
-            }
-
-            treenode *ifis(const vecs &code);
-
-            void assign(treenode *head, const string &oper, const vecs &code);
-
-            void callfunction(treenode *head, const vecs &code);
-
-            void sentence_tree(treenode *head, const vecs &code);
-
-            void while_loop_tree(treenode *head, const vecs &code);
-
-            void if_tree(treenode *head, const vecs &code);
-
-            void func_define(treenode *head, const vecs &code);
-
-            bool block(treenode *head, const vecs &code);
-
-            void oper_tree(treenode *head, const vecs &code, const string &oper);
-
-            void not_tree(treenode *head, const vecs &code);
-
-            /**
-             * 记录相关的整型信息
-             * 例如：while a>0{
-             *      print(a)
-             *      a=a-1
-             * }
-             * 将会把while a>0{所在的行数存进去，直到遇到}再取出
-             */
-            stack<int> lines_save;
-            /*储存代码块的信息，例如遇到if将if的信息存入栈中，遇到}再取出*/
-            stack<trc::compiler::blocks_type> blocks_st;
-
-            int *line_;
-
-            vector<treenode *> *codes;
-        };
-        treenode *detail_grammar::ifis(const vecs &code)
-        {
-            /**
-             * 本节点是对real_grammar函数的间接递归
-             * 当code为数据时返回DATA节点
-             * 当code为表达式时解析代码并返回TREE节点
-             * 注：本函数仅仅生成节点，对于指向不作管理
-             */
-
-            return code.size() == 1 ? new treenode(DATA, code.front()) : get_node(code);
+    token* lex_tmp;
+    while (1) {
+        lex_tmp = token_.get_token();
+        if (lex_tmp->tick
+            == token_ticks::RIGHT_SMALL_BRACE) {
+            delete lex_tmp;
+            break;
+        } else if (lex_tmp->tick
+            != trc::compiler::token_ticks::COMMA) {
+            argv_node->connect(get_node());
+        } else {
+            //逗号
+            delete lex_tmp;
         }
+    }
 
-        void detail_grammar::assign(treenode *head, const string &oper, const vecs &code)
-        {
-            /**
-             * 生成赋值语句节点
-             */
+    // 由于栈先进后出的特征，在此处将参数进行反转
+    std::reverse(
+        argv_node->son.begin(), argv_node->son.end());
 
-            // 申请新的树节点
-            auto ass = new treenode,
-                 name = new treenode,
-                 opernode = new treenode(VAR_DEFINE, oper);
-            // 父节点指向
-            const vecs &temp = until_cut(code, oper);
-            if (temp.size() == 1)
-            {
-                // 数组之类的名字比一个长
-                name->set_alloc(temp[0].length());
-                strcpy(name->data, temp[0].c_str());
-                name->type = DATA;
-            }
-            else
-            {
-            }
+    auto* len = new node_base_int_without_sons(
+        NUMBER, argv_node->son.size());
+    functree->connect(len);
 
-            // 父节点留下子节点记录
-            head->connect(ass);
-            opernode->connect(name);
-            // 存放等号右边的值
-            ass->connect(ifis(from_cut_until(code, oper)));
-            ass->connect(opernode);
+    // 函数名问题：判断内置函数和自定义函数
+    if (funcname.size() == 1) {
+        if (trc::utils::check_in(
+                funcname[0]->data, loader::num_func)) {
+            // 内置函数
+            auto builtin = new node_base_data(
+                trc::compiler::BUILTIN_FUNC);
+            auto bycode = new node_base_data_without_sons(
+                trc::compiler::DATA);
+            auto nodeargv
+                = new node_base_int_without_sons(NUMBER,
+                    loader::func_num[funcname[0]->data]);
+
+            bycode->data = (char*)"CALL_BUILTIN";
+
+            builtin->connect(bycode);
+            builtin->connect(nodeargv);
+            functree->connect(builtin);
+        } else {
+            // 自定义函数
+            auto builtin = new node_base_data(
+                trc::compiler::CALL_FUNC);
+            auto bycode = new node_base_data_without_sons(
+                trc::compiler::DATA);
+            auto nodeargv
+                = new node_base_int_without_sons(NUMBER,
+                    loader::func_num[funcname[0]->data]);
+            // 原因是释放的标志位未开启，而字符串位于静态储存区作为常量储存，整个程序运行期间都不会被回收，所以可以直接使用
+            bycode->data = (char*)"CALL_FUNCTION";
+
+            builtin->connect(bycode);
+            builtin->connect(nodeargv);
+            functree->connect(builtin);
         }
+    }
+}
 
-        void detail_grammar::callfunction(treenode *head, const vecs &code)
-        {
-            /**
-             * 生成函数调用节点
-             */
+void grammar_lex::sentence_tree(
+    node_base_tick* head, token_ticks sentence_name) {
+    size_t argc = 0;
 
-            const auto &name = until_cut(code, "(");
-            vecs add_temp;
-            int argc = 0;
-            auto functree = new treenode, argv_node = new treenode;
-            head->connect(functree);
-            functree->connect(argv_node);
+    token* now = token_.get_token();
+    if (is_end_token(now->tick)) {
+        head->type = OPCODE;
+        head->tick = sentence_name;
+        delete now;
+        return;
+    }
+    token_.unget_token(now);
 
-            const auto &argv = from_cut_until(code, "(");
-            size_t argv_n = argv.size(), break_num = 0;
-            if (argv_n != 1)
-            {
-                for (const auto &i : argv)
-                {
-                    if (i == "(")
-                        break_num++;
-                    if ((i == "," || i == ")") && break_num == 0)
-                    {
-                        argv_node->connect(ifis(add_temp));
-                        argc++;
-                        add_temp.clear();
-                    }
-                    else
-                        add_temp.push_back(i);
-                    if (i == ")")
-                        break_num--;
-                }
-            }
+    auto* argv_node = new is_not_end_node;
 
-            // 由于栈先进后出的特征，在此处将参数进行反转
-            vector<treenode *> finally_temp;
-            size_t f_n = argv_node->son.size();
-            if (f_n > 1)
-            {
-                for (int i = 1; i <= f_n; ++i)
-                {
-                    finally_temp.push_back(argv_node->son[f_n - i]);
-                }
-                argv_node->son = finally_temp;
-            }
+    if (is_sentence_with_one_argv(sentence_name)) {
+        head->type = OPCODE_ARGV;
+        auto* argv = get_node();
+        head->connect(argv);
+        return;
+    }
 
-            add_temp.clear();
-            auto *len = new treenode(DATA, to_string(argc));
-            functree->connect(len);
-
-            // 函数名问题：判断内置函数和自定义函数
-            if (name.size() == 1)
-            {
-                treenode *builtin, *bycode, *nodeargv;
-                if (utils::check_in(name[0], loader::num_func))
-                {
-                    // 内置函数
-                    builtin = new treenode(BUILTIN_FUNC);
-                    bycode = new treenode(DATA);
-                    nodeargv = new treenode(DATA);
-
-                    const char *msg = "CALL_BUILTIN";
-                    bycode->set_alloc(strlen(msg));
-                    strcpy(bycode->data, msg);
-
-                    const string &tmp = to_string(loader::func_num[name[0]]);
-                    nodeargv->set_alloc(tmp.length());
-                    strcpy(nodeargv->data, tmp.c_str());
-
-                    builtin->connect(bycode);
-                    builtin->connect(nodeargv);
-                    functree->connect(builtin);
-                }
-                else
-                {
-                    // 自定义函数
-                    builtin = new treenode(CALL_FUNC);
-                    bycode = new treenode(DATA);
-                    nodeargv = new treenode(DATA);
-
-                    const char *msg = "CALL_FUNCTION";
-                    bycode->set_alloc(strlen(msg));
-                    strcpy(bycode->data, msg);
-
-                    const string &tmp = to_string(loader::func_num[name[0]]);
-                    nodeargv->set_alloc(tmp.length());
-                    strcpy(nodeargv->data, tmp.c_str());
-
-                    builtin->connect(bycode);
-                    builtin->connect(nodeargv);
-                    functree->connect(builtin);
-                }
-            }
-        }
-
-        void detail_grammar::sentence_tree(treenode *head, const vecs &code)
-        {
-            /**
-             * 生成语句执行节点
-             */
-
-            auto *argv_node = new treenode;
-            const string &sentence_name = code[0];
-            size_t n = code.size(), argc = 0;
-            if (n == 1)
-            {
-                // 单个语句
-                auto *snode = new treenode(ORIGIN, sentence_name);
-                head->connect(snode);
-                return;
-            }
-            else if (utils::check_in(code[0], sentences_yes_argv))
-            {
-                auto *snode = new treenode(OPCODE_ARGV, code[0]),
-                     *argv = new treenode(DATA, code[1]);
-                snode->connect(argv);
-                head->connect(snode);
-                return;
-            }
-            auto *snode = new treenode;
-
-            const vecs &argv = from_cut_until(code, code[0]);
-            vecs add_temp;
-            size_t argv_n = argv.size();
-
-            for (int i = 0; i < argv_n; ++i)
-            {
-                if (argv[i] == ",")
-                {
-                    argv_node->connect(ifis(add_temp));
-                    ++argc;
-                    add_temp.clear();
-                }
-                else
-                    add_temp.push_back(argv[i]);
-            }
-            argv_node->connect(ifis(add_temp));
+    while (1) {
+        token* tmp_ = token_.get_token();
+        if (is_end_token(tmp_->tick)) {
+            delete tmp_;
+            break;
+        } else if (tmp_->tick != token_ticks::COMMA) {
+            delete tmp_;
+        } else {
+            token_.unget_token(tmp_);
+            argv_node->connect(get_node());
             ++argc;
-
-            auto len = new treenode(DATA, to_string(argc)), name_node = new treenode(OPCODE, sentence_name);
-            snode->connect(argv_node);
-            snode->connect(len);
-            snode->connect(name_node);
-            head->connect(snode);
         }
+    }
+    // 将参数反转，因为栈先进后出
+    std::reverse(
+        argv_node->son.begin(), argv_node->son.end());
 
-        void detail_grammar::while_loop_tree(treenode *head, const vecs &code)
-        {
-            /**
-             * 生成条件循环字节码
-             * 注：仅对当前行进行解析
-             * 循环通过跳转实现
-             */
+    auto len = new node_base_int_without_sons(NUMBER, argc);
+    head->connect(argv_node);
+    head->connect(len);
+}
 
-            const auto &begin_ = code.begin(),
-                       &end_ = code.end();
-            // 条件表达式
-            const vecs &bool_sen = cut(code, *(find(begin_, end_, "while") + 1), "{");
-            // 保存当前循环状态
-            save_line(blocks_type::WHILE_TYPE);
-            auto *opcode_ = new treenode(OPCODE_ARGV, "if"),
-                 *data_node = new treenode(DATA, ""); //先使用空字符占位，当遇到}时再补回来
-            opcode_->connect(data_node);
-            head->connect(ifis(bool_sen));
-            head->connect(opcode_);
+void grammar_lex::while_loop_tree(is_not_end_node* head) {
+    auto while_argv = new node_base_tick(
+        OPCODE_ARGV, token_ticks::WHILE);
+    // 条件表达式
+    head->connect(get_node());
+    head->connect(while_argv);
+    token* token_data;
+    size_t while_start_line = error_->line;
+    for (;;) {
+        token_data = token_.get_token();
+        if (token_data->tick
+            == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
+            delete token_data;
+            break;
+        } else {
+            token_.unget_token(token_data);
+            head->connect(get_node());
         }
+    }
+    // 如果条件不满足，调到goto语句之后出循环
+    auto data_node = new node_base_int_without_sons(
+        LINE_NUMBER, error_->line + 1);
+    while_argv->connect(data_node);
 
-        void detail_grammar::if_tree(treenode *head, const vecs &code)
-        {
-            /**
-             * 生成条件判断字节码
-             * 注：仅对当前行进行解析
-             * 判断通过跳转实现
-             */
+    auto* goto_while_line = new node_base_tick(
+        OPCODE_ARGV, token_ticks::GOTO);
+    auto line_node = new node_base_int_without_sons(
+        LINE_NUMBER, while_start_line);
+    goto_while_line->connect(line_node);
+    head->connect(goto_while_line);
+}
 
-            const auto &begin_ = code.begin(),
-                       &end_ = code.end();
-            // 条件表达式
-            const vecs &bool_sen = cut(code, *(find(begin_, end_, "if") + 1), "{");
-            save_line(blocks_type::IF_TYPE);
-            auto *opcode_ = new treenode(OPCODE_ARGV, "if"),
-                 *data_node = new treenode(DATA, "");
-            opcode_->connect(data_node);
-            head->connect(ifis(bool_sen));
-            head->connect(opcode_);
+void grammar_lex::if_tree(is_not_end_node* head) {
+    auto* if_with_argv
+        = new node_base_tick(OPCODE_ARGV, token_ticks::IF);
+    // 条件表达式
+    head->connect(get_node());
+    head->connect(if_with_argv);
+    token* token_data;
+    for (;;) {
+        token_data = token_.get_token();
+        if (token_data->tick
+            == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
+            delete token_data;
+            break;
+        } else {
+            token_.unget_token(token_data);
+            head->connect(get_node());
         }
+    }
+    auto* data_node = new node_base_int_without_sons(
+        LINE_NUMBER, error_->line);
+    if_with_argv->connect(data_node);
+}
 
-        void detail_grammar::func_define(treenode *head, const vecs &code)
-        {
-            /**
-             *定义函数，原理：标记出函数结束的位置，使字节码生成器把函数单独解析
-             * 使用goto语句改变定义
-             */
+void grammar_lex::func_define(is_not_end_node* head) {
+    auto name = check_excepted(token_ticks::NAME);
+    auto* func_node = new node_base_data(
+        trc::compiler::FUNC_DEFINE, name->data);
+    delete name;
+    auto* line_node = new node_base_data_without_sons(
+        trc::compiler::DATA, "");
 
-            save_line(blocks_type::FUNC_TYPE);
-            auto *func_node = new treenode(FUNC_DEFINE, code[1]),
-                 *line_node = new treenode(DATA, "");
+    func_node->connect(line_node);
+    head->connect(func_node);
+}
 
-            func_node->connect(line_node);
-            head->connect(func_node);
-        }
+treenode* grammar_lex::get_node() {
+    trc::compiler::token* now = token_.get_token();
+    if (now->tick
+        == trc::compiler::token_ticks::END_OF_TOKENS) {
+        delete now;
+        return nullptr;
+    }
 
-        bool detail_grammar::block(treenode *head, const vecs &code)
-        {
-            /**
-             * 此函数负责所有关于语句块的语句的解析
-             * 包括func，if， while等
-             */
-
-            const char *name = code[0].c_str();
-            if (!strcmp(name, "if"))
-            {
-                if_tree(head, code);
-                return true;
-            }
-            if (!strcmp(name, "while"))
-            {
-                while_loop_tree(head, code);
-                return true;
-            }
-            if (!strcmp(name, "func"))
-            {
-                func_define(head, code);
-                return true;
-            }
-            return false;
-        }
-
-        void detail_grammar::oper_tree(treenode *head, const vecs &code, const string &oper)
-        {
-            /**
-             * 运算符和条件运算符解析，+-*%,==,!=等运算符
-             */
-
-            auto oper_node = new treenode(TREE),
-                 oper_data = new treenode(OPCODE, oper),
-                 left = ifis(until_cut(code, oper)),
-                 right = ifis(from_cut_until(code, oper));
-
-            if (left->type == DATA &&
-                right->type == DATA &&
-                what_type(left->data) == int_TICK &&
-                what_type(right->data) == int_TICK)
-            {
-                auto *result_oper = new treenode(DATA);
-                // 仅允许整型进行运算符的常量折叠
-                if (utils::check_in(oper, opti_condits))
-                {
-                    // 布尔值
-                    const string &res_tmp = to_string(optimize_condit[oper](atoi(left->data), atoi(right->data)));
-                    result_oper->set_alloc(res_tmp.length());
-                    strcpy(result_oper->data, res_tmp.c_str());
-                    head->connect(result_oper);
-                    return;
-                }
-                else if (utils::check_in(oper, opti_opers))
-                {
-                    bool res_tmp = optimize_number[oper](atoi(left->data), atoi(right->data));
-                    result_oper->set_alloc(2);
-                    result_oper->data[1] = '\0';
-                    result_oper->data[0] = res_tmp ? '1' : '0';
-                    head->connect(result_oper);
-                    return;
-                }
-            }
-            oper_node->connect(left);
-            oper_node->connect(right);
-            oper_node->connect(oper_data);
-            head->connect(oper_node);
-        }
-
-        void detail_grammar::not_tree(treenode *head, const vecs &code)
-        {
-            /**
-             * !非运算符
-             */
-
-            head->connect(ifis(from_cut_until(code, "not")));
-            head->connect(new treenode(OPCODE, "not"));
-        }
-
-        treenode *detail_grammar::get_node(const vecs &code)
-        {
-            auto head = new treenode;
-            size_t n = code.size();
-            if (!n)
+    if (is_cal_value(now->tick)) {
+        /*是一个可运算符号*/
+        std::vector<token*> got_tokens;
+        while (!is_end_token(now->tick)) {
+            got_tokens.push_back(now);
+            if (is_as_token(now->tick)) {
+                /*赋值语句*/
+                auto head = new is_not_end_node;
+                assign(head, now->tick, got_tokens);
+                delete now;
                 return head;
-
-            for (auto &i : aslist)
-            {
-                // 赋值运算
-                if (utils::check_in(i, code))
-                {
-                    assign(head, i, code);
-                    return head;
-                }
-            }
-            if (utils::check_in(code[0], sentences))
-            {
-                // 语句
-                sentence_tree(head, code);
+            } else if (is_cal_token(now->tick)
+                || is_condit_token(now->tick)) {
+                /*表达式*/
+                auto head = new is_not_end_node;
+                got_tokens.push_back(now);
+                change_to_last_expr(head, got_tokens);
+                return head;
+            } else if (now->tick
+                == token_ticks::LEFT_SMALL_BRACE) {
+                /*函数调用*/
+                auto head = new node_base_data;
+                delete now;
+                callfunction(head, got_tokens);
+            } else {
+                /*数据符号*/
+                auto head = new node_base_data_without_sons(
+                    DATA, now->data);
+                delete now;
                 return head;
             }
-
-            // 语句块
-            const string &end = code.back();
-            if (end == "{")
-                if (block(head, code))
-                    return head;
-            if (end == "}")
-            {
-                // 语句块结束，需要修正代码
-                int start_line = lines_save.top();
-                switch (blocks_st.top())
-                {
-                case blocks_type::WHILE_TYPE:
-                {
-                    head = ifis({"goto", to_string(start_line)});
-                    // 覆盖当时的占位符
-                    const string &tmp = to_string(*line_);
-                    head->son[1]->son[0]->set_alloc(tmp.length());
-                    strcpy(head->son[1]->son[0]->data, tmp.c_str());
-                    break;
-                }
-                case blocks_type::IF_TYPE:
-                {
-                    // 覆盖当时的占位符
-                    const string &tmp = to_string(*line_);
-                    head->son[1]->son[0]->set_alloc(tmp.length());
-                    strcpy(head->son[1]->son[0]->data, tmp.c_str());
-                    break;
-                }
-                }
-                blocks_st.pop();
-                lines_save.pop();
-            }
-
-            // 返回in_func_char中的元素在code中第一次出现的位置
-            int oper_i = utils::os_check_in_s_i(in_func_char, code);
-            // 判断语句含义：如果（）符号都在语句中且不为add(1, 1)+r(1, 2)的形式，作为函数进行解析
-            if (utils::s_check_in_s(func_symbol, code) && (oper_i == -1 || in_func(oper_i, code)))
-            {
-                // 函数
-                callfunction(head, code);
-                return head;
-            }
-            // 判断最高级运算符
-            OPER_TREE(highest_condits, code)
-            // 特殊判断， not
-            if (utils::check_in("not", code))
-            {
-                not_tree(head, code);
-                return head;
-            }
-            OPER_TREE(other_condits, code)
-
-            // 运算符，优先级低
-            OPER_TREE(opers, code)
-            // 无法匹配且为字符开头，报错
-            string tmp;
-            for (const auto &j : code)
-                tmp += j;
-            if (tmp.length() > 0 && is_english(tmp.front()))
-                error::send_error(error::NameError, tmp.c_str());
-            return head;
+            now = token_.get_token();
         }
-
-        detail_grammar::detail_grammar(vector<treenode *> *line) : line_(&LINE_NOW),
-                                                                   codes(line)
-        {
+    }
+    if (is_sentence_token(now->tick)) {
+        // 语句
+        auto head = new node_base_tick(TREE, now->tick);
+        sentence_tree(head, now->tick);
+        delete now;
+        return head;
+    }
+    if (is_blocked_token(now->tick)) {
+        auto head = new is_not_end_node;
+        delete now;
+        if (now->tick == token_ticks::WHILE) {
+            while_loop_tree(head);
+        } else if (now->tick == token_ticks::IF) {
+            if_tree(head);
+        } else if (now->tick == token_ticks::FUNC) {
+            func_define(head);
         }
+        return head;
     }
 }
 
-namespace trc
-{
-    namespace compiler
-    {
-        grammar_lex::grammar_lex(const string &codes_str) : token_(codes_str),
-                                                            env(new grammar_data_control),
-                                                            lex(new detail_grammar(&codes))
-        {
-        }
+grammar_lex::grammar_lex(const std::string& codes_str,
+    trc::compiler::compiler_error* error_)
+    : error_(error_)
+    , env(new trc::compiler::grammar_data_control)
+    , token_(codes_str, error_) {
+}
 
-        grammar_lex::~grammar_lex()
-        {
-            delete env;
-            delete lex;
+void grammar_lex::ConvertDataToExpressions(token* raw_lex,
+    std::vector<treenode*>& st,
+    std::stack<token_ticks>& oper_tmp) {
+    token_ticks quicktmp;
+    auto tick = raw_lex->tick;
+    if (is_cal_value(tick)) {
+        token_.unget_token(raw_lex);
+        st.push_back(get_node());
+        return;
+    }
+    if (tick == token_ticks::RIGHT_SMALL_BRACE) {
+        while ((quicktmp = oper_tmp.top())
+            != token_ticks::LEFT_SMALL_BRACE) {
+            st.push_back(
+                new node_base_tick(OPCODE, quicktmp));
+            oper_tmp.pop();
         }
-
-        vector<treenode *> *grammar_lex::compile_nodes()
-        {
-            for (;;)
-            {
-                const vecs &codes_to = token_.get_line();
-                if (codes_to.empty())
-                {
-                    // 代表解析结束
-                    return &codes;
-                }
-                codes.push_back(lex->get_node(codes_to));
-            }
+        oper_tmp.pop();
+        return;
+    }
+    if (tick != token_ticks::LEFT_SMALL_BRACE) {
+        int quickorder;
+        while (!oper_tmp.empty()
+            && (quickorder = cal_priority[(
+                    quicktmp = oper_tmp.top())])
+                != '('
+            && cal_priority[tick] <= quickorder) {
+            st.push_back(
+                new node_base_tick(OPCODE, quicktmp));
+            oper_tmp.pop();
         }
     }
+    oper_tmp.push(raw_lex->tick);
+}
+
+void grammar_lex::change_to_last_expr(
+    is_not_end_node* head, code_type& code) {
+    std::vector<treenode*> st;
+    is_not_end_node* expr_node = new node_base_data;
+    std::stack<token_ticks> oper_tmp;
+    for (auto i : code) {
+        ConvertDataToExpressions(
+            i, expr_node->son, oper_tmp);
+    }
+    memory::free_array_obj(code);
+    for (;;) {
+        trc::compiler::token* raw_lex = token_.get_token();
+        if (is_end_token(raw_lex->tick)) {
+            delete raw_lex;
+            break;
+        }
+        ConvertDataToExpressions(
+            raw_lex, expr_node->son, oper_tmp);
+        delete raw_lex;
+    }
+    while (!oper_tmp.empty()) {
+        token_ticks tmp = oper_tmp.top();
+        expr_node->son.push_back(
+            new node_base_tick(OPCODE, tmp));
+        oper_tmp.pop();
+    }
+    head->connect(expr_node);
+}
+
+token* grammar_lex::check_excepted(token_ticks tick) {
+    token* res = token_.get_token();
+    if (res->tick != tick) {
+        auto out_error_msg = res->data;
+        delete res;
+        error_->send_error_module(error::SyntaxError,
+            language::error::syntaxerror_no_expect,
+            out_error_msg.c_str());
+    }
+    return res;
+}
 }

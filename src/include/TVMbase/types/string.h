@@ -1,83 +1,73 @@
 ﻿#pragma once
 
-#include <string>
-#include "base/trcdef.h"
 #include "TVM/TVMdef.h"
-#include "TVMbase/types/base.h"
 #include "TVMbase/dll.h"
+#include "TVMbase/types/base.h"
+#include "base/trcdef.h"
+#include <string>
 
-using namespace std;
+namespace trc::TVM_space::types {
+class TRC_TVMbase_api trc_string : public trcobj {
+public:
+    // 字符数(不包括\0)
+    size_t char_num = 0;
 
-namespace trc
-{
-    namespace TVM_space
-    {
-        namespace types
-        {
-            class TRC_TVMbase_api trc_string : public trcobj
-            {
-            public:
-                // 字符数(不包括\0)
-                size_t char_num = 0;
+    char* value;
 
-                char *value;
+    trc_string(const trc_string& init);
 
-                trc_string(const trc_string &init);
+    trc_string& operator=(const std::string&);
 
-                trc_string &operator=(const string &);
+    trc_string(const std::string& init);
 
-                trc_string(const string &init);
+    trc_string();
 
-                trc_string();
+    ~trc_string() override;
 
-                ~trc_string();
+    size_t len();
 
-                size_t len();
+    char& operator[](unsigned int index);
 
-                char &operator[](unsigned int index);
+    const char& operator[](unsigned int index) const;
 
-                const char &operator[](unsigned int index) const;
+    trc_string& operator=(const trc_string& value_i);
 
-                trc_string &operator=(const trc_string &value_i);
+    def::OBJ operator+=(def::OBJ value_i);
 
-                def::OBJ operator+=(def::OBJ value_i);
+    const char* c_str() const;
 
-                const char *c_str();
+    void putline(FILE* out) override;
 
-                void putline(ostream &out);
+    void in(FILE* in_);
 
-                void in(istream &in_);
+    def::OBJ to_int() override;
 
-                def::OBJ to_int();
+    def::OBJ to_float() override;
 
-                def::OBJ to_float();
+    def::INTOBJ operator==(def::OBJ value_i) override;
 
-                def::INTOBJ operator==(def::OBJ value_i);
+    def::INTOBJ operator!=(def::OBJ value_i) override;
 
-                def::INTOBJ operator!=(def::OBJ value_i);
+    def::INTOBJ operator<(def::OBJ value_i) override;
 
-                def::INTOBJ operator<(def::OBJ value_i);
+    def::INTOBJ operator>(def::OBJ value_i) override;
 
-                def::INTOBJ operator>(def::OBJ value_i);
+    def::INTOBJ operator<=(def::OBJ value_i) override;
 
-                def::INTOBJ operator<=(def::OBJ value_i);
+    def::INTOBJ operator>=(def::OBJ value_i) override;
 
-                def::INTOBJ operator>=(def::OBJ value_i);
+    def::OBJ operator+(def::OBJ value_i) override;
 
-                def::OBJ operator+(def::OBJ value_i);
+    def::OBJ operator*(def::OBJ value_i) override;
 
-                def::OBJ operator*(def::OBJ value_i);
+    RUN_TYPE_TICK gettype() override;
 
-                const int &gettype();
+    void delete_() override;
 
-                void delete_();
+private:
+    void set_realloc(size_t num);
 
-            private:
-                void set_realloc(size_t num);
-
-                // 整型标记类型
-                const static int type = string_T;
-            };
-        }
-    }
+    // 整型标记类型
+    const static RUN_TYPE_TICK type;
+};
 }

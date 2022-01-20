@@ -1,27 +1,33 @@
 ﻿#pragma once
 
-#include <string>
-#include <map>
 #include "TVMbase/TVM_data.h"
 #include "TVMdef.h"
+#include "base/trcdef.h"
+#include <map>
+#include <string>
 
-using namespace std;
+namespace trc::TVM_space {
+class frame_ {
+public:
+    TVM_dyna_data dyna_data;
 
-namespace trc {
-    namespace TVM_space {
-        class frame_{
-        public:
-            TVM_dyna_data dyna_data;
-            frame_();
-        };
+    frame_();
+};
 
-        class func_ {
-        public:
-            // 函数名
-            const string name;
+class func_ {
+public:
+    char* name;
 
-            // 字节码信息
-            vector<vector<TVM_bytecode *> > bytecodes;
-        };
-    }
+    ~func_();
+
+    // 字节码信息
+    struct_codes bytecodes;
+
+    /**
+     * @brief 执行函数
+     * @param frame 函数帧
+     * @return def::OBJ 返回值
+     */
+    def::OBJ run(frame_& frame);
+};
 }

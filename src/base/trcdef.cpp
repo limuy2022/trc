@@ -1,37 +1,25 @@
 ﻿/**
- * 共享数据
+ * @file trcdef.cpp
+ * @brief 基础定义
+ * @date 2022-04-23
+ *
+ * @copyright Copyright (c) 2022
+ *
  */
-#include <string>
-#include <map>
-#include <array>
 #include "base/trcdef.h"
-#include "base/trcdef.h"
-#include "base/dll.h"
-
-using namespace std;
+#include "language/error.h"
+#include <cstdio>
+#include <cstdlib>
 
 namespace trc {
-    namespace def {
-        // 虚拟机中的数字代号对应的类型
-        const float version = 0.2;
-    }
+namespace def {
+    const float version = 0.2;
+}
 
-    namespace run_env {
-        // 执行环境
-
-        // 当前执行模块
-        string run_module("__main__");
-        // 当前执行到的模块行数
-        map<string, int> lines;
-
-        void set_module(const string &name) {
-            /**
-             * 设置当前编译模块(新建)
-             * name:模块名
-             */
-
-            run_env::run_module = name;
-            run_env::lines[name] = 0;
-        }
-    }
+void noreach_internal(size_t line, const char* funcname,
+    const char* filename) {
+    fprintf(stderr, "Fatal error in %s %s %zu\n%s",
+        filename, funcname, line, language::error::noreach);
+    exit(1);
+}
 }

@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['read_5ffile_5fdetail_0',['read_file_detail',['../namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1',1,'trc::utils']]],
+  ['readcode_1',['readcode',['../namespacetrc_1_1utils.html#af2c566de7738ba133f7df2b72424bf4b',1,'trc::utils']]],
+  ['readcode_5fwith_5fcode_2',['readcode_with_code',['../namespacetrc_1_1utils.html#ab4989124ce15101402a19e4321ecfe5b',1,'trc::utils']]],
+  ['readstr_3',['readstr',['../namespacetrc_1_1io.html#a1d1b39b2f0999a5548b54ef7a407d1d8',1,'trc::io']]],
+  ['realloc_4',['REALLOC',['../base_2memory_2memory_8h.html#a2e501a3b49991d5e526b5c52c1522df4',1,'memory.h']]],
+  ['realloc_5fsize_5',['REALLOC_SIZE',['../memory__pool_8cpp.html#a52a348a9c94583f75caf175e68a07324',1,'memory_pool.cpp']]],
+  ['red_6',['red',['../namespacetrc_1_1color.html#a9167acf1e97077ae5f2d6367dad3fff1',1,'trc::color']]],
+  ['refs_7',['refs',['../classtrc_1_1_t_v_m__space_1_1types_1_1trcobj.html#a1f2ccdad3306f8033b8de48a3c1fe87d',1,'trc::TVM_space::types::trcobj']]],
+  ['releasestringdata_8',['ReleaseStringData',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a7749cc631139dd865f180b0dc4a8ac93',1,'trc::TVM_space::TVM_static_data']]],
+  ['reload_9',['reload',['../classtrc_1_1utils_1_1cfg.html#a15c50256e64cca837fac50e2b79f81fc',1,'trc::utils::cfg']]],
+  ['right_5fbig_5fbrace_10',['RIGHT_BIG_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ad1ca82eb453ad159d8d9d8d246790500',1,'trc::compiler']]],
+  ['right_5fmid_5fbrace_11',['RIGHT_MID_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a97879d06f75ccde64044b02d1f74f2a6',1,'trc::compiler']]],
+  ['right_5fsmall_5fbrace_12',['RIGHT_SMALL_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ae22e68a6cf9ed2f54c99bfcf7218f55d',1,'trc::compiler']]],
+  ['run_13',['run',['../classtrc_1_1_t_v_m__space_1_1func__.html#a903e76fa6cdf49b398e76c581d815c96',1,'trc::TVM_space::func_::run()'],['../namespacetrc_1_1tools_1_1tools__out.html#a8f75d7b1429c5d95a4fbc847c066d259',1,'trc::tools::tools_out::run()']]],
+  ['run_2ecpp_14',['run.cpp',['../run_8cpp.html',1,'']]],
+  ['run_5fall_15',['run_all',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a8c25cc9f18fa1df1a99dcf9999371049',1,'trc::TVM_space::TVM']]],
+  ['run_5fbycode_16',['run_bycode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a298181868ec9b0dacfdfb0a8e92d4e84',1,'trc::TVM_space::TVM']]],
+  ['run_5findex_17',['run_index',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a36ca669e3859f27fa8b753fc9c2350a5',1,'trc::TVM_space::TVM']]],
+  ['run_5fline_5fbycode_18',['run_line_bycode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#acaef8cb21818a147e497f00f32f95098',1,'trc::TVM_space::TVM']]],
+  ['run_5fone_5fbycode_19',['run_one_bycode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a0de5fc580ca8b9e080282f6328c43651',1,'trc::TVM_space::TVM']]],
+  ['run_5ftype_5ftick_20',['RUN_TYPE_TICK',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774e',1,'trc::TVM_space']]],
+  ['runerror_21',['RunError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a773d38f3cb92a29e6db0beafaba562e6',1,'trc::error']]]
+];

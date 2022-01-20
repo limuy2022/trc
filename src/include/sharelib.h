@@ -15,12 +15,14 @@
 #include "platform.h"
 
 #ifdef WINDOWS_PLAT
-    #ifdef BUILD_xxx_DLL
-        #define TRC_xxx_api __declspec(dllexport)
-    #else
-        #define TRC_xxx_api __declspec(dllimport)
-    #endif
-#else
-    #define TRC_xxx_api
-#endif
+#ifdef BUILD_xxx_DLL
+#define TRC_xxx_api __declspec(dllexport)
+#define TRC_xxx_func_api extern "C"
+__declspec(dllexport) #else #define TRC_xxx_api
+__declspec(dllimport) #define TRC_xxx_func_api
+extern "C" __declspec(dllimport) #endif #else
+#define TRC_xxx_api
+__attribute__((visibility("default"))) #define
+TRC_xxx_func_api extern "C"
+__attribute__((visibility("default"))) #endif
 */

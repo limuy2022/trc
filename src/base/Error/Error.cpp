@@ -1,70 +1,115 @@
-﻿#include <iostream>
-#include <string>
-#include <cstdarg>
-#include <stack>
-#include "base/dll.h"
-#include "language/language.h"
+﻿#include "language/error.h"
 #include "base/Error.h"
-#include "base/trcdef.h"
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>
 
-using namespace std;
+namespace trc::error {
+namespace error_env {
+    bool quit = true;
+}
 
-namespace trc {
-    namespace error {
-        typedef string error_t;
-        
-        namespace error_env {
-            /**
-             * 报错设置
-             * 系统需要知道当前处于什么模式，以合适的模式应对发生的状况
-             */
-            // 是否终止程序
-            bool quit = true;
-            // 是否显示出错误信息，如果为否将会把错误信息存入栈中
-            bool out_msg = true;
-            // 异常栈
-            stack<error_t> error_stack;
-        }
-
-        string make_error_msg(error_type error_name, va_list &ap) {
-            /**
-             * 通用函数，填充报错信息
-             * error_name：异常名
-             * ap：可变参数
-             */
-
-            string finally_out = language::error::error_map[error_name];
-            string::size_type index;
-            for (;;) {
-                index = finally_out.find('$');
-                if (index == string::npos)
-                    return finally_out;
-                finally_out.replace(index, 1, va_arg(ap, const char*));
+char* make_error_msg(int error_name, va_list& ap) {
+    // 报错的模板字符串
+    const char* base_string = va_arg(ap, const char*);
+    // 模板字符串的长度
+    size_t base_string_len = strlen(base_string);
+    // 错误名的长度
+    size_t error_name_map_len
+        = strlen(language::error::error_map[error_name]);
+    // finally_out增加的大小，大于等于base_string加上错误名的长度,且预留\0后再多预留4个字节
+    size_t finally_out_length
+        = error_name_map_len + base_string_len + 5;
+    // 具体报错数据储存容器
+    char* finally_out
+        = (char*)malloc(finally_out_length * sizeof(char));
+    if (finally_out == nullptr) {
+        error::send_error(error::MemoryError,
+            language::error::memoryerror);
+    }
+    // 将错误名拷贝到报错数据中
+    strcpy(finally_out,
+        language::error::error_map[error_name]);
+    // 已使用长度
+    size_t used_size = error_name_map_len;
+    // 字符串索引
+    size_t res_string_index = error_name_map_len;
+    for (size_t i = 0; i < base_string_len; ++i) {
+        if (base_string[i] == '%') {
+            const char* addtmp = va_arg(ap, const char*);
+            size_t addtmp_len = strlen(addtmp);
+            used_size += addtmp_len;
+            if (used_size >= finally_out_length) {
+                // 需要的内存已经超过了申请的，之所以是等于，是因为还有\0
+                // 多申请5个作预留
+                finally_out_length += addtmp_len + 5;
+                finally_out = (char*)realloc(
+                    finally_out, finally_out_length);
+                if (finally_out == nullptr) {
+                    error::send_error(error::MemoryError,
+                        language::error::memoryerror);
+                }
             }
-        }
-
-        void send_error(error_type name, ...) {
-            /**
-             * 运行时报出错误，错误名称和错误信息
-             * name:错误名
-             * 可变参数：const char* 类型的字符串
-             */
-
-            va_list ap;
-            va_start(ap, name);
-            send_error_(make_error_msg(name, ap));
-            va_end(ap);
-            if (error_env::quit) exit(1);
-        }
-
-        void send_error_(const string &error_msg) noexcept {
-            /**
-             * 不接收可变参数，接受已经处理好的报错信息
-             */
-
-            cerr << "\n" << language::error::error_from << run_env::run_module << "\n" \
-         << language::error::error_in_line << LINE_NOW + 1 << ":\n"\
-         << error_msg << "\n";
+            strncpy(finally_out + res_string_index, addtmp,
+                addtmp_len);
+            res_string_index += addtmp_len;
+        } else {
+            finally_out[res_string_index] = base_string[i];
+            res_string_index++;
+            used_size++;
         }
     }
+    finally_out[used_size] = '\0';
+    return finally_out;
+}
+
+/**
+ * @brief 报错的实现细节
+ * @details 运用默认参数巧妙解决了两个版本的报错
+ */
+static void send_error_detail(int name, va_list& ap,
+    const std::string& module = "__main__",
+    size_t line_index = 0) {
+    char* error_msg = make_error_msg(name, ap);
+    send_error_(error_msg, module.c_str(), line_index);
+    free(error_msg);
+    if (error_env::quit)
+        exit(1);
+}
+
+void send_error_module_aplist(int name,
+    const std::string& module, size_t line_index,
+    va_list& ap) {
+    send_error_detail(name, ap, module, line_index);
+}
+
+void send_error(int name, ...) {
+    va_list ap;
+    va_start(ap, name);
+    send_error_detail(name, ap);
+    va_end(ap);
+}
+
+void send_error_(const char* error_msg, const char* module,
+    size_t line_index) noexcept {
+    fprintf(stderr, "\n%s%s\n%s%zu:\n%s\n",
+        language::error::error_from, module,
+        language::error::error_in_line, line_index,
+        error_msg);
+}
+
+error_module::error_module(std::string name)
+    : name(std::move(name)) {
+}
+
+void error_module::send_error_module(int ename, ...) {
+    va_list ap;
+    va_start(ap, ename);
+    // 加1是为了从索引转成行号
+    error::send_error_module_aplist(
+        ename, name, line + 1, ap);
+    va_end(ap);
+}
 }

@@ -1,109 +1,126 @@
-#include <cmath>
-#include "base/utils/type.hpp"
+#include "TVMbase/TRE.h"
+#include "TVMbase/memory.h"
 #include "TVMbase/types/float.h"
 #include "TVMbase/types/int.h"
-#include "TVMbase/types/flong.h"
-#include "TVMbase/TRE.h"
-#include "base/memory/objs_pool.hpp"
-#include "TVMbase/memory.h"
+#include "base/utils/type.hpp"
+#include <cmath>
 
-using namespace std;
+namespace trc::TVM_space::types {
+const RUN_TYPE_TICK trc_float::type
+    = RUN_TYPE_TICK::float_T;
 
-namespace trc {
-    namespace TVM_space {
-        namespace types {
-            const int trc_float::type;
+void trc_float::putline(FILE* out) {
+    fprintf(out, "%lf", value);
+}
 
-            void trc_float::putline(ostream &out) {
-                out << value;
-            }
+trc_float::~trc_float() = default;
 
-            trc_float::~trc_float() = default;
+trc_float::trc_float() = default;
 
-            trc_float::trc_float() = default;
+trc_float::trc_float(const double& value)
+    : value(value) {
+}
 
-            trc_float::trc_float(const double &value) :
-                    value(value) {}
+def::INTOBJ trc_float::operator==(def::OBJ value_i) {
+    return (((def::FLOATOBJ)(value_i))->value != value
+            ? TVM_share::false_
+            : TVM_share::true_);
+}
 
-            def::INTOBJ trc_float::operator==(def::OBJ value_i) {
-                return (((def::FLOATOBJ) (value_i))->value != value ? TVM_share::false_ : TVM_share::true_);
-            }
+def::INTOBJ trc_float::operator!=(def::OBJ value_i) {
+    return (((def::FLOATOBJ)(value_i))->value == value
+            ? TVM_share::false_
+            : TVM_share::true_);
+}
 
-            def::INTOBJ trc_float::operator!=(def::OBJ value_i) {
-                return (((def::FLOATOBJ) (value_i))->value == value ? TVM_share::false_ : TVM_share::true_);
-            }
+def::INTOBJ trc_float::operator<(def::OBJ value_i) {
+    return (value < ((def::FLOATOBJ)(value_i))->value
+            ? TVM_share::true_
+            : TVM_share::false_);
+}
 
-            def::INTOBJ trc_float::operator<(def::OBJ value_i) {
-                return (value < ((def::FLOATOBJ) (value_i))->value ? TVM_share::true_ : TVM_share::false_);
-            }
+def::INTOBJ trc_float::operator>(def::OBJ value_i) {
+    return (value > ((def::FLOATOBJ)(value_i))->value
+            ? TVM_share::true_
+            : TVM_share::false_);
+}
 
-            def::INTOBJ trc_float::operator>(def::OBJ value_i) {
-                return (value > ((def::FLOATOBJ) (value_i))->value ? TVM_share::true_ : TVM_share::false_);
-            }
+def::INTOBJ trc_float::operator<=(def::OBJ value_i) {
+    return (value <= ((def::FLOATOBJ)(value_i))->value
+            ? TVM_share::true_
+            : TVM_share::false_);
+}
 
-            def::INTOBJ trc_float::operator<=(def::OBJ value_i) {
-                return (value <= ((def::FLOATOBJ) (value_i))->value ? TVM_share::true_ : TVM_share::false_);
-            }
+def::INTOBJ trc_float::operator>=(def::OBJ value_i) {
+    return (value >= ((def::FLOATOBJ)(value_i))->value
+            ? TVM_share::true_
+            : TVM_share::false_);
+}
 
-            def::INTOBJ trc_float::operator>=(def::OBJ value_i) {
-                return (value >= ((def::FLOATOBJ) (value_i))->value ? TVM_share::true_ : TVM_share::false_);
-            }
+def::OBJ trc_float::operator+(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        value + ((def::FLOATOBJ)(value_i))->value);
+}
 
-            def::OBJ trc_float::operator+(def::OBJ value_i) {
-                return MALLOCFLOAT(value + ((def::FLOATOBJ) (value_i))->value);
-            }
+def::OBJ trc_float::operator-(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        value - ((def::FLOATOBJ)(value_i))->value);
+}
 
-            def::OBJ trc_float::operator-(def::OBJ value_i) {
-                return MALLOCFLOAT(value - ((def::FLOATOBJ) (value_i))->value);
-            }
+def::OBJ trc_float::operator*(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        value * ((def::FLOATOBJ)(value_i))->value);
+}
 
-            def::OBJ trc_float::operator*(def::OBJ value_i) {
-                return MALLOCFLOAT(value * ((def::FLOATOBJ) (value_i))->value);
-            }
+def::OBJ trc_float::operator/(def::OBJ value_i) {
+    double second = ((def::FLOATOBJ)(value_i))->value;
+    return second ? MALLOCFLOAT(value / second) : nullptr;
+}
 
-            def::OBJ trc_float::operator/(def::OBJ value_i) {
-                return MALLOCFLOAT(value / ((def::FLOATOBJ) (value_i))->value);
-            }
+def::OBJ trc_float::operator%(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        fmod(value, ((def::FLOATOBJ)(value_i))->value));
+}
 
-            def::OBJ trc_float::operator%(def::OBJ value_i) {
-                return MALLOCFLOAT(fmod(value, ((def::FLOATOBJ) (value_i))->value));
-            }
+def::OBJ trc_float::pow_(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        pow(value, ((def::FLOATOBJ)(value_i))->value));
+}
 
-            def::OBJ trc_float::pow_(def::OBJ value_i) {
-                return MALLOCFLOAT(pow(value, ((def::FLOATOBJ) (value_i))->value));
-            }
+def::OBJ trc_float::zdiv(def::OBJ value_i) {
+    return MALLOCFLOAT(
+        (int)(value / ((def::FLOATOBJ)(value_i))->value));
+}
 
-            def::OBJ trc_float::zdiv(def::OBJ value_i) {
-                return MALLOCFLOAT((int) (value / ((def::FLOATOBJ) (value_i))->value));
-            }
+def::INTOBJ trc_float::operator!() {
+    return !value ? TVM_share::false_ : TVM_share::true_;
+}
 
-            def::INTOBJ trc_float::operator!() {
-                return !value ? TVM_share::false_ : TVM_share::true_;
-            }
+def::INTOBJ trc_float::operator&&(def::OBJ value_i) {
+    return value && ((def::FLOATOBJ)(value_i))->value
+        ? TVM_share::true_
+        : TVM_share::false_;
+}
 
-            def::INTOBJ trc_float::operator&&(def::OBJ value_i) {
-                return value && ((def::FLOATOBJ) (value_i))->value ? TVM_share::true_ : TVM_share::false_;
-            }
+def::INTOBJ trc_float::operator||(def::OBJ value_i) {
+    return (value || ((def::FLOATOBJ)(value_i))->value
+            ? TVM_share::true_
+            : TVM_share::false_);
+}
 
-            def::INTOBJ trc_float::operator||(def::OBJ value_i) {
-                return (value || ((def::FLOATOBJ) (value_i)) -> value  ? TVM_share::true_ : TVM_share::false_);
-            }
+def::OBJ trc_float::to_string() {
+    return new trc_string(std::to_string(value));
+}
 
-            def::OBJ trc_float::to_string() {
-                return new trc_string(std::to_string(value));
-            }
+def::OBJ trc_float::to_bool() {
+    return (value ? TVM_share::true_ : TVM_share::false_);
+}
 
-            def::OBJ trc_float::to_bool() {
-                return (value ? TVM_share::true_ : TVM_share::false_);
-            }
+def::OBJ trc_float::to_int() {
+    return new trc_int((int)value);
+}
 
-            def::OBJ trc_float::to_int() {
-                return new trc_int((int) value);
-            }
-
-            const int &trc_float::gettype() {
-                return type;
-            }
-        }
-    }
+RUN_TYPE_TICK trc_float::gettype() {
+    return type;
+}
 }

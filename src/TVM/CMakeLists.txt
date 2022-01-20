@@ -1,5 +1,3 @@
-set(LIBRARY_OUTPUT_PATH "../../bin")
-
 file(GLOB_RECURSE SRCS "*.cpp")
 file(GLOB_RECURSE HEADERS "*../include/TVM/*.h")
 

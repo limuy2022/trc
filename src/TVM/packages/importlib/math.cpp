@@ -3,16 +3,8 @@
  * 由c++语言支持的标准库
  */
 
-#include <cmath>
-#include "base/trcdef.h"
 #include "TVM/lib.h"
+#include "base/trcdef.h"
+#include <cmath>
 
-using namespace std;
-
-namespace trc {
-    namespace TVM_space {
-        namespace cpp_libs {
-
-        }
-    }
-}
+namespace trc::TVM_space::cpp_libs { }

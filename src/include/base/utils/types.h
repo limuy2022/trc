@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file types.h
  * @brief 关于各种类型的操作
  * @date 2022-01-18
@@ -11,10 +11,9 @@
 
 #include "base/dll.h"
 
-namespace trc
-{
-    namespace utils
-    {
-        TRC_base_api int len(int);
-    }
+namespace trc::utils {
+/**
+ * @brief 获取整型的长度
+ */
+TRC_base_func_api int len(int);
 }

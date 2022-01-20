@@ -1,81 +1,89 @@
 ﻿/**
-*File    :   Trc.cpp
-*Time    :   2021/07/09 20:49:12
-*Author  :   李沐阳
-*Version :   0.2
-*/
+ * File    :   Trc.cpp
+ * Time    :   2021/07/09 20:49:12
+ * Author  :   李沐阳
+ * @warning 此文件不能包含任何需要测试的程序
+ */
 
-#include <iostream>
-#include <cstring>
-#include <string>
-#include "tools.h"
-#include "base/utils/data.hpp"
-#include "language/language.h"
+#include "base/color.h"
 #include "base/memory/memory.h"
+#include "base/trcdef.h"
+#include "base/utils/data.hpp"
+#include "gflags/gflags.h"
+#include "language/language.h"
+#include "tools.h"
+#include <cstdio>
+#include <cstring>
 
-using namespace std;
-
-static inline void show_error(char *mode) {
-    /**
-     * 这个函数作用是报错
-     */ 
-    cerr << mode << language::trc::mode_not_found;
+/**
+ * @brief 报出找不到模式错误
+ */
+static inline void show_error(const char* mode) {
+    trc::color::red.print(
+        "\"%s\"%s", mode, language::trc::mode_not_found);
 }
 
-typedef void (*no_argv_func)();
-static pair<const char*, no_argv_func> no_argv[] = {
-    {"tdb", trc::tools_out::tdb},
-    {"help", trc::tools_out::help}
+/**
+ * @brief 输出版本号，version命令行参数对应的函数
+ */
+static void showversion() {
+    printf("The version is %.1f\n", trc::def::version);
+}
+
+typedef void (*argv_func_tools)();
+
+static const char* tools_func_name[] = {
+    "tdb",
+    "help",
+    "version",
+    "run",
+    "token",
+    "dis",
+    "grammar",
+    "brun",
+    "build",
 };
 
-typedef void (*yes_argv_func)(int, char**);
-static pair<const char*, yes_argv_func> yes_argv[] {
-    {"run", trc::tools_out::run},
-    {"token", trc::tools_out::out_token},
-    {"dis", trc::tools_out::dis},
-    {"grammar", trc::tools_out::out_grammar},
-    {"brun", trc::tools_out::brun},
-    {"build", trc::tools_out::build}
-};
+static const argv_func_tools tools_func[]
+    = { trc::tools::tools_out::tdb,
+          trc::tools::tools_out::help, showversion,
+          trc::tools::tools_out::run,
+          trc::tools::tools_out::out_token,
+          trc::tools::tools_out::dis,
+          trc::tools::tools_out::out_grammar,
+          trc::tools::tools_out::brun,
+          trc::tools::tools_out::build };
 
-static inline void run_no_argv_mode(char *mode) {
-    for(int i = 0, end = trc::utils::get_index_static_array(no_argv); i < end; ++i) {
-        if(!strcmp(mode, no_argv[i].first)) {
+/**
+ * @brief 查找对应工具并运行
+ */
+static inline void run_yes_argv_mode(char* mode) {
+    for (int i = 0,
+             end
+         = trc::utils::sizeof_static_array(tools_func);
+         i < end; ++i) {
+        if (!strcmp(mode, tools_func_name[i])) {
             // 匹配上了
-            no_argv[i].second();
+            tools_func[i]();
             return;
         }
     }
     show_error(mode);
 }
 
-static inline void run_yes_argv_mode(char *mode, int argc, char **argv) {
-    for(int i = 0, end = trc::utils::get_index_static_array(yes_argv); i < end; ++i) {
-        if(!strcmp(mode, yes_argv[i].first)) {
-            // 匹配上了
-            yes_argv[i].second(argc, argv);
-            return;
-        }
-    }
-    show_error(mode);
-}
-
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     trc::memory::init_mem();
-    // 停止兼容stdio，提升I/O的速度
-    ios_base::sync_with_stdio(false);
-    switch (argc) {
-        case 1:
-            // 不指定模式，没有参数，默认为交互模式
-            trc::tools_out::tshell();
-            break;
-        case 2:
-            // 指定模式，没有参数
-            run_no_argv_mode(argv[1]);
-            break;
-        default:
-            // 检查参数，匹配调用模式
-            run_yes_argv_mode(argv[1], argc, argv);
+    // 设置命令行参数
+    trc::tools::argv = argv;
+    trc::tools::argc = argc;
+    gflags::ParseCommandLineFlags(&argc, &argv, true);
+
+    if (argc == 1) {
+        // 不指定模式，没有参数，默认为交互模式
+        trc::tools::tools_out::tshell();
+    } else {
+        // 指定模式，匹配调用模式
+        run_yes_argv_mode(argv[1]);
     }
     // 执行正常情况下卸载内存，不正常的话就崩溃了
     trc::memory::quit_mem();

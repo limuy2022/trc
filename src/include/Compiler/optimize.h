@@ -6,15 +6,11 @@
 #include <map>
 #include <string>
 
-using namespace std;
+namespace trc::compiler {
+typedef int (*ip)(const int&, const int&);
 
-namespace trc {
-    namespace compiler {
-        typedef int (*ip)(const int &, const int &);
+typedef bool (*bp)(const int&, const int&);
 
-        typedef bool (*bp)(const int &, const int &);
-        
-        extern map<string, bp> optimize_condit;
-        extern map<string, ip> optimize_number;
-    }
+extern std::map<std::string, bp> optimize_condit;
+extern std::map<std::string, ip> optimize_number;
 }

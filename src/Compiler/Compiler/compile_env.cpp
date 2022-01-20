@@ -3,6 +3,3 @@
  */
 
 #include "compile_env.h"
-
-using namespace std;
-

@@ -2,140 +2,109 @@
  * 关于文件系统和文件路径的操作
  */
 
-#include <cstring>
-#include <string>
+#include "base/utils/filesys.h"
+#include "base/Error.h"
+#include "base/trcdef.h"
+#include "language/error.h"
 #include <cstdarg>
 #include <cstdio>
 #include <filesystem>
-#include "base/Error.h"
-#include "base/trcdef.h"
-#include "base/utils/filesys.h"
-#include "platform.h"
-#include "base/dll.h"
+#include <string>
+#include <sys/stat.h>
 
 namespace fs = std::filesystem;
 
-using namespace std;
-
-namespace trc {
-    namespace utils {
-        void listfiles(const string &dir, func_type func, vecs &fileList, vecs &dirList) {
-            /**
-             * 遍历目录
-             * dir:遍历目录
-             * func:判断文件是否应当存入的判别函数
-             * fileList:遍历出文件的存储地
-             * dirList：遍历出文件夹的存储地
-             */
-
-            string tmp;
-            for(const auto& path_i : fs::recursive_directory_iterator(dir)) {
-                if(is_directory(path_i)) {
-                    fileList.push_back(path_i.path().string());
-                    continue;
-                }
-                tmp = path_i.path().string();
-                if(func(tmp)){
-                    dirList.push_back(tmp);
-                }
-            }
+namespace trc::utils {
+void listfiles(const std::string& path, filefilter func,
+    vecs& fileList, vecs& dirList) {
+    std::string tmp;
+    for (const auto& path_i :
+        fs::recursive_directory_iterator(path)) {
+        if (is_directory(path_i)) {
+            fileList.push_back(path_i.path().string());
+            continue;
         }
-
-        bool check_file_is(const string &path) {
-            /**
-             * 检查文件是否存在
-             */
-
-            return fs::exists(path);
-        }
-
-        string path_last(const string &path, const string &last) {
-            /**
-             * 改变路径后缀名
-             * path：路径
-             * last：需要改变成的后缀名
-             */
-            return path.substr(0, path.find_last_of('.')) + last;
-        }
-
-        string import_to_path(string import_name) {
-            /**
-             * 在虚拟机执行过程中，动态加载字节码时路径转换
-             * 例如：math.lang -> math/lang
-             */
-
-            size_t index;
-            for (;;) {
-                index = import_name.find('.');
-                if (index != string::npos)
-                    break;
-                import_name[index] = '/';
-            }
-            return import_name;
-        }
-
-        string path_join(int n, ...) {
-            /**
-             * 路径粘贴
-             * n：参数个数
-             */
-
-            va_list ap;
-            va_start(ap, n);
-            string root(va_arg(ap, const char*));
-            for (int i = 1; i < n; ++i) {
-                root += "\\";
-                root += va_arg(ap, const char*);
-            }
-            va_end(ap);
-            return root;
-        }
-
-        string file_last_(const string &path) {
-            /**
-             * 查找文件后缀名
-             */
-            return path.substr(path.find_last_of('.'));
-        }
-
-        void readcode(string &file_data, const string &path) {
-            /*
-            * 读取文件并返回字符串
-            */
-
-            file_data.clear();
-            FILE *file = fopen(path.c_str(), "r");
-            if (!file)
-                error::send_error(error::OpenFileError, path.c_str());
-            char tmp = fgetc(file);
-            while (!feof(file)) {
-                file_data += tmp;
-                tmp = fgetc(file);
-            }
-            fclose(file);
-        }
-
-        void readfile(string &file_data, const string &path, error::error_type err, ...) {
-            /**
-             * 与上面那种方法不同在于可以自由选择报错类型，但失败同样会结束程序
-             * err：错误名
-             */
-
-            file_data.clear();
-            va_list ap;
-            va_start(ap, err);
-            FILE *file = fopen(path.c_str(), "r");
-            if (!file) {
-                error::send_error_(error::make_error_msg(err, ap));
-                exit(1);
-            }
-            char tmp = fgetc(file);
-            while (!feof(file)) {
-                file_data += tmp;
-                tmp = fgetc(file);
-            }
-            fclose(file);
-            va_end(ap);
+        tmp = path_i.path().string();
+        if (func(tmp)) {
+            dirList.push_back(tmp);
         }
     }
+}
+
+bool file_exists(const std::string& path) {
+    FILE* file = fopen(path.c_str(), "r");
+    if (file == nullptr) {
+        return false;
+    } else {
+        fclose(file);
+        return true;
+    }
+}
+
+std::string path_last(
+    const std::string& path, const std::string& last) {
+    return path.substr(0, path.find_last_of('.')) + last;
+}
+
+std::string import_to_path(std::string import_name) {
+    for (int i = 0, n = import_name.length(); i < n; ++i) {
+        if (import_name[i] == '.') {
+            import_name[i] = '/';
+        }
+    }
+    return import_name;
+}
+
+std::string path_join(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    std::string root(va_arg(ap, const char*));
+    for (int i = 1; i < n; ++i) {
+        root += "/";
+        root += va_arg(ap, const char*);
+    }
+    va_end(ap);
+    return root;
+}
+
+std::string file_last_(const std::string& path) {
+    return path.substr(path.find_last_of('.'));
+}
+
+/**
+ * @brief 具体的读取文件的细节
+ * @param path 文件路径
+ * @param file_data 读取出的内容的存放地
+ * @param file 文件
+ */
+inline void read_file_detail(const std::string& path,
+    std::string& file_data, FILE* file) {
+    struct stat buffer;
+    stat(path.c_str(), &buffer);
+    size_t size = buffer.st_size;
+    file_data.resize(size);
+    fread(
+        (char*)file_data.c_str(), sizeof(char), size, file);
+}
+
+void readcode(
+    std::string& file_data, const std::string& path) {
+    FILE* file = fopen(path.c_str(), "r");
+    if (!file)
+        error::send_error(error::OpenFileError,
+            language::error::openfileerror, path.c_str());
+    read_file_detail(path, file_data, file);
+    fclose(file);
+}
+
+int readcode_with_code(
+    std::string& file_data, const std::string& path) {
+    FILE* file = fopen(path.c_str(), "r");
+    if (!file) {
+        return 1;
+    }
+    read_file_detail(path, file_data, file);
+    fclose(file);
+    return 0;
+}
 }

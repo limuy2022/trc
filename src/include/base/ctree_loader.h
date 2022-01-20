@@ -1,13 +1,30 @@
-#pragma once
+﻿#pragma once
+#include "dll.h"
+#include <TVM/TVM.h>
+#include <string>
 
-using namespace std;
+namespace trc::loader {
+/**
+ * @brief
+ * 读取ctree文件到虚拟机中，并对文件进行验证(魔数及版本号)
+ * @param vm 虚拟机
+ * @param path 路径
+ */
+TRC_base_func_api void loader_ctree(
+    TVM_space::TVM* vm, const std::string& path);
 
-namespace trc {
-    namespace loader {
-        TRC_base_api void loader_ctree(TVM_space::TVM *vm, const string &path);
+/**
+ * @brief 保存虚拟机数据为ctree文件
+ * @param vm 虚拟机
+ * @param path 路径
+ */
+TRC_base_func_api void save_ctree(
+    TVM_space::TVM* vm, const std::string& path);
 
-        TRC_base_api void save_ctree(TVM_space::TVM *vm, const string &path);
-
-        TRC_base_api bool is_magic(const string &path);
-    }
+/**
+ * @brief 判断一个文件是不是合法的ctree文件
+ * @param path 路径
+ * @warning 此时文件必须未被打开
+ */
+TRC_base_func_api bool is_magic(const std::string& path);
 }

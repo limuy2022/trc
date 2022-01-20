@@ -5,54 +5,52 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-#include <map>
-#include <array>
 #include "dll.h"
+#include <array>
+#include <string>
+#include <vector>
 
-// 当前模块行号
-#define LINE_NOW run_env::lines[run_env::run_module]
+typedef std::vector<std::string> vecs;
 
-using namespace std;
-
-typedef vector<string> vecs;
+#define NOREACH                                            \
+    do {                                                   \
+        trc::noreach_internal(                             \
+            __LINE__, __FUNCTION__, __FILE__);             \
+    } while (0)
 
 namespace trc {
-    namespace TVM_space {
-        namespace types {
-            class trc_long;
+/**
+ * @brief
+ * 在不能被执行到的地方放上这条语句，出现问题会强行停止程序
+ */
+TRC_base_func_api void noreach_internal(size_t line,
+    const char* funcname, const char* filename);
 
-            class trcobj;
-            
-            class trc_int;
-            
-            class trc_float;
-            
-            class trc_string;
-            
-            class trc_flong;
-        }
-    }
-    namespace def {
-        typedef TVM_space::types::trcobj *OBJ;
-        typedef TVM_space::types::trc_int *INTOBJ;
-        typedef TVM_space::types::trc_float *FLOATOBJ;
-        typedef TVM_space::types::trc_string *STRINGOBJ;
-        typedef TVM_space::types::trc_long *LONGOBJ;
-        typedef TVM_space::types::trc_flong *FLONGOBJ;
+namespace TVM_space::types {
+    class trc_long;
 
-        typedef unsigned char byte_t;
-        TRC_base_api extern const float version;
-    }
-    
-    namespace run_env {
-        // 执行环境
+    class trcobj;
 
-        TRC_base_api extern string run_module;
-        // 当前执行到的模块函数
-        TRC_base_api extern map<string, int> lines;
+    class trc_int;
 
-        TRC_base_api void set_module(const std::string &name);
-    }
+    class trc_float;
+
+    class trc_string;
+
+    class trc_flong;
+}
+namespace def {
+    // 虚拟机对象
+    typedef TVM_space::types::trcobj* OBJ;
+    typedef TVM_space::types::trc_int* INTOBJ;
+    typedef TVM_space::types::trc_float* FLOATOBJ;
+    typedef TVM_space::types::trc_string* STRINGOBJ;
+    typedef TVM_space::types::trc_long* LONGOBJ;
+    typedef TVM_space::types::trc_flong* FLONGOBJ;
+
+    // 字节类型
+    typedef unsigned char byte_t;
+    // 版本号
+    TRC_base_api extern const float version;
+}
 }

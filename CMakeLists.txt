@@ -1,41 +1,47 @@
 cmake_minimum_required(VERSION 3.16)
-SET(CMAKE_C_COMPILER clang)
-SET(CMAKE_CXX_COMPILER clang++)
-project(Trc)
 
-include_directories(src/include)
-link_directories(bin)
+set(CMAKE_CXX_STANDARD 20)
 
-set(rele_comp "-O3 -fno-rtti -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -std=c++17 -fdata-sections -ffunction-sections -fvisibility=hidden")
-set(debug_comp "-g -O0 -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-exceptions -std=c++17 -fdata-sections -ffunction-sections -fvisibility=hidden")
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    #release
-    set(CMAKE_CXX_FLAGS ${rele_comp})
-    #debug
-    #set(CMAKE_CXX_FLAGS ${debug_comp})
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    #release
-    set(CMAKE_CXX_FLAGS ${rele_comp})
-    #debug
-    #set(CMAKE_CXX_FLAGS ${debug_comp})
-else()
-    set(CMAKE_CXX_FLAGS "/nologo /std:c++latest")
-    #release
-    set(CMAKE_BUILD_type "release")
-    #debug
-    #set(CMAKE_BUILD_type "debug")
+# ccache的使用
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+	message("using ccache")
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif()
 
-add_subdirectory(src/language)
-add_subdirectory(src/base)
-add_subdirectory(src/TVM)
-add_subdirectory(src/Compiler)
-add_subdirectory(src/trc)
-add_subdirectory(src/TVMbase)
+include_directories(src/include)
+include_directories(third_party)
 
-target_link_libraries(base language)
-target_link_libraries(TVMbase base language)
-target_link_libraries(TVM language base TVMbase Compiler)
-target_link_libraries(Compiler language base TVMbase)
-target_link_libraries(Trc language base TVM Compiler TVMbase)
+#去除那些烦人的警告
+add_definitions(-D _CRT_SECURE_NO_WARNINGS)
+
+project(Trc CXX)
+
+#调试专区
+message("${CMAKE_BUILD_TYPE}")
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+link_directories(${PROJECT_SOURCE_DIR}/bin)
+
+# 分自己编写的代码和第三方库两部分构建，避免编译参数互相干扰
+add_subdirectory(third_party)
+add_subdirectory(src)
+
+# 将主程序编译为静态链接库，单元测试链接它执行
+# 添加单元测试
+if("${TRC_BUILD_TYPE}" STREQUAL "Test")
+	message("Test")
+	add_subdirectory(tests/unittest)
+	find_library(gtest_path gtest)
+	if(NOT gtest_path)
+		message(FATAL_ERROR "can't find gtest.Maybe you can install googletest and add it to env path")
+	endif()
+	message("using gtest")
+	target_link_libraries(unittest Trc ${gtest_path})
+	if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+		target_link_libraries(unittest pthread)
+	endif()
+endif()

@@ -1,8 +1,0 @@
-# 测试\转义
-
-a := 10
-while a >= 10{
-	println("\\")
-	print("tree\\")
-	a = a - 1
-}

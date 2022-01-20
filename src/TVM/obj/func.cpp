@@ -1,9 +1,9 @@
 #include "TVM/func.h"
 
-using namespace std;
+namespace trc::TVM_space {
+frame_::frame_() = default;
 
-namespace trc {
-    namespace TVM_space {
-        frame_::frame_() = default;
-    }
+func_::~func_() {
+    delete[] name;
+}
 }

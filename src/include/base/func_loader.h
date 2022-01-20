@@ -1,13 +1,11 @@
 #pragma once
 
+#include "base/dll.h"
 #include <array>
+#include <map>
+#include <string>
 
-
-using namespace std;
-
-namespace trc {
-    namespace loader {
-        TRC_base_api extern array<string, 11> num_func;
-        TRC_base_api extern map<string, short> func_num;
-    }
+namespace trc::loader {
+TRC_base_api extern std::array<std::string, 11> num_func;
+TRC_base_api extern std::map<std::string, short> func_num;
 }

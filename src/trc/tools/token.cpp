@@ -1,49 +1,108 @@
 ﻿/*
-* 工具：输出token，调试工具
-*/
+ * 工具：输出token，调试工具
+ */
 
-#include <iostream>
 #include "Compiler/Compiler.h"
 #include "base/utils/filesys.h"
+#include "tools.h"
+#include <cstdio>
 
-using namespace std;
+// token标记映射到名称，便于输出
+static const char* tokenticks_to_string[] = {
+    "FOR", // for
+    "WHILE", // while
+    "IF", // if
+    "FUNC", // function
+    "CLASS", // class
+    "ADD", // +
+    "SUB", // -
+    "MUL", // *
+    "DIV", // /
+    "ZDIV", // //
+    "MOD", // %
+    "POW", // **
+    "AND", // and
+    "OR", // or
+    "NOT", // not
+    "EQUAL", // ==
+    "UNEQUAL", // !=
+    "LESS", // <
+    "GREATER", // >
+    "LESS_EQUAL", // <=
+    "GREATER_EQUAL", // >=
+    "IMPORT", // import
+    "GOTO", // goto
+    "DEL", // del
+    "BREAK", // break
+    "CONTINUE", // continue
+    "ASSERT", // assert
+    "SELFADD", // +=
+    "SELFSUB", // -=
+    "SELFMUL", // *=
+    "SELFDIV", // /=
+    "SELFZDIV", // //=
+    "SELFMOD", // %=
+    "SELFPOW", // **=
+    "ASSIGN", // =
+    "STORE", // :=
+    "NAME", // 名称
+    "STRING_VALUE", // 字符串值
+    "FLOAT_VALUE", // 浮点数值
+    "INT_VALUE", // 整型值
+    "LEFT_BIG_BRACE", // {
+    "RIGHT_BIG_BRACE", // }
+    "LEFT_SMALL_BRACE", // (
+    "RIGHT_SMALL_BRACE", // )
+    "LEFT_MID_BRACE", // [
+    "RIGHT_MID_BRACE", // ]
+    "POINT", //.
+    "COMMA", // ,
+};
 
-namespace trc {
-    namespace tools_in {
-        void out(const string& file_name, compiler::token_lex& token_c) {
-            /*
-            * 格式化输出
-            */
-            cout << "From file " << file_name << ":\n";
-            int line_index = 0;
-            for (;;) {
-                // 行
-                const vecs& line = token_c.get_line();
-                if (line.empty()) {
-                    return;
-                }
-                cout << line_index << ":";
-                line_index++;
-                for (const auto& j : line) {
-                    cout << j << ", ";
-                }
-                cout << "\n";
+namespace trc::tools {
+namespace tools_in {
+    /**
+     * @brief 格式化输出
+     */
+    static void out(const std::string& file_name,
+        compiler::token_lex& token_c) {
+        printf("From file %s:", file_name.c_str());
+        compiler::token* token_lex;
+        bool change_line = true;
+        for (;;) {
+            if (change_line) {
+                printf("\n%zu:", token_c.error_->line);
+                change_line = false;
             }
-        }
-
-        void __out_token(const string &path) {
-            string file_data;
-            utils::readcode(file_data, path);
-            // 解析
-            compiler::token_lex token_c(file_data);
-            out(path, token_c);
-        }
-    }
-
-    namespace tools_out {
-        void out_token(int argc, char *argv[]) {
-            for (int i = 2; i < argc; ++i)
-                tools_in::__out_token(argv[i]);
+            token_lex = token_c.get_token();
+            if (token_lex->tick
+                == compiler::token_ticks::END_OF_TOKENS) {
+                return;
+            }
+            if (token_lex->tick
+                == compiler::token_ticks::END_OF_LINE) {
+                change_line = true;
+                continue;
+            }
+            printf("%s, %s", token_lex->data.c_str(),
+                tokenticks_to_string[(int)token_lex->tick]);
         }
     }
+
+    void __out_token(const std::string& path) {
+        std::string file_data;
+        utils::readcode(file_data, path);
+        compiler::compiler_error error_(path);
+        // 解析
+        compiler::token_lex token_c(file_data, &error_);
+        out(path, token_c);
+    }
+}
+
+namespace tools_out {
+    void out_token() {
+        for (int i = 2; i < argc; ++i)
+            tools_in::__out_token(argv[i]);
+    }
+}
 }

@@ -93,11 +93,6 @@ node_base_int_without_sons::node_base_int_without_sons(
 }
 
 COMPILE_TYPE_TICK what_type(const std::string& value) {
-    /**
-     * 编译时判断传入的字符串实际代表的类型
-     * return:一个字符串，类型
-     */
-
     char front = value.front(), back = value.back();
     size_t lenght = value.length();
     if (('\'' == front && '\'' == back)

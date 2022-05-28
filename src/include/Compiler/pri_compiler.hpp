@@ -240,6 +240,10 @@ inline bool is_english(char c) {
     return isalpha(c) || c == '_';
 }
 
+/**
+ * @brief 编译时判断传入的字符串实际代表的类型
+ * @return 类型
+ */
 COMPILE_TYPE_TICK what_type(const std::string& value);
 
 /**

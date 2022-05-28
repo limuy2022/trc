@@ -14,7 +14,7 @@
 
 using namespace trc::compiler;
 
-static compiler_error error("unittest");
+static compiler_error error("token_unittest");
 
 /**
  * @brief 测试代码是否会输出相应的tokens

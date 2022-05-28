@@ -1,10 +1,10 @@
-#include "TVMbase/TRE.h"
+﻿#include "TVMbase/TRE.h"
 #include "TVMbase/memory.h"
 #include "TVMbase/types/flong.h"
 #include "TVMbase/types/int.h"
 #include "base/io.hpp"
 #include <cmath>
-#include <ostream>
+#include <cstdio>
 
 namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;

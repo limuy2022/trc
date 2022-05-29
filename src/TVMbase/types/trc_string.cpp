@@ -17,8 +17,8 @@
 #include "base/memory/memory.h"
 #include "base/trcdef.h"
 #include "base/utils/type.hpp"
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;

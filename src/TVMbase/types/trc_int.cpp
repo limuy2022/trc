@@ -10,7 +10,7 @@ namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;
 
 void trc_int::putline(FILE* out) {
-    if(out == stdin) {
+    if (out == stdin) {
         // 当在控制台输出时，printf比快输要快
         fprintf(out, "%d", value);
     } else {

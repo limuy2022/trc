@@ -73,6 +73,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>管理配置文件的类  
+ <a href="classtrc_1_1utils_1_1cfg.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="cfg_8hpp_source.html">cfg.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -80,13 +83,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ade85361241399fb0921764db9e7d1d1b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1cfg.html#ade85361241399fb0921764db9e7d1d1b">cfg</a> (const std::string &amp;path)</td></tr>
 <tr class="separator:ade85361241399fb0921764db9e7d1d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15c50256e64cca837fac50e2b79f81fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1cfg.html#a15c50256e64cca837fac50e2b79f81fc">reload</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:a15c50256e64cca837fac50e2b79f81fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">重新读取配置文件  <a href="classtrc_1_1utils_1_1cfg.html#a15c50256e64cca837fac50e2b79f81fc">More...</a><br /></td></tr>
 <tr class="separator:a15c50256e64cca837fac50e2b79f81fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49cdfe51ca544771a641d809cb3bd610"><td class="memItemLeft" align="right" valign="top">t2 &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1cfg.html#a49cdfe51ca544771a641d809cb3bd610">operator[]</a> (const t1 &amp;)</td></tr>
 <tr class="separator:a49cdfe51ca544771a641d809cb3bd610"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6528783d9acc5add34e142c9fb925fc2"><td class="memItemLeft" align="right" valign="top">const t2 &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1cfg.html#a6528783d9acc5add34e142c9fb925fc2">operator[]</a> (const t1 &amp;) const</td></tr>
 <tr class="separator:a6528783d9acc5add34e142c9fb925fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename t1, typename t2&gt;<br />
+class trc::utils::cfg&lt; t1, t2 &gt;</div><p >管理配置文件的类 </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">t1</td><td>键的类型 </td></tr>
+    <tr><td class="paramname">t2</td><td>值的类型 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ade85361241399fb0921764db9e7d1d1b" name="ade85361241399fb0921764db9e7d1d1b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ade85361241399fb0921764db9e7d1d1b">&#9670;&nbsp;</a></span>cfg()</h2>
 
@@ -104,7 +118,12 @@ template&lt;typename t1 , typename t2 &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >管理配置文件的类 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>配置文件路径 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -166,6 +185,14 @@ template&lt;typename t1 , typename t2 &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>重新读取配置文件 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>文件路径 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

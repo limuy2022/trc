@@ -1,7 +1,7 @@
 #include "Compiler/grammar.h"
 #include <cstdarg>
-#include <string>
 #include <gtest/gtest.h>
+#include <string>
 
 using namespace trc::compiler;
 
@@ -16,13 +16,14 @@ static compiler_error error("grammar_unittest");
  */
 static void check_grammar(
     const char* code, treenode* treenode) {
-        grammar_lex grammar_test(code, &error);
+    grammar_lex grammar_test(code, &error);
 }
 
 // 测试变量解析是否正确
 TEST(grammar, var_lex) {
     is_not_end_node* HEAD = new is_not_end_node;
-    auto assign = new node_base_tick(grammar_type::TREE, token_ticks::ASSIGN);
+    auto assign = new node_base_tick(
+        grammar_type::TREE, token_ticks::ASSIGN);
     HEAD->connect(assign);
     check_grammar("a:=10", HEAD);
 }

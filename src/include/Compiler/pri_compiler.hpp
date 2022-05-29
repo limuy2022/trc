@@ -116,7 +116,7 @@ enum grammar_type {
  * 树节点的基类，生成语法分析树时用到
  * 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除
  */
-class treenode {
+class TRC_Compiler_api treenode {
 public:
     virtual ~treenode() = 0;
 
@@ -129,7 +129,7 @@ public:
  * @brief
  * 描述不是终结节点的类(不储存数据的非叶子节点)
  */
-class is_not_end_node : public treenode {
+class TRC_Compiler_api is_not_end_node : public treenode {
 public:
     std::vector<treenode*> son;
 
@@ -141,7 +141,7 @@ public:
 /**
  * @brief 描述终结节点
  */
-class is_end_node : public treenode {
+class TRC_Compiler_api is_end_node : public treenode {
 public:
     bool has_son();
 };
@@ -149,7 +149,7 @@ public:
 /**
  * @brief 数据节点
  */
-class data_node {
+class TRC_Compiler_api data_node {
 public:
     char* data = nullptr;
 
@@ -171,7 +171,7 @@ private:
     void set_alloc(size_t sizes);
 };
 
-class tick_node {
+class TRC_Compiler_api tick_node {
 public:
     token_ticks tick;
 
@@ -181,8 +181,9 @@ public:
 /**
  * @brief 基于token符号的节点
  */
-class node_base_tick : public is_not_end_node,
-                       public tick_node {
+class TRC_Compiler_api node_base_tick
+    : public is_not_end_node,
+      public tick_node {
 public:
     node_base_tick(grammar_type type, token_ticks tick);
 };
@@ -190,8 +191,9 @@ public:
 /**
  * @brief 基于数据的节点
  */
-class node_base_data : public is_not_end_node,
-                       public data_node {
+class TRC_Compiler_api node_base_data
+    : public is_not_end_node,
+      public data_node {
 public:
     node_base_data(
         grammar_type type_argv, const std::string& data);
@@ -202,8 +204,9 @@ public:
 /**
  * @brief 基于标签的没有子节点的类型
  */
-class node_base_tick_without_sons : public is_end_node,
-                                    public tick_node {
+class TRC_Compiler_api node_base_tick_without_sons
+    : public is_end_node,
+      public tick_node {
 public:
     node_base_tick_without_sons(
         grammar_type type, token_ticks);
@@ -212,8 +215,9 @@ public:
 /**
  * @brief 基于字符串的没有子节点的节点
  */
-class node_base_data_without_sons : public data_node,
-                                    public is_end_node {
+class TRC_Compiler_api node_base_data_without_sons
+    : public data_node,
+      public is_end_node {
 public:
     node_base_data_without_sons(
         grammar_type type, const std::string& name);
@@ -224,7 +228,8 @@ public:
 /**
  * @brief 基于整型的没有子节点的类型
  */
-class node_base_int_without_sons : public is_not_end_node {
+class TRC_Compiler_api node_base_int_without_sons
+    : public is_not_end_node {
 public:
     int value;
 

@@ -33,4 +33,5 @@ TEST(filesys, file_exists) {
         utils::file_exists(redefine_path("test_data/")));
     EXPECT_FALSE(
         utils::file_exists(redefine_path("testdata/")));
+    EXPECT_FALSE(utils::file_exists(redefine_path("testdata")));
 }

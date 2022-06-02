@@ -1,5 +1,10 @@
 ﻿/**
- * 关于文件系统和文件路径的操作
+ * @file filesys.cpp
+ * @brief 关于文件系统和文件路径的操作
+ * @date 2022-06-02
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
 #include "base/utils/filesys.h"
@@ -32,12 +37,14 @@ void listfiles(const std::string& path, filefilter func,
 }
 
 bool file_exists(const std::string& path) {
-    FILE* file = fopen(path.c_str(), "r");
-    if (file == nullptr) {
-        return false;
+    if(fs::exists(path)) {
+        if(fs::is_directory(path)) {
+            return false;
+        } else {
+            return true;
+        }
     } else {
-        fclose(file);
-        return true;
+        return false;
     }
 }
 

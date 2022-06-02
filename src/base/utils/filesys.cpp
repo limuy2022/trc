@@ -2,9 +2,9 @@
  * @file filesys.cpp
  * @brief 关于文件系统和文件路径的操作
  * @date 2022-06-02
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include "base/utils/filesys.h"
@@ -20,25 +20,22 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-void listfiles(const std::string& path, filefilter func,
-    vecs& fileList, vecs& dirList) {
-    std::string tmp;
+void listfiles(const std::string& path, std::vector<fs::path>& fileList, std::vector<fs::path>& dirList, filefilter func) {
+    fs::path tmp;
     for (const auto& path_i :
         fs::recursive_directory_iterator(path)) {
+        tmp = path_i.path();
         if (is_directory(path_i)) {
-            fileList.push_back(path_i.path().string());
-            continue;
-        }
-        tmp = path_i.path().string();
-        if (func(tmp)) {
             dirList.push_back(tmp);
+        } else if(func(tmp.filename())) {
+            fileList.push_back(tmp);
         }
     }
 }
 
 bool file_exists(const std::string& path) {
-    if(fs::exists(path)) {
-        if(fs::is_directory(path)) {
+    if (fs::exists(path)) {
+        if (fs::is_directory(path)) {
             return false;
         } else {
             return true;
@@ -46,11 +43,6 @@ bool file_exists(const std::string& path) {
     } else {
         return false;
     }
-}
-
-std::string path_last(
-    const std::string& path, const std::string& last) {
-    return path.substr(0, path.find_last_of('.')) + last;
 }
 
 std::string import_to_path(std::string import_name) {
@@ -72,10 +64,6 @@ std::string path_join(int n, ...) {
     }
     va_end(ap);
     return root;
-}
-
-std::string file_last_(const std::string& path) {
-    return path.substr(path.find_last_of('.'));
 }
 
 /**

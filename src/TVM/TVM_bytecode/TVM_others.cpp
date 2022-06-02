@@ -8,6 +8,9 @@
 #include "base/utils/data.hpp"
 #include "base/utils/filesys.h"
 #include "language/error.h"
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace trc::TVM_space {
 void TVM::LOAD_INT(short index) {
@@ -61,8 +64,7 @@ static void fix_path(const std::string& path) {
     if (utils::check_in(path, cpp_libs::names)) {
         return;
     }
-    if (utils::file_exists(utils::path_join(2,
-            "TVM/packages/self_support", path.c_str()))) {
+    if (utils::file_exists(fs::path("TVM/packages/self_support").append(path).string())) {
         return;
     }
     if (utils::file_exists(utils::path_join(2,

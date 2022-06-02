@@ -2,33 +2,32 @@
 
 #include "base/Error.h"
 #include "base/trcdef.h"
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
 
 namespace trc::utils {
-typedef bool (*filefilter)(const std::string&);
+typedef bool (*filefilter)(const std::filesystem::path&);
 
 /**
  * @brief 遍历目录
  * @param path 遍历的目录
  * @param func
  * 判断文件是否应当存入文件列表的判别函数
+ * 默认全部加入
  * @param fileList 遍历出文件的存储地
  * @param dirList 遍历出文件夹的存储地
  */
-TRC_base_func_api void listfiles(const std::string& path,
-    filefilter, vecs& fileList, vecs& dirList);
+TRC_base_func_api void listfiles(
+    const std::string& path, std::vector<fs::path>& fileList, std::vector<fs::path>& dirList,
+    filefilter
+    = [](const fs::path&) -> bool { return true; });
 
 /**
  * @brief 检查文件是否存在
  */
 TRC_base_func_api bool file_exists(const std::string& path);
-
-/**
- * @brief 改变路径后缀名
- * @param path 原路径
- * @param last 需要改变成的后缀名
- */
-TRC_base_func_api std::string path_last(
-    const std::string& path, const std::string& last);
 
 /**
  * @brief
@@ -44,12 +43,6 @@ TRC_base_func_api std::string import_to_path(
  * @param n 参数个数
  */
 TRC_base_func_api std::string path_join(int n, ...);
-
-/**
- * @brief 获取文件后缀名
- */
-TRC_base_func_api std::string file_last_(
-    const std::string& path);
 
 /**
  * @brief 读取文件并将字符存入file_data

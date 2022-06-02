@@ -9,6 +9,9 @@
 #include "gflags/gflags.h"
 #include "tools.h"
 #include <string>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace trc::tools {
 namespace tools_in {
@@ -18,7 +21,7 @@ namespace tools_in {
         utils::readcode(scode, path);
         compiler::Compiler(vm, scode);
         loader::save_ctree(
-            vm, utils::path_last(path, ".ctree"));
+            vm, fs::path(path).replace_extension(".ctree").string());
     }
 }
 

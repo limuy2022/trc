@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <gtest/gtest.h>
-#include <iostream>
 #include <vector>
 
 #define redefine_path(p) "../tests/unittest/testdata/" p
@@ -22,12 +21,11 @@ using namespace trc;
 static void check_items(
     const std::vector<fs::path>& raw_items,
     const std::vector<fs::path>& expect_result) {
-    for (int i = 0, n = raw_items.size(); i < n; ++i) {
+    for (const auto & raw_item : raw_items) {
         bool flag = false;
-        fs::path filename = raw_items[i].filename();
-        for (int j = 0, nj = expect_result.size(); j < nj;
-             ++j) {
-            if (expect_result[j] == filename) {
+        fs::path filename = raw_item.filename();
+        for (const auto & j : expect_result) {
+            if (j == filename) {
                 flag = true;
                 break;
             }
@@ -43,7 +41,7 @@ TEST(filesys, listfiles) {
     utils::listfiles(redefine_path("filesys/listdirs"),
         filelist, dirlist,
         [](const std::filesystem::path& path) -> bool {
-            if (path.stem().string().find("t")
+            if (path.stem().string().find('t')
                 != std::string::npos) {
                 return true;
             } else {

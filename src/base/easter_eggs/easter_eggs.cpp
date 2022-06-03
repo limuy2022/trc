@@ -11,6 +11,15 @@
 #include <cstring>
 #include <vector>
 
+/**
+ * 默认图形：
+ *   +---+
+ *  /   /|
+ * +---+ |
+ * |   | +
+ * |   |/
+ * +---+
+ */
 static const char* block[] = { "+---+", "/   /|", "+---+ |",
     "|   | +", "|   |/", "+---+" };
 
@@ -22,8 +31,7 @@ inline static int realy(int x, int y) {
     return y * 4 - x * 2;
 }
 
-namespace trc {
-namespace eggs {
+namespace trc::eggs {
     /**
      * @brief 负责绘图和设置方块
      */
@@ -81,8 +89,8 @@ namespace eggs {
 
     drawer::drawer(
         const canvas_data& canvas, char background)
-        : background(background)
-        , line_nums(canvas.size()) {
+        : line_nums(canvas.size()),
+            background(background) {
         // 根据数据计算画布长宽
 
         // 初始化数据
@@ -94,14 +102,14 @@ namespace eggs {
     }
 
     drawer::~drawer() {
-        for (int i = 0; i < line_nums; ++i) {
+        for (size_t i = 0; i < line_nums; ++i) {
             delete[] canvas_[i];
         }
         delete[] canvas_;
     }
 
     bool drawer::check_x(int x) {
-        for (int i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             if (canvas_[x][i] != background) {
                 return false;
             }
@@ -110,7 +118,7 @@ namespace eggs {
     }
 
     bool drawer::check_y(int y) {
-        for (int i = 0; i < width; ++i) {
+        for (size_t i = 0; i < width; ++i) {
             if (canvas_[i][y] != background) {
                 return false;
             }
@@ -179,5 +187,4 @@ namespace eggs {
         // 打印
         painter.draw();
     }
-}
 }

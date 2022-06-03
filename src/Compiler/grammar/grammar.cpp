@@ -29,12 +29,16 @@ class grammar_data_control {
 public:
     /**
      * @brief 编译从map或者从array中取值的代码
+     * @param head 头节点
+     * @param code 读取对象代码
      */
     void compile_get_value(
         treenode* head, const vecs& code);
 
     /**
      * @brief 编译从map或者从array中创建对象的代码
+     * @param head 根节点指针
+     * @param code 创建对象代码
      */
     void compile_create_obj(
         treenode* head, const vecs& code);
@@ -42,8 +46,10 @@ public:
     ~grammar_data_control();
 
 private:
+    // 保存数组的vector
     vecs array_list;
 
+    // 保存map的vector，用于转成符号表索引
     vecs map_list;
 
     // 由于map和array获取值的方式相同但是生成的字节码不同，需要在定义时予以区分
@@ -117,6 +123,7 @@ void grammar_lex::assign(is_not_end_node* head,
 
     // 父节点留下子节点记录
     head->connect(ass);
+    // 保存变量名
     ass->connect(name);
     // 存放等号右边的值
     ass->connect(get_node());

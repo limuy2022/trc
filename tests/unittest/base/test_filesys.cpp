@@ -12,22 +12,22 @@
 #include <algorithm>
 #include <filesystem>
 #include <gtest/gtest.h>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 using namespace trc;
 
-static std::string redefine_path(const std::string &p) {
+static std::string redefine_path(const std::string& p) {
     return "../tests/unittest/testdata/" + p;
 }
 
 static void check_items(
     const std::vector<fs::path>& raw_items,
     const std::vector<fs::path>& expect_result) {
-    for (const auto & raw_item : raw_items) {
+    for (const auto& raw_item : raw_items) {
         bool flag = false;
         fs::path filename = raw_item.filename();
-        for (const auto & j : expect_result) {
+        for (const auto& j : expect_result) {
             if (j == filename) {
                 flag = true;
                 break;
@@ -75,7 +75,8 @@ TEST(filesys, file_exists) {
 
 static std::string filedata;
 
-static void test_readfile(const char *path, const char *expect) {
+static void test_readfile(
+    const char* path, const char* expect) {
     utils::readcode(filedata, redefine_path(path));
     EXPECT_STREQ(filedata.c_str(), expect);
     filedata.clear();
@@ -84,11 +85,14 @@ static void test_readfile(const char *path, const char *expect) {
 // 测试读取文件的函数
 TEST(filesys, readfile) {
     // 测试读取多行文件
-    test_readfile("filesys/readfile/readwithlines.txt", "\n\n\nreadwithlines\n\nreadwithlines\n");
+    test_readfile("filesys/readfile/readwithlines.txt",
+        "\n\n\nreadwithlines\n\nreadwithlines\n");
     // 测试读取空文件
     test_readfile("filesys/readfile/readempty.txt", "");
     // 测试读取英文文件
-    test_readfile("filesys/readfile/readenglish.txt", "abcd\nefgh\nijkl\nmnop\nqrst\nuvwx\nyz\n");
+    test_readfile("filesys/readfile/readenglish.txt",
+        "abcd\nefgh\nijkl\nmnop\nqrst\nuvwx\nyz\n");
     // 测试读取中文文件
-    test_readfile("filesys/readfile/readchinese.txt", "生活就像海洋，只有意志坚强的人才能到达彼岸\n");
+    test_readfile("filesys/readfile/readchinese.txt",
+        "生活就像海洋，只有意志坚强的人才能到达彼岸\n");
 }

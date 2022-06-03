@@ -8,8 +8,8 @@
 #include "base/utils/filesys.h"
 #include "gflags/gflags.h"
 #include "tools.h"
-#include <string>
 #include <filesystem>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -20,8 +20,10 @@ namespace tools_in {
         std::string scode;
         utils::readcode(scode, path);
         compiler::Compiler(vm, scode);
-        loader::save_ctree(
-            vm, fs::path(path).replace_extension(".ctree").string());
+        loader::save_ctree(vm,
+            fs::path(path)
+                .replace_extension(".ctree")
+                .string());
     }
 }
 

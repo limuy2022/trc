@@ -20,7 +20,9 @@ typedef bool (*filefilter)(const std::filesystem::path&);
  * @param dirList 遍历出文件夹的存储地
  */
 TRC_base_func_api void listfiles(
-    const std::string& path, std::vector<fs::path>& fileList, std::vector<fs::path>& dirList,
+    const std::string& path,
+    std::vector<fs::path>& fileList,
+    std::vector<fs::path>& dirList,
     filefilter
     = [](const fs::path&) -> bool { return true; });
 

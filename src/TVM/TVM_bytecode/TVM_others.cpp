@@ -64,7 +64,10 @@ static void fix_path(const std::string& path) {
     if (utils::check_in(path, cpp_libs::names)) {
         return;
     }
-    if (utils::file_exists(fs::path("TVM/packages/self_support").append(path).string())) {
+    if (utils::file_exists(
+            fs::path("TVM/packages/self_support")
+                .append(path)
+                .string())) {
         return;
     }
     if (utils::file_exists(utils::path_join(2,

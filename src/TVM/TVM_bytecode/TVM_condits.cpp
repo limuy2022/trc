@@ -60,16 +60,18 @@ void TVM::ASSERT() {
                 "one or two");
 
         switch (tmp_i) {
-        case 1:
+        case 1: {
             error_report(error::AssertError,
                 language::error::asserterror_default);
             break;
-        case 2:
+        }
+        case 2: {
             firsts = (def::STRINGOBJ)pop();
             error_report(error::AssertError,
                 language::error::asserterror_user,
                 firsts->c_str());
             break;
+        }
         }
     }
 }

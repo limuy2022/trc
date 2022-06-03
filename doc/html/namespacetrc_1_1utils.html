@@ -82,8 +82,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a077368876d5cf77c6ec7a6226a273f64"><td class="memItemLeft" align="right" valign="top">typedef bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a077368876d5cf77c6ec7a6226a273f64">filefilter</a>) (const std::string &amp;)</td></tr>
-<tr class="separator:a077368876d5cf77c6ec7a6226a273f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96636eb1ea2c7b3a7d437fbf096e9390"><td class="memItemLeft" align="right" valign="top">typedef bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>) (const std::filesystem::path &amp;)</td></tr>
+<tr class="separator:a96636eb1ea2c7b3a7d437fbf096e9390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -94,24 +94,18 @@ Functions</h2></td></tr>
 <tr class="separator:aad4ac63db521335d2124d9f8b7e7eddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea1bacf7d43bbcc008397cbdb216114e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#aea1bacf7d43bbcc008397cbdb216114e">utf_8_encode</a> ()</td></tr>
 <tr class="separator:aea1bacf7d43bbcc008397cbdb216114e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ab12c3d8e5e0f2a27a4ecf92e079414a7">listfiles</a> (const std::string &amp;path, <a class="el" href="namespacetrc_1_1utils.html#a077368876d5cf77c6ec7a6226a273f64">filefilter</a>, <a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;fileList, <a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;dirList)</td></tr>
-<tr class="memdesc:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="namespacetrc_1_1utils.html#ab12c3d8e5e0f2a27a4ecf92e079414a7">More...</a><br /></td></tr>
-<tr class="separator:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a854b40be9e1e495c0ba8af3f49a37ea9">listfiles</a> (const std::string &amp;path, std::vector&lt; fs::path &gt; &amp;fileList, std::vector&lt; fs::path &gt; &amp;dirList, <a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>=[](const fs::path &amp;) -&gt; bool { return true;})</td></tr>
+<tr class="memdesc:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="namespacetrc_1_1utils.html#a854b40be9e1e495c0ba8af3f49a37ea9">More...</a><br /></td></tr>
+<tr class="separator:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89774702b2325f983bf527143b270ee1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a89774702b2325f983bf527143b270ee1">file_exists</a> (const std::string &amp;path)</td></tr>
 <tr class="memdesc:a89774702b2325f983bf527143b270ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查文件是否存在  <a href="namespacetrc_1_1utils.html#a89774702b2325f983bf527143b270ee1">More...</a><br /></td></tr>
 <tr class="separator:a89774702b2325f983bf527143b270ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c2b781eea0f2c6fb621071a70734458"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a8c2b781eea0f2c6fb621071a70734458">path_last</a> (const std::string &amp;path, const std::string &amp;last)</td></tr>
-<tr class="memdesc:a8c2b781eea0f2c6fb621071a70734458"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变路径后缀名  <a href="namespacetrc_1_1utils.html#a8c2b781eea0f2c6fb621071a70734458">More...</a><br /></td></tr>
-<tr class="separator:a8c2b781eea0f2c6fb621071a70734458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d4eeec4ec2654289aad132a57150bcf"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a3d4eeec4ec2654289aad132a57150bcf">import_to_path</a> (std::string import_name)</td></tr>
 <tr class="memdesc:a3d4eeec4ec2654289aad132a57150bcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">在虚拟机执行过程中，动态加载字节码时路径转换  <a href="namespacetrc_1_1utils.html#a3d4eeec4ec2654289aad132a57150bcf">More...</a><br /></td></tr>
 <tr class="separator:a3d4eeec4ec2654289aad132a57150bcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a568d79e536afbede3e3518bb1aa56ac5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a568d79e536afbede3e3518bb1aa56ac5">path_join</a> (int n,...)</td></tr>
 <tr class="memdesc:a568d79e536afbede3e3518bb1aa56ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">将多个路径拼接起来  <a href="namespacetrc_1_1utils.html#a568d79e536afbede3e3518bb1aa56ac5">More...</a><br /></td></tr>
 <tr class="separator:a568d79e536afbede3e3518bb1aa56ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25c0c033b027e9a9e793535b20087cdd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a25c0c033b027e9a9e793535b20087cdd">file_last_</a> (const std::string &amp;path)</td></tr>
-<tr class="memdesc:a25c0c033b027e9a9e793535b20087cdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取文件后缀名  <a href="namespacetrc_1_1utils.html#a25c0c033b027e9a9e793535b20087cdd">More...</a><br /></td></tr>
-<tr class="separator:a25c0c033b027e9a9e793535b20087cdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">read_file_detail</a> (const std::string &amp;path, std::string &amp;file_data, FILE *file)</td></tr>
 <tr class="memdesc:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">具体的读取文件的细节  <a href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">More...</a><br /></td></tr>
 <tr class="separator:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,17 +157,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplItemLeft" align="right" valign="top">outtype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">to_type</a> (const intype &amp;value)</td></tr>
 <tr class="separator:a10fddf0485656e34179e2d7892bdd1cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >关于文件系统和文件路径的操作 </p>
-</div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a077368876d5cf77c6ec7a6226a273f64" name="a077368876d5cf77c6ec7a6226a273f64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a077368876d5cf77c6ec7a6226a273f64">&#9670;&nbsp;</a></span>filefilter</h2>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="a96636eb1ea2c7b3a7d437fbf096e9390" name="a96636eb1ea2c7b3a7d437fbf096e9390"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96636eb1ea2c7b3a7d437fbf096e9390">&#9670;&nbsp;</a></span>filefilter</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef bool(* trc::utils::filefilter) (const std::string &amp;)</td>
+          <td class="memname">typedef bool(* trc::utils::filefilter) (const std::filesystem::path &amp;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -327,26 +319,6 @@ template&lt;typename T , typename O &gt; </div>
 </div><div class="memdoc">
 
 <p>检查文件是否存在 </p>
-
-</div>
-</div>
-<a id="a25c0c033b027e9a9e793535b20087cdd" name="a25c0c033b027e9a9e793535b20087cdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25c0c033b027e9a9e793535b20087cdd">&#9670;&nbsp;</a></span>file_last_()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2dll_8h.html#a0ef634d0b01599ba642b6c57df29d792">TRC_base_func_api</a> std::string trc::utils::file_last_ </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>获取文件后缀名 </p>
 
 </div>
 </div>
@@ -513,8 +485,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="ab12c3d8e5e0f2a27a4ecf92e079414a7" name="ab12c3d8e5e0f2a27a4ecf92e079414a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab12c3d8e5e0f2a27a4ecf92e079414a7">&#9670;&nbsp;</a></span>listfiles()</h2>
+<a id="a854b40be9e1e495c0ba8af3f49a37ea9" name="a854b40be9e1e495c0ba8af3f49a37ea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a854b40be9e1e495c0ba8af3f49a37ea9">&#9670;&nbsp;</a></span>listfiles()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -528,20 +500,20 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacetrc_1_1utils.html#a077368876d5cf77c6ec7a6226a273f64">filefilter</a>&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; fs::path &gt; &amp;&#160;</td>
           <td class="paramname"><em>fileList</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;&#160;</td>
-          <td class="paramname"><em>dirList</em>&#160;</td>
+          <td class="paramtype">std::vector&lt; fs::path &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dirList</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>&#160;</td>
+          <td class="paramname"> = <code>[](const&#160;fs::path&#160;&amp;)&#160;-&gt;&#160;bool&#160;{&#160;return&#160;true;}</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -555,7 +527,7 @@ template&lt;typename T &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>遍历的目录 </td></tr>
-    <tr><td class="paramname">func</td><td>判断文件是否应当存入文件列表的判别函数 </td></tr>
+    <tr><td class="paramname">func</td><td>判断文件是否应当存入文件列表的判别函数 默认全部加入 </td></tr>
     <tr><td class="paramname">fileList</td><td>遍历出文件的存储地 </td></tr>
     <tr><td class="paramname">dirList</td><td>遍历出文件夹的存储地 </td></tr>
   </table>
@@ -686,43 +658,6 @@ template&lt;typename T , typename O &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n</td><td>参数个数 </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a8c2b781eea0f2c6fb621071a70734458" name="a8c2b781eea0f2c6fb621071a70734458"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c2b781eea0f2c6fb621071a70734458">&#9670;&nbsp;</a></span>path_last()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2dll_8h.html#a0ef634d0b01599ba642b6c57df29d792">TRC_base_func_api</a> std::string trc::utils::path_last </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>last</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>改变路径后缀名 </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">path</td><td>原路径 </td></tr>
-    <tr><td class="paramname">last</td><td>需要改变成的后缀名 </td></tr>
   </table>
   </dd>
 </dl>

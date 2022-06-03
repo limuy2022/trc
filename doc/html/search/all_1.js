@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['add_0',['add',['../namespacetrc_1_1compiler.html#a8dae35a7d622b4875c6ff196c539cbb1',1,'trc::compiler']]],
-  ['add_1',['ADD',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a9eeb52badb613229884838847294b90d',1,'trc::compiler']]],
+  ['add_0',['ADD',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a9eeb52badb613229884838847294b90d',1,'trc::compiler']]],
+  ['add_1',['add',['../namespacetrc_1_1compiler.html#a8dae35a7d622b4875c6ff196c539cbb1',1,'trc::compiler']]],
   ['add_5f_2',['ADD_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca3c65a7718764d41d630a0d1566d27e56',1,'TVM.h']]],
   ['and_3',['AND',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a558ffc8f5770d8e4f95f51d822685532',1,'trc::compiler']]],
   ['and_5f_4',['and_',['../namespacetrc_1_1compiler.html#abb07fd8d03f393e9813d56b1736c3404',1,'trc::compiler']]],

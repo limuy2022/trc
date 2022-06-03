@@ -72,6 +72,9 @@ $(function() {
   <div class="headertitle"><div class="title">filesys.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>关于文件系统和文件路径的操作  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="filesys_8h_source.html">base/utils/filesys.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="trcdef_8h_source.html">base/trcdef.h</a>&quot;</code><br />
@@ -91,24 +94,18 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ab12c3d8e5e0f2a27a4ecf92e079414a7">trc::utils::listfiles</a> (const std::string &amp;path, filefilter, <a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;fileList, <a class="el" href="trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df">vecs</a> &amp;dirList)</td></tr>
-<tr class="memdesc:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="namespacetrc_1_1utils.html#ab12c3d8e5e0f2a27a4ecf92e079414a7">More...</a><br /></td></tr>
-<tr class="separator:ab12c3d8e5e0f2a27a4ecf92e079414a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a854b40be9e1e495c0ba8af3f49a37ea9">trc::utils::listfiles</a> (const std::string &amp;path, std::vector&lt; fs::path &gt; &amp;fileList, std::vector&lt; fs::path &gt; &amp;dirList, filefilter=[](const fs::path &amp;) -&gt; bool { return true;})</td></tr>
+<tr class="memdesc:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="namespacetrc_1_1utils.html#a854b40be9e1e495c0ba8af3f49a37ea9">More...</a><br /></td></tr>
+<tr class="separator:a854b40be9e1e495c0ba8af3f49a37ea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89774702b2325f983bf527143b270ee1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a89774702b2325f983bf527143b270ee1">trc::utils::file_exists</a> (const std::string &amp;path)</td></tr>
 <tr class="memdesc:a89774702b2325f983bf527143b270ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查文件是否存在  <a href="namespacetrc_1_1utils.html#a89774702b2325f983bf527143b270ee1">More...</a><br /></td></tr>
 <tr class="separator:a89774702b2325f983bf527143b270ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c2b781eea0f2c6fb621071a70734458"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a8c2b781eea0f2c6fb621071a70734458">trc::utils::path_last</a> (const std::string &amp;path, const std::string &amp;last)</td></tr>
-<tr class="memdesc:a8c2b781eea0f2c6fb621071a70734458"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变路径后缀名  <a href="namespacetrc_1_1utils.html#a8c2b781eea0f2c6fb621071a70734458">More...</a><br /></td></tr>
-<tr class="separator:a8c2b781eea0f2c6fb621071a70734458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d4eeec4ec2654289aad132a57150bcf"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a3d4eeec4ec2654289aad132a57150bcf">trc::utils::import_to_path</a> (std::string import_name)</td></tr>
 <tr class="memdesc:a3d4eeec4ec2654289aad132a57150bcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">在虚拟机执行过程中，动态加载字节码时路径转换  <a href="namespacetrc_1_1utils.html#a3d4eeec4ec2654289aad132a57150bcf">More...</a><br /></td></tr>
 <tr class="separator:a3d4eeec4ec2654289aad132a57150bcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a568d79e536afbede3e3518bb1aa56ac5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a568d79e536afbede3e3518bb1aa56ac5">trc::utils::path_join</a> (int n,...)</td></tr>
 <tr class="memdesc:a568d79e536afbede3e3518bb1aa56ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">将多个路径拼接起来  <a href="namespacetrc_1_1utils.html#a568d79e536afbede3e3518bb1aa56ac5">More...</a><br /></td></tr>
 <tr class="separator:a568d79e536afbede3e3518bb1aa56ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25c0c033b027e9a9e793535b20087cdd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a25c0c033b027e9a9e793535b20087cdd">trc::utils::file_last_</a> (const std::string &amp;path)</td></tr>
-<tr class="memdesc:a25c0c033b027e9a9e793535b20087cdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取文件后缀名  <a href="namespacetrc_1_1utils.html#a25c0c033b027e9a9e793535b20087cdd">More...</a><br /></td></tr>
-<tr class="separator:a25c0c033b027e9a9e793535b20087cdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">trc::utils::read_file_detail</a> (const std::string &amp;path, std::string &amp;file_data, FILE *file)</td></tr>
 <tr class="memdesc:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">具体的读取文件的细节  <a href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">More...</a><br /></td></tr>
 <tr class="separator:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -119,7 +116,11 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab4989124ce15101402a19e4321ecfe5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件并将字符存入file_data  <a href="namespacetrc_1_1utils.html#ab4989124ce15101402a19e4321ecfe5b">More...</a><br /></td></tr>
 <tr class="separator:ab4989124ce15101402a19e4321ecfe5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >关于文件系统和文件路径的操作 </p>
+<dl class="section date"><dt>Date</dt><dd>2022-06-02</dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (c) 2022 </dd></dl>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4

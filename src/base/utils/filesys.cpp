@@ -79,7 +79,8 @@ inline void read_file_detail(const std::string& path,
     struct stat buffer;
     stat(path.c_str(), &buffer);
     size_t size = buffer.st_size;
-    file_data.resize(size);
+    file_data.resize(size + 1);
+    file_data[size] = '\0';
     fread(
         (char*)file_data.c_str(), sizeof(char), size, file);
 }
@@ -87,9 +88,10 @@ inline void read_file_detail(const std::string& path,
 void readcode(
     std::string& file_data, const std::string& path) {
     FILE* file = fopen(path.c_str(), "r");
-    if (!file)
+    if (file == nullptr) {
         error::send_error(error::OpenFileError,
             language::error::openfileerror, path.c_str());
+    }
     read_file_detail(path, file_data, file);
     fclose(file);
 }
@@ -97,7 +99,7 @@ void readcode(
 int readcode_with_code(
     std::string& file_data, const std::string& path) {
     FILE* file = fopen(path.c_str(), "r");
-    if (!file) {
+    if (file == nullptr) {
         return 1;
     }
     read_file_detail(path, file_data, file);

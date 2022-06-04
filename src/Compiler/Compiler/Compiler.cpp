@@ -11,14 +11,9 @@
 #include "TVMbase/memory.h"
 #include "base/Error.h"
 #include "base/code_loader.h"
-#include "base/memory/memory.h"
 #include "base/utils/data.hpp"
-#include "base/utils/type.hpp"
-#include "compile_env.h"
 #include "language/error.h"
 #include <climits>
-#include <cstdarg>
-#include <map>
 #include <string>
 #include <vector>
 

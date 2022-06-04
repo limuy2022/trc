@@ -2,7 +2,6 @@
 #include "TVMbase/memory.h"
 #include "TVMbase/types/float.h"
 #include "TVMbase/types/int.h"
-#include "base/utils/type.hpp"
 #include <cmath>
 
 namespace trc::TVM_space::types {

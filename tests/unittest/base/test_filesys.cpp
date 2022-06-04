@@ -95,4 +95,13 @@ TEST(filesys, readfile) {
     // 测试读取中文文件
     test_readfile("filesys/readfile/readchinese.txt",
         "生活就像海洋，只有意志坚强的人才能到达彼岸\n");
+    filedata.clear();
+    EXPECT_EQ(1,
+        utils::readcode_with_code(filedata,
+            redefine_path("filesys/readfile/failtoread")));
+    filedata.clear();
+    EXPECT_EQ(0,
+        utils::readcode_with_code(filedata,
+            redefine_path(
+                "filesys/readfile/readenglish.txt")));
 }

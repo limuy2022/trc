@@ -13,14 +13,14 @@
  * @brief 判断是否为新的语句块开始
  */
 static inline bool is_block(const std::string& code) {
-    return code.back() == '{';
+    return !code.empty() && code.back() == '{';
 }
 
 /**
  * @brief 判断语句块是否结束
  */
 static inline bool is_end(const std::string& code) {
-    return code.back() == '}';
+    return !code.empty() && code.back() == '}';
 }
 
 namespace trc {

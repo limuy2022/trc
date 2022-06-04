@@ -1,10 +1,8 @@
-﻿#include "Compiler/Compiler.h"
-#include "TVM/TVM.h"
+﻿#include "TVM/TVM.h"
 #include "TVM/lib.h"
 #include "TVMbase/TRE.h"
 #include "TVMbase/memory.h"
 #include "base/Error.h"
-#include "base/trcdef.h"
 #include "base/utils/data.hpp"
 #include "base/utils/filesys.h"
 #include "language/error.h"
@@ -70,8 +68,10 @@ static void fix_path(const std::string& path) {
                 .string())) {
         return;
     }
-    if (utils::file_exists(utils::path_join(2,
-            "TVM/packages/other_support", path.c_str()))) {
+    if (utils::file_exists(
+            fs::path("TVM/packages/other_support")
+                .append(path)
+                .string())) {
         return;
     }
 

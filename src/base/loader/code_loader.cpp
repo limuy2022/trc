@@ -3,9 +3,6 @@
  */
 
 #include "base/code_loader.h"
-#include "TVM/TVM.h"
-#include <map>
-#include <string>
 
 namespace trc::loader {
 // 在反编译时把字节码转化为助记符

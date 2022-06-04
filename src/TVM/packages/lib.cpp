@@ -5,8 +5,8 @@ namespace trc::TVM_space::cpp_libs {
 std::array<std::string, 1> names = { "math" };
 
 cpp_lib::cpp_lib(int funcnums)
-    : funcs_nums(funcnums)
-    , funcs(new char*[funcnums]) {
+    : funcs(new char*[funcnums])
+    , funcs_nums(funcnums) {
 }
 
 cpp_lib::~cpp_lib() {

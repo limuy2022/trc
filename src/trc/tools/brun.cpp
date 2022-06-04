@@ -3,10 +3,7 @@
  * 注：先编译再保存
  */
 
-#include "Compiler/Compiler.h"
 #include "TVM/TVM.h"
-#include "base/ctree_loader.h"
-#include "base/utils/filesys.h"
 #include "tools.h"
 #include <string>
 

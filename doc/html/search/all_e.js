@@ -41,8 +41,8 @@ var searchData=
   ['optimize_5fcondit_38',['optimize_condit',['../namespacetrc_1_1compiler.html#aa898db461b91dfbb38d2df4988db1d43',1,'trc::compiler']]],
   ['optimize_5fnumber_39',['optimize_number',['../namespacetrc_1_1compiler.html#a749e98cf00a40423a86c8e709fb06c23',1,'trc::compiler']]],
   ['or_40',['OR',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a1d00e7dce692e8dc3f6877f035e3a616',1,'trc::compiler']]],
-  ['or_5f_41',['OR_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca0b8d4344085f64da487cc7b74987a4cd',1,'TVM.h']]],
-  ['or_5f_42',['or_',['../namespacetrc_1_1compiler.html#a23d97f6dbdcbda12808b58e3b424d2c9',1,'trc::compiler']]],
+  ['or_5f_41',['or_',['../namespacetrc_1_1compiler.html#a23d97f6dbdcbda12808b58e3b424d2c9',1,'trc::compiler']]],
+  ['or_5f_42',['OR_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca0b8d4344085f64da487cc7b74987a4cd',1,'TVM.h']]],
   ['out_43',['out',['../namespacetrc_1_1tools_1_1tools__in.html#acc9f1c6dd9f4571e2d72b18433ca14e0',1,'trc::tools::tools_in']]],
   ['out_5fgrammar_44',['out_grammar',['../namespacetrc_1_1tools_1_1tools__out.html#a87293d98c1f642269bf2682ca09c9b5a',1,'trc::tools::tools_out']]],
   ['out_5ftoken_45',['out_token',['../namespacetrc_1_1tools_1_1tools__out.html#a6facfd6ae2d6ecd75437e05b7524a786',1,'trc::tools::tools_out']]]

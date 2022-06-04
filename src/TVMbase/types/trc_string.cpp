@@ -16,7 +16,6 @@
 #include "base/Error.h"
 #include "base/memory/memory.h"
 #include "base/trcdef.h"
-#include "base/utils/type.hpp"
 #include <cstdio>
 #include <cstring>
 

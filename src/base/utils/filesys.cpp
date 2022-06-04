@@ -56,18 +56,6 @@ std::string import_to_path(std::string import_name) {
     return import_name;
 }
 
-std::string path_join(int n, ...) {
-    va_list ap;
-    va_start(ap, n);
-    std::string root(va_arg(ap, const char*));
-    for (int i = 1; i < n; ++i) {
-        root += "/";
-        root += va_arg(ap, const char*);
-    }
-    va_end(ap);
-    return root;
-}
-
 /**
  * @brief 具体的读取文件的细节
  * @param path 文件路径

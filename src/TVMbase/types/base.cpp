@@ -9,7 +9,8 @@
 #include "language/language.h"
 #include <cstring>
 
-/* 动态生成报错模板，为了能够在编译后通过dll切换语言
+/**
+ * 动态生成报错模板，为了能够在编译后通过dll切换语言
  */
 static inline char* ERROR_TYPE_MSG(const char* type_name) {
     char* res

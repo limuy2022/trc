@@ -5,7 +5,6 @@
 #include "Compiler/Compiler.h"
 #include "TVM/TVM.h"
 #include "base/ctree_loader.h"
-#include "base/trcdef.h"
 #include "base/utils/filesys.h"
 #include "tools.h"
 

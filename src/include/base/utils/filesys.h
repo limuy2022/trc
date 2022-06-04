@@ -8,6 +8,7 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
+// 用来过滤文件的函数类型
 typedef bool (*filefilter)(const std::filesystem::path&);
 
 /**
@@ -39,12 +40,6 @@ TRC_base_func_api bool file_exists(const std::string& path);
  */
 TRC_base_func_api std::string import_to_path(
     std::string import_name);
-
-/**
- * @brief 将多个路径拼接起来
- * @param n 参数个数
- */
-TRC_base_func_api std::string path_join(int n, ...);
 
 /**
  * @brief 读取文件并将字符存入file_data

@@ -1,7 +1,7 @@
-﻿#include "base/easter_eggs.h"
-#include "language/language.h"
+﻿#include "base/color.h"
+#include "base/easter_eggs.h"
 #include "base/trcdef.h"
-#include "base/color.h"
+#include "language/language.h"
 #include <cstdio>
 
 namespace trc::tools::tools_out {

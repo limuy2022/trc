@@ -37,7 +37,7 @@ static void get_block(std::string& res) {
             printf("%s", "    ");
         printf("->");
         free(temp);
-        io::readstr(temp);
+        io::readstr(temp, stdin);
         res += temp;
         res += '\n';
         if (is_block(temp))
@@ -62,7 +62,7 @@ namespace tools::tools_out {
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
-            io::readstr(code);
+            io::readstr(code, stdin);
             std::string code_str(code);
             if (code_str == "exit()")
                 break;

@@ -53,8 +53,8 @@ namespace def {
     // 版本号
     TRC_base_api extern const float version;
     // github项目地址
-    TRC_base_api extern const char *repo_github;
+    TRC_base_api extern const char* repo_github;
     // gitee项目地址
-    TRC_base_api extern const char *repo_gitee;
+    TRC_base_api extern const char* repo_gitee;
 }
 }

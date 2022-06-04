@@ -74,9 +74,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1d1b39b2f0999a5548b54ef7a407d1d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#a1d1b39b2f0999a5548b54ef7a407d1d8">readstr</a> (char *&amp;)</td></tr>
-<tr class="memdesc:a1d1b39b2f0999a5548b54ef7a407d1d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">读入一个长度不限的字符串(不包括换行符)  <a href="namespacetrc_1_1io.html#a1d1b39b2f0999a5548b54ef7a407d1d8">More...</a><br /></td></tr>
-<tr class="separator:a1d1b39b2f0999a5548b54ef7a407d1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9108377e1c6377d40197f4356b2e39a0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#a9108377e1c6377d40197f4356b2e39a0">readstr</a> (char *&amp;, FILE *stream=stdin)</td></tr>
+<tr class="memdesc:a9108377e1c6377d40197f4356b2e39a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">读入一个长度不限的字符串(不包括换行符)  <a href="namespacetrc_1_1io.html#a9108377e1c6377d40197f4356b2e39a0">More...</a><br /></td></tr>
+<tr class="separator:a9108377e1c6377d40197f4356b2e39a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeac711c2b346660c1a2ee1fe70b76851"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:aeac711c2b346660c1a2ee1fe70b76851"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#aeac711c2b346660c1a2ee1fe70b76851">fast_int_read</a> (FILE *stream=stdin)</td></tr>
 <tr class="memdesc:aeac711c2b346660c1a2ee1fe70b76851"><td class="mdescLeft">&#160;</td><td class="mdescRight">快速读入一个整数，当从文件读入时性能比scanf高  <a href="namespacetrc_1_1io.html#aeac711c2b346660c1a2ee1fe70b76851">More...</a><br /></td></tr>
@@ -160,24 +160,35 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a1d1b39b2f0999a5548b54ef7a407d1d8" name="a1d1b39b2f0999a5548b54ef7a407d1d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d1b39b2f0999a5548b54ef7a407d1d8">&#9670;&nbsp;</a></span>readstr()</h2>
+<a id="a9108377e1c6377d40197f4356b2e39a0" name="a9108377e1c6377d40197f4356b2e39a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9108377e1c6377d40197f4356b2e39a0">&#9670;&nbsp;</a></span>readstr()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2dll_8h.html#a0ef634d0b01599ba642b6c57df29d792">TRC_base_func_api</a> void trc::io::readstr </td>
+          <td class="memname"><a class="el" href="base_2dll_8h.html#a0ef634d0b01599ba642b6c57df29d792">TRC_base_func_api</a> bool trc::io::readstr </td>
           <td>(</td>
           <td class="paramtype">char *&amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>stdin</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>读入一个长度不限的字符串(不包括换行符) </p>
 <p >具体使用可以参考getline(cin, str)函数的使用 </p><dl class="section warning"><dt>Warning</dt><dd>参数必须是未分配内存的，已分配的需要在进函数之前释放掉 </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true:正确读取，false:读取完毕(字符串可以正常使用) </dd></dl>
 
 </div>
 </div>

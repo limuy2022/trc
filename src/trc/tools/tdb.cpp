@@ -102,7 +102,7 @@ static void debug(const std::string& code) {
     while (line_index < n) {
         printf("%s", "tdb>");
         free(instruction);
-        io::readstr(instruction);
+        io::readstr(instruction, stdin);
         instruction_length = strlen(instruction);
 
         if (*instruction == '\0') {
@@ -146,7 +146,7 @@ namespace tools {
                 // 读取需要debug的文件
                 printf("%s", "file>");
                 free(file_path);
-                io::readstr(file_path);
+                io::readstr(file_path, stdin);
                 if (!strcmp(file_path, "exit"))
                     break;
                 utils::readcode(tmp, file_path);

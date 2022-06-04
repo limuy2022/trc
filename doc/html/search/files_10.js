@@ -27,7 +27,5 @@ var searchData=
   ['tvm_5fothers_2ecpp_24',['TVM_others.cpp',['../_t_v_m__others_8cpp.html',1,'']]],
   ['tvm_5fvar_2ecpp_25',['TVM_var.cpp',['../_t_v_m__var_8cpp.html',1,'']]],
   ['tvmdef_2eh_26',['TVMdef.h',['../_t_v_mdef_8h.html',1,'']]],
-  ['type_2ehpp_27',['type.hpp',['../type_8hpp.html',1,'']]],
-  ['types_2ecpp_28',['types.cpp',['../types_8cpp.html',1,'']]],
-  ['types_2eh_29',['types.h',['../types_8h.html',1,'']]]
+  ['type_2ehpp_27',['type.hpp',['../type_8hpp.html',1,'']]]
 ];

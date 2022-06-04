@@ -55,7 +55,8 @@ public:
      * @details 像使用printf一样使用它
      */
     template <typename... argvs>
-    void operator()(const char* fmt, const argvs&... data) const;
+    void operator()(
+        const char* fmt, const argvs&... data) const;
 
 private:
     color_type color;

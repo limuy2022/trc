@@ -115,9 +115,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">get_byte_order</a> ()</td></tr>
 <tr class="memdesc:a60e0b7d72054ff094840174a0d5d9fd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取字节序  <a href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">More...</a><br /></td></tr>
 <tr class="separator:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a045ee0322b4bd098e925f35e5bd4b08c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a045ee0322b4bd098e925f35e5bd4b08c">len</a> (int)</td></tr>
-<tr class="memdesc:a045ee0322b4bd098e925f35e5bd4b08c"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取整型的长度  <a href="namespacetrc_1_1utils.html#a045ee0322b4bd098e925f35e5bd4b08c">More...</a><br /></td></tr>
-<tr class="separator:a045ee0322b4bd098e925f35e5bd4b08c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ac2783f73889aa4e6cf0279dc2bfe2c77">inrange</a> (const T &amp;start, const T &amp;end, const T &amp;data)</td></tr>
 <tr class="memdesc:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否在start到end的区间中  <a href="namespacetrc_1_1utils.html#ac2783f73889aa4e6cf0279dc2bfe2c77">More...</a><br /></td></tr>
@@ -150,6 +147,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a7c083b41c6d20ae4aec6c12e84448202"><td class="memTemplItemLeft" align="right" valign="top">constexpr size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7c083b41c6d20ae4aec6c12e84448202">sizeof_static_array</a> (T &amp;arr)</td></tr>
 <tr class="memdesc:a7c083b41c6d20ae4aec6c12e84448202"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取数组的长度  <a href="namespacetrc_1_1utils.html#a7c083b41c6d20ae4aec6c12e84448202">More...</a><br /></td></tr>
 <tr class="separator:a7c083b41c6d20ae4aec6c12e84448202"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memTemplItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">len</a> (T in)</td></tr>
+<tr class="memdesc:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="mdescLeft">&#160;</td><td class="mdescRight">求整型长度  <a href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">More...</a><br /></td></tr>
+<tr class="separator:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplParams" colspan="2">template&lt;typename outtype , typename intype &gt; </td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplItemLeft" align="right" valign="top">outtype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">to_type</a> (const intype &amp;value)</td></tr>
 <tr class="separator:a10fddf0485656e34179e2d7892bdd1cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -462,23 +463,32 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a045ee0322b4bd098e925f35e5bd4b08c" name="a045ee0322b4bd098e925f35e5bd4b08c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a045ee0322b4bd098e925f35e5bd4b08c">&#9670;&nbsp;</a></span>len()</h2>
+<a id="a7f4800bbbf0ebf0d3ca60412ded4074d" name="a7f4800bbbf0ebf0d3ca60412ded4074d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f4800bbbf0ebf0d3ca60412ded4074d">&#9670;&nbsp;</a></span>len()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2dll_8h.html#a0ef634d0b01599ba642b6c57df29d792">TRC_base_func_api</a> int trc::utils::len </td>
+          <td class="memname">unsigned int trc::utils::len </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>in</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>获取整型的长度 </p>
+<p>求整型长度 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>数据</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>具体优化方法：按多位计算，减少除法数量 </p>
 
 </div>
 </div>

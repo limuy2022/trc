@@ -10,10 +10,11 @@
 #include "base/io.hpp"
 #include "base/Error.h"
 #include "language/error.h"
+#include <cstdio>
 #include <cstdlib>
 
 namespace trc::io {
-void readstr(char*& str) {
+bool readstr(char*& str, FILE* stream) {
     size_t len = 15;
     str = (char*)malloc((len + 1) * sizeof(char));
     if (str == nullptr) {
@@ -21,8 +22,14 @@ void readstr(char*& str) {
             language::error::memoryerror);
     }
     size_t index = 0;
-    char c = getchar();
+    // 采用int是为了检测出EOF标志
+    int c = fgetc(stream);
     while (c != '\n') {
+        if (c == EOF) {
+            // 文件读取完毕
+            str[index] = '\0';
+            return false;
+        }
         if (index > len) {
             len += 15;
             str = (char*)realloc(
@@ -32,10 +39,11 @@ void readstr(char*& str) {
                     language::error::memoryerror);
             }
         }
-        str[index] = c;
-        c = getchar();
+        str[index] = (char)c;
+        c = fgetc(stream);
         index++;
     }
     str[index] = '\0';
+    return true;
 }
 }

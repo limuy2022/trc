@@ -15,10 +15,10 @@ var searchData=
   ['grammar_5flex_12',['grammar_lex',['../classtrc_1_1compiler_1_1grammar__lex.html#a1fc49c1faf88fdd9422ca26f300f4725',1,'trc::compiler::grammar_lex::grammar_lex()'],['../classtrc_1_1compiler_1_1grammar__lex.html',1,'trc::compiler::grammar_lex']]],
   ['grammar_5ftype_13',['grammar_type',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef',1,'trc::compiler']]],
   ['greater_14',['GREATER',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ae7e72355289e404b762d4cf88824d23b',1,'trc::compiler']]],
-  ['greater_5f_15',['greater_',['../namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9',1,'trc::compiler']]],
-  ['greater_5f_16',['GREATER_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaa168f2f6e595c4e2df4853617f42ff04',1,'TVM.h']]],
+  ['greater_5f_15',['GREATER_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaa168f2f6e595c4e2df4853617f42ff04',1,'TVM.h']]],
+  ['greater_5f_16',['greater_',['../namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9',1,'trc::compiler']]],
   ['greater_5fequal_17',['GREATER_EQUAL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a87e6b203bf40967d37a33f9a4438561a',1,'trc::compiler']]],
-  ['greater_5fequal_5f_18',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
-  ['greater_5fequal_5f_19',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
+  ['greater_5fequal_5f_18',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
+  ['greater_5fequal_5f_19',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
   ['green_20',['green',['../namespacetrc_1_1color.html#a47ebc8d67db78e335c3a68cedcab018b',1,'trc::color']]]
 ];

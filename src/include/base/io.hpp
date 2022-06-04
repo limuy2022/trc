@@ -31,16 +31,17 @@ extern bool readflagdefault;
  * @tparam T 整数类型int，long等
  */
 template <typename T>
-T fast_int_read(FILE* stream = stdin, bool&readflag=readflagdefault) {
+T fast_int_read(FILE* stream = stdin,
+    bool& readflag = readflagdefault) {
     T res = 0;
     int f = 1;
     int c;
-    for(;;) {
+    for (;;) {
         c = fgetc(stream);
-        if('0'<=c&&c<='9') {
+        if ('0' <= c && c <= '9') {
             break;
         }
-        if(c == EOF) {
+        if (c == EOF) {
             readflag = false;
             return 0;
         }

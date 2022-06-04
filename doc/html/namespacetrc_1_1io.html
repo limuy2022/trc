@@ -67,7 +67,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">trc::io Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -77,18 +78,23 @@ Functions</h2></td></tr>
 <tr class="memitem:a9108377e1c6377d40197f4356b2e39a0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#a9108377e1c6377d40197f4356b2e39a0">readstr</a> (char *&amp;, FILE *stream=stdin)</td></tr>
 <tr class="memdesc:a9108377e1c6377d40197f4356b2e39a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">读入一个长度不限的字符串(不包括换行符)  <a href="namespacetrc_1_1io.html#a9108377e1c6377d40197f4356b2e39a0">More...</a><br /></td></tr>
 <tr class="separator:a9108377e1c6377d40197f4356b2e39a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeac711c2b346660c1a2ee1fe70b76851"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:aeac711c2b346660c1a2ee1fe70b76851"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#aeac711c2b346660c1a2ee1fe70b76851">fast_int_read</a> (FILE *stream=stdin)</td></tr>
-<tr class="memdesc:aeac711c2b346660c1a2ee1fe70b76851"><td class="mdescLeft">&#160;</td><td class="mdescRight">快速读入一个整数，当从文件读入时性能比scanf高  <a href="namespacetrc_1_1io.html#aeac711c2b346660c1a2ee1fe70b76851">More...</a><br /></td></tr>
-<tr class="separator:aeac711c2b346660c1a2ee1fe70b76851"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9742a885a9f9183f15b2b9a18540f702"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a9742a885a9f9183f15b2b9a18540f702"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#a9742a885a9f9183f15b2b9a18540f702">fast_int_read</a> (FILE *stream=stdin, bool &amp;readflag=<a class="el" href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">readflagdefault</a>)</td></tr>
+<tr class="memdesc:a9742a885a9f9183f15b2b9a18540f702"><td class="mdescLeft">&#160;</td><td class="mdescRight">快速读入一个整数，当从文件读入时性能比scanf高  <a href="namespacetrc_1_1io.html#a9742a885a9f9183f15b2b9a18540f702">More...</a><br /></td></tr>
+<tr class="separator:a9742a885a9f9183f15b2b9a18540f702"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a945022c6007119a6d2eab3a25dfe3616"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a945022c6007119a6d2eab3a25dfe3616"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#a945022c6007119a6d2eab3a25dfe3616">fast_int_write</a> (T num, FILE *stream=stdout)</td></tr>
 <tr class="memdesc:a945022c6007119a6d2eab3a25dfe3616"><td class="mdescLeft">&#160;</td><td class="mdescRight">快速输出一个整数，当向文件输出性能比printf要高  <a href="namespacetrc_1_1io.html#a945022c6007119a6d2eab3a25dfe3616">More...</a><br /></td></tr>
 <tr class="separator:a945022c6007119a6d2eab3a25dfe3616"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:af468ce944abe4f1b84e560a41a008ea0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">readflagdefault</a></td></tr>
+<tr class="separator:af468ce944abe4f1b84e560a41a008ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aeac711c2b346660c1a2ee1fe70b76851" name="aeac711c2b346660c1a2ee1fe70b76851"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeac711c2b346660c1a2ee1fe70b76851">&#9670;&nbsp;</a></span>fast_int_read()</h2>
+<a id="a9742a885a9f9183f15b2b9a18540f702" name="a9742a885a9f9183f15b2b9a18540f702"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9742a885a9f9183f15b2b9a18540f702">&#9670;&nbsp;</a></span>fast_int_read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -99,8 +105,18 @@ template&lt;typename T &gt; </div>
           <td class="memname">T trc::io::fast_int_read </td>
           <td>(</td>
           <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>stream</em> = <code>stdin</code></td><td>)</td>
+          <td class="paramname"><em>stream</em> = <code>stdin</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>readflag</em> = <code><a class="el" href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">readflagdefault</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -109,6 +125,7 @@ template&lt;typename T &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">stream</td><td>输入流 </td></tr>
+    <tr><td class="paramname">readflag</td><td>读入标志，标志是否正确，false为错误 </td></tr>
   </table>
   </dd>
 </dl>
@@ -189,6 +206,29 @@ template&lt;typename T &gt; </div>
 <p>读入一个长度不限的字符串(不包括换行符) </p>
 <p >具体使用可以参考getline(cin, str)函数的使用 </p><dl class="section warning"><dt>Warning</dt><dd>参数必须是未分配内存的，已分配的需要在进函数之前释放掉 </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>true:正确读取，false:读取完毕(字符串可以正常使用) </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="af468ce944abe4f1b84e560a41a008ea0" name="af468ce944abe4f1b84e560a41a008ea0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af468ce944abe4f1b84e560a41a008ea0">&#9670;&nbsp;</a></span>readflagdefault</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trc::io::readflagdefault</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

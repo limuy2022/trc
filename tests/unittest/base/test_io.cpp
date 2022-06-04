@@ -3,7 +3,7 @@
  */
 
 #include "base/io.hpp"
-#include "pathfix.h"
+#include "filesys_tools.h"
 #include <cstdio>
 #include <cstdlib>
 #include <gtest/gtest.h>
@@ -14,13 +14,7 @@ using namespace trc;
 
 static void check_readstr(const char* path,
     const std::vector<const char*>& expectstr) {
-    FILE* file = fopen(redefine_path(path).c_str(), "r");
-    if (file == nullptr) {
-        fprintf(stderr, "%s",
-            "The test data has been lost.Unable to "
-            "continue testing.");
-        exit(0);
-    }
+    FILE* file = fopen_with_check(redefine_path(path).c_str(), "r");
     char* raw_str;
     // -1是为了避开最后一个false(eof)值
     for (size_t i = 0, n = expectstr.size(); i < n - 1;
@@ -52,4 +46,40 @@ TEST(io, readstr) {
 
 // 整型文件快读
 TEST(io, fast_int_read) {
+    // 测试读取空文件
+    bool isright = true;
+    FILE*file = fopen_with_check(redefine_path("io/fastread_empty.in").c_str(), "r");
+    EXPECT_EQ(0, io::fast_int_read<int>(file, isright));
+    EXPECT_FALSE(isright);
+    fclose(file);
+    // 测试读取各种类型的整型
+    isright = true;
+    file = fopen_with_check(redefine_path("io/fastread.in").c_str(), "r");
+    std::vector<int> expect_res = {
+        789,456,123,0,0,14,-7,-2369
+    };
+    for(auto i : expect_res) {
+        EXPECT_EQ(i, io::fast_int_read<int>(file, isright));
+        EXPECT_TRUE(isright);
+    }
+    fclose(file);
+}
+
+// 整型文件快输
+TEST(io, fast_int_write) {
+    // 先通过写入文件的方式，然后再通过字符串比较的方式来校验代码是否正确
+    FILE* file = fopen_with_check(redefine_path("io/fastwrite.out").c_str(), "w");
+    io::fast_int_write(10, file);
+    fputc(' ', file);
+    io::fast_int_write(-10, file);
+    io::fast_int_write(0, file);
+    fputc(' ', file);
+    io::fast_int_write(1000000, file);
+    fclose(file);
+
+    file = fopen_with_check(redefine_path("io/fastwrite.out").c_str(), "r");
+    char* res;
+    io::readstr(res, file);
+    EXPECT_STREQ(res, "10 -100 1000000");
+    free(res);
 }

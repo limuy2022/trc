@@ -14,3 +14,6 @@ bin/
 Trc.sln
 CMakeSettings.json
 testlog.txt
+
+# 单元测试中的临时输出文件
+*.out

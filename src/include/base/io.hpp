@@ -21,21 +21,32 @@ namespace trc::io {
 TRC_base_func_api bool readstr(
     char*&, FILE* stream = stdin);
 
+// 用来占位的变量,不要读取，可能是无意义的值
+extern bool readflagdefault;
+
 /**
  * @brief 快速读入一个整数，当从文件读入时性能比scanf高
  * @param stream 输入流
+ * @param readflag 读入标志，标志是否正确，false为错误
  * @tparam T 整数类型int，long等
  */
 template <typename T>
-T fast_int_read(FILE* stream = stdin) {
+T fast_int_read(FILE* stream = stdin, bool&readflag=readflagdefault) {
     T res = 0;
     int f = 1;
-    char c = fgetc(stream);
-    while (c < '0' || c > '9') {
+    int c;
+    for(;;) {
+        c = fgetc(stream);
+        if('0'<=c&&c<='9') {
+            break;
+        }
+        if(c == EOF) {
+            readflag = false;
+            return 0;
+        }
         if (c == '-') {
             f = -1;
         }
-        c = fgetc(stream);
     }
     do {
         res *= 10;

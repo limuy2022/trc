@@ -121,4 +121,34 @@ template <typename T>
 constexpr size_t sizeof_static_array(T& arr) {
     return sizeof(arr) / sizeof(arr[0]);
 }
+
+/**
+ * @brief 求整型长度
+ * @param in 数据
+ * @details 具体优化方法：按多位计算，减少除法数量
+ */
+template<typename T>
+unsigned int len(T in) {
+    // 负数就提升为正数
+    if(in < 0) {
+        in = -in;
+    }
+    int out = 0;
+    do {
+        if(in < 10) {
+            return out + 1;
+        } else if(in < 100) {
+            return out + 2;
+        } else if(in < 1000){
+            return out + 3;
+        } else if(in < 10000) {
+            return out + 4;
+        } else if(in < 100000) {
+            return out + 5;
+        }
+        in /= 100000;
+        out += 5;
+    } while (in != 0);
+    return out;
+}
 }

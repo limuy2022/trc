@@ -55,14 +55,14 @@ public:
      * @details 像使用printf一样使用它
      */
     template <typename... argvs>
-    void print(const char* fmt, const argvs&... data) const;
+    void operator()(const char* fmt, const argvs&... data) const;
 
 private:
     color_type color;
 };
 
 template <typename... argvs>
-void color_st::print(
+void color_st::operator()(
     const char* fmt, const argvs&... data) const {
 #ifdef WINDOWS_PLAT
     SetConsoleTextAttribute(hout, this->color);

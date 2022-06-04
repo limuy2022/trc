@@ -20,7 +20,7 @@
  * @brief 报出找不到模式错误
  */
 static inline void show_error(const char* mode) {
-    trc::color::red.print(
+    trc::color::red(
         "\"%s\"%s", mode, language::trc::mode_not_found);
 }
 
@@ -28,7 +28,7 @@ static inline void show_error(const char* mode) {
  * @brief 输出版本号，version命令行参数对应的函数
  */
 static void showversion() {
-    printf("Version %.1f\n", trc::def::version);
+    trc::color::green("Version %.1f\n", trc::def::version);
     // 调用小彩蛋模块
     trc::eggs::canvas_data data
         = { { 0, 1, 0 }, { 1, 2, 1 }, { 0, 1, 0 } };
@@ -61,8 +61,9 @@ static const argv_func_tools tools_func[]
 
 /**
  * @brief 查找对应工具并运行
+ * @param mode 对应工具
  */
-static inline void run_yes_argv_mode(char* mode) {
+static inline void find_mode_to_run(char* mode) {
     for (int i = 0,
              end
          = trc::utils::sizeof_static_array(tools_func);
@@ -88,7 +89,7 @@ int main(int argc, char* argv[]) {
         trc::tools::tools_out::tshell();
     } else {
         // 指定模式，匹配调用模式
-        run_yes_argv_mode(argv[1]);
+        find_mode_to_run(argv[1]);
     }
     // 执行正常情况下卸载内存，不正常的话就崩溃了
     trc::memory::quit_mem();

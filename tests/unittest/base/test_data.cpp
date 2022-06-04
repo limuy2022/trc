@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 
+// 测试改变大小端函数
 TEST(data, bytes) {
     trc::def::byte_t origin_data[] = { 0x64, 0x34 };
     trc::utils::bytes_order_change(origin_data, 2);
@@ -70,10 +71,23 @@ TEST(data, map_check_in) {
     EXPECT_TRUE(trc::utils::map_check_in_second(a, "pp"));
 }
 
+// 求静态数组长度
 TEST(data, sizeof_static_array) {
     int a[10];
     EXPECT_EQ(trc::utils::sizeof_static_array(a), 10);
 
     char t[19];
     EXPECT_EQ(trc::utils::sizeof_static_array(t), 19);
+}
+
+// 测试求整型长度函数
+TEST(data, len) {
+    EXPECT_EQ(trc::utils::len(0), 1);
+    EXPECT_EQ(trc::utils::len(900000), 6);
+    EXPECT_EQ(trc::utils::len(10), 2);
+    EXPECT_EQ(trc::utils::len(1000000000), 10);
+    EXPECT_EQ(trc::utils::len(-1), 1);
+    EXPECT_EQ(trc::utils::len(-1000000), 7);
+    EXPECT_EQ(trc::utils::len((unsigned int)0), 1);
+    EXPECT_EQ(trc::utils::len((unsigned int)100), 3);
 }

@@ -6,8 +6,7 @@
  * @copyright Copyright (c) 2022
  *
  */
-#include "Compiler/Compiler.h"
-#include <cstdarg>
+#include <Compiler/Compiler.h>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
@@ -24,10 +23,10 @@ static compiler_error error("token_unittest");
  */
 static void test_tokens(const std::string& test_code,
     const std::vector<token>& a) {
-    token_lex* lex = new token_lex((test_code), &error);
+    auto* lex = new token_lex((test_code), &error);
     token* tokendata;
     /* 一个个检查是否匹配上了测试数据 */
-    for (const auto& iter : (a)) {
+    for (const auto& iter : a) {
         tokendata = lex->get_token();
         ASSERT_NE(
             tokendata->tick, token_ticks::END_OF_TOKENS);
@@ -118,6 +117,11 @@ TEST(token, call_func_lex) {
         { { token_ticks::NAME, "print" },
             { token_ticks::LEFT_SMALL_BRACE, "" },
             { token_ticks::INT_VALUE, "10" },
+            { token_ticks::RIGHT_SMALL_BRACE, "" } });
+    test_tokens(R"(print("p\np"))",
+        { { token_ticks::NAME, "print" },
+            { token_ticks::LEFT_SMALL_BRACE, "" },
+            { token_ticks::STRING_VALUE, "p\np" },
             { token_ticks::RIGHT_SMALL_BRACE, "" } });
 }
 

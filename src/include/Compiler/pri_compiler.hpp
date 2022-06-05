@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "base/trcdef.h"
-#include "base/utils/data.hpp"
-#include "dll.h"
+#include <Compiler/library.h>
 #include <array>
+#include <base/trcdef.h>
+#include <base/utils/data.hpp>
 #include <cctype>
 #include <string>
 
@@ -75,7 +75,6 @@ extern std::array<std::string, 7> opti_opers;
 extern std::array<std::string, 8> opti_condits;
 extern std::array<std::string, 3> const_values;
 extern std::map<std::string, int> change_const;
-extern std::map<char, std::string> change_varchar;
 
 // 编译时类型标识
 enum COMPILE_TYPE_TICK {

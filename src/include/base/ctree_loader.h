@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "dll.h"
 #include <TVM/TVM.h>
+#include <base/library.h>
 #include <string>
 
 namespace trc::loader {

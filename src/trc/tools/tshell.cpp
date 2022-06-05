@@ -2,10 +2,10 @@
  * trc交互式界面，无需文件即可执行
  */
 
-#include "Compiler/Compiler.h"
-#include "TVM/TVM.h"
-#include "base/Error.h"
-#include "base/io.hpp"
+#include <Compiler/Compiler.h>
+#include <TVM/TVM.h>
+#include <base/Error.h>
+#include <base/io.hpp>
 #include <cstdio>
 #include <string>
 

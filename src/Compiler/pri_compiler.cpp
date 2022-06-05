@@ -2,11 +2,11 @@
  * 编译时期共享的数据
  */
 
-#include "Compiler/pri_compiler.hpp"
-#include "base/Error.h"
-#include "language/error.h"
+#include <Compiler/pri_compiler.hpp>
 #include <array>
+#include <base/Error.h>
 #include <cstring>
+#include <language/error.h>
 #include <map>
 #include <string>
 
@@ -127,10 +127,6 @@ std::array<std::string, 7> opti_opers
 // 可以优化的条件运算符
 std::array<std::string, 8> opti_condits
     = { "<", ">", "<=", ">=", "!=", "==", "and", "or" };
-// 转义字符对应表
-std::map<char, std::string> change_varchar
-    = { { 'n', "\n" }, { 't', "\t" }, { '\'', "'" },
-          { '"', R"(")" }, { '\\', R"(\)" } };
 // 常量值
 std::array<std::string, 3> const_values
     = { "true", "false", "null" };

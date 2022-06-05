@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "base/trcdef.h"
+#include <base/trcdef.h>
 #include <cstdint>
 
 namespace trc::utils {
@@ -12,7 +12,7 @@ namespace trc::utils {
  * char正好是一个字节，而且比较好操作，使用之前需要把指针转为（char*）
  */
 TRC_base_func_api void bytes_order_change(
-    def::byte_t* const& bytes_, int size);
+    def::byte_t* const& bytes_, size_t size);
 
 uint32_t utf_8_decode();
 

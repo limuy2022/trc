@@ -5,8 +5,8 @@
  * 当申请失败时报出MemoryError
  */
 
-#include "base/dll.h"
-#include "memory_pool.h"
+#include <base/library.h>
+#include <base/memory/memory_pool.h>
 
 // 申请内存池
 #define MALLOC trc::memory::global_memory_pool.mem_malloc

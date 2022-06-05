@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platform.h"
+#include <platform.h>
 
 #ifdef WINDOWS_PLAT
 #ifdef BUILD_language_DLL

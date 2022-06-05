@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "TVM/TVMdef.h"
-#include "base/Error.h"
-#include "dll.h"
-#include "types/base.h"
-#include "types/int.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/library.h>
+#include <TVMbase/types/base.h>
+#include <TVMbase/types/int.h>
+#include <base/Error.h>
 #include <map>
 #include <string>
 

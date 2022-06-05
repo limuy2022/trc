@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "TVMbase/TVM_data.h"
-#include "TVMdef.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/TVM_data.h>
+#include <base/trcdef.h>
 #include <map>
 #include <string>
 

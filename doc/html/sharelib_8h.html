@@ -66,11 +66,52 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle"><div class="title">sharelib.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;<a class="el" href="platform_8h_source.html">platform.h</a>&gt;</code><br />
+</div>
 <p><a href="sharelib_8h_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:aaa0c4a4dabaa8f7d9528440d5b8238c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sharelib_8h.html#aaa0c4a4dabaa8f7d9528440d5b8238c7">TRC_xxx_api</a>&#160;&#160;&#160;__attribute__((visibility(&quot;default&quot;)))</td></tr>
+<tr class="separator:aaa0c4a4dabaa8f7d9528440d5b8238c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58410943730a1ab0c8a3c1f10e75cd49"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sharelib_8h.html#a58410943730a1ab0c8a3c1f10e75cd49">TRC_xxx_func_api</a>&#160;&#160;&#160;    extern &quot;C&quot; __attribute__((visibility(&quot;default&quot;)))</td></tr>
+<tr class="separator:a58410943730a1ab0c8a3c1f10e75cd49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="aaa0c4a4dabaa8f7d9528440d5b8238c7" name="aaa0c4a4dabaa8f7d9528440d5b8238c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa0c4a4dabaa8f7d9528440d5b8238c7">&#9670;&nbsp;</a></span>TRC_xxx_api</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TRC_xxx_api&#160;&#160;&#160;__attribute__((visibility(&quot;default&quot;)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >关于动态链接库的使用 使用方法： 该文件不是直接用来include的，而是一个模板 为每个模块新建一个相应的dll.h 将xxx替换成一个自定义的宏，然后在 它的声明前加上TRC_xxx_api，并且在定义文件 最上方加上“::define BUILD_xxx_DLL”或者在 cmake中添加target_compile_definitions（推荐） </p>
+
+</div>
+</div>
+<a id="a58410943730a1ab0c8a3c1f10e75cd49" name="a58410943730a1ab0c8a3c1f10e75cd49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58410943730a1ab0c8a3c1f10e75cd49">&#9670;&nbsp;</a></span>TRC_xxx_func_api</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TRC_xxx_func_api&#160;&#160;&#160;    extern &quot;C&quot; __attribute__((visibility(&quot;default&quot;)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

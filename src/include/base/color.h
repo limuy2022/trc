@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "base/dll.h"
-#include "platform.h"
+#include <base/library.h>
 #include <cstdio>
+#include <platform.h>
 
 // windows和linux输出颜色的方式不同，这种为linux的
 #ifdef LINUX_PLAT

@@ -7,7 +7,7 @@
  *
  */
 
-#include "dll.h"
+#include <base/library.h>
 #include <cstdio>
 
 namespace trc::io {

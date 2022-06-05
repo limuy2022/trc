@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "dll.h"
+#include <base/library.h>
 #include <vector>
 
 namespace trc::eggs {

@@ -4,10 +4,10 @@
  * 部分有报出相应错误的功能和职责
  */
 
-#include "TVMbase/types/base.h"
-#include "base/Error.h"
-#include "language/language.h"
+#include <TVMbase/types/base.h>
+#include <base/Error.h>
 #include <cstring>
+#include <language/language.h>
 
 /**
  * 动态生成报错模板，为了能够在编译后通过dll切换语言

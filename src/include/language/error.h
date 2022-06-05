@@ -1,4 +1,4 @@
-﻿#include "dll.h"
+﻿#include <language/library.h>
 
 namespace language::error {
 TRC_language_api extern const char* error_map[];
@@ -27,6 +27,8 @@ TRC_language_api extern const char* syntaxerror_lexanno;
 TRC_language_api extern const char* syntaxerror_no_expect;
 // 未遇到期待字符，表示期待的字符
 TRC_language_api extern const char* syntaxerror_expect;
+// 未定义的转义符被读取到
+TRC_language_api extern const char* syntaxerror_escape_char;
 
 // 断言的默认报错信息
 TRC_language_api extern const char* asserterror_default;

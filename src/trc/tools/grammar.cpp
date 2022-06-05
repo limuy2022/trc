@@ -2,13 +2,13 @@
  * 递归输出语法树，为一个调试功能
  */
 
-#include "Compiler/grammar.h"
-#include "Compiler/Compiler.h"
-#include "base/utils/filesys.h"
-#include "language/error.h"
-#include "tools.h"
+#include <Compiler/Compiler.h>
+#include <Compiler/grammar.h>
+#include <base/utils/filesys.h>
 #include <cstdio>
+#include <language/error.h>
 #include <string>
+#include <tools.h>
 #include <vector>
 
 namespace trc::tools {

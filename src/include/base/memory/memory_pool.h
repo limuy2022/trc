@@ -17,7 +17,7 @@
 #define MEMORY_LISTS_NUM                                   \
     MEMORY_BASE_SIZE / MEMORY_BLOCKS_SIZE
 
-#include "base/dll.h"
+#include <base/library.h>
 #include <vector>
 
 namespace trc::memory {

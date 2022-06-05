@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "TVM/dll.h"
-#include "TVMbase/TRE.h"
-#include "TVMbase/TVM_data.h"
-#include "base/utils/bytes.h"
+#include <TVM/library.h>
+#include <TVMbase/TRE.h>
+#include <TVMbase/TVM_data.h>
+#include <base/utils/bytes.h>
 #include <stack>
 #include <string>
 #include <vector>

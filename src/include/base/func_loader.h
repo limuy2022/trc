@@ -1,7 +1,7 @@
 #pragma once
 
-#include "base/dll.h"
 #include <array>
+#include <base/library.h>
 #include <map>
 #include <string>
 

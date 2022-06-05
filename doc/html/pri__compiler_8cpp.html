@@ -66,17 +66,48 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">pri_compiler.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="pri__compiler_8hpp_source.html">Compiler/pri_compiler.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="language_2_error_8h_source.html">language/error.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">Compiler/pri_compiler.hpp</a>&gt;</code><br />
 <code>#include &lt;array&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&gt;</code><br />
 <code>#include &lt;cstring&gt;</code><br />
+<code>#include &lt;<a class="el" href="language_2_error_8h_source.html">language/error.h</a>&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
-</div></div><!-- contents -->
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacetrc"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc.html">trc</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacetrc_1_1compiler"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html">trc::compiler</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memItemLeft" align="right" valign="top">COMPILE_TYPE_TICK&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">trc::compiler::what_type</a> (const std::string &amp;value)</td></tr>
+<tr class="memdesc:a822452e66a495f0e0c6da5adcf7ea36c"><td class="mdescLeft">&#160;</td><td class="mdescRight">编译时判断传入的字符串实际代表的类型  <a href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">More...</a><br /></td></tr>
+<tr class="separator:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ae7212915c9c18eaf8ec38216160264f8"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 7 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ae7212915c9c18eaf8ec38216160264f8">trc::compiler::opti_opers</a> = { &quot;+&quot;, &quot;-&quot;, &quot;**&quot;, &quot;*&quot;, &quot;//&quot;, &quot;%&quot;, &quot;/&quot; }</td></tr>
+<tr class="separator:ae7212915c9c18eaf8ec38216160264f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35f7516051f08dd3edd6471f3477b753"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a35f7516051f08dd3edd6471f3477b753">trc::compiler::opti_condits</a> = { &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;&lt;=&quot;, &quot;&gt;=&quot;, &quot;!=&quot;, &quot;==&quot;, &quot;and&quot;, &quot;or&quot; }</td></tr>
+<tr class="separator:a35f7516051f08dd3edd6471f3477b753"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3538137419d8f843ad5d29da2957cddd"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a3538137419d8f843ad5d29da2957cddd">trc::compiler::const_values</a> = { &quot;true&quot;, &quot;false&quot;, &quot;null&quot; }</td></tr>
+<tr class="separator:a3538137419d8f843ad5d29da2957cddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1585c35a0079e8001f12f788884d282d"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a1585c35a0079e8001f12f788884d282d">trc::compiler::change_const</a></td></tr>
+<tr class="separator:a1585c35a0079e8001f12f788884d282d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a918fc5d84ac2ff31f4890371a112c7cb"><td class="memItemLeft" align="right" valign="top">const cal_priority_class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a918fc5d84ac2ff31f4890371a112c7cb">trc::compiler::cal_priority</a></td></tr>
+<tr class="separator:a918fc5d84ac2ff31f4890371a112c7cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4

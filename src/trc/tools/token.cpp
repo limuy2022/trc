@@ -2,10 +2,10 @@
  * 工具：输出token，调试工具
  */
 
-#include "Compiler/Compiler.h"
-#include "base/utils/filesys.h"
-#include "tools.h"
+#include <Compiler/Compiler.h>
+#include <base/utils/filesys.h>
 #include <cstdio>
+#include <tools.h>
 
 // token标记映射到名称，便于输出
 static const char* tokenticks_to_string[] = {

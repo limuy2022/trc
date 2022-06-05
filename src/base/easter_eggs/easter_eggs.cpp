@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "base/easter_eggs.h"
+#include <base/easter_eggs.h>
 #include <cstdio>
 #include <cstring>
 #include <vector>

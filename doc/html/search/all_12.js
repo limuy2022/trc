@@ -42,10 +42,11 @@ var searchData=
   ['sub_5f_39',['SUB_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca4b2dc9092de4084406e110af0dd19b05',1,'TVM.h']]],
   ['symbol_5fform_40',['symbol_form',['../classtrc_1_1_t_v_m__space_1_1symbol__form.html',1,'trc::TVM_space']]],
   ['syntaxerror_41',['SyntaxError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0',1,'trc::error']]],
-  ['syntaxerror_5fexpect_42',['syntaxerror_expect',['../namespacelanguage_1_1error.html#a47134cfe0a5a0fd7d8c70ee83e7b56b1',1,'language::error']]],
-  ['syntaxerror_5fint_43',['syntaxerror_int',['../namespacelanguage_1_1error.html#a24bd655767ed8e29404f8de7f0384b58',1,'language::error']]],
-  ['syntaxerror_5flexanno_44',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
-  ['syntaxerror_5flexstring_45',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
-  ['syntaxerror_5fno_5fexpect_46',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]],
-  ['systemerror_47',['SystemError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211',1,'trc::error']]]
+  ['syntaxerror_5fescape_5fchar_42',['syntaxerror_escape_char',['../namespacelanguage_1_1error.html#a2b018cdf7caa6ce6c9b29d86cbe77dd1',1,'language::error']]],
+  ['syntaxerror_5fexpect_43',['syntaxerror_expect',['../namespacelanguage_1_1error.html#a47134cfe0a5a0fd7d8c70ee83e7b56b1',1,'language::error']]],
+  ['syntaxerror_5fint_44',['syntaxerror_int',['../namespacelanguage_1_1error.html#a24bd655767ed8e29404f8de7f0384b58',1,'language::error']]],
+  ['syntaxerror_5flexanno_45',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
+  ['syntaxerror_5flexstring_46',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
+  ['syntaxerror_5fno_5fexpect_47',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]],
+  ['systemerror_48',['SystemError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211',1,'trc::error']]]
 ];

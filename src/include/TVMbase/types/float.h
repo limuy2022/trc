@@ -1,9 +1,9 @@
 #pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVMbase/dll.h"
-#include "TVMbase/types/base.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/library.h>
+#include <TVMbase/types/base.h>
+#include <base/trcdef.h>
 
 namespace trc::TVM_space::types {
 class TRC_TVMbase_api trc_float : public trcobj {

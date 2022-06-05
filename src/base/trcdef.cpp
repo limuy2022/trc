@@ -6,10 +6,10 @@
  * @copyright Copyright (c) 2022
  *
  */
-#include "base/trcdef.h"
-#include "language/error.h"
+#include <base/trcdef.h>
 #include <cstdio>
 #include <cstdlib>
+#include <language/error.h>
 
 namespace trc {
 namespace def {

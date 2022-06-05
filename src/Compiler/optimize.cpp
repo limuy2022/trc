@@ -2,10 +2,10 @@
  * 常量折叠：加减乘除模运算
  */
 
-#include "Compiler/optimize.h"
-#include "base/Error.h"
-#include "language/error.h"
+#include <Compiler/optimize.h>
+#include <base/Error.h>
 #include <cmath>
+#include <language/error.h>
 #include <map>
 #include <string>
 

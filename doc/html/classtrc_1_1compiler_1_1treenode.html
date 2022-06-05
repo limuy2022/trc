@@ -93,8 +93,8 @@ Inheritance diagram for trc::compiler::treenode:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5555c69c8fe75428458cec7a3696e64e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a5555c69c8fe75428458cec7a3696e64e">~treenode</a> ()=0</td></tr>
-<tr class="separator:a5555c69c8fe75428458cec7a3696e64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a550288a2e3a3183d8ecc57319728c38d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a550288a2e3a3183d8ecc57319728c38d">~treenode</a> ()=0</td></tr>
+<tr class="separator:a550288a2e3a3183d8ecc57319728c38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25f67e5b535bb40fb1dfa92c20f77af6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a25f67e5b535bb40fb1dfa92c20f77af6">has_son</a> ()=0</td></tr>
 <tr class="separator:a25f67e5b535bb40fb1dfa92c20f77af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -106,8 +106,8 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >树节点的基类，生成语法分析树时用到 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除 </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a5555c69c8fe75428458cec7a3696e64e" name="a5555c69c8fe75428458cec7a3696e64e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5555c69c8fe75428458cec7a3696e64e">&#9670;&nbsp;</a></span>~treenode()</h2>
+<a id="a550288a2e3a3183d8ecc57319728c38d" name="a550288a2e3a3183d8ecc57319728c38d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a550288a2e3a3183d8ecc57319728c38d">&#9670;&nbsp;</a></span>~treenode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -116,7 +116,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual trc::compiler::treenode::~treenode </td>
+          <td class="memname">trc::compiler::treenode::~treenode </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -124,7 +124,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -174,8 +174,9 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/include/Compiler/<a class="el" href="pri__compiler_8hpp_source.html">pri_compiler.hpp</a></li>
+<li>src/Compiler/<a class="el" href="pri__compiler_8cpp.html">pri_compiler.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

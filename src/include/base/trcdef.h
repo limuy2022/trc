@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "dll.h"
 #include <array>
+#include <base/library.h>
 #include <string>
 #include <vector>
 

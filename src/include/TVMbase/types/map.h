@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVMbase/dll.h"
-#include "TVMbase/types/base.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/library.h>
+#include <TVMbase/types/base.h>
+#include <base/trcdef.h>
 
 // 哈希表大小
 #define MAP_MIN_SIZE 50

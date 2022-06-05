@@ -8,11 +8,11 @@
  */
 #pragma once
 
-#include "TVM/TVM.h"
-#include "base/Error.h"
-#include "base/trcdef.h"
-#include "dll.h"
-#include "pri_compiler.hpp"
+#include <Compiler/library.h>
+#include <Compiler/pri_compiler.hpp>
+#include <TVM/TVM.h>
+#include <base/Error.h>
+#include <base/trcdef.h>
 #include <stack>
 
 namespace trc::compiler {

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVMbase/dll.h"
-#include "base.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/library.h>
+#include <TVMbase/types/base.h>
 #include <string>
 
 namespace trc::TVM_space::types {

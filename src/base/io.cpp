@@ -7,11 +7,11 @@
  *
  */
 
-#include "base/io.hpp"
-#include "base/Error.h"
-#include "language/error.h"
+#include <base/Error.h>
+#include <base/io.hpp>
 #include <cstdio>
 #include <cstdlib>
+#include <language/error.h>
 
 namespace trc::io {
 bool readstr(char*& str, FILE* stream) {

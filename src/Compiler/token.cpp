@@ -1,8 +1,8 @@
-﻿#include "Compiler/Compiler.h"
-#include "Compiler/pri_compiler.hpp"
-#include "base/Error.h"
-#include "base/utils/data.hpp"
-#include "language/error.h"
+﻿#include <Compiler/Compiler.h>
+#include <Compiler/pri_compiler.hpp>
+#include <base/Error.h>
+#include <base/utils/data.hpp>
+#include <language/error.h>
 #include <string>
 #include <vector>
 
@@ -16,9 +16,60 @@ void token_lex::lex_string(token* result) {
     while (*char_ptr != string_begin) {
         if (*char_ptr == '\\') {
             // 转义符
-            // 读出真实符号
+            // 读出真实符号并匹配转为真实符号
             get_next_char();
-            result->data += change_varchar[*char_ptr];
+            switch (*char_ptr) {
+            case 'r': {
+                result->data += '\r';
+                break;
+            }
+            case 'b': {
+                result->data += '\b';
+                break;
+            }
+            case 'n': {
+                result->data += '\n';
+                break;
+            }
+            case '\'': {
+                result->data += '\'';
+                break;
+            }
+            case '"': {
+                result->data += '"';
+                break;
+            }
+            case 't': {
+                result->data += '\t';
+                break;
+            }
+            case '\\': {
+                result->data += '\\';
+                break;
+            }
+            case '0': {
+                result->data += '\0';
+                break;
+            }
+            case 'a': {
+                result->data += '\a';
+                break;
+            }
+            case 'f': {
+                result->data += '\f';
+                break;
+            }
+            case 'v': {
+                result->data += '\v';
+                break;
+            }
+            default: {
+                error_->send_error_module(
+                    error::SyntaxError,
+                    language::error::
+                        syntaxerror_escape_char);
+            }
+            }
         } else {
             result->data += *char_ptr;
         }
@@ -294,7 +345,7 @@ token* token_lex::get_token() {
         is_unget = false;
         return back_token;
     }
-    token* result = new token;
+    auto* result = new token;
     if (*char_ptr == '\0') {
         // 解析结束
         result->tick = token_ticks::END_OF_TOKENS;

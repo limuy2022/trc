@@ -2,8 +2,8 @@
  * 英文的语句
  */
 
-#include "language/error.h"
-#include "language/language.h"
+#include <language/error.h>
+#include <language/language.h>
 
 namespace language {
 namespace error {
@@ -41,6 +41,8 @@ namespace error {
     const char* syntaxerror_expect = R"(% is excepted.)";
     const char* syntaxerror_lexanno
         = "Comments should end with */";
+    const char* syntaxerror_escape_char
+        = R"(Escape character % is not defined.)";
 
     const char* asserterror_default = "assert";
     const char* asserterror_user = "%";

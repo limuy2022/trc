@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVMbase/dll.h"
-#include "TVMbase/types/base.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVMbase/library.h>
+#include <TVMbase/types/base.h>
+#include <base/trcdef.h>
 #include <cstdio>
 #include <string>
 

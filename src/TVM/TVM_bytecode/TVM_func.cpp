@@ -1,8 +1,8 @@
-﻿#include "TVM/TVM.h"
-#include "TVM/built_in_func.h"
-#include "TVM/func.h"
-#include "TVMbase/TRE.h"
-#include "base/trcdef.h"
+﻿#include <TVM/TVM.h>
+#include <TVM/built_in_func.h>
+#include <TVM/func.h>
+#include <TVMbase/TRE.h>
+#include <base/trcdef.h>
 
 namespace trc::TVM_space {
 TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT,

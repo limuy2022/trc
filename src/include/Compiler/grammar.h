@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Compiler.h"
+#include <Compiler/Compiler.h>
 
 namespace trc::compiler {
 /**

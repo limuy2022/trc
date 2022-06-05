@@ -1,20 +1,12 @@
-#include "base/trcdef.h"
-#include "base/utils/bytes.h"
-#include "base/utils/data.hpp"
-#include "base/utils/filesys.h"
+#include <base/trcdef.h>
+#include <base/utils/bytes.h>
+#include <base/utils/data.hpp>
+#include <base/utils/filesys.h>
 #include <deque>
 #include <gtest/gtest.h>
 #include <list>
 #include <map>
 #include <vector>
-
-// 测试改变大小端函数
-TEST(data, bytes) {
-    trc::def::byte_t origin_data[] = { 0x64, 0x34 };
-    trc::utils::bytes_order_change(origin_data, 2);
-    EXPECT_EQ(origin_data[0], 0x34);
-    EXPECT_EQ(origin_data[1], 0x64);
-}
 
 TEST(data, inrange) {
     EXPECT_FALSE(trc::utils::inrange(6, 1, 9));

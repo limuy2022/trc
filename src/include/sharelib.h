@@ -9,20 +9,20 @@
  * cmake中添加target_compile_definitions（推荐）
  */
 
-/*
 #pragma once
 
-#include "platform.h"
+#include <platform.h>
 
 #ifdef WINDOWS_PLAT
 #ifdef BUILD_xxx_DLL
 #define TRC_xxx_api __declspec(dllexport)
-#define TRC_xxx_func_api extern "C"
-__declspec(dllexport) #else #define TRC_xxx_api
-__declspec(dllimport) #define TRC_xxx_func_api
-extern "C" __declspec(dllimport) #endif #else
-#define TRC_xxx_api
-__attribute__((visibility("default"))) #define
-TRC_xxx_func_api extern "C"
-__attribute__((visibility("default"))) #endif
-*/
+#define TRC_xxx_func_api extern "C" __declspec(dllexport)
+#else
+#define TRC_xxx_api__declspec(dllimport)
+#define TRC_xxx_func_api extern "C" __declspec(dllimport)
+#endif
+#else
+#define TRC_xxx_api __attribute__((visibility("default")))
+#define TRC_xxx_func_api                                   \
+    extern "C" __attribute__((visibility("default")))
+#endif

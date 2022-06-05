@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "TVMbase/types/base.h"
-#include "TVMbase/types/float.h"
-#include "TVMbase/types/flong.h"
-#include "TVMbase/types/int.h"
-#include "TVMbase/types/long.h"
-#include "TVMbase/types/string.h"
-#include "base/memory/objs_pool.hpp"
-#include "dll.h"
-#include "platform.h"
+#include <TVMbase/types/base.h>
+#include <TVMbase/types/float.h>
+#include <TVMbase/types/flong.h>
+#include <TVMbase/types/int.h>
+#include <TVMbase/types/long.h>
+#include <TVMbase/types/string.h>
+#include <base/library.h>
+#include <base/memory/objs_pool.hpp>
+#include <platform.h>
 
 // 申请对象池
 #define MALLOCINT                                          \

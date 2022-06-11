@@ -68,22 +68,22 @@ TEST(memory, free_array_array) {
     count_new_del::reset();
     std::vector<count_new_del::test_new_del*> arr(10);
     for (int i = 0; i < 10; i++) {
-        arr[i] = new count_new_del::test_new_del[10];
+        arr[i] = new count_new_del::test_new_del[2];
     }
     memory::free_array_array(arr);
-    EXPECT_EQ(100, count_new_del::del_cnt);
+    EXPECT_EQ(20, count_new_del::del_cnt);
     EXPECT_EQ(
         count_new_del::new_cnt, count_new_del::del_cnt);
 }
 
 TEST(memory, free_array_obj) {
     count_new_del::reset();
-    std::vector<count_new_del::test_new_del*> arr(100);
-    for (int i = 0; i < 100; ++i) {
+    std::vector<count_new_del::test_new_del*> arr(10);
+    for (int i = 0; i < 10; ++i) {
         arr[i] = new count_new_del::test_new_del;
     }
     memory::free_array_obj(arr);
-    EXPECT_EQ(100, count_new_del::del_cnt);
+    EXPECT_EQ(10, count_new_del::del_cnt);
     EXPECT_EQ(
         count_new_del::new_cnt, count_new_del::del_cnt);
 }

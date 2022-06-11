@@ -72,29 +72,28 @@ $(function() {
 <a href="memory_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1memory.html">trc::memory</a> {</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">   10</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">free_stl</a>(T&amp; f) {</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    T().swap(f);</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>}</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">   19</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V&gt; <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">free_array_array</a>(V&amp; f) {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : f) {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="keyword">delete</span>[] i;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    }</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    f.clear();</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>}</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">   32</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">free_array_obj</a>(T&amp; f) {</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : f) {</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="keyword">delete</span> i;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    }</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    f.clear();</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>}</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>}</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">   11</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">free_stl</a>(T&amp; f) {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    T().swap(f);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>}</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">   21</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> V&gt; <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">free_array_array</a>(V&amp; f) {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : f) {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="keyword">delete</span>[] i;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    }</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    f.clear();</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">   34</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">free_array_obj</a>(T&amp; f) {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : f) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="keyword">delete</span> i;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    }</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    f.clear();</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>}</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
 <div class="ttc" id="anamespacetrc_1_1memory_html"><div class="ttname"><a href="namespacetrc_1_1memory.html">trc::memory</a></div><div class="ttdef"><b>Definition:</b> free.cpp:3</div></div>
-<div class="ttc" id="anamespacetrc_1_1memory_html_a4b1cf91dd790e263bac9ffbbd594a70a"><div class="ttname"><a href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">trc::memory::free_stl</a></div><div class="ttdeci">void free_stl(T &amp;f)</div><div class="ttdoc">通过交换强制释放所有内存 注：由于效率极低，应当谨慎使用，只有当需要释放stack等stl的内存使才使用</div><div class="ttdef"><b>Definition:</b> memory.hpp:10</div></div>
-<div class="ttc" id="anamespacetrc_1_1memory_html_aa28f1bd84f1cee975af45427e8c65c7f"><div class="ttname"><a href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">trc::memory::free_array_obj</a></div><div class="ttdeci">void free_array_obj(T &amp;f)</div><div class="ttdoc">释放整个容器中元素的内存</div><div class="ttdef"><b>Definition:</b> memory.hpp:32</div></div>
-<div class="ttc" id="anamespacetrc_1_1memory_html_acf852b2c2e34d1828c27c5bbde0df7b5"><div class="ttname"><a href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">trc::memory::free_array_array</a></div><div class="ttdeci">void free_array_array(V &amp;f)</div><div class="ttdoc">释放容器内所有动态数组的内存</div><div class="ttdef"><b>Definition:</b> memory.hpp:19</div></div>
+<div class="ttc" id="anamespacetrc_1_1memory_html_a4b1cf91dd790e263bac9ffbbd594a70a"><div class="ttname"><a href="namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a">trc::memory::free_stl</a></div><div class="ttdeci">void free_stl(T &amp;f)</div><div class="ttdoc">通过交换强制释放所有内存</div><div class="ttdef"><b>Definition:</b> memory.hpp:11</div></div>
+<div class="ttc" id="anamespacetrc_1_1memory_html_aa28f1bd84f1cee975af45427e8c65c7f"><div class="ttname"><a href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">trc::memory::free_array_obj</a></div><div class="ttdeci">void free_array_obj(T &amp;f)</div><div class="ttdoc">释放整个容器中元素的内存</div><div class="ttdef"><b>Definition:</b> memory.hpp:34</div></div>
+<div class="ttc" id="anamespacetrc_1_1memory_html_acf852b2c2e34d1828c27c5bbde0df7b5"><div class="ttname"><a href="namespacetrc_1_1memory.html#acf852b2c2e34d1828c27c5bbde0df7b5">trc::memory::free_array_array</a></div><div class="ttdeci">void free_array_array(V &amp;f)</div><div class="ttdoc">释放容器内所有动态数组的内存</div><div class="ttdef"><b>Definition:</b> memory.hpp:21</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

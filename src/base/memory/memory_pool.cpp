@@ -9,13 +9,14 @@
 #include <base/trcdef.h>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <language/error.h>
 #include <utility>
 
 // 初次申请的node_mem个数
 #define INIT_NODE_SIZE 500
 // 再次申请的node_mem个数
-#define REALLOC_SIZE 30
+#define REALLOC_SIZE 50
 // full_gc启动条件
 #define condit_for_full_gc 500
 
@@ -121,6 +122,7 @@ void* memory_pool::mem_realloc(
     void* p, size_t before, size_t size_) {
     if (before > MEMORY_CUT_LINE
         && size_ > MEMORY_CUT_LINE) {
+        // 都超过memory_pool分割线，意味着全都是利用malloc和realloc分配
         void* tmp = realloc(p, size_);
         if (!tmp)
             error::send_error(error::MemoryError,
@@ -128,10 +130,13 @@ void* memory_pool::mem_realloc(
         return tmp;
     }
     if (get_list(before) == get_list(size_)) {
+        // 两者都处在同一个内存节点的最大值内，原样返回
         return p;
     }
+    void* res = this->mem_malloc(size_);
+    memcpy(res, p, before);
     this->mem_free(p, before);
-    return this->mem_malloc(size_);
+    return res;
 }
 
 /**

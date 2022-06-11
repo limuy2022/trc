@@ -18,8 +18,8 @@ Trc是一个功能强大，工具链完善，容易上手的解释型语言，�
 
 ## 项目站点
 
-[gitee](https://gitee.com/li-muyangangel/trc.git)
-[github](https://github.com/limuy2022/trc.git)
+[Gitee](https://gitee.com/li-muyangangel/trc.git)
+[GitHub](https://github.com/limuy2022/trc.git)
 
 ## 具体文档说明请参考
 

@@ -2,10 +2,16 @@
 
 采用cmake或xmake编译程序，需要安装cmake或xmake
 
-本项目保证支持
-msvc(windows)，
-gcc(linux)，
-clang(windows, linux)
+| 项目支持编译器       |
+|:--------------|
+| msvc(vs)      |
+| gcc(无mingw支持) |
+| clang         |
+
+| 项目支持平台        |
+|:--------------|
+| windows       |
+| linux(wsl2测试) |
 注：如果编译器不满足上述要求仍然可以编译，
 但操作系统不满足就会直接报错，无法编译
 

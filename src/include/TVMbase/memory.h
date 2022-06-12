@@ -36,8 +36,15 @@ struct TRC_TVMbase_api objs_pool_TVM {
     memory::objs_pool<types::trc_flong> flong_pool;
 };
 
+/**
+ * @brief 删除TVM变量信息
+ */
 TRC_TVMbase_func_api void free_var_vm(TVM_dyna_data* vm);
 
+/**
+ * @brief 删除TVM中的栈信息，常量池，字节码
+ * @warning 会保留变量信息（tshell）
+ */
 TRC_TVMbase_func_api void free_TVM(TVM* vm);
 
 TRC_TVMbase_func_api void quit_mem();

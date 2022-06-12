@@ -10,10 +10,11 @@ var searchData=
   ['start_5ftip_7',['start_tip',['../namespacelanguage_1_1tdb.html#a91ad22f35a6f4df3a0207a1da8fa9556',1,'language::tdb']]],
   ['static_5fdata_8',['static_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a51794c73fd3cb9f1579fbcc6a69a26df',1,'trc::TVM_space::TVM']]],
   ['str_5fpool_9',['str_pool',['../structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html#a4ae82303c5dc35e1f62631e34524b822',1,'trc::TVM_space::objs_pool_TVM']]],
-  ['syntaxerror_5fescape_5fchar_10',['syntaxerror_escape_char',['../namespacelanguage_1_1error.html#a2b018cdf7caa6ce6c9b29d86cbe77dd1',1,'language::error']]],
-  ['syntaxerror_5fexpect_11',['syntaxerror_expect',['../namespacelanguage_1_1error.html#a47134cfe0a5a0fd7d8c70ee83e7b56b1',1,'language::error']]],
-  ['syntaxerror_5fint_12',['syntaxerror_int',['../namespacelanguage_1_1error.html#a24bd655767ed8e29404f8de7f0384b58',1,'language::error']]],
-  ['syntaxerror_5flexanno_13',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
-  ['syntaxerror_5flexstring_14',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
-  ['syntaxerror_5fno_5fexpect_15',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]]
+  ['syntaxerror_10',['syntaxerror',['../namespacelanguage_1_1error.html#a3b31f6f58f314bff2658aa4ba0920923',1,'language::error']]],
+  ['syntaxerror_5fescape_5fchar_11',['syntaxerror_escape_char',['../namespacelanguage_1_1error.html#a2b018cdf7caa6ce6c9b29d86cbe77dd1',1,'language::error']]],
+  ['syntaxerror_5fexpect_12',['syntaxerror_expect',['../namespacelanguage_1_1error.html#a47134cfe0a5a0fd7d8c70ee83e7b56b1',1,'language::error']]],
+  ['syntaxerror_5fint_13',['syntaxerror_int',['../namespacelanguage_1_1error.html#a24bd655767ed8e29404f8de7f0384b58',1,'language::error']]],
+  ['syntaxerror_5flexanno_14',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
+  ['syntaxerror_5flexstring_15',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
+  ['syntaxerror_5fno_5fexpect_16',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]]
 ];

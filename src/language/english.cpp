@@ -25,10 +25,11 @@ namespace error {
     const char* memoryerror
         = "can't get the memory from os.";
     const char* zerodiverror = "\"%\" division by zero.";
-    const char* modulenotfounderror = "Could't find \"%\".";
+    const char* modulenotfounderror
+        = "Could't find \"%\" module.";
     const char* keyerror = "Key \"%\" is not defined.";
     const char* indexerror = R"(% is out of %)";
-    const char* valueerror = R"("$" could not be "$")";
+    const char* valueerror = R"("%" could not be "%")";
 
     const char* argumenterror = R"(% need % arguments.)";
 
@@ -43,6 +44,7 @@ namespace error {
         = "Comments should end with */";
     const char* syntaxerror_escape_char
         = R"(Escape character % is not defined.)";
+    const char* syntaxerror = "invalid syntax.";
 
     const char* asserterror_default = "assert";
     const char* asserterror_user = "%";
@@ -61,14 +63,12 @@ namespace error {
 
 namespace help {
     const char* help_msg
-        = "Trc is a programming language based on stack.This project from the\n\
-most basic operators such as arithmetic, the branch structure, circulation structure, \n\
-and then realize the constant folding, has realized the type of high precision operation, \n\
-input and output as well as some commonly used built-in function, then realize the recycling, \n\
-escaping strings, local and global variables,  This paper constructs a perfect error reporting \n\
-system from compiler to interpreter, introduces the concept of module, makes the program can\n\
-be modular programming, and establishes many practical tools, such as compile, run, decompile, \n\
-batch compile, clean up files, code debugging, command line scripts and other functions";
+        = "TRC is a stack programming language. This "
+          "project implements most of the modern "
+          "programming language basics, provides a perfect "
+          "tool chain, which is suitable for working "
+          "scripts or embedded in your projects, and helps "
+          "to learn how to compile. ";
 }
 
 namespace TVM {
@@ -84,7 +84,7 @@ namespace tdb {
     const char* var = "var";
     const char* not_defined = " is not defined.\n";
     const char* start_tip
-        = R"(trc debugger is running.You can read 'Doc/TDB.txt' to find the help.\n)";
+        = R"(trc debugger is running.You can read 'Doc/use/TDB.txt' to find the help.\n)";
     const char* instruction = "instruction ";
 }
 }

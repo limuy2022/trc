@@ -105,16 +105,15 @@ void grammar_lex::assign(is_not_end_node* head,
     const code_type& code) {
     // 申请新的树节点
     auto ass = new trc::compiler::node_base_tick(
-        trc::compiler::TREE, oper);
-    auto name = new trc::compiler::node_base_data;
+        trc::compiler::VAR_DEFINE, oper);
+    treenode* name;
     if (code.size() == 1) {
         // 数组之类的名字比一个长
-        auto quicktmp = code.front();
-        name->set(quicktmp->data);
-        name->type = trc::compiler::DATA;
+        name = new trc::compiler::
+            node_base_data_without_sons(
+                DATA, code.front()->data);
     } else {
     }
-
     // 父节点留下子节点记录
     head->connect(ass);
     // 保存变量名
@@ -213,7 +212,7 @@ void grammar_lex::sentence_tree(
         return;
     }
 
-    while (1) {
+    while (true) {
         token* tmp_ = token_.get_token();
         if (is_end_token(tmp_->tick)) {
             delete tmp_;
@@ -313,8 +312,16 @@ treenode* grammar_lex::get_node() {
     if (is_cal_value(now->tick)) {
         /*是一个可运算符号*/
         std::vector<token*> got_tokens;
-        while (!is_end_token(now->tick)) {
+        while (true) {
             got_tokens.push_back(now);
+            now = token_.get_token();
+            if (is_end_token(now->tick)) {
+                /*匹配到结尾还没有匹配到，一定是数据*/
+                auto datanode
+                    = new node_base_data_without_sons(
+                        DATA, got_tokens[0]->data);
+                return datanode;
+            }
             if (is_as_token(now->tick)) {
                 /*赋值语句*/
                 auto head = new is_not_end_node;
@@ -353,7 +360,6 @@ treenode* grammar_lex::get_node() {
     }
     if (is_blocked_token(now->tick)) {
         auto head = new is_not_end_node;
-        delete now;
         if (now->tick == token_ticks::WHILE) {
             while_loop_tree(head);
         } else if (now->tick == token_ticks::IF) {
@@ -361,8 +367,11 @@ treenode* grammar_lex::get_node() {
         } else if (now->tick == token_ticks::FUNC) {
             func_define(head);
         }
+        delete now;
         return head;
     }
+    error_->send_error_module(
+        error::SyntaxError, language::error::syntaxerror);
 }
 
 grammar_lex::grammar_lex(const std::string& codes_str,

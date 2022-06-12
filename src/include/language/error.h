@@ -29,6 +29,8 @@ TRC_language_api extern const char* syntaxerror_no_expect;
 TRC_language_api extern const char* syntaxerror_expect;
 // 未定义的转义符被读取到
 TRC_language_api extern const char* syntaxerror_escape_char;
+// 不明确的语法错误
+TRC_language_api extern const char* syntaxerror;
 
 // 断言的默认报错信息
 TRC_language_api extern const char* asserterror_default;

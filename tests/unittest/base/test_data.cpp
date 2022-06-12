@@ -1,5 +1,4 @@
 #include <base/trcdef.h>
-#include <base/utils/bytes.h>
 #include <base/utils/data.hpp>
 #include <base/utils/filesys.h>
 #include <deque>
@@ -8,11 +7,13 @@
 #include <map>
 #include <vector>
 
+using namespace trc;
+
 TEST(data, inrange) {
-    EXPECT_FALSE(trc::utils::inrange(6, 1, 9));
-    EXPECT_TRUE(trc::utils::inrange(0, 9, 5));
-    EXPECT_TRUE(trc::utils::inrange(-5, -1, -2));
-    EXPECT_FALSE(trc::utils::inrange(-9, 0, 1));
+    EXPECT_FALSE(utils::inrange(6, 1, 9));
+    EXPECT_TRUE(utils::inrange(0, 9, 5));
+    EXPECT_TRUE(utils::inrange(-5, -1, -2));
+    EXPECT_FALSE(utils::inrange(-9, 0, 1));
 }
 
 TEST(data, index_vector) {
@@ -22,6 +23,13 @@ TEST(data, index_vector) {
     std::vector<int> u = { 8, 8, 9 };
     EXPECT_EQ(trc::utils::index_vector(u, 8), 0);
     EXPECT_EQ(trc::utils::index_vector(u, 2), -1);
+}
+
+TEST(data, index_strstl) {
+    std::list<const char*> p = { "ppp", "lll", "pp" };
+    EXPECT_EQ(utils::index_vector(p, "ppp"), 0);
+    EXPECT_EQ(utils::index_vector(p, "pp"), 2);
+    EXPECT_EQ(utils::index_vector(p, "llll"), -1);
 }
 
 TEST(check_in, check_in) {
@@ -34,6 +42,14 @@ TEST(check_in, check_in) {
     EXPECT_FALSE(trc::utils::check_in(-1, b));
 }
 
+TEST(check_in, str_check_in) {
+    std::vector<const char*> a = {};
+    EXPECT_FALSE(utils::str_check_in("pp", a));
+    std::vector<const char*> b = { "ppp", "ooo", "llll" };
+    EXPECT_FALSE(utils::str_check_in("lll", b));
+    EXPECT_TRUE(utils::str_check_in("ooo", b));
+}
+
 TEST(check_in, check_in_i) {
     std::list<std::string> b
         = { "apple", "bananas", "pear" };
@@ -42,6 +58,14 @@ TEST(check_in, check_in_i) {
     EXPECT_EQ(trc::utils::check_in_i("watermelon", b), -1);
     EXPECT_EQ(trc::utils::check_in_i(1, c), 2);
     EXPECT_EQ(trc::utils::check_in_i(-10, c), -1);
+}
+
+TEST(check_in, str_check_in_i) {
+    std::vector<const char*> a = { "qbchj", "", "qbch" };
+    EXPECT_EQ(utils::str_check_in_i("", a), 1);
+    EXPECT_EQ(utils::str_check_in_i(" ", a), -1);
+    EXPECT_EQ(utils::str_check_in_i("qbch", a), 2);
+    EXPECT_EQ(utils::str_check_in_i("qbchj", a), 0);
 }
 
 TEST(check_in, s_check_in_s) {

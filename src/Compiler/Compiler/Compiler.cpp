@@ -13,6 +13,7 @@
 #include <base/code_loader.h>
 #include <base/utils/data.hpp>
 #include <climits>
+#include <cstring>
 #include <language/error.h>
 #include <queue>
 #include <string>
@@ -127,71 +128,79 @@ short detail_compiler::add(TVM_space::TVM* vm,
     COMPILE_TYPE_TICK data_type, char* data_value) {
     switch (data_type) {
     case string_TICK: {
-        size_t index_tmp = vm->static_data.const_s.size();
-        if (!utils::check_in(
-                data_value, vm->static_data.const_s)) {
-            vm->static_data.const_s.push_back(data_value);
-            return index_tmp;
+        int index = utils::str_check_in_i(
+            data_value, vm->static_data.const_s);
+        size_t size = vm->static_data.const_s.size();
+        if (index != -1) {
+            return index;
+        } else {
+            char* copy = new char[strlen(data_value) + 1];
+            strcpy(copy, data_value);
+            vm->static_data.const_s.push_back(copy);
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_s, data_value);
     }
     case int_TICK: {
         int afdata = atoi(data_value);
-        size_t index_tmp = vm->static_data.const_i.size();
-        if (!utils::check_in(
-                afdata, vm->static_data.const_i)) {
+        size_t size = vm->static_data.const_i.size();
+        int index = utils::check_in_i(
+            afdata, vm->static_data.const_i);
+        if (index != -1) {
+            return index;
+        } else {
             vm->static_data.const_i.push_back(afdata);
-            return index_tmp;
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_i, afdata);
     }
     case float_TICK: {
         double afdata = atof(data_value);
-        size_t index_tmp = vm->static_data.const_f.size();
-        if (!utils::check_in(
-                afdata, vm->static_data.const_f)) {
+        size_t size = vm->static_data.const_f.size();
+        int index = utils::check_in_i(
+            afdata, vm->static_data.const_f);
+        if (index != -1) {
+            return index;
+        } else {
             vm->static_data.const_f.push_back(afdata);
-            return index_tmp;
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_f, afdata);
     }
     case VAR_TICK: {
-        size_t index_tmp
-            = vm->static_data.const_name.size();
-        if (!utils::check_in(
-                data_value, vm->static_data.const_name)) {
-            vm->static_data.const_name.push_back(
-                data_value);
-            return index_tmp;
+        size_t size = vm->static_data.const_name.size();
+        int index = utils::str_check_in_i(
+            data_value, vm->static_data.const_name);
+        if (index != -1) {
+            return index;
+        } else {
+            char* copy = new char[strlen(data_value) + 1];
+            strcpy(copy, data_value);
+            vm->static_data.const_name.push_back(copy);
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_name, data_value);
     }
     case LONG_TICK: {
-        size_t index_tmp
-            = vm->static_data.const_long.size();
-        if (!utils::check_in(
-                data_value, vm->static_data.const_long)) {
-            vm->static_data.const_long.push_back(
-                data_value);
-            return index_tmp;
+        size_t size = vm->static_data.const_long.size();
+        int index = utils::str_check_in_i(
+            data_value, vm->static_data.const_long);
+        if (index != -1) {
+            return index;
+        } else {
+            char* copy = new char[strlen(data_value) + 1];
+            strcpy(copy, data_value);
+            vm->static_data.const_long.push_back(copy);
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_long, data_value);
     }
     case CONST_TICK: {
         int afdata = change_const[data_value];
-        size_t index_tmp = vm->static_data.const_i.size();
-        if (!utils::check_in(
-                afdata, vm->static_data.const_i)) {
+        size_t size = vm->static_data.const_i.size();
+        int index = utils::check_in_i(
+            afdata, vm->static_data.const_i);
+        if (index != -1) {
+            return index;
+        } else {
             vm->static_data.const_i.push_back(afdata);
-            return index_tmp;
+            return size;
         }
-        return utils::index_vector(
-            vm->static_data.const_i, afdata);
     }
     }
 }

@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <base/utils/type.hpp>
+#include <gtest/gtest.h>
 
 using namespace trc;
 

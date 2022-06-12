@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <algorithm>
+#include <cstring>
 #include <map>
 #include <string>
 #include <vector>
@@ -19,11 +20,12 @@ inline bool inrange(
 }
 
 /**
- * @brief 获取data在v1中的索引值
+ * @brief 获取data在v1中的索引值(第一个)
  * @tparam T 容器类型
  * @tparam V 数据类型
  * @param v1 容器
  * @param data 数据
+ * @warning C风格字符串不可用
  * @return 索引，未查找到返回-1
  */
 template <typename T, typename V>
@@ -31,6 +33,19 @@ int index_vector(const T& v1, const V& data) {
     auto begin = v1.begin(), end = v1.end();
     auto item = std::find(begin, end, data);
     return item != end ? distance(begin, item) : -1;
+}
+
+/**
+ * @brief 获取字符串data在v1中的索引值(第一个)
+ */
+template <typename T>
+int index_strstl(const T& v1, const char* data) {
+    for (int i = 0, n = v1.size(); i < n; i++) {
+        if (!strcmp(v1[i], data)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 /**
@@ -47,6 +62,19 @@ bool check_in(const O& data, const T& arr) {
 }
 
 /**
+ * @brief 检查data是否在容器T每一项值的里面(字符串专用)
+ */
+template <typename T>
+bool str_check_in(const char* data, const T& arr) {
+    for (size_t i = 0, n = arr.size(); i < n; ++i) {
+        if (!strcmp(arr[i], data)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * @brief
  * 检查数据，成功返回元素所在索引，否则返回-1
  * @tparam T 数据类型
@@ -56,11 +84,30 @@ bool check_in(const O& data, const T& arr) {
  */
 template <typename T, typename O>
 int check_in_i(const T& data, const O& l) {
-    size_t index = 0;
+    int res = 0;
     for (const auto& i : l) {
         if (data == i)
-            return index;
-        index++;
+            return res;
+        res++;
+    }
+    return -1;
+}
+
+/**
+ * @brief
+ * 检查字符串数据是否在容器中，成功返回元素所在索引，否则返回-1
+ * @tparam T 数据类型
+ * @tparam O 容器类型
+ * @param data 数据
+ * @param l 容器
+ */
+template <typename T>
+int str_check_in_i(const char* data, const T& l) {
+    int res = 0;
+    for (auto i : l) {
+        if (!strcmp(i, data))
+            return res;
+        res++;
     }
     return -1;
 }

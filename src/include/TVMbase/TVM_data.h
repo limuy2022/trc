@@ -22,12 +22,12 @@ struct TVM_bytecode {
     index_t index;
 };
 
+/**
+ * 静态数据
+ * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
+ * 并且降低TVM和Compiler之间的耦合度
+ */
 struct TRC_TVMbase_api TVM_static_data {
-    /**
-     * 静态数据
-     * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
-     * 并且降低TVM和Compiler之间的耦合度
-     */
     // 各种常量数据
     std::vector<int> const_i;
     std::vector<char*> const_s, const_name, const_long;

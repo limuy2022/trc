@@ -15,7 +15,6 @@ void free_TVM(TVM_space::TVM* vm) {
     vm->static_data.byte_codes.clear();
     vm->static_data.const_i.clear();
     vm->static_data.const_f.clear();
-    vm->static_data.ReleaseStringData();
     memory::free_stl(vm->dyna_data.frames);
 }
 

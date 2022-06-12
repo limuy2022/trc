@@ -26,7 +26,7 @@ TEST(compiler, var) {
     EXPECT_EQ(vm->static_data.const_i[0], 90);
     ASSERT_EQ(vm->static_data.const_name.size(), 1);
     EXPECT_STREQ(vm->static_data.const_name[0], "a");
-    // delete vm;
+    delete vm;
 }
 
 TEST(compiler, if_lex) {

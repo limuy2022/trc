@@ -86,6 +86,9 @@ node_base_data_without_sons::node_base_data_without_sons(
     this->type = type;
 }
 
+node_base_data_without_sons::node_base_data_without_sons()
+    = default;
+
 node_base_int_without_sons::node_base_int_without_sons(
     grammar_type type, int value)
     : value(value) {

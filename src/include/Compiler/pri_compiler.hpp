@@ -121,7 +121,7 @@ public:
 
     virtual bool has_son() = 0;
 
-    grammar_type type;
+    grammar_type type = TREE;
 };
 
 /**
@@ -134,7 +134,7 @@ public:
 
     void connect(treenode* son_node);
 
-    bool has_son();
+    bool has_son() override;
 };
 
 /**
@@ -142,7 +142,7 @@ public:
  */
 class TRC_Compiler_api is_end_node : public treenode {
 public:
-    bool has_son();
+    bool has_son() override;
 };
 
 /**
@@ -160,7 +160,7 @@ public:
 
     data_node() = default;
 
-    ~data_node();
+    virtual ~data_node();
 
 private:
     /**
@@ -174,7 +174,7 @@ class TRC_Compiler_api tick_node {
 public:
     token_ticks tick;
 
-    tick_node(token_ticks tick);
+    explicit tick_node(token_ticks tick);
 };
 
 /**
@@ -197,7 +197,7 @@ public:
     node_base_data(
         grammar_type type_argv, const std::string& data);
 
-    node_base_data(grammar_type type = TREE);
+    explicit node_base_data(grammar_type type = TREE);
 };
 
 /**
@@ -221,7 +221,9 @@ public:
     node_base_data_without_sons(
         grammar_type type, const std::string& name);
 
-    node_base_data_without_sons(grammar_type type);
+    explicit node_base_data_without_sons(grammar_type type);
+
+    node_base_data_without_sons();
 };
 
 /**

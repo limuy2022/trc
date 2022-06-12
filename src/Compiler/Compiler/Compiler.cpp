@@ -14,6 +14,7 @@
 #include <base/utils/data.hpp>
 #include <climits>
 #include <language/error.h>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -217,7 +218,7 @@ void detail_compiler::compile(
     TVM_space::TVM* vm, treenode* head) {
     grammar_type type = head->type;
     if (head->has_son()) {
-        is_not_end_node* root = (is_not_end_node*)head;
+        auto* root = (is_not_end_node*)head;
         switch (type) {
         case TREE: {
             // 不是数据和传参节点，确认为树
@@ -228,10 +229,9 @@ void detail_compiler::compile(
         }
         case BUILTIN_FUNC: {
             // 内置函数
-            node_base_tick_without_sons* code
-                = (node_base_tick_without_sons*)
-                      root->son[0];
-            node_base_int_without_sons* index_
+            auto* code = (node_base_tick_without_sons*)
+                             root->son[0];
+            auto* index_
                 = (node_base_int_without_sons*)root->son[1];
             add_opcode(
                 build_opcode(code->tick, index_->value));
@@ -240,9 +240,8 @@ void detail_compiler::compile(
         case OPCODE_ARGV: {
             // 带参数字节码
             // 参数
-            node_base_data_without_sons* argv_
-                = (node_base_data_without_sons*)
-                      root->son[0];
+            auto* argv_ = (node_base_data_without_sons*)
+                              root->son[0];
             COMPILE_TYPE_TICK type_data
                 = what_type(argv_->data);
             add_opcode(
@@ -257,13 +256,13 @@ void detail_compiler::compile(
         }
         case VAR_DEFINE: {
             // 变量定义
-            node_base_data_without_sons* argv_
-                = (node_base_data_without_sons*)
-                      root->son[0];
-            COMPILE_TYPE_TICK type_data
-                = what_type(argv_->data);
-            short index_argv
-                = add(vm, type_data, argv_->data);
+            // 处理等式右边的数据
+            compile(vm, root->son[1]);
+            // 处理等式左边的数据
+            auto* argv_ = (node_base_data_without_sons*)
+                              root->son[0];
+            short index_argv = add(vm,
+                COMPILE_TYPE_TICK::VAR_TICK, argv_->data);
             add_opcode(build_var(
                 ((node_base_tick*)root)->tick, index_argv));
             break;
@@ -276,14 +275,16 @@ void detail_compiler::compile(
                     vm->static_data.funcs, nodedata))
                 error_.send_error_module(error::NameError,
                     language::error::nameerror, nodedata);
-            node_base_tick_without_sons* code
-                = (node_base_tick_without_sons*)
-                      root->son[0];
-            node_base_int_without_sons* index_
+            auto* code = (node_base_tick_without_sons*)
+                             root->son[0];
+            auto* index_
                 = (node_base_int_without_sons*)root->son[1];
             add_opcode(
                 build_opcode(code->tick, index_->value));
             break;
+        }
+        default: {
+            NOREACH;
         }
         }
     } else {
@@ -333,6 +334,9 @@ void detail_compiler::compile(
             add_opcode(build_opcode(tick));
             break;
         }
+        default: {
+            NOREACH;
+        }
         }
     }
 }
@@ -344,39 +348,41 @@ detail_compiler::detail_compiler(compiler_error& error_,
 }
 }
 
-namespace trc {
-namespace compiler {
-    void free_tree(treenode* head) {
-        if (head->has_son()) {
-            for (treenode* i :
-                ((is_not_end_node*)head)->son) {
-                free_tree(i);
-                delete i;
+namespace trc::compiler {
+void free_tree(treenode* head) {
+    // 采用队列
+    std::queue<treenode*> l;
+    l.push(head);
+    while (!l.empty()) {
+        treenode* node = l.front();
+        if (node->has_son()) {
+            for (auto& i : ((is_not_end_node*)node)->son) {
+                l.push(i);
             }
         }
-        delete head;
-        head = nullptr;
+        delete node;
+        l.pop();
     }
+}
 
-    void Compiler(
-        TVM_space::TVM* vm, const std::string& codes) {
-        // 先释放所有的内存
-        TVM_space::free_TVM(vm);
-        compiler_error error_("__main__");
-        // 不会开始解析
-        grammar_lex grammar_lexer(codes, &error_);
-        /* 正式进入虚拟机字节码生成环节*/
-        vm->static_data.ver_ = def::version;
-        detail_compiler lex_d(error_, vm->static_data);
-        treenode* now_get;
-        for (;;) {
-            now_get = grammar_lexer.get_node();
-            if (now_get == nullptr) {
-                break;
-            }
-            lex_d.compile(vm, now_get);
-            free_tree(now_get);
+void Compiler(
+    TVM_space::TVM* vm, const std::string& codes) {
+    // 先释放所有的内存
+    TVM_space::free_TVM(vm);
+    compiler_error error_("__main__");
+    // 不会开始解析
+    grammar_lex grammar_lexer(codes, &error_);
+    /* 正式进入虚拟机字节码生成环节*/
+    vm->static_data.ver_ = def::version;
+    detail_compiler lex_d(error_, vm->static_data);
+    treenode* now_get;
+    for (;;) {
+        now_get = grammar_lexer.get_node();
+        if (now_get == nullptr) {
+            break;
         }
+        lex_d.compile(vm, now_get);
+        free_tree(now_get);
     }
 }
 }

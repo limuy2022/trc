@@ -7,19 +7,11 @@
 
 namespace trc::TVM_space {
 void free_var_vm(TVM_dyna_data* data) {
-    /**
-     * 删除TVM变量信息
-     */
-
     data->var_names.clear();
 }
 
 void free_TVM(TVM_space::TVM* vm) {
-    /**
-     * 删除TVM中的栈信息，常量池，字节码，但会保留变量信息（tshell）
-     */
-
-    memory::free_array_array(vm->static_data.byte_codes);
+    memory::free_array_obj(vm->static_data.byte_codes);
     vm->static_data.byte_codes.clear();
     vm->static_data.const_i.clear();
     vm->static_data.const_f.clear();

@@ -15,7 +15,6 @@
 #include <climits>
 #include <cstring>
 #include <language/error.h>
-#include <queue>
 #include <string>
 #include <vector>
 
@@ -359,19 +358,12 @@ detail_compiler::detail_compiler(compiler_error& error_,
 
 namespace trc::compiler {
 void free_tree(treenode* head) {
-    // 采用队列
-    std::queue<treenode*> l;
-    l.push(head);
-    while (!l.empty()) {
-        treenode* node = l.front();
-        if (node->has_son()) {
-            for (auto& i : ((is_not_end_node*)node)->son) {
-                l.push(i);
-            }
+    if(head->has_son()) {
+        for(const auto i:((is_not_end_node*)head)->son) {
+            free_tree(i);
         }
-        delete node;
-        l.pop();
     }
+    delete head;
 }
 
 void Compiler(

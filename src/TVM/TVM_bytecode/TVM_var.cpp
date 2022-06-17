@@ -15,7 +15,7 @@
     }
 
 namespace trc::TVM_space {
-void TVM::CHANGE_VALUE(short index) {
+void TVM::CHANGE_VALUE(bytecode_index_t index) {
     const std::string& name_v
         = static_data.const_name[index];
     NAMEERROR(name_v.c_str());
@@ -34,26 +34,26 @@ void TVM::DEL() {
     }
 }
 
-void TVM::LOAD_NAME(short index) {
+void TVM::LOAD_NAME(bytecode_index_t index) {
     const std::string& name(static_data.const_name[index]);
     NAMEERROR(name.c_str());
     push(dyna_data.var_names[name]);
 }
 
-void TVM::STORE_NAME(short index) {
+void TVM::STORE_NAME(bytecode_index_t index) {
     firstv = pop();
     dyna_data.var_names[static_data.const_name[index]]
         = firstv;
 }
 
-void TVM::STORE_LOCAL(short name) {
+void TVM::STORE_LOCAL(bytecode_index_t name) {
     frame_* fast = dyna_data.frames.top();
     firstv = pop();
     fast->dyna_data.var_names[static_data.const_name[name]]
         = firstv;
 }
 
-void TVM::LOAD_LOCAL(short name) {
+void TVM::LOAD_LOCAL(bytecode_index_t name) {
     const std::string& s_name
         = static_data.const_name[name];
     NAMEERROR(s_name.c_str());
@@ -61,7 +61,7 @@ void TVM::LOAD_LOCAL(short name) {
              ->dyna_data.var_names[s_name]);
 }
 
-void TVM::CHANGE_LOCAL(short index) {
+void TVM::CHANGE_LOCAL(bytecode_index_t index) {
     const std::string& name_v
         = static_data.const_name[index];
     NAMEERROR(name_v.c_str());

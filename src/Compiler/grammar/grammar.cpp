@@ -155,8 +155,9 @@ void grammar_lex::callfunction(
 
     // 函数名问题：判断内置函数和自定义函数
     if (funcname.size() == 1) {
-        if (trc::utils::check_in(
-                funcname[0]->data, loader::num_func)) {
+        if (trc::utils::check_in(funcname[0]->data,
+                loader::num_func.begin(),
+                loader::num_func.end())) {
             // 内置函数
             auto builtin = new node_base_data(
                 trc::compiler::BUILTIN_FUNC);

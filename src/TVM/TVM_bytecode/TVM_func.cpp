@@ -11,12 +11,12 @@ TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT,
     &builtin::INT_, &builtin::BOOL_, &builtin::FLOAT_,
     &builtin::TYPE };
 
-void TVM::CALL_BUILTIN(short name) {
+void TVM::CALL_BUILTIN(bytecode_index_t name) {
     firsti = (def::INTOBJ)pop();
     builtin_funcs[name](firsti->value, this);
 }
 
-void TVM::CALL_FUNCTION(short index) {
+void TVM::CALL_FUNCTION(bytecode_index_t index) {
     func_* fast
         = static_data.funcs[static_data.const_name[index]];
     run_func_str = fast->name;
@@ -31,6 +31,6 @@ void TVM::FREE_FUNCTION() {
     dyna_data.frames.pop();
 }
 
-void TVM::CALL_METHOD(short index) {
+void TVM::CALL_METHOD(bytecode_index_t index) {
 }
 }

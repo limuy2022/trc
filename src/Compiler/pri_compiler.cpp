@@ -119,7 +119,8 @@ COMPILE_TYPE_TICK what_type(const std::string& value) {
 
         return int_TICK;
     }
-    if (utils::check_in(value, const_values))
+    if (utils::check_in(value, const_values.begin(),
+            const_values.end()))
         return CONST_TICK;
     return VAR_TICK;
 }

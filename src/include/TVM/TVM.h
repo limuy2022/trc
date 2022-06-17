@@ -62,7 +62,7 @@ namespace trc::TVM_space {
  */
 class TRC_TVM_api TVM {
 public:
-    TVM(const std::string& name);
+    TVM(std::string name);
 
     ~TVM();
     /**
@@ -105,7 +105,7 @@ public:
      * @param bycode 字节码
      */
     inline void run_bycode(TVM_bytecode* bycode) {
-        if (bycode->index == -1)
+        if (bycode->index == 0)
             (this
                     ->*TVM_RUN_CODE_NOARG_FUNC
                         [bycode->bycode])();
@@ -158,17 +158,17 @@ private:
      * @brief 加载整型变量到栈
      * @param index 常量池中的索引
      */
-    void LOAD_INT(short index);
+    void LOAD_INT(bytecode_index_t index);
 
     /**
      * @brief 加载浮点型变量到栈
      */
-    void LOAD_FLOAT(short index);
+    void LOAD_FLOAT(bytecode_index_t index);
 
     /**
      * @brief 加载字符串变量到栈
      */
-    void LOAD_STRING(short index);
+    void LOAD_STRING(bytecode_index_t index);
 
     /**
      * @brief 加法运算
@@ -221,17 +221,17 @@ private:
      * @brief 跳转到行
      * @param index 行的索引（以0开始计数）
      */
-    void GOTO(short index);
+    void GOTO(bytecode_index_t index);
 
     /**
      * @brief 新建变量
      */
-    void STORE_NAME(short index);
+    void STORE_NAME(bytecode_index_t index);
 
     /**
      * @brief 读取变量的值
      */
-    void LOAD_NAME(short index);
+    void LOAD_NAME(bytecode_index_t index);
 
     /**
      * @brief 删除变量
@@ -241,7 +241,7 @@ private:
     /**
      * @brief 执行内置函数
      */
-    void CALL_BUILTIN(short name);
+    void CALL_BUILTIN(bytecode_index_t name);
 
     /**
      * @brief 模块导入
@@ -256,12 +256,12 @@ private:
     /**
      * @brief 如果为否，跳转代码到栈顶索引处
      */
-    void IF_FALSE_GOTO(short index);
+    void IF_FALSE_GOTO(bytecode_index_t index);
 
     /**
      * @brief 改变变量的值（全局）
      */
-    void CHANGE_VALUE(short index);
+    void CHANGE_VALUE(bytecode_index_t index);
 
     /**
      * @brief
@@ -322,19 +322,19 @@ private:
     /**
      * @brief 生成函数局部变量
      */
-    void STORE_LOCAL(short name);
+    void STORE_LOCAL(bytecode_index_t name);
 
     /**
      * @brief 读取函数局部变量
      */
-    void LOAD_LOCAL(short name);
+    void LOAD_LOCAL(bytecode_index_t name);
 
     /**
      * @brief 执行自定义函数
      * @details
      * 事实上是在虚拟机内创建帧，在帧中完成字节码运行,帧就相当于一个小环境
      */
-    void CALL_FUNCTION(short index);
+    void CALL_FUNCTION(bytecode_index_t index);
 
     /**
      * @brief 还原到调用函数前的环境
@@ -344,7 +344,7 @@ private:
     /**
      * @brief 改变局部变量的值
      */
-    void CHANGE_LOCAL(short index);
+    void CHANGE_LOCAL(bytecode_index_t index);
 
     /**
      * @brief 删除局部变量
@@ -354,21 +354,21 @@ private:
     /**
      * @brief 加载大整数变量到栈
      */
-    void LOAD_LONG(short index);
+    void LOAD_LONG(bytecode_index_t index);
 
     /**
      * @brief 执行方法
      * @param index
      */
-    void CALL_METHOD(short index);
+    void CALL_METHOD(bytecode_index_t index);
 
-    void LOAD_ARRAY(short index);
+    void LOAD_ARRAY(bytecode_index_t index);
 
     /**
      * @brief 加载map型变量到栈
      * @param argc 有几个参数
      */
-    void LOAD_MAP(short argc);
+    void LOAD_MAP(bytecode_index_t argc);
 
     // 指令集定义结束
 };

@@ -42,7 +42,7 @@ void TVM::GREATER() {
     push(firstv->operator>(secondv));
 }
 
-void TVM::IF_FALSE_GOTO(short index) {
+void TVM::IF_FALSE_GOTO(bytecode_index_t index) {
     firsti = (def::INTOBJ)(pop());
     if (!firsti->value)
         GOTO(index);

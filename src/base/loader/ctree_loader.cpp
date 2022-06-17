@@ -201,7 +201,7 @@ static void load_bytecode(FILE* file,
     // 字节码条数
     int size;
     trc::TVM_space::bytecode_t name;
-    trc::TVM_space::index_t argv;
+    trc::TVM_space::bytecode_index_t argv;
     fread(&size, sizeof(size), 1, file);
     // 读取长度判断是否有行号表
     size_t line_number_size;

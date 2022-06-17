@@ -14,6 +14,7 @@
 #include <base/utils/data.hpp>
 #include <climits>
 #include <cstring>
+#include <iostream>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -67,7 +68,7 @@ private:
      * @brief 把数据添加进相对应的vm常量池
      * @return 数据在常量池中所占的索引
      */
-    short add(TVM_space::TVM* vm,
+    TVM_space::bytecode_index_t add(TVM_space::TVM* vm,
         COMPILE_TYPE_TICK data_type, char* data_value);
 
     /**
@@ -77,15 +78,16 @@ private:
      * @param index 索引
      */
     TVM_space::TVM_bytecode* build_opcode(
-        token_ticks symbol, short index = -1);
+        token_ticks symbol,
+        TVM_space::bytecode_index_t index = 0);
 
     /**
      * @brief 构建有关变量的字节码
      * @param data 符号
      * @param index 索引
      */
-    TVM_space::TVM_bytecode* build_var(
-        token_ticks data, short index = -1);
+    TVM_space::TVM_bytecode* build_var(token_ticks data,
+        TVM_space::bytecode_index_t index = 0);
 
     /**
      * @brief 添加字节码，并完善对应环境
@@ -123,15 +125,17 @@ void detail_compiler::func_lexer(
     TVM_space::TVM* vm, treenode* head) {
 }
 
-short detail_compiler::add(TVM_space::TVM* vm,
-    COMPILE_TYPE_TICK data_type, char* data_value) {
+TVM_space::bytecode_index_t detail_compiler::add(
+    TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type,
+    char* data_value) {
     switch (data_type) {
     case string_TICK: {
-        int index = utils::str_check_in_i(
-            data_value, vm->static_data.const_s);
+        int index = utils::str_check_in_i(data_value,
+            vm->static_data.const_s.begin() + 1,
+            vm->static_data.const_s.end());
         size_t size = vm->static_data.const_s.size();
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             char* copy = new char[strlen(data_value) + 1];
             strcpy(copy, data_value);
@@ -142,10 +146,11 @@ short detail_compiler::add(TVM_space::TVM* vm,
     case int_TICK: {
         int afdata = atoi(data_value);
         size_t size = vm->static_data.const_i.size();
-        int index = utils::check_in_i(
-            afdata, vm->static_data.const_i);
+        int index = utils::check_in_i(afdata,
+            vm->static_data.const_i.begin() + 1,
+            vm->static_data.const_i.end());
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             vm->static_data.const_i.push_back(afdata);
             return size;
@@ -154,10 +159,11 @@ short detail_compiler::add(TVM_space::TVM* vm,
     case float_TICK: {
         double afdata = atof(data_value);
         size_t size = vm->static_data.const_f.size();
-        int index = utils::check_in_i(
-            afdata, vm->static_data.const_f);
+        int index = utils::check_in_i(afdata,
+            vm->static_data.const_f.begin() + 1,
+            vm->static_data.const_f.end());
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             vm->static_data.const_f.push_back(afdata);
             return size;
@@ -165,10 +171,11 @@ short detail_compiler::add(TVM_space::TVM* vm,
     }
     case VAR_TICK: {
         size_t size = vm->static_data.const_name.size();
-        int index = utils::str_check_in_i(
-            data_value, vm->static_data.const_name);
+        int index = utils::str_check_in_i(data_value,
+            vm->static_data.const_name.begin() + 1,
+            vm->static_data.const_name.end());
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             char* copy = new char[strlen(data_value) + 1];
             strcpy(copy, data_value);
@@ -178,10 +185,11 @@ short detail_compiler::add(TVM_space::TVM* vm,
     }
     case LONG_TICK: {
         size_t size = vm->static_data.const_long.size();
-        int index = utils::str_check_in_i(
-            data_value, vm->static_data.const_long);
+        int index = utils::str_check_in_i(data_value,
+            vm->static_data.const_long.begin() + 1,
+            vm->static_data.const_long.end());
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             char* copy = new char[strlen(data_value) + 1];
             strcpy(copy, data_value);
@@ -192,27 +200,31 @@ short detail_compiler::add(TVM_space::TVM* vm,
     case CONST_TICK: {
         int afdata = change_const[data_value];
         size_t size = vm->static_data.const_i.size();
-        int index = utils::check_in_i(
-            afdata, vm->static_data.const_i);
+        int index = utils::check_in_i(afdata,
+            vm->static_data.const_i.begin() + 1,
+            vm->static_data.const_i.end());
         if (index != -1) {
-            return index;
+            return index + 1;
         } else {
             vm->static_data.const_i.push_back(afdata);
             return size;
         }
     }
+    default: {
+        NOREACH;
+    }
     }
 }
 
 TVM_space::TVM_bytecode* detail_compiler::build_opcode(
-    token_ticks symbol, short index) {
+    token_ticks symbol, TVM_space::bytecode_index_t index) {
     return new TVM_space::TVM_bytecode {
         (bytecode_t)opcodesym_int[(int)symbol], index
     };
 }
 
 TVM_space::TVM_bytecode* detail_compiler::build_var(
-    token_ticks data, short index) {
+    token_ticks data, TVM_space::bytecode_index_t index) {
     if (data == token_ticks::ASSIGN)
         return new TVM_space::TVM_bytecode {
             (bytecode_t)byteCodeNumber::CHANGE_VALUE_, index
@@ -303,7 +315,8 @@ void detail_compiler::compile(
                 = ((node_base_data_without_sons*)head)
                       ->data;
             auto type_data = what_type(nodedata);
-            short index_argv = add(vm, type_data, nodedata);
+            TVM_space::bytecode_index_t index_argv
+                = add(vm, type_data, nodedata);
             if (type_data == string_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
                     (bytecode_t)
@@ -358,8 +371,8 @@ detail_compiler::detail_compiler(compiler_error& error_,
 
 namespace trc::compiler {
 void free_tree(treenode* head) {
-    if(head->has_son()) {
-        for(const auto i:((is_not_end_node*)head)->son) {
+    if (head->has_son()) {
+        for (const auto i : ((is_not_end_node*)head)->son) {
             free_tree(i);
         }
     }

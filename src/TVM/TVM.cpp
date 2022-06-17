@@ -5,6 +5,7 @@
 #include <base/memory/memory.h>
 #include <base/trcdef.h>
 #include <cstdarg>
+#include <utility>
 
 namespace trc::TVM_space {
 
@@ -53,8 +54,8 @@ const ARGV_TVM_METHOD TVM::TVM_RUN_CODE_ARG_FUNC[] = {
     &trc::TVM_space::TVM::LOAD_MAP
 };
 
-TVM::TVM(const std::string& name)
-    : name(name) {
+TVM::TVM(std::string name)
+    : name(std::move(name)) {
     // 初始化TVM
     TVM_space::init_mem();
     dyna_data.var_names["__name__"]

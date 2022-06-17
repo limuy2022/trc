@@ -110,22 +110,23 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html">TVM_dyna_data</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_static_data</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">静态数据 本类用于分离TVM的职责，装载编译时的数据，如常量池等 并且降低TVM和Compiler之间的耦合度  <a href="structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a23779c121a6f316b46afc314471d202f"><td class="memItemLeft" align="right" valign="top">typedef void(TVM::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a23779c121a6f316b46afc314471d202f">ARGV_TVM_METHOD</a>) (short)</td></tr>
-<tr class="separator:a23779c121a6f316b46afc314471d202f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8856078f3eaa312161fe735b67e70f17"><td class="memItemLeft" align="right" valign="top">typedef void(TVM::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a8856078f3eaa312161fe735b67e70f17">NOARGV_TVM_METHOD</a>) ()</td></tr>
-<tr class="separator:a8856078f3eaa312161fe735b67e70f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69f45768cf6e8aa1d30762edab706f68"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b">def::byte_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a69f45768cf6e8aa1d30762edab706f68">bytecode_t</a></td></tr>
 <tr class="separator:a69f45768cf6e8aa1d30762edab706f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cb2e399d3af7e42aebdef044ff8ee82"><td class="memItemLeft" align="right" valign="top">typedef short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a7cb2e399d3af7e42aebdef044ff8ee82">index_t</a></td></tr>
-<tr class="separator:a7cb2e399d3af7e42aebdef044ff8ee82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17aa43725f24e4afba985b8d2fbdc1aa"><td class="memItemLeft" align="right" valign="top">typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">bytecode_index_t</a></td></tr>
+<tr class="separator:a17aa43725f24e4afba985b8d2fbdc1aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25fdd3a6fdfb63c8ebe12cc02bb0ed89"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a25fdd3a6fdfb63c8ebe12cc02bb0ed89">struct_codes</a></td></tr>
 <tr class="separator:a25fdd3a6fdfb63c8ebe12cc02bb0ed89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85cef7438d5d252b20026c3ed514b7e5"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a85cef7438d5d252b20026c3ed514b7e5">TVM_BUILTINS_FUNC</a>) (int argc, <a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> *vm)</td></tr>
 <tr class="separator:a85cef7438d5d252b20026c3ed514b7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a283bc93753cdcc8d8e067c49160263e3"><td class="memItemLeft" align="right" valign="top">typedef void(TVM::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a283bc93753cdcc8d8e067c49160263e3">ARGV_TVM_METHOD</a>) (<a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">bytecode_index_t</a>)</td></tr>
+<tr class="separator:a283bc93753cdcc8d8e067c49160263e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8856078f3eaa312161fe735b67e70f17"><td class="memItemLeft" align="right" valign="top">typedef void(TVM::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a8856078f3eaa312161fe735b67e70f17">NOARGV_TVM_METHOD</a>) ()</td></tr>
+<tr class="separator:a8856078f3eaa312161fe735b67e70f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -191,14 +192,28 @@ Variables</h2></td></tr>
 <p >TVM中的一些的定义</p>
 <p >TVM各种数据集合的定义处 </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a23779c121a6f316b46afc314471d202f" name="a23779c121a6f316b46afc314471d202f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23779c121a6f316b46afc314471d202f">&#9670;&nbsp;</a></span>ARGV_TVM_METHOD</h2>
+<a id="a283bc93753cdcc8d8e067c49160263e3" name="a283bc93753cdcc8d8e067c49160263e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a283bc93753cdcc8d8e067c49160263e3">&#9670;&nbsp;</a></span>ARGV_TVM_METHOD</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void(TVM::* trc::TVM_space::ARGV_TVM_METHOD) (short)</td>
+          <td class="memname">typedef void(TVM::* trc::TVM_space::ARGV_TVM_METHOD) (<a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">bytecode_index_t</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a17aa43725f24e4afba985b8d2fbdc1aa" name="a17aa43725f24e4afba985b8d2fbdc1aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17aa43725f24e4afba985b8d2fbdc1aa">&#9670;&nbsp;</a></span>bytecode_index_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint16_t <a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">trc::TVM_space::bytecode_index_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -213,20 +228,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef <a class="el" href="namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b">def::byte_t</a> <a class="el" href="namespacetrc_1_1_t_v_m__space.html#a69f45768cf6e8aa1d30762edab706f68">trc::TVM_space::bytecode_t</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7cb2e399d3af7e42aebdef044ff8ee82" name="a7cb2e399d3af7e42aebdef044ff8ee82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7cb2e399d3af7e42aebdef044ff8ee82">&#9670;&nbsp;</a></span>index_t</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef short <a class="el" href="namespacetrc_1_1_t_v_m__space.html#a7cb2e399d3af7e42aebdef044ff8ee82">trc::TVM_space::index_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

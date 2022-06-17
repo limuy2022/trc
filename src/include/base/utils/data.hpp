@@ -56,18 +56,17 @@ int index_strstl(const T& v1, const char* data) {
  * @param arr 容器
  */
 template <typename T, typename O>
-bool check_in(const O& data, const T& arr) {
-    auto end = arr.end();
-    return std::find(arr.begin(), end, data) != end;
+bool check_in(const O& data, T begin, T end) {
+    return std::find(begin, end, data) != end;
 }
 
 /**
  * @brief 检查data是否在容器T每一项值的里面(字符串专用)
  */
 template <typename T>
-bool str_check_in(const char* data, const T& arr) {
-    for (size_t i = 0, n = arr.size(); i < n; ++i) {
-        if (!strcmp(arr[i], data)) {
+bool str_check_in(const char* data, T begin, T end) {
+    for (auto i = begin; i != end; ++i) {
+        if (!strcmp(*i, data)) {
             return true;
         }
     }
@@ -78,15 +77,15 @@ bool str_check_in(const char* data, const T& arr) {
  * @brief
  * 检查数据，成功返回元素所在索引，否则返回-1
  * @tparam T 数据类型
- * @tparam O 容器类型
+ * @tparam O 迭代器类型
  * @param data 数据
  * @param l 容器
  */
 template <typename T, typename O>
-int check_in_i(const T& data, const O& l) {
+int check_in_i(const T& data, O begin, O end) {
     int res = 0;
-    for (const auto& i : l) {
-        if (data == i)
+    for (auto i = begin; i != end; ++i) {
+        if (*i == data)
             return res;
         res++;
     }
@@ -96,16 +95,15 @@ int check_in_i(const T& data, const O& l) {
 /**
  * @brief
  * 检查字符串数据是否在容器中，成功返回元素所在索引，否则返回-1
- * @tparam T 数据类型
+ * @tparam T 迭代器类型
  * @tparam O 容器类型
  * @param data 数据
- * @param l 容器
  */
 template <typename T>
-int str_check_in_i(const char* data, const T& l) {
+int str_check_in_i(const char* data, T begin, T end) {
     int res = 0;
-    for (auto i : l) {
-        if (!strcmp(i, data))
+    for (auto i = begin; i != end; ++i) {
+        if (!strcmp(*i, data))
             return res;
         res++;
     }
@@ -120,10 +118,9 @@ int str_check_in_i(const char* data, const T& l) {
  * @param s2 容器2
  */
 template <typename T, typename O>
-bool s_check_in_s(const T& s1, const O& s2) {
-    auto end = s1.end();
-    for (auto i = s1.begin(); i != end; ++i)
-        if (!check_in(*i, s2))
+bool s_check_in_s(T s1begin, T s1end, O s2begin, O s2end) {
+    for (auto i = s1begin; i != s1end; ++i)
+        if (!check_in(*i, s2begin, s2end))
             return false;
     return true;
 }

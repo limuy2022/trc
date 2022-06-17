@@ -11,7 +11,7 @@
 namespace fs = std::filesystem;
 
 namespace trc::TVM_space {
-void TVM::LOAD_INT(short index) {
+void TVM::LOAD_INT(bytecode_index_t index) {
     int value = static_data.const_i[index];
     if (INT_CACHE_BEGIN <= value
         && value <= INT_CACHE_END) {
@@ -25,28 +25,28 @@ void TVM::LOAD_INT(short index) {
     push(MALLOCINT(value));
 }
 
-void TVM::LOAD_MAP(short argc) {
+void TVM::LOAD_MAP(bytecode_index_t argc) {
 }
 
-void TVM::LOAD_FLOAT(short index) {
+void TVM::LOAD_FLOAT(bytecode_index_t index) {
     push(MALLOCFLOAT(static_data.const_f[index]));
 }
 
-void TVM::LOAD_STRING(short index) {
+void TVM::LOAD_STRING(bytecode_index_t index) {
     push(MALLOCSTRING(static_data.const_s[index]));
 }
 
-void TVM::LOAD_LONG(short index) {
+void TVM::LOAD_LONG(bytecode_index_t index) {
     push(MALLOCLONG(static_data.const_long[index]));
 }
 
-void TVM::LOAD_ARRAY(short index) {
+void TVM::LOAD_ARRAY(bytecode_index_t index) {
 }
 
 void TVM::NOP() {
 }
 
-void TVM::GOTO(short index) {
+void TVM::GOTO(bytecode_index_t index) {
     run_index = static_data.const_i[index] - 1;
 }
 
@@ -59,7 +59,8 @@ static void fix_path(const std::string& path) {
     if (utils::file_exists(path)) {
         return;
     }
-    if (utils::check_in(path, cpp_libs::names)) {
+    if (utils::check_in(path, cpp_libs::names.begin(),
+            cpp_libs::names.end())) {
         return;
     }
     if (utils::file_exists(

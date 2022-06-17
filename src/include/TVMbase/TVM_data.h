@@ -19,11 +19,11 @@ class frame_;
 
 struct TVM_bytecode {
     bytecode_t bycode;
-    index_t index;
+    bytecode_index_t index;
 };
 
 /**
- * 静态数据
+ * @brief 静态数据
  * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
  * 并且降低TVM和Compiler之间的耦合度
  */
@@ -44,6 +44,7 @@ struct TRC_TVMbase_api TVM_static_data {
     std::vector<size_t> line_number_table;
     void ReleaseStringData();
     ~TVM_static_data();
+    TVM_static_data();
 };
 
 struct TVM_dyna_data {

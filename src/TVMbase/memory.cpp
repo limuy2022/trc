@@ -13,8 +13,13 @@ void free_var_vm(TVM_dyna_data* data) {
 void free_TVM(TVM_space::TVM* vm) {
     memory::free_array_obj(vm->static_data.byte_codes);
     vm->static_data.byte_codes.clear();
+
     vm->static_data.const_i.clear();
+    vm->static_data.const_i.push_back(0);
+
     vm->static_data.const_f.clear();
+    vm->static_data.const_f.push_back(0);
+
     vm->static_data.ReleaseStringData();
     memory::free_stl(vm->dyna_data.frames);
 }

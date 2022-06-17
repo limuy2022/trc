@@ -26,7 +26,7 @@
  * @return int 对应的链表编号
  */
 inline static int get_list(size_t size_) {
-    return std::ceil(size_ * 1.0 / MEMORY_BLOCKS_SIZE) - 1;
+    return int(std::ceil(size_ * 1.0 / MEMORY_BLOCKS_SIZE) - 1);
 }
 
 /**

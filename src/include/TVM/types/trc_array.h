@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVM/library.h"
-#include "base.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVM/library.h>
+#include <TVM/types/base.h>
+#include <base/trcdef.h>
 
 namespace trc::TVM_space::types {
 /**

@@ -2,7 +2,7 @@
  * trc交互式界面，无需文件即可执行
  */
 
-#include "TVM/memory.h"
+#include <TVM/memory.h>
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
 #include <base/Error.h>

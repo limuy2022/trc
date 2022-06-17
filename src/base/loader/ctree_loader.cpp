@@ -43,7 +43,7 @@ static const int MAGIC_VALUE = 0xACFD;
  * 包装fread函数，使它能够自动统一为大端字节序
  * @warning 用法与fread相同
  */
-static void fread_all(void* a, int b, int c, FILE* d) {
+static void fread_all(void* a, size_t b, size_t c, FILE* d) {
     fread(a, b, c, d);
     /*为大端则转成小端*/
     if (!trc::def::byte_order) {
@@ -56,7 +56,7 @@ static void fread_all(void* a, int b, int c, FILE* d) {
  * 包装fwrite函数，使它能够自动统一为大端字节序
  * @warning 用法与fwrite相同
  */
-static void fwrite_all(const void* a, int b, int c, FILE* d) {
+static void fwrite_all(const void* a, size_t b, size_t c, FILE* d) {
     fwrite(a, b, c, d);
     /*为小端则转成大端*/
     if (!trc::def::byte_order) {
@@ -83,7 +83,7 @@ static char* load_string_one(FILE* file) {
  * @brief 写入单个字符串
  */
 static void write_string_one(FILE* file, const std::string& data) {
-    int n = data.length();
+    int n = (int)data.length();
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
     fwrite(data.c_str(), n, 1, file);
@@ -125,7 +125,7 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
  * @param const_pool 字符串型常量池
  */
 static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
-    int size = const_pool.size();
+    int size = (int)const_pool.size();
     // 数据长度
     fwrite(&size, sizeof(size), 1, file);
     for (const auto& i : const_pool)
@@ -158,7 +158,7 @@ static void load_string_pool(FILE* file, std::vector<char*>& const_pool) {
 static void write_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
-    int size = static_data.byte_codes.size();
+    int size = (int)static_data.byte_codes.size();
     fwrite(&size, sizeof(size), 1, file);
     // 是否带有行号表
     size_t line_numeber_size = static_data.line_number_table.size();

@@ -1,8 +1,8 @@
-﻿#include "TVM/memory.h"
-#include "TVM/TRE.h"
-#include "TVM/TVM.h"
-#include "TVM/TVM_data.h"
-#include "base/memory/memory.hpp"
+﻿#include <TVM/memory.h>
+#include <TVM/TRE.h>
+#include <TVM/TVM.h>
+#include <TVM/TVM_data.h>
+#include <base/memory/memory.hpp>
 #include <map>
 
 namespace trc::TVM_space {

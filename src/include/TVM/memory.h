@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "base/library.h"
-#include "base/memory/objs_pool.hpp"
-#include "platform.h"
 #include <TVM/types/base.h>
-#include <TVM/types/float.h>
-#include <TVM/types/flong.h>
-#include <TVM/types/int.h>
-#include <TVM/types/long.h>
-#include <TVM/types/string.h>
+#include <TVM/types/trc_float.h>
+#include <TVM/types/trc_string.h>
+#include <TVM/types/trc_flong.h>
+#include <TVM/types/trc_int.h>
+#include <TVM/types/trc_long.h>
+#include <base/library.h>
+#include <base/memory/objs_pool.hpp>
+#include <platform.h>
 
 // 申请对象池
 #define MALLOCINT trc::TVM_space::global_objs_pool->int_pool.trcmalloc

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "TVMdef.h"
-#include "library.h"
-#include "object.h"
+#include <TVM/TVMdef.h>
+#include <TVM/library.h>
+#include <TVM/object.h>
 #include <map>
 #include <stack>
 #include <string>

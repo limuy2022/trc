@@ -1,6 +1,6 @@
-﻿#include "TVM/TRE.h"
-#include "TVM/types/array.h"
-#include "base/trcdef.h"
+﻿#include <TVM/TRE.h>
+#include <TVM/types/trc_array.h>
+#include <base/trcdef.h>
 #include <cstdio>
 
 namespace trc::TVM_space::types {

@@ -1,7 +1,7 @@
-#include "TVM/TRE.h"
-#include "TVM/memory.h"
-#include "TVM/types/float.h"
-#include "TVM/types/int.h"
+#include <TVM/TRE.h>
+#include <TVM/memory.h>
+#include <TVM/types/trc_float.h>
+#include <TVM/types/trc_int.h>
 #include <cmath>
 
 namespace trc::TVM_space::types {

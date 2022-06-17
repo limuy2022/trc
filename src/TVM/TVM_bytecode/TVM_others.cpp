@@ -1,5 +1,5 @@
-﻿#include "TVM/TRE.h"
-#include "TVM/memory.h"
+﻿#include <TVM/TRE.h>
+#include <TVM/memory.h>
 #include <TVM/TVM.h>
 #include <TVM/lib.h>
 #include <base/Error.h>

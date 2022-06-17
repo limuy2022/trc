@@ -1,7 +1,7 @@
-﻿#include "TVM/TRE.h"
+﻿#include <TVM/TRE.h>
 #include <TVM/TVM.h>
 #include <TVM/func.h>
-#include <TVM/types/string.h>
+#include <TVM/types/trc_string.h>
 #include <base/Error.h>
 #include <base/utils/data.hpp>
 #include <language/error.h>

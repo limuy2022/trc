@@ -23,11 +23,11 @@
 static const char* block[]
     = { "+---+", "/   /|", "+---+ |", "|   | +", "|   |/", "+---+" };
 
-inline static int realx(int x) {
+inline static size_t realx(size_t x) {
     return x * 2;
 }
 
-inline static int realy(int x, int y) {
+inline static size_t realy(size_t x, size_t y) {
     return y * 4 - x * 2;
 }
 
@@ -56,7 +56,7 @@ public:
      * @param x 横坐标
      * @param y 纵坐标
      */
-    void set_block(int x, int y);
+    void set_block(size_t x, size_t y);
 
 private:
     /**
@@ -109,7 +109,7 @@ bool drawer::check_y(int y) {
     return true;
 }
 
-void drawer::set_block(int x, int y) {
+void drawer::set_block(size_t x, size_t y) {
     x += 450;
     y += 450;
     memcpy(&canvas_[x + 0][y + 2], block[0], strlen(block[0]) * sizeof(char));

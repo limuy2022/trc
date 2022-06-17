@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "TVM/memory.h"
+#include <TVM/memory.h>
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
 #include <algorithm>

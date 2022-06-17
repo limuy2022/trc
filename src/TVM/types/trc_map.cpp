@@ -5,14 +5,14 @@
  * 效率也只能算是一般，不过有时间再改吧
  */
 
-#include "TVM/TVMdef.h"
-#include "TVM/types/float.h"
-#include "TVM/types/int.h"
-#include "TVM/types/map.h"
-#include "TVM/types/string.h"
-#include "base/Error.h"
-#include "language/error.h"
+#include <TVM/TVMdef.h>
+#include <TVM/types/trc_float.h>
+#include <TVM/types/trc_string.h>
+#include <TVM/types/trc_int.h>
+#include <TVM/types/trc_map.h>
+#include <base/Error.h>
 #include <cstdlib>
+#include <language/error.h>
 
 namespace trc::TVM_space::types {
 namespace map_space {

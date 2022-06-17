@@ -1,26 +1,26 @@
 #pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVM/library.h"
-#include "base.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVM/library.h>
+#include <TVM/types/base.h>
+#include <base/trcdef.h>
 
 namespace trc::TVM_space::types {
-class TRC_TVM_api trc_float : public trcobj {
+class TRC_TVM_api trc_int : public trcobj {
 public:
-    double value;
+    int value = 0;
 
     void putline(FILE* out);
 
-    ~trc_float();
+    ~trc_int();
 
-    trc_float();
+    trc_int();
 
-    trc_float(const double& value);
-
-    def::OBJ to_int();
+    trc_int(int value);
 
     def::OBJ to_string();
+
+    def::OBJ to_float();
 
     def::OBJ to_bool();
 

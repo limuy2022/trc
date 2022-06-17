@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "TVM/TVMdef.h"
-#include "TVM/library.h"
-#include "base/trcdef.h"
+#include <TVM/TVMdef.h>
+#include <TVM/library.h>
+#include <base/trcdef.h>
 #include <cstdio>
 
 namespace trc::TVM_space::types {

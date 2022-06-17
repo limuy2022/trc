@@ -2,11 +2,11 @@
  * 大整数运算
  */
 
-#include "TVM/TRE.h"
-#include "TVM/memory.h"
-#include "TVM/types/long.h"
-#include "base/memory/memory.h"
-#include "base/memory/objs_pool.hpp"
+#include <TVM/TRE.h>
+#include <TVM/memory.h>
+#include <TVM/types/trc_long.h>
+#include <base/memory/memory.h>
+#include <base/memory/objs_pool.hpp>
 #include <cstdio>
 #include <cstring>
 #include <string>

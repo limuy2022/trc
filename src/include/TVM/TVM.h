@@ -106,12 +106,9 @@ public:
      */
     inline void run_bycode(TVM_bytecode* bycode) {
         if (bycode->index == 0)
-            (this
-                    ->*TVM_RUN_CODE_NOARG_FUNC
-                        [bycode->bycode])();
+            (this->*TVM_RUN_CODE_NOARG_FUNC[bycode->bycode])();
         else
-            (this->*TVM_RUN_CODE_ARG_FUNC[bycode->bycode])(
-                bycode->index);
+            (this->*TVM_RUN_CODE_ARG_FUNC[bycode->bycode])(bycode->index);
     }
 
     /**
@@ -147,8 +144,7 @@ private:
     // 调用函数的字节码所在的行
     int call_func_index;
 
-    const static NOARGV_TVM_METHOD
-        TVM_RUN_CODE_NOARG_FUNC[];
+    const static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[];
 
     const static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[];
 
@@ -373,6 +369,5 @@ private:
     // 指令集定义结束
 };
 
-TRC_TVM_func_api TVM* create_TVM(
-    const std::string& name = "__main__");
+TRC_TVM_func_api TVM* create_TVM(const std::string& name = "__main__");
 }

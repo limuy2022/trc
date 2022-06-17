@@ -64,8 +64,8 @@ namespace tools_in {
     /**
      * @brief 格式化输出
      */
-    static void out(const std::string& file_name,
-        compiler::token_lex& token_c) {
+    static void out(
+        const std::string& file_name, compiler::token_lex& token_c) {
         printf("From file %s:", file_name.c_str());
         compiler::token* token_lex;
         bool change_line = true;
@@ -75,12 +75,10 @@ namespace tools_in {
                 change_line = false;
             }
             token_lex = token_c.get_token();
-            if (token_lex->tick
-                == compiler::token_ticks::END_OF_TOKENS) {
+            if (token_lex->tick == compiler::token_ticks::END_OF_TOKENS) {
                 return;
             }
-            if (token_lex->tick
-                == compiler::token_ticks::END_OF_LINE) {
+            if (token_lex->tick == compiler::token_ticks::END_OF_LINE) {
                 change_line = true;
                 continue;
             }

@@ -13,19 +13,16 @@
  * 动态生成报错模板，为了能够在编译后通过dll切换语言
  */
 static inline char* ERROR_TYPE_MSG(const char* type_name) {
-    char* res
-        = new char[strlen(
-                       language::TVM::type_change_error_msg)
-            + strlen(type_name) + 1];
+    char* res = new char[strlen(language::TVM::type_change_error_msg)
+        + strlen(type_name) + 1];
     strcpy(res, language::TVM::type_change_error_msg);
     strcat(res, type_name);
     return res;
 }
 
 static inline char* ERROR_OPER_MSG(const char* type_name) {
-    char* res = new char
-        [strlen(language::TVM::oper_not_def_error_msg)
-            + strlen(type_name) + 1];
+    char* res = new char[strlen(language::TVM::oper_not_def_error_msg)
+        + strlen(type_name) + 1];
     strcpy(res, language::TVM::oper_not_def_error_msg);
     strcat(res, type_name);
     return res;

@@ -35,8 +35,7 @@ namespace TVM_share {
     // 布尔值
     TRC_TVMbase_api extern def::INTOBJ true_, false_;
     // 整型缓存
-    TRC_TVMbase_api extern types::trc_int
-        int_cache[INT_CACHE_LEN];
+    TRC_TVMbase_api extern types::trc_int int_cache[INT_CACHE_LEN];
 
     /**
      * @brief
@@ -48,8 +47,7 @@ namespace TVM_share {
 }
 
 namespace type_int {
-    TRC_TVMbase_api extern std::map<std::string, int>
-        name_int_s;
+    TRC_TVMbase_api extern std::map<std::string, int> name_int_s;
     TRC_TVMbase_api extern std::string int_name_s[];
 }
 }

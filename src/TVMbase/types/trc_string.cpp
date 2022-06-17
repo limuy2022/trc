@@ -21,13 +21,11 @@
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
-const RUN_TYPE_TICK trc_string::type
-    = RUN_TYPE_TICK::string_T;
+const RUN_TYPE_TICK trc_string::type = RUN_TYPE_TICK::string_T;
 
 trc_string::trc_string(const trc_string& init)
     : char_num(init.char_num)
-    , value(
-          (char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
+    , value((char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
     strcpy(value, init.value);
 }
 
@@ -43,8 +41,7 @@ trc_string& trc_string::operator=(const std::string& init) {
 
 trc_string::trc_string(const std::string& init)
     : char_num(init.length())
-    , value(
-          (char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
+    , value((char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
     /**
      * 由于常量池，所以兼容string
      */
@@ -64,8 +61,7 @@ size_t trc_string::len() {
     return char_num;
 }
 
-trc_string& trc_string::operator=(
-    const trc_string& value_i) {
+trc_string& trc_string::operator=(const trc_string& value_i) {
     if (&value_i != this) {
         set_realloc(value_i.char_num);
         strcpy(value, value_i.value);
@@ -90,8 +86,7 @@ char& trc_string::operator[](unsigned int index) {
     return value[index];
 }
 
-const char& trc_string::operator[](
-    unsigned int index) const {
+const char& trc_string::operator[](unsigned int index) const {
     return value[index];
 }
 
@@ -121,47 +116,36 @@ void trc_string::set_realloc(size_t num) {
      * 重新申请字符数，不包括\0
      */
 
-    value = (char*)REALLOC(
-        value, char_num + 1, sizeof(char) * (num + 1));
+    value = (char*)REALLOC(value, char_num + 1, sizeof(char) * (num + 1));
     char_num = num;
 }
 
 def::INTOBJ trc_string::operator==(def::OBJ value_i) {
-    return (!strcmp(value, ((def::STRINGOBJ)value_i)->value)
-            ? true_
-            : false_);
+    return (!strcmp(value, ((def::STRINGOBJ)value_i)->value) ? true_ : false_);
 }
 
 def::INTOBJ trc_string::operator<(trcobj* value_i) {
     return (
-        strcmp(value, ((def::STRINGOBJ)value_i)->value) < 0
-            ? true_
-            : false_);
+        strcmp(value, ((def::STRINGOBJ)value_i)->value) < 0 ? true_ : false_);
 }
 
 def::INTOBJ trc_string::operator>(trcobj* value_i) {
     return (
-        strcmp(value, ((def::STRINGOBJ)value_i)->value) > 0
-            ? true_
-            : false_);
+        strcmp(value, ((def::STRINGOBJ)value_i)->value) > 0 ? true_ : false_);
 }
 
 def::INTOBJ trc_string::operator<=(trcobj* value_i) {
-    int tmp
-        = strcmp(value, ((def::STRINGOBJ)value_i)->value);
+    int tmp = strcmp(value, ((def::STRINGOBJ)value_i)->value);
     return (tmp < 0 || !tmp ? true_ : false_);
 }
 
 def::INTOBJ trc_string::operator>=(trcobj* value_i) {
-    int tmp
-        = strcmp(value, ((def::STRINGOBJ)value_i)->value);
+    int tmp = strcmp(value, ((def::STRINGOBJ)value_i)->value);
     return (tmp > 0 || !tmp ? true_ : false_);
 }
 
 def::INTOBJ trc_string::operator!=(trcobj* value_i) {
-    return (strcmp(value, ((def::STRINGOBJ)value_i)->value)
-            ? true_
-            : false_);
+    return (strcmp(value, ((def::STRINGOBJ)value_i)->value) ? true_ : false_);
 }
 
 const char* trc_string::c_str() const {

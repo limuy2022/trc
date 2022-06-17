@@ -20,8 +20,8 @@
  * |   |/
  * +---+
  */
-static const char* block[] = { "+---+", "/   /|", "+---+ |",
-    "|   | +", "|   |/", "+---+" };
+static const char* block[]
+    = { "+---+", "/   /|", "+---+ |", "|   | +", "|   |/", "+---+" };
 
 inline static int realx(int x) {
     return x * 2;
@@ -112,13 +112,10 @@ bool drawer::check_y(int y) {
 void drawer::set_block(int x, int y) {
     x += 450;
     y += 450;
-    memcpy(&canvas_[x + 0][y + 2], block[0],
-        strlen(block[0]) * sizeof(char));
-    memcpy(&canvas_[x + 1][y + 1], block[1],
-        strlen(block[1]) * sizeof(char));
+    memcpy(&canvas_[x + 0][y + 2], block[0], strlen(block[0]) * sizeof(char));
+    memcpy(&canvas_[x + 1][y + 1], block[1], strlen(block[1]) * sizeof(char));
     for (int i = 2; i < 6; ++i) {
-        memcpy(&canvas_[x + i][y], block[i],
-            strlen(block[i]) * sizeof(char));
+        memcpy(&canvas_[x + i][y], block[i], strlen(block[i]) * sizeof(char));
     }
 }
 
@@ -159,8 +156,7 @@ void draw_pictures(canvas_data& pos_, char background) {
             for (size_t j = 0; j < n; ++j) {
                 if (pos_[i][j].count_ != 0) {
                     painter->set_block(
-                        realx(i) - pos_[i][j].high * 3,
-                        realy(i, j));
+                        realx(i) - pos_[i][j].high * 3, realy(i, j));
                     pos_[i][j].count_--;
                     pos_[i][j].high++;
                     flag = true;

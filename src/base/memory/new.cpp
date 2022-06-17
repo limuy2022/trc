@@ -13,8 +13,7 @@ namespace trc::memory {
  * @brief 当没有内存时报错
  */
 static void nomemory() {
-    error::send_error(
-        error::MemoryError, language::error::memoryerror);
+    error::send_error(error::MemoryError, language::error::memoryerror);
 }
 
 memory_pool global_memory_pool;

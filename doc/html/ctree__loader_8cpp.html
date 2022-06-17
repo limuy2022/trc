@@ -172,24 +172,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                   \</div>
-<div class="line">        <span class="comment">/* 整型常量池 */</span>                              \</div>
-<div class="line">        str##_pool((file), (vm)-&gt;static_data.const_i);     \</div>
-<div class="line">        <span class="comment">/* 浮点数常量池 */</span>                           \</div>
-<div class="line">        str##_pool((file), (vm)-&gt;static_data.const_f);     \</div>
-<div class="line">        <span class="comment">/* 字符串常量池 */</span>                           \</div>
-<div class="line">        str##_string_pool(                                 \</div>
-<div class="line">            (file), (vm)-&gt;static_data.const_s);            \</div>
-<div class="line">        <span class="comment">/* 长整型常量池 */</span>                           \</div>
-<div class="line">        str##_string_pool(                                 \</div>
-<div class="line">            (file), (vm)-&gt;static_data.const_long);         \</div>
-<div class="line">        <span class="comment">/* 变量名常量池 */</span>                           \</div>
-<div class="line">        str##_string_pool(                                 \</div>
-<div class="line">            (file), (vm)-&gt;static_data.const_name);         \</div>
-<div class="line">        <span class="comment">/* 字节码常量池 */</span>                           \</div>
-<div class="line">        str##_bytecode((file), (vm)-&gt;static_data);         \</div>
-<div class="line">        <span class="comment">/* 函数字节码常量池 */</span>                     \</div>
-<div class="line">        str##_functions((file), (vm)-&gt;static_data.funcs);  \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
+<div class="line">        <span class="comment">/* 整型常量池 */</span>                                                  \</div>
+<div class="line">        str##_pool((file), (vm)-&gt;static_data.const_i);                         \</div>
+<div class="line">        <span class="comment">/* 浮点数常量池 */</span>                                               \</div>
+<div class="line">        str##_pool((file), (vm)-&gt;static_data.const_f);                         \</div>
+<div class="line">        <span class="comment">/* 字符串常量池 */</span>                                               \</div>
+<div class="line">        str##_string_pool((file), (vm)-&gt;static_data.const_s);                  \</div>
+<div class="line">        <span class="comment">/* 长整型常量池 */</span>                                               \</div>
+<div class="line">        str##_string_pool((file), (vm)-&gt;static_data.const_long);               \</div>
+<div class="line">        <span class="comment">/* 变量名常量池 */</span>                                               \</div>
+<div class="line">        str##_string_pool((file), (vm)-&gt;static_data.const_name);               \</div>
+<div class="line">        <span class="comment">/* 字节码常量池 */</span>                                               \</div>
+<div class="line">        str##_bytecode((file), (vm)-&gt;static_data);                             \</div>
+<div class="line">        <span class="comment">/* 函数字节码常量池 */</span>                                         \</div>
+<div class="line">        str##_functions((file), (vm)-&gt;static_data.funcs);                      \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 </div>

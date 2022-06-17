@@ -9,6 +9,5 @@
 #define TRC_language_api __declspec(dllimport)
 #endif
 #else
-#define TRC_language_api                                   \
-    __attribute__((visibility("default")))
+#define TRC_language_api __attribute__((visibility("default")))
 #endif

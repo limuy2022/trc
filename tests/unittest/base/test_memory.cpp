@@ -20,12 +20,10 @@ TEST(memory, memory_pool) {
     char* str = (char*)MALLOC(sizeof(char) * 20);
     strcpy(str, "pppp");
     // 往短的方向申请
-    str = (char*)REALLOC(
-        str, sizeof(char) * 20, sizeof(char) * 5);
+    str = (char*)REALLOC(str, sizeof(char) * 20, sizeof(char) * 5);
     EXPECT_STREQ(str, "pppp");
     // 往长的方向申请
-    str = (char*)REALLOC(
-        str, sizeof(char) * 5, sizeof(char) * 50);
+    str = (char*)REALLOC(str, sizeof(char) * 5, sizeof(char) * 50);
     EXPECT_STREQ(str, "pppp");
     FREE(str, sizeof(char) * 50);
 }
@@ -33,13 +31,11 @@ TEST(memory, memory_pool) {
 // 对象池构造函数和析构函数测试
 TEST(memory, objs_pool_new_delete) {
     count_new_del::reset();
-    auto pool = new memory::objs_pool<
-        count_new_del::test_new_del>;
+    auto pool = new memory::objs_pool<count_new_del::test_new_del>;
     delete pool;
     EXPECT_NE(count_new_del::del_cnt, 0);
     EXPECT_NE(count_new_del::new_cnt, 0);
-    EXPECT_EQ(
-        count_new_del::new_cnt, count_new_del::del_cnt);
+    EXPECT_EQ(count_new_del::new_cnt, count_new_del::del_cnt);
 }
 
 TEST(memory, free_stl) {
@@ -72,8 +68,7 @@ TEST(memory, free_array_array) {
     }
     memory::free_array_array(arr);
     EXPECT_EQ(20, count_new_del::del_cnt);
-    EXPECT_EQ(
-        count_new_del::new_cnt, count_new_del::del_cnt);
+    EXPECT_EQ(count_new_del::new_cnt, count_new_del::del_cnt);
 }
 
 TEST(memory, free_array_obj) {
@@ -84,6 +79,5 @@ TEST(memory, free_array_obj) {
     }
     memory::free_array_obj(arr);
     EXPECT_EQ(10, count_new_del::del_cnt);
-    EXPECT_EQ(
-        count_new_del::new_cnt, count_new_del::del_cnt);
+    EXPECT_EQ(count_new_del::new_cnt, count_new_del::del_cnt);
 }

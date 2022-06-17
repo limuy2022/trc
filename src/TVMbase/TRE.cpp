@@ -25,7 +25,7 @@ namespace TVM_share {
 }
 
 namespace type_int {
-    std::string int_name_s[] = { "int", "string", "float",
-        "long int", "long float", "map", "array" };
+    std::string int_name_s[] = { "int", "string", "float", "long int",
+        "long float", "map", "array" };
 }
 }

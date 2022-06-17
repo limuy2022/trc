@@ -35,21 +35,15 @@ objs_pool_TVM* global_objs_pool;
 void init_mem() {
     global_objs_pool = new objs_pool_TVM;
     // 布尔值初始化
-    TVM_space::TVM_share::true_
-        = new TVM_space::types::trc_int(1),
-        TVM_space::TVM_share::false_
-        = new TVM_space::types::trc_int(0);
+    TVM_space::TVM_share::true_ = new TVM_space::types::trc_int(1),
+    TVM_space::TVM_share::false_ = new TVM_space::types::trc_int(0);
     // 整型缓存初始化，-5~256
     int index = 0;
     for (int i = INT_CACHE_BEGIN; i <= INT_CACHE_END; ++i)
         TVM_space::TVM_share::int_cache[index++].value = i;
-    TVM_space::firsti = MALLOCINT(),
-    TVM_space::secondi = MALLOCINT();
-    TVM_space::firstf = MALLOCFLOAT(),
-    TVM_space::secondf = MALLOCFLOAT();
-    TVM_space::firsts = MALLOCSTRING(),
-    TVM_space::seconds = MALLOCSTRING();
-    TVM_space::firstl = MALLOCLONG(),
-    TVM_space::secondl = MALLOCLONG();
+    TVM_space::firsti = MALLOCINT(), TVM_space::secondi = MALLOCINT();
+    TVM_space::firstf = MALLOCFLOAT(), TVM_space::secondf = MALLOCFLOAT();
+    TVM_space::firsts = MALLOCSTRING(), TVM_space::seconds = MALLOCSTRING();
+    TVM_space::firstl = MALLOCLONG(), TVM_space::secondl = MALLOCLONG();
 }
 }

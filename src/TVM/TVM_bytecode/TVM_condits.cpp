@@ -54,20 +54,18 @@ void TVM::ASSERT() {
     int tmp_i = firsti->value;
     if (!secondi->value) {
         if (tmp_i > 2)
-            error_report(error::ArgumentError,
-                language::error::argumenterror, "assert",
-                "one or two");
+            error_report(error::ArgumentError, language::error::argumenterror,
+                "assert", "one or two");
 
         switch (tmp_i) {
         case 1: {
-            error_report(error::AssertError,
-                language::error::asserterror_default);
+            error_report(
+                error::AssertError, language::error::asserterror_default);
             break;
         }
         case 2: {
             firsts = (def::STRINGOBJ)pop();
-            error_report(error::AssertError,
-                language::error::asserterror_user,
+            error_report(error::AssertError, language::error::asserterror_user,
                 firsts->c_str());
             break;
         }

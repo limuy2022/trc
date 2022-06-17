@@ -6,22 +6,19 @@ symbol_form::~symbol_form() {
 }
 
 void TVM_static_data::ReleaseStringData() {
-    for (auto i = const_s.begin() + 1, end = const_s.end();
-         i != end; ++i) {
+    for (auto i = const_s.begin() + 1, end = const_s.end(); i != end; ++i) {
         delete[] * i;
     }
     const_s.clear();
     const_s.push_back(nullptr);
-    for (auto i = const_name.begin() + 1,
-              end = const_name.end();
-         i != end; ++i) {
+    for (auto i = const_name.begin() + 1, end = const_name.end(); i != end;
+         ++i) {
         delete[] * i;
     }
     const_name.clear();
     const_name.push_back(nullptr);
-    for (auto i = const_long.begin() + 1,
-              end = const_long.end();
-         i != end; ++i) {
+    for (auto i = const_long.begin() + 1, end = const_long.end(); i != end;
+         ++i) {
         delete[] * i;
     }
     const_long.clear();

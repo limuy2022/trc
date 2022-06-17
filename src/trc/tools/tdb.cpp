@@ -25,11 +25,9 @@ static trc::TVM_space::TVM* vm;
  * @param instruction 指令
  */
 static void var_lex(const std::string& instruction) {
-    const std::string& var_
-        = instruction.substr(instruction.find("var") + 4,
-            instruction.length() - 3);
-    if (!trc::utils::map_check_in_first(
-            vm->dyna_data.var_names, var_)) {
+    const std::string& var_ = instruction.substr(
+        instruction.find("var") + 4, instruction.length() - 3);
+    if (!trc::utils::map_check_in_first(vm->dyna_data.var_names, var_)) {
         printf("%s%s%s", language::tdb::var, var_.c_str(),
             language::tdb::not_defined);
         return;
@@ -113,22 +111,19 @@ static void debug(const std::string& code) {
             || instruction[0] == 'e') {
             /*意思是如果执行到了末尾或者遇到了退出指令*/
             return;
-        } else if (instruction[0] == 'n'
-            || !strcmp(instruction, "next")) {
+        } else if (instruction[0] == 'n' || !strcmp(instruction, "next")) {
             printf("%s\n", out_data[line_index].c_str());
             vm->run_line_bycode();
             putchar('\n');
             line_index++;
-        } else if ((instruction_length >= 3
-                       && !strcmp(instruction, "var"))
+        } else if ((instruction_length >= 3 && !strcmp(instruction, "var"))
             || instruction[0] == 'v') {
             var_lex(instruction);
-        } else if (!strcmp(instruction, "stack")
-            || instruction[0] == 's') {
+        } else if (!strcmp(instruction, "stack") || instruction[0] == 's') {
             stack_out();
         } else {
-            printf("%s%s%s", language::tdb::instruction,
-                instruction, language::tdb::not_defined);
+            printf("%s%s%s", language::tdb::instruction, instruction,
+                language::tdb::not_defined);
         }
     }
     free(instruction);

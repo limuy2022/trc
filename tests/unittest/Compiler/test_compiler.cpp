@@ -14,8 +14,7 @@ using namespace trc;
  * @param vm
  */
 static void bytecode_check(
-    const std::vector<TVM_space::struct_codes>& expect,
-    TVM_space::TVM* vm) {
+    const std::vector<TVM_space::struct_codes>& expect, TVM_space::TVM* vm) {
 }
 
 TEST(compiler, var) {

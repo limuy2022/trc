@@ -20,12 +20,10 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-void listfiles(const std::string& path,
-    std::vector<fs::path>& fileList,
+void listfiles(const std::string& path, std::vector<fs::path>& fileList,
     std::vector<fs::path>& dirList, filefilter func) {
     fs::path tmp;
-    for (const auto& path_i :
-        fs::recursive_directory_iterator(path)) {
+    for (const auto& path_i : fs::recursive_directory_iterator(path)) {
         tmp = path_i.path();
         if (is_directory(path_i)) {
             dirList.push_back(tmp);
@@ -62,30 +60,27 @@ std::string import_to_path(std::string import_name) {
  * @param file_data 读取出的内容的存放地
  * @param file 文件
  */
-inline void read_file_detail(const std::string& path,
-    std::string& file_data, FILE* file) {
+inline void read_file_detail(
+    const std::string& path, std::string& file_data, FILE* file) {
     struct stat buffer;
     stat(path.c_str(), &buffer);
     size_t size = buffer.st_size;
     file_data.resize(size + 1);
     file_data[size] = '\0';
-    fread(
-        (char*)file_data.c_str(), sizeof(char), size, file);
+    fread((char*)file_data.c_str(), sizeof(char), size, file);
 }
 
-void readcode(
-    std::string& file_data, const std::string& path) {
+void readcode(std::string& file_data, const std::string& path) {
     FILE* file = fopen(path.c_str(), "r");
     if (file == nullptr) {
-        error::send_error(error::OpenFileError,
-            language::error::openfileerror, path.c_str());
+        error::send_error(
+            error::OpenFileError, language::error::openfileerror, path.c_str());
     }
     read_file_detail(path, file_data, file);
     fclose(file);
 }
 
-int readcode_with_code(
-    std::string& file_data, const std::string& path) {
+int readcode_with_code(std::string& file_data, const std::string& path) {
     FILE* file = fopen(path.c_str(), "r");
     if (file == nullptr) {
         return 1;

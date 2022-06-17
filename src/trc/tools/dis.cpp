@@ -15,22 +15,18 @@ namespace tools_in {
     /**
      * @brief 输出TVM中的数据
      */
-    static void out(const TVM_space::TVM& static_data,
-        const char* file_name) {
+    static void out(const TVM_space::TVM& static_data, const char* file_name) {
         printf("From file %s:\n", file_name);
         // 输出版本号
-        printf(
-            "Version:%f\n", static_data.static_data.ver_);
+        printf("Version:%f\n", static_data.static_data.ver_);
         // 输出字节码
         puts("\nCode:");
-        for (const auto& bycode :
-            static_data.static_data.byte_codes) {
+        for (const auto& bycode : static_data.static_data.byte_codes) {
             // 行
             printf("    %zu:%s|%hd, \n",
-                static_data.static_data.line_number_table
-                    [static_data.run_index],
-                loader::int_code[bycode->bycode],
-                bycode->index);
+                static_data.static_data
+                    .line_number_table[static_data.run_index],
+                loader::int_code[bycode->bycode], bycode->index);
         }
         size_t n;
         // 输出常量池
@@ -39,38 +35,33 @@ namespace tools_in {
         n = static_data.static_data.const_i.size();
         puts("\nint constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%d\n", i,
-                static_data.static_data.const_i[i]);
+            printf("    %zu:%d\n", i, static_data.static_data.const_i[i]);
         }
 
         // 浮点数常量池
         n = static_data.static_data.const_f.size();
         puts("\nfloat constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%lf\n", i,
-                static_data.static_data.const_f[i]);
+            printf("    %zu:%lf\n", i, static_data.static_data.const_f[i]);
         }
         // 字符串常量池
         n = static_data.static_data.const_s.size();
         puts("\nstring constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i,
-                static_data.static_data.const_s[i]);
+            printf("    %zu:%s\n", i, static_data.static_data.const_s[i]);
         }
         // 大整数
         puts("\nlong int constant pool:");
         n = static_data.static_data.const_long.size();
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i,
-                static_data.static_data.const_long[i]);
+            printf("    %zu:%s\n", i, static_data.static_data.const_long[i]);
         }
 
         // 输出名字列表
         n = static_data.static_data.const_name.size();
         puts("\nname:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i,
-                static_data.static_data.const_name[i]);
+            printf("    %zu:%s\n", i, static_data.static_data.const_name[i]);
         }
         // 输出函数
         n = static_data.static_data.funcs.size();

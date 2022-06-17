@@ -14,8 +14,7 @@
 // 一个内存链表的初始大小
 #define MEMORY_BASE_SIZE 128
 // 内存链表个数
-#define MEMORY_LISTS_NUM                                   \
-    MEMORY_BASE_SIZE / MEMORY_BLOCKS_SIZE
+#define MEMORY_LISTS_NUM MEMORY_BASE_SIZE / MEMORY_BLOCKS_SIZE
 
 #include <base/library.h>
 #include <vector>
@@ -78,9 +77,7 @@ private:
     void full_gc();
 
     // 储存各个链表的链表头
-    memclass::node_mem* memory_heads[MEMORY_LISTS_NUM] {
-        nullptr
-    };
+    memclass::node_mem* memory_heads[MEMORY_LISTS_NUM] { nullptr };
     // 储存所有申请的内存块
     std::vector<void*> malloc_mem_heads;
 

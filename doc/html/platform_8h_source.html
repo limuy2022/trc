@@ -72,25 +72,24 @@ $(function() {
 <a href="platform_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#if defined(WIN32) || defined(_WIN32)                      \</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">    || defined(__WIN32__) || defined(__NT__)</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define WINDOWS_PLAT</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#elif defined(__linux__)</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#define LINUX_PLAT</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// 不受支持的平台，报错</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#error Cannot compile on this platform</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc.html">trc</a> {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">namespace </span>utils {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">get_byte_order</a>();</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">namespace </span>def {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="comment">// 字节序，true为大端，false为小端</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespacetrc_1_1def.html#a6c0916fe5a90fd2ddd821da61aa09c59">byte_order</a>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define WINDOWS_PLAT</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#elif defined(__linux__)</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define LINUX_PLAT</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// 不受支持的平台，报错</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#error Cannot compile on this platform</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc.html">trc</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span>utils {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">get_byte_order</a>();</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>}</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">namespace </span>def {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="comment">// 字节序，true为大端，false为小端</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespacetrc_1_1def.html#a6c0916fe5a90fd2ddd821da61aa09c59">byte_order</a>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>}</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>}</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}</div>
 <div class="ttc" id="anamespacetrc_1_1def_html_a6c0916fe5a90fd2ddd821da61aa09c59"><div class="ttname"><a href="namespacetrc_1_1def.html#a6c0916fe5a90fd2ddd821da61aa09c59">trc::def::byte_order</a></div><div class="ttdeci">const bool byte_order</div><div class="ttdef"><b>Definition:</b> platform.cpp:12</div></div>
 <div class="ttc" id="anamespacetrc_1_1utils_html_a60e0b7d72054ff094840174a0d5d9fd0"><div class="ttname"><a href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">trc::utils::get_byte_order</a></div><div class="ttdeci">bool get_byte_order()</div><div class="ttdoc">获取字节序</div><div class="ttdef"><b>Definition:</b> platform.cpp:5</div></div>
 <div class="ttc" id="anamespacetrc_html"><div class="ttname"><a href="namespacetrc.html">trc</a></div><div class="ttdef"><b>Definition:</b> autodll.cpp:19</div></div>

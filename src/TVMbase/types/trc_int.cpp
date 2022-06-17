@@ -27,54 +27,45 @@ trc_int::trc_int(int value)
 }
 
 def::INTOBJ trc_int::operator==(def::OBJ value_i) {
-    return (((def::INTOBJ)(value_i))->value != value
-            ? TVM_share::false_
-            : TVM_share::true_);
+    return (((def::INTOBJ)(value_i))->value != value ? TVM_share::false_
+                                                     : TVM_share::true_);
 }
 
 def::INTOBJ trc_int::operator!=(def::OBJ value_i) {
-    return (((def::INTOBJ)(value_i))->value == value
-            ? TVM_share::false_
-            : TVM_share::true_);
+    return (((def::INTOBJ)(value_i))->value == value ? TVM_share::false_
+                                                     : TVM_share::true_);
 }
 
 def::INTOBJ trc_int::operator<(def::OBJ value_i) {
-    return (value < ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value < ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                    : TVM_share::false_);
 }
 
 def::INTOBJ trc_int::operator>(def::OBJ value_i) {
-    return (value > ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value > ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                    : TVM_share::false_);
 }
 
 def::INTOBJ trc_int::operator<=(def::OBJ value_i) {
-    return (value <= ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value <= ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                     : TVM_share::false_);
 }
 
 def::INTOBJ trc_int::operator>=(def::OBJ value_i) {
-    return (value >= ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value >= ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                     : TVM_share::false_);
 }
 
 def::OBJ trc_int::operator+(def::OBJ value_i) {
-    return MALLOCINT(
-        value + ((def::INTOBJ)(value_i))->value);
+    return MALLOCINT(value + ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator-(def::OBJ value_i) {
-    return MALLOCINT(
-        value - ((def::INTOBJ)(value_i))->value);
+    return MALLOCINT(value - ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator*(def::OBJ value_i) {
-    return MALLOCINT(
-        value * ((def::INTOBJ)(value_i))->value);
+    return MALLOCINT(value * ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator/(def::OBJ value_i) {
@@ -83,18 +74,16 @@ def::OBJ trc_int::operator/(def::OBJ value_i) {
 }
 
 def::OBJ trc_int::operator%(def::OBJ value_i) {
-    return MALLOCINT(
-        value % ((def::INTOBJ)(value_i))->value);
+    return MALLOCINT(value % ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::pow_(def::OBJ value_i) {
-    return MALLOCINT((int)pow((double)value,
-        (double)(((def::INTOBJ)(value_i))->value)));
+    return MALLOCINT(
+        (int)pow((double)value, (double)(((def::INTOBJ)(value_i))->value)));
 }
 
 def::OBJ trc_int::zdiv(def::OBJ value_i) {
-    return MALLOCINT(
-        value / ((def::INTOBJ)(value_i))->value);
+    return MALLOCINT(value / ((def::INTOBJ)(value_i))->value);
 }
 
 def::INTOBJ trc_int::operator!() {
@@ -102,15 +91,13 @@ def::INTOBJ trc_int::operator!() {
 }
 
 def::INTOBJ trc_int::operator&&(def::OBJ value_i) {
-    return (value && ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value && ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                     : TVM_share::false_);
 }
 
 def::INTOBJ trc_int::operator||(def::OBJ value_i) {
-    return (value || ((def::INTOBJ)(value_i))->value
-            ? TVM_share::true_
-            : TVM_share::false_);
+    return (value || ((def::INTOBJ)(value_i))->value ? TVM_share::true_
+                                                     : TVM_share::false_);
 }
 
 def::OBJ trc_int::to_string() {

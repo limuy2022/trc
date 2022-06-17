@@ -7,11 +7,10 @@
 
 namespace language {
 namespace error {
-    const char* error_map[] = { "名字错误:", "值错误:",
-        "语法错误:", "版本错误:", "文件打开错误:",
-        "模块找不到错误:", "参数错误:", "除零错误:",
-        "运行错误:", "断言错误:", "索引错误:", "内存错误:",
-        "键错误:", "系统错误:" };
+    const char* error_map[]
+        = { "名字错误:", "值错误:", "语法错误:", "版本错误:", "文件打开错误:",
+              "模块找不到错误:", "参数错误:", "除零错误:", "运行错误:",
+              "断言错误:", "索引错误:", "内存错误:", "键错误:", "系统错误:" };
     const char* error_from = "错误来自";
     const char* error_in_line = "错误发生在行";
 
@@ -29,14 +28,11 @@ namespace error {
     const char* argumenterror = R"(%需要%个参数.)";
 
     const char* syntaxerror_int = R"(数字%不正确.)";
-    const char* syntaxerror_lexstring
-        = R"(这个字符串不以"或'结尾)";
+    const char* syntaxerror_lexstring = R"(这个字符串不以"或'结尾)";
     const char* syntaxerror_no_expect = R"(%是不被期待的)";
     const char* syntaxerror_expect = R"(%是被期待的.)";
-    const char* syntaxerror_lexanno
-        = "多行注释应当以*/结尾";
-    const char* syntaxerror_escape_char
-        = R"(转义符%未定义)";
+    const char* syntaxerror_lexanno = "多行注释应当以*/结尾";
+    const char* syntaxerror_escape_char = R"(转义符%未定义)";
     const char* syntaxerror = "错误的语法";
 
     const char* asserterror_default = "断言";
@@ -51,11 +47,10 @@ namespace error {
           "\n";
 }
 namespace help {
-    const char* help_msg
-        = "Trc是一门基于栈的编程语言。这个项目实现"
-          "了大部分现代编程语言的功能，提供了一个完"
-          "善的工具链。它很方便被嵌入到你的项目中或"
-          "者作为工作脚本，也可以帮助你去学习编译原理.";
+    const char* help_msg = "Trc是一门基于栈的编程语言。这个项目实现"
+                           "了大部分现代编程语言的功能，提供了一个完"
+                           "善的工具链。它很方便被嵌入到你的项目中或"
+                           "者作为工作脚本，也可以帮助你去学习编译原理.";
 }
 
 namespace TVM {
@@ -70,9 +65,8 @@ namespace trc {
 namespace tdb {
     const char* var = "变量";
     const char* not_defined = "没有被定义";
-    const char* start_tip
-        = "trc的调试器正在运行.你可以阅读'Doc/"
-          "use/TDB.txt'以寻找帮助.\n";
+    const char* start_tip = "trc的调试器正在运行.你可以阅读'Doc/"
+                            "use/TDB.txt'以寻找帮助.\n";
     const char* instruction = "指令";
 }
 }

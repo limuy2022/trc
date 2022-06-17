@@ -9,8 +9,7 @@
 
 namespace trc::tools {
 namespace tools_in {
-    void __brun(
-        TVM_space::TVM* vm, const std::string& path) {
+    void __brun(TVM_space::TVM* vm, const std::string& path) {
         __build(vm, path);
         vm->run_all();
     }

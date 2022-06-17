@@ -89,11 +89,9 @@ def::OBJ& trc_map::get_value(const def::OBJ key_) const {
 }
 
 trc_map::trc_map()
-    : data_(
-        (data_info*)malloc(sizeof(data_info) * length)) {
+    : data_((data_info*)malloc(sizeof(data_info) * length)) {
     if (data_ == nullptr) {
-        error::send_error(error::MemoryError,
-            language::error::memoryerror);
+        error::send_error(error::MemoryError, language::error::memoryerror);
     }
 }
 
@@ -105,19 +103,16 @@ def::OBJ& trc_map::operator[](const def::OBJ& key) {
     return get_value(key);
 }
 
-const def::OBJ& trc_map::operator[](
-    const def::OBJ& key) const {
+const def::OBJ& trc_map::operator[](const def::OBJ& key) const {
     return get_value(key);
 }
 
 void trc_map::resize() {
     if (objs_in * 1.0 / length >= 0.75) {
         /* 扩容 */
-        data_ = (data_info*)(realloc(
-            data_, sizeof(data_info) * length * 2));
+        data_ = (data_info*)(realloc(data_, sizeof(data_info) * length * 2));
         if (data_ == nullptr) {
-            error::send_error(error::MemoryError,
-                language::error::memoryerror);
+            error::send_error(error::MemoryError, language::error::memoryerror);
         }
         // 遍历原先的哈希表长度,做一个记录
         int tmp = length;

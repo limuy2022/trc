@@ -38,6 +38,5 @@ typedef std::vector<std::vector<pos>> canvas_data;
  * @warning
  * 这个函数将会修改pos_参数中的值，理想状态下，最后pos_应该全部被清零
  */
-TRC_base_func_api void draw_pictures(
-    canvas_data& pos_, char background = '.');
+TRC_base_func_api void draw_pictures(canvas_data& pos_, char background = '.');
 }

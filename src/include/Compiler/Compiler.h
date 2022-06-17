@@ -26,8 +26,7 @@ typedef error::error_module compiler_error;
  */
 class TRC_Compiler_api token_lex {
 public:
-    token_lex(
-        const std::string& code, compiler_error* error_);
+    token_lex(const std::string& code, compiler_error* error_);
 
     ~token_lex();
 
@@ -91,8 +90,8 @@ private:
      * 解析符号时遇到多种情况，例如读取*后可以为*，*=，**，**=四种情况
      * 使用方法：传入符号后期待的符号，如*期待=,再依次传入期待满足时的标记和期待不满足时的标记
      */
-    token_ticks get_binary_ticks(char expected_char,
-        token_ticks expected, token_ticks unexpected);
+    token_ticks get_binary_ticks(
+        char expected_char, token_ticks expected, token_ticks unexpected);
 
     /**
      * 只有在有且仅有一个期待字符时使用
@@ -119,6 +118,5 @@ TRC_Compiler_func_api void Compiler(
 /**
  * @brief 释放整棵树的内存
  */
-TRC_Compiler_func_api void free_tree(
-    compiler::treenode* head);
+TRC_Compiler_func_api void free_tree(compiler::treenode* head);
 }

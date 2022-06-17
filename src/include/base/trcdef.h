@@ -12,10 +12,9 @@
 
 typedef std::vector<std::string> vecs;
 
-#define NOREACH                                            \
-    do {                                                   \
-        trc::noreach_internal(                             \
-            __LINE__, __FUNCTION__, __FILE__);             \
+#define NOREACH                                                                \
+    do {                                                                       \
+        trc::noreach_internal(__LINE__, __FUNCTION__, __FILE__);               \
     } while (0)
 
 namespace trc {
@@ -23,8 +22,8 @@ namespace trc {
  * @brief
  * 在不能被执行到的地方放上这条语句，出现问题会强行停止程序
  */
-TRC_base_func_api void noreach_internal(size_t line,
-    const char* funcname, const char* filename);
+TRC_base_func_api void noreach_internal(
+    size_t line, const char* funcname, const char* filename);
 
 namespace TVM_space::types {
     class trc_long;

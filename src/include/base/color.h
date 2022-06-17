@@ -15,8 +15,7 @@
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"
 #define BLUE "\033[34m"
-#define WHITE                                              \
-    "\033[37m" /*虽然默认就是白色，但终端颜色是可以手动调整的*/
+#define WHITE "\033[37m" /*虽然默认就是白色，但终端颜色是可以手动调整的*/
 #define PURPLE "\033[35m"
 #define CLOSE_COLOR "\033[0m"
 typedef const char* color_type;
@@ -26,17 +25,12 @@ typedef const char* color_type;
 
 #define RED (FOREGROUND_INTENSITY | FOREGROUND_RED)
 #define GREEN (FOREGROUND_INTENSITY | FOREGROUND_GREEN)
-#define YELLOW                                             \
-    (FOREGROUND_INTENSITY | FOREGROUND_RED                 \
-        | FOREGROUND_GREEN)
+#define YELLOW (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN)
 #define BLUE (FOREGROUND_INTENSITY | FOREGROUND_BLUE)
-#define WHITE                                              \
-    (FOREGROUND_INTENSITY | FOREGROUND_RED                 \
-        | FOREGROUND_GREEN                                 \
+#define WHITE                                                                  \
+    (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN                  \
         | FOREGROUND_BLUE) /*虽然默认就是白色，但终端颜色是可以手动调整的*/
-#define PURPLE                                             \
-    (FOREGROUND_INTENSITY | FOREGROUND_RED                 \
-        | FOREGROUND_BLUE)
+#define PURPLE (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE)
 #define CLOSE_COLOR WHITE
 typedef int color_type;
 #endif
@@ -55,16 +49,14 @@ public:
      * @details 像使用printf一样使用它
      */
     template <typename... argvs>
-    void operator()(
-        const char* fmt, const argvs&... data) const;
+    void operator()(const char* fmt, const argvs&... data) const;
 
 private:
     color_type color;
 };
 
 template <typename... argvs>
-void color_st::operator()(
-    const char* fmt, const argvs&... data) const {
+void color_st::operator()(const char* fmt, const argvs&... data) const {
 #ifdef WINDOWS_PLAT
     SetConsoleTextAttribute(hout, this->color);
     printf(fmt, data...);
@@ -76,6 +68,5 @@ void color_st::operator()(
 #endif
 }
 
-TRC_base_api extern color_st yellow, blue, red, green,
-    white, purple;
+TRC_base_api extern color_st yellow, blue, red, green, white, purple;
 }

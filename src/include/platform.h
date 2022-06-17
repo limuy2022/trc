@@ -6,8 +6,7 @@
 
 #pragma once
 
-#if defined(WIN32) || defined(_WIN32)                      \
-    || defined(__WIN32__) || defined(__NT__)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define WINDOWS_PLAT
 #elif defined(__linux__)
 #define LINUX_PLAT

@@ -52,8 +52,7 @@ static byteCodeNumber opcodesym_int[] = {
 
 class detail_compiler {
 public:
-    detail_compiler(
-        compiler_error&, TVM_space::TVM_static_data&);
+    detail_compiler(compiler_error&, TVM_space::TVM_static_data&);
 
     /**
      * @brief 将一个节点解析成字节码
@@ -67,8 +66,8 @@ private:
      * @brief 把数据添加进相对应的vm常量池
      * @return 数据在常量池中所占的索引
      */
-    TVM_space::bytecode_index_t add(TVM_space::TVM* vm,
-        COMPILE_TYPE_TICK data_type, char* data_value);
+    TVM_space::bytecode_index_t add(
+        TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type, char* data_value);
 
     /**
      * @brief
@@ -77,16 +76,15 @@ private:
      * @param index 索引
      */
     TVM_space::TVM_bytecode* build_opcode(
-        token_ticks symbol,
-        TVM_space::bytecode_index_t index = 0);
+        token_ticks symbol, TVM_space::bytecode_index_t index = 0);
 
     /**
      * @brief 构建有关变量的字节码
      * @param data 符号
      * @param index 索引
      */
-    TVM_space::TVM_bytecode* build_var(token_ticks data,
-        TVM_space::bytecode_index_t index = 0);
+    TVM_space::TVM_bytecode* build_var(
+        token_ticks data, TVM_space::bytecode_index_t index = 0);
 
     /**
      * @brief 添加字节码，并完善对应环境
@@ -108,8 +106,7 @@ private:
     std::vector<int> line_to_bycodeindex_table;
 };
 
-void detail_compiler::add_opcode(
-    TVM_space::TVM_bytecode* opcode) {
+void detail_compiler::add_opcode(TVM_space::TVM_bytecode* opcode) {
     static_data.byte_codes.push_back(opcode);
     static_data.line_number_table.push_back(error_.line);
     if (error_.line != prev_value) {
@@ -120,18 +117,15 @@ void detail_compiler::add_opcode(
     }
 }
 
-void detail_compiler::func_lexer(
-    TVM_space::TVM* vm, treenode* head) {
+void detail_compiler::func_lexer(TVM_space::TVM* vm, treenode* head) {
 }
 
 TVM_space::bytecode_index_t detail_compiler::add(
-    TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type,
-    char* data_value) {
+    TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type, char* data_value) {
     switch (data_type) {
     case string_TICK: {
         int index = utils::str_check_in_i(data_value,
-            vm->static_data.const_s.begin() + 1,
-            vm->static_data.const_s.end());
+            vm->static_data.const_s.begin() + 1, vm->static_data.const_s.end());
         size_t size = vm->static_data.const_s.size();
         if (index != -1) {
             return index + 1;
@@ -146,8 +140,7 @@ TVM_space::bytecode_index_t detail_compiler::add(
         int afdata = atoi(data_value);
         size_t size = vm->static_data.const_i.size();
         int index = utils::check_in_i(afdata,
-            vm->static_data.const_i.begin() + 1,
-            vm->static_data.const_i.end());
+            vm->static_data.const_i.begin() + 1, vm->static_data.const_i.end());
         if (index != -1) {
             return index + 1;
         } else {
@@ -159,8 +152,7 @@ TVM_space::bytecode_index_t detail_compiler::add(
         double afdata = atof(data_value);
         size_t size = vm->static_data.const_f.size();
         int index = utils::check_in_i(afdata,
-            vm->static_data.const_f.begin() + 1,
-            vm->static_data.const_f.end());
+            vm->static_data.const_f.begin() + 1, vm->static_data.const_f.end());
         if (index != -1) {
             return index + 1;
         } else {
@@ -200,8 +192,7 @@ TVM_space::bytecode_index_t detail_compiler::add(
         int afdata = change_const[data_value];
         size_t size = vm->static_data.const_i.size();
         int index = utils::check_in_i(afdata,
-            vm->static_data.const_i.begin() + 1,
-            vm->static_data.const_i.end());
+            vm->static_data.const_i.begin() + 1, vm->static_data.const_i.end());
         if (index != -1) {
             return index + 1;
         } else {
@@ -217,9 +208,8 @@ TVM_space::bytecode_index_t detail_compiler::add(
 
 TVM_space::TVM_bytecode* detail_compiler::build_opcode(
     token_ticks symbol, TVM_space::bytecode_index_t index) {
-    return new TVM_space::TVM_bytecode {
-        (bytecode_t)opcodesym_int[(int)symbol], index
-    };
+    return new TVM_space::TVM_bytecode { (bytecode_t)opcodesym_int[(int)symbol],
+        index };
 }
 
 TVM_space::TVM_bytecode* detail_compiler::build_var(
@@ -233,8 +223,7 @@ TVM_space::TVM_bytecode* detail_compiler::build_var(
     };
 }
 
-void detail_compiler::compile(
-    TVM_space::TVM* vm, treenode* head) {
+void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
     grammar_type type = head->type;
     if (head->has_son()) {
         auto* root = (is_not_end_node*)head;
@@ -248,24 +237,18 @@ void detail_compiler::compile(
         }
         case BUILTIN_FUNC: {
             // 内置函数
-            auto* code = (node_base_tick_without_sons*)
-                             root->son[0];
-            auto* index_
-                = (node_base_int_without_sons*)root->son[1];
-            add_opcode(
-                build_opcode(code->tick, index_->value));
+            auto* code = (node_base_tick_without_sons*)root->son[0];
+            auto* index_ = (node_base_int_without_sons*)root->son[1];
+            add_opcode(build_opcode(code->tick, index_->value));
             break;
         }
         case OPCODE_ARGV: {
             // 带参数字节码
             // 参数
-            auto* argv_ = (node_base_data_without_sons*)
-                              root->son[0];
-            COMPILE_TYPE_TICK type_data
-                = what_type(argv_->data);
-            add_opcode(
-                build_opcode(((node_base_tick*)root)->tick,
-                    add(vm, type_data, argv_->data)));
+            auto* argv_ = (node_base_data_without_sons*)root->son[0];
+            COMPILE_TYPE_TICK type_data = what_type(argv_->data);
+            add_opcode(build_opcode(((node_base_tick*)root)->tick,
+                add(vm, type_data, argv_->data)));
             break;
         }
         case FUNC_DEFINE: {
@@ -278,28 +261,22 @@ void detail_compiler::compile(
             // 处理等式右边的数据
             compile(vm, root->son[1]);
             // 处理等式左边的数据
-            auto* argv_ = (node_base_data_without_sons*)
-                              root->son[0];
-            short index_argv = add(vm,
-                COMPILE_TYPE_TICK::VAR_TICK, argv_->data);
-            add_opcode(build_var(
-                ((node_base_tick*)root)->tick, index_argv));
+            auto* argv_ = (node_base_data_without_sons*)root->son[0];
+            short index_argv
+                = add(vm, COMPILE_TYPE_TICK::VAR_TICK, argv_->data);
+            add_opcode(build_var(((node_base_tick*)root)->tick, index_argv));
             break;
         }
         case CALL_FUNC: {
             // 调用自定义函数
             // 判断函数是否存在
             char* nodedata = ((node_base_data*)root)->data;
-            if (!utils::map_check_in_first(
-                    vm->static_data.funcs, nodedata))
-                error_.send_error_module(error::NameError,
-                    language::error::nameerror, nodedata);
-            auto* code = (node_base_tick_without_sons*)
-                             root->son[0];
-            auto* index_
-                = (node_base_int_without_sons*)root->son[1];
-            add_opcode(
-                build_opcode(code->tick, index_->value));
+            if (!utils::map_check_in_first(vm->static_data.funcs, nodedata))
+                error_.send_error_module(
+                    error::NameError, language::error::nameerror, nodedata);
+            auto* code = (node_base_tick_without_sons*)root->son[0];
+            auto* index_ = (node_base_int_without_sons*)root->son[1];
+            add_opcode(build_opcode(code->tick, index_->value));
             break;
         }
         default: {
@@ -310,34 +287,25 @@ void detail_compiler::compile(
         switch (type) {
         case DATA: {
             // 数据节点
-            char* nodedata
-                = ((node_base_data_without_sons*)head)
-                      ->data;
+            char* nodedata = ((node_base_data_without_sons*)head)->data;
             auto type_data = what_type(nodedata);
             TVM_space::bytecode_index_t index_argv
                 = add(vm, type_data, nodedata);
             if (type_data == string_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)
-                        byteCodeNumber::LOAD_STRING_,
-                    index_argv });
-            } else if (type_data == int_TICK
-                || type_data == CONST_TICK) {
+                    (bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv });
+            } else if (type_data == int_TICK || type_data == CONST_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_INT_,
-                    index_argv });
+                    (bytecode_t)byteCodeNumber::LOAD_INT_, index_argv });
             } else if (type_data == float_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_FLOAT_,
-                    index_argv });
+                    (bytecode_t)byteCodeNumber::LOAD_FLOAT_, index_argv });
             } else if (type_data == VAR_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_NAME_,
-                    index_argv });
+                    (bytecode_t)byteCodeNumber::LOAD_NAME_, index_argv });
             } else if (type_data == LONG_TICK) {
                 add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_LONG_,
-                    index_argv });
+                    (bytecode_t)byteCodeNumber::LOAD_LONG_, index_argv });
             }
             break;
         }
@@ -348,9 +316,7 @@ void detail_compiler::compile(
         }
         case OPCODE: {
             // 生成字节码, -1代表没有参数
-            token_ticks tick
-                = ((node_base_tick_without_sons*)head)
-                      ->tick;
+            token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
             add_opcode(build_opcode(tick));
             break;
         }
@@ -361,8 +327,8 @@ void detail_compiler::compile(
     }
 }
 
-detail_compiler::detail_compiler(compiler_error& error_,
-    TVM_space::TVM_static_data& static_data)
+detail_compiler::detail_compiler(
+    compiler_error& error_, TVM_space::TVM_static_data& static_data)
     : error_(error_)
     , static_data(static_data) {
 }
@@ -378,8 +344,7 @@ void free_tree(treenode* head) {
     delete head;
 }
 
-void Compiler(
-    TVM_space::TVM* vm, const std::string& codes) {
+void Compiler(TVM_space::TVM* vm, const std::string& codes) {
     // 先释放所有的内存
     TVM_space::free_TVM(vm);
     compiler_error error_("__main__");

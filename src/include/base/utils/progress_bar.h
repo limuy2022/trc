@@ -10,8 +10,7 @@ namespace trc::utils {
  */
 class TRC_base_api progress_bar {
 public:
-    progress_bar(unsigned int total_steps, char background,
-        char bar_char);
+    progress_bar(unsigned int total_steps, char background, char bar_char);
 
     /**
      * @brief 进度+1,(延长进度条)

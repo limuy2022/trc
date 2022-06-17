@@ -22,8 +22,8 @@ public:
      * @param line 储存代码行的地方
      * @param error_ 报错模块
      */
-    grammar_lex(const std::string& codes_str,
-        trc::compiler::compiler_error* error_);
+    grammar_lex(
+        const std::string& codes_str, trc::compiler::compiler_error* error_);
 
     ~grammar_lex();
 
@@ -37,16 +37,14 @@ private:
      * @param oper_tmp 储存符号的临时数据容器
      * 设置的原因是会有两个数据来源：已经读入的数据和即时读入的数据
      */
-    void ConvertDataToExpressions(token* raw_lex,
-        std::vector<treenode*>& st,
+    void ConvertDataToExpressions(token* raw_lex, std::vector<treenode*>& st,
         std::stack<token_ticks>& oper_tmp);
 
     /**
      * @brief 将中缀表达式转换成后缀表达式
      * @details 常量折叠在此进行
      */
-    void change_to_last_expr(
-        is_not_end_node* head, code_type& code);
+    void change_to_last_expr(is_not_end_node* head, code_type& code);
 
     /**
      * @brief 生成赋值语句节点
@@ -55,8 +53,7 @@ private:
      * @param lvalue 左值
      * @param rvalue 右值
      */
-    void assign(is_not_end_node* head,
-        trc::compiler::token_ticks oper,
+    void assign(is_not_end_node* head, trc::compiler::token_ticks oper,
         const code_type& code);
 
     /**
@@ -64,16 +61,14 @@ private:
      * @param head 根节点指针
      * @param code 整条语句
      */
-    void callfunction(node_base_data* functree,
-        const code_type& funcname);
+    void callfunction(node_base_data* functree, const code_type& funcname);
 
     /**
      * @brief 生成语句执行节点
      * @param head 根节点指针
      * @param code 整条语句
      */
-    void sentence_tree(
-        node_base_tick* head, token_ticks sentence_name);
+    void sentence_tree(node_base_tick* head, token_ticks sentence_name);
 
     /**
      * @brief 生成条件循环字节码

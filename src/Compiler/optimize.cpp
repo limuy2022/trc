@@ -26,16 +26,14 @@ int mul(const int& a, const int& b) {
 int zdiv_(const int& a, const int& b) {
     if (b)
         return a / b;
-    error::send_error(error::ZeroDivError,
-        language::error::zerodiverror,
+    error::send_error(error::ZeroDivError, language::error::zerodiverror,
         std::to_string(b).c_str());
 }
 
 int mod(const int& a, const int& b) {
     if (b)
         return a % b;
-    error::send_error(error::ZeroDivError,
-        language::error::zerodiverror,
+    error::send_error(error::ZeroDivError, language::error::zerodiverror,
         std::to_string(b).c_str());
 }
 

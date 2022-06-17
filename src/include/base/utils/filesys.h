@@ -21,11 +21,9 @@ typedef bool (*filefilter)(const std::filesystem::path&);
  * @param dirList 遍历出文件夹的存储地
  */
 TRC_base_func_api void listfiles(
-    const std::string& path,
-    std::vector<fs::path>& fileList,
+    const std::string& path, std::vector<fs::path>& fileList,
     std::vector<fs::path>& dirList,
-    filefilter
-    = [](const fs::path&) -> bool { return true; });
+    filefilter = [](const fs::path&) -> bool { return true; });
 
 /**
  * @brief 检查文件是否存在
@@ -38,8 +36,7 @@ TRC_base_func_api bool file_exists(const std::string& path);
  * @code math.lang -> math/lang @endcode
  * @details 不采用正则表达式处理
  */
-TRC_base_func_api std::string import_to_path(
-    std::string import_name);
+TRC_base_func_api std::string import_to_path(std::string import_name);
 
 /**
  * @brief 读取文件并将字符存入file_data

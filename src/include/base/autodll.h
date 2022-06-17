@@ -40,14 +40,12 @@ TRC_base_func_api void dllfree(dll_t dll);
  * @param dll dll
  * @param funcname 函数名
  */
-TRC_base_func_api void* dllfuncload(
-    dll_t dll, const char* funcname);
+TRC_base_func_api void* dllfuncload(dll_t dll, const char* funcname);
 
 /**
  * @brief 将链接库名字改为当前系统中的名字
  * @warning 不要加后缀和前缀
  * 另外记得用delete[]释放内存
  */
-TRC_base_func_api char* redirect_to_platform(
-    const std::string& name);
+TRC_base_func_api char* redirect_to_platform(const std::string& name);
 }

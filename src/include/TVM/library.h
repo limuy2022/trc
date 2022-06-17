@@ -12,6 +12,5 @@
 #endif
 #else
 #define TRC_TVM_api __attribute__((visibility("default")))
-#define TRC_TVM_func_api                                   \
-    extern "C" __attribute__((visibility("default")))
+#define TRC_TVM_func_api extern "C" __attribute__((visibility("default")))
 #endif

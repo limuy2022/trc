@@ -17,21 +17,16 @@ char* make_error_msg(int error_name, va_list& ap) {
     // 模板字符串的长度
     size_t base_string_len = strlen(base_string);
     // 错误名的长度
-    size_t error_name_map_len
-        = strlen(language::error::error_map[error_name]);
+    size_t error_name_map_len = strlen(language::error::error_map[error_name]);
     // finally_out增加的大小，大于等于base_string加上错误名的长度,且预留\0后再多预留4个字节
-    size_t finally_out_length
-        = error_name_map_len + base_string_len + 5;
+    size_t finally_out_length = error_name_map_len + base_string_len + 5;
     // 具体报错数据储存容器
-    char* finally_out
-        = (char*)malloc(finally_out_length * sizeof(char));
+    char* finally_out = (char*)malloc(finally_out_length * sizeof(char));
     if (finally_out == nullptr) {
-        error::send_error(error::MemoryError,
-            language::error::memoryerror);
+        error::send_error(error::MemoryError, language::error::memoryerror);
     }
     // 将错误名拷贝到报错数据中
-    strcpy(finally_out,
-        language::error::error_map[error_name]);
+    strcpy(finally_out, language::error::error_map[error_name]);
     // 已使用长度
     size_t used_size = error_name_map_len;
     // 字符串索引
@@ -45,15 +40,13 @@ char* make_error_msg(int error_name, va_list& ap) {
                 // 需要的内存已经超过了申请的，之所以是等于，是因为还有\0
                 // 多申请5个作预留
                 finally_out_length += addtmp_len + 5;
-                finally_out = (char*)realloc(
-                    finally_out, finally_out_length);
+                finally_out = (char*)realloc(finally_out, finally_out_length);
                 if (finally_out == nullptr) {
-                    error::send_error(error::MemoryError,
-                        language::error::memoryerror);
+                    error::send_error(
+                        error::MemoryError, language::error::memoryerror);
                 }
             }
-            strncpy(finally_out + res_string_index, addtmp,
-                addtmp_len);
+            strncpy(finally_out + res_string_index, addtmp, addtmp_len);
             res_string_index += addtmp_len;
         } else {
             finally_out[res_string_index] = base_string[i];
@@ -70,8 +63,7 @@ char* make_error_msg(int error_name, va_list& ap) {
  * @details 运用默认参数巧妙解决了两个版本的报错
  */
 static void send_error_detail(int name, va_list& ap,
-    const std::string& module = "__main__",
-    size_t line_index = 0) {
+    const std::string& module = "__main__", size_t line_index = 0) {
     char* error_msg = make_error_msg(name, ap);
     send_error_(error_msg, module.c_str(), line_index);
     free(error_msg);
@@ -79,9 +71,8 @@ static void send_error_detail(int name, va_list& ap,
         exit(1);
 }
 
-void send_error_module_aplist(int name,
-    const std::string& module, size_t line_index,
-    va_list& ap) {
+void send_error_module_aplist(
+    int name, const std::string& module, size_t line_index, va_list& ap) {
     send_error_detail(name, ap, module, line_index);
 }
 
@@ -92,12 +83,10 @@ void send_error(int name, ...) {
     va_end(ap);
 }
 
-void send_error_(const char* error_msg, const char* module,
-    size_t line_index) noexcept {
-    fprintf(stderr, "\n%s%s\n%s%zu:\n%s\n",
-        language::error::error_from, module,
-        language::error::error_in_line, line_index,
-        error_msg);
+void send_error_(
+    const char* error_msg, const char* module, size_t line_index) noexcept {
+    fprintf(stderr, "\n%s%s\n%s%zu:\n%s\n", language::error::error_from, module,
+        language::error::error_in_line, line_index, error_msg);
 }
 
 error_module::error_module(std::string name)
@@ -108,8 +97,7 @@ void error_module::send_error_module(int ename, ...) {
     va_list ap;
     va_start(ap, ename);
     // 加1是为了从索引转成行号
-    error::send_error_module_aplist(
-        ename, name, line + 1, ap);
+    error::send_error_module_aplist(ename, name, line + 1, ap);
     va_end(ap);
 }
 }

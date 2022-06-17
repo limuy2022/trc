@@ -14,8 +14,7 @@ namespace trc::utils {
  * @param data 数据
  */
 template <typename T>
-inline bool inrange(
-    const T& start, const T& end, const T& data) {
+inline bool inrange(const T& start, const T& end, const T& data) {
     return start <= data && data <= end;
 }
 
@@ -28,8 +27,7 @@ inline bool inrange(
  * @warning C风格字符串不可用
  * @return 索引，未查找到返回-1
  */
-template <typename T, typename V>
-int index_vector(const T& v1, const V& data) {
+template <typename T, typename V> int index_vector(const T& v1, const V& data) {
     auto begin = v1.begin(), end = v1.end();
     auto item = std::find(begin, end, data);
     return item != end ? distance(begin, item) : -1;
@@ -38,8 +36,7 @@ int index_vector(const T& v1, const V& data) {
 /**
  * @brief 获取字符串data在v1中的索引值(第一个)
  */
-template <typename T>
-int index_strstl(const T& v1, const char* data) {
+template <typename T> int index_strstl(const T& v1, const char* data) {
     for (int i = 0, n = v1.size(); i < n; i++) {
         if (!strcmp(v1[i], data)) {
             return i;
@@ -55,16 +52,14 @@ int index_strstl(const T& v1, const char* data) {
  * @param data 数据
  * @param arr 容器
  */
-template <typename T, typename O>
-bool check_in(const O& data, T begin, T end) {
+template <typename T, typename O> bool check_in(const O& data, T begin, T end) {
     return std::find(begin, end, data) != end;
 }
 
 /**
  * @brief 检查data是否在容器T每一项值的里面(字符串专用)
  */
-template <typename T>
-bool str_check_in(const char* data, T begin, T end) {
+template <typename T> bool str_check_in(const char* data, T begin, T end) {
     for (auto i = begin; i != end; ++i) {
         if (!strcmp(*i, data)) {
             return true;
@@ -99,8 +94,7 @@ int check_in_i(const T& data, O begin, O end) {
  * @tparam O 容器类型
  * @param data 数据
  */
-template <typename T>
-int str_check_in_i(const char* data, T begin, T end) {
+template <typename T> int str_check_in_i(const char* data, T begin, T end) {
     int res = 0;
     for (auto i = begin; i != end; ++i) {
         if (!strcmp(*i, data))
@@ -161,8 +155,7 @@ bool map_check_in_second(const T& m1, const O& data) {
  * @param arr 数组
  * @return 数组的长度
  */
-template <typename T>
-constexpr size_t sizeof_static_array(T& arr) {
+template <typename T> constexpr size_t sizeof_static_array(T& arr) {
     return sizeof(arr) / sizeof(arr[0]);
 }
 

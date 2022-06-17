@@ -14,8 +14,8 @@
 namespace trc::TVM_space::builtin {
 void LENGTH(int argc, TVM* vm) {
     if (argc != 1) {
-        vm->error_report(error::ArgumentError,
-            language::error::argumenterror, "len", "1");
+        vm->error_report(
+            error::ArgumentError, language::error::argumenterror, "len", "1");
     }
     firsts = (def::STRINGOBJ)vm->pop();
     vm->push(new types::trc_int(firsts->len()));
@@ -79,7 +79,6 @@ void BOOL_(int argc, TVM* vm) {
 
 void TYPE(int argc, TVM* vm) {
     firstv = vm->pop();
-    vm->push(MALLOCSTRING(
-        type_int::int_name_s[(int)firstv->gettype()]));
+    vm->push(MALLOCSTRING(type_int::int_name_s[(int)firstv->gettype()]));
 }
 }

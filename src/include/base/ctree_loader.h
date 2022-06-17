@@ -18,8 +18,7 @@ TRC_base_func_api void loader_ctree(
  * @param vm 虚拟机
  * @param path 路径
  */
-TRC_base_func_api void save_ctree(
-    TVM_space::TVM* vm, const std::string& path);
+TRC_base_func_api void save_ctree(TVM_space::TVM* vm, const std::string& path);
 
 /**
  * @brief 判断一个文件是不是合法的ctree文件

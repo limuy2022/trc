@@ -13,13 +13,11 @@ namespace fs = std::filesystem;
 namespace trc::TVM_space {
 void TVM::LOAD_INT(bytecode_index_t index) {
     int value = static_data.const_i[index];
-    if (INT_CACHE_BEGIN <= value
-        && value <= INT_CACHE_END) {
+    if (INT_CACHE_BEGIN <= value && value <= INT_CACHE_END) {
         // 处在缓存范围中
 
         // 减去负数偏移量
-        push(
-            &TVM_share::int_cache[value - INT_CACHE_BEGIN]);
+        push(&TVM_share::int_cache[value - INT_CACHE_BEGIN]);
         return;
     }
     push(MALLOCINT(value));
@@ -59,20 +57,15 @@ static void fix_path(const std::string& path) {
     if (utils::file_exists(path)) {
         return;
     }
-    if (utils::check_in(path, cpp_libs::names.begin(),
-            cpp_libs::names.end())) {
+    if (utils::check_in(path, cpp_libs::names.begin(), cpp_libs::names.end())) {
         return;
     }
     if (utils::file_exists(
-            fs::path("TVM/packages/self_support")
-                .append(path)
-                .string())) {
+            fs::path("TVM/packages/self_support").append(path).string())) {
         return;
     }
     if (utils::file_exists(
-            fs::path("TVM/packages/other_support")
-                .append(path)
-                .string())) {
+            fs::path("TVM/packages/other_support").append(path).string())) {
         return;
     }
 

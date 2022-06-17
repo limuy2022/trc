@@ -5,10 +5,9 @@
 #include <base/trcdef.h>
 
 namespace trc::TVM_space {
-TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT,
-    &builtin::PRINT, &builtin::PRINTLN, &builtin::INPUT,
-    &builtin::LENGTH, &builtin::HELP, &builtin::STRING_,
-    &builtin::INT_, &builtin::BOOL_, &builtin::FLOAT_,
+TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT, &builtin::PRINT,
+    &builtin::PRINTLN, &builtin::INPUT, &builtin::LENGTH, &builtin::HELP,
+    &builtin::STRING_, &builtin::INT_, &builtin::BOOL_, &builtin::FLOAT_,
     &builtin::TYPE };
 
 void TVM::CALL_BUILTIN(bytecode_index_t name) {
@@ -17,8 +16,7 @@ void TVM::CALL_BUILTIN(bytecode_index_t name) {
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {
-    func_* fast
-        = static_data.funcs[static_data.const_name[index]];
+    func_* fast = static_data.funcs[static_data.const_name[index]];
     run_func_str = fast->name;
     frame_* frame_var = new frame_;
     dyna_data.frames.push(frame_var);

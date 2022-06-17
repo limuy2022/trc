@@ -64,10 +64,8 @@ void token_lex::lex_string(token* result) {
                 break;
             }
             default: {
-                error_->send_error_module(
-                    error::SyntaxError,
-                    language::error::
-                        syntaxerror_escape_char);
+                error_->send_error_module(error::SyntaxError,
+                    language::error::syntaxerror_escape_char);
             }
             }
         } else {
@@ -77,8 +75,8 @@ void token_lex::lex_string(token* result) {
         get_next_char();
         if (end_of_lex()) {
             // 读到文件末尾了，说明字符串解析错误
-            error_->send_error_module(error::SyntaxError,
-                language::error::syntaxerror_lexstring);
+            error_->send_error_module(
+                error::SyntaxError, language::error::syntaxerror_lexstring);
         }
     }
     // 略过字符串终结符
@@ -124,17 +122,14 @@ void token_lex::lex_english(token* result) {
     result->data += *char_ptr;
     get_next_char();
     for (;;) {
-        if (!(is_english(*char_ptr) || isdigit(*char_ptr))
-            || end_of_lex()) {
+        if (!(is_english(*char_ptr) || isdigit(*char_ptr)) || end_of_lex()) {
             // 不满足字母，数字，下划线
             break;
         }
         result->data += *char_ptr;
         get_next_char();
     }
-    for (size_t i = 0,
-                n = utils::sizeof_static_array(keywords_);
-         i < n; ++i) {
+    for (size_t i = 0, n = utils::sizeof_static_array(keywords_); i < n; ++i) {
         if (result->data == keywords_[i].first) {
             // 注：传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
             result->data.clear();
@@ -146,8 +141,8 @@ void token_lex::lex_english(token* result) {
     result->tick = token_ticks::NAME;
 }
 
-token_ticks token_lex::get_binary_ticks(char expected_char,
-    token_ticks expected, token_ticks unexpected) {
+token_ticks token_lex::get_binary_ticks(
+    char expected_char, token_ticks expected, token_ticks unexpected) {
     get_next_char();
     if (*char_ptr == expected_char) {
         return expected;
@@ -162,27 +157,25 @@ void token_lex::check_expected_char(char expected_char) {
     if (*char_ptr != expected_char) {
         char err_tmp[] = { *char_ptr, '\0' };
         error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_no_expect,
-            err_tmp);
+            language::error::syntaxerror_no_expect, err_tmp);
     }
 }
 
 void token_lex::lex_others(token* result) {
     switch (*char_ptr) {
     case '<': {
-        result->tick = get_binary_ticks('=',
-            token_ticks::LESS_EQUAL, token_ticks::LESS);
+        result->tick
+            = get_binary_ticks('=', token_ticks::LESS_EQUAL, token_ticks::LESS);
         break;
     }
     case '>': {
-        result->tick = get_binary_ticks('=',
-            token_ticks::GREATER_EQUAL,
-            token_ticks::GREATER);
+        result->tick = get_binary_ticks(
+            '=', token_ticks::GREATER_EQUAL, token_ticks::GREATER);
         break;
     }
     case '=': {
-        result->tick = get_binary_ticks(
-            '=', token_ticks::EQUAL, token_ticks::ASSIGN);
+        result->tick
+            = get_binary_ticks('=', token_ticks::EQUAL, token_ticks::ASSIGN);
         break;
     }
     case '!': {
@@ -196,42 +189,39 @@ void token_lex::lex_others(token* result) {
         break;
     }
     case '+': {
-        result->tick = get_binary_ticks(
-            '=', token_ticks::SELFADD, token_ticks::ADD);
+        result->tick
+            = get_binary_ticks('=', token_ticks::SELFADD, token_ticks::ADD);
         break;
     }
     case '-': {
-        result->tick = get_binary_ticks(
-            '=', token_ticks::SELFSUB, token_ticks::SUB);
+        result->tick
+            = get_binary_ticks('=', token_ticks::SELFSUB, token_ticks::SUB);
         break;
     }
     case '*': {
         // *比较特殊，有**符号
-        if (get_binary_ticks(
-                '*', token_ticks::POW, token_ticks::UNKNOWN)
+        if (get_binary_ticks('*', token_ticks::POW, token_ticks::UNKNOWN)
             == token_ticks::POW) {
             // 确认有两个**
-            result->tick = get_binary_ticks('=',
-                token_ticks::SELFPOW, token_ticks::POW);
+            result->tick
+                = get_binary_ticks('=', token_ticks::SELFPOW, token_ticks::POW);
         } else {
             // 只有一个*
-            result->tick = get_binary_ticks('=',
-                token_ticks::SELFMUL, token_ticks::MUL);
+            result->tick
+                = get_binary_ticks('=', token_ticks::SELFMUL, token_ticks::MUL);
         }
         break;
     }
     case '/': {
         // /符号是最特殊的，因为有//符号和/*符号
-        if (get_binary_ticks('/', token_ticks::ZDIV,
-                token_ticks::UNKNOWN)
+        if (get_binary_ticks('/', token_ticks::ZDIV, token_ticks::UNKNOWN)
             == token_ticks::ZDIV) {
             // 确认有两个//
-            result->tick = get_binary_ticks('=',
-                token_ticks::SELFZDIV, token_ticks::ZDIV);
+            result->tick = get_binary_ticks(
+                '=', token_ticks::SELFZDIV, token_ticks::ZDIV);
         } else {
             // 只有一个/
-            if (get_binary_ticks('*', token_ticks::MUL,
-                    token_ticks::UNKNOWN)
+            if (get_binary_ticks('*', token_ticks::MUL, token_ticks::UNKNOWN)
                 == token_ticks::MUL) {
                 // 说明是/*符号，开启注释
 
@@ -250,23 +240,21 @@ void token_lex::lex_others(token* result) {
                     }
                     if (end_of_lex()) {
                         // 注释未结尾，报错
-                        error_->send_error_module(
-                            error::SyntaxError,
-                            language::error::
-                                syntaxerror_lexanno);
+                        error_->send_error_module(error::SyntaxError,
+                            language::error::syntaxerror_lexanno);
                     }
                     get_next_char();
                 }
             } else {
-                result->tick = get_binary_ticks('=',
-                    token_ticks::SELFDIV, token_ticks::DIV);
+                result->tick = get_binary_ticks(
+                    '=', token_ticks::SELFDIV, token_ticks::DIV);
             }
         }
         break;
     }
     case '%': {
-        result->tick = get_binary_ticks(
-            '=', token_ticks::SELFMOD, token_ticks::MOD);
+        result->tick
+            = get_binary_ticks('=', token_ticks::SELFMOD, token_ticks::MOD);
         break;
     }
     /* 以下的这些括号需要进行括号匹配进行验证 */
@@ -279,8 +267,7 @@ void token_lex::lex_others(token* result) {
         result->tick = token_ticks::RIGHT_SMALL_BRACE;
         if (check_brace.top() != '(') {
             error_->send_error_module(error::SyntaxError,
-                language::error::syntaxerror_no_expect,
-                ")");
+                language::error::syntaxerror_no_expect, ")");
         }
         check_brace.pop();
         break;
@@ -294,8 +281,7 @@ void token_lex::lex_others(token* result) {
         result->tick = token_ticks::RIGHT_MID_BRACE;
         if (check_brace.top() != '[') {
             error_->send_error_module(error::SyntaxError,
-                language::error::syntaxerror_no_expect,
-                "]");
+                language::error::syntaxerror_no_expect, "]");
         }
         check_brace.pop();
         break;
@@ -309,8 +295,7 @@ void token_lex::lex_others(token* result) {
         result->tick = token_ticks::RIGHT_BIG_BRACE;
         if (check_brace.top() != '{') {
             error_->send_error_module(error::SyntaxError,
-                language::error::syntaxerror_no_expect,
-                "}");
+                language::error::syntaxerror_no_expect, "}");
         }
         check_brace.pop();
         break;
@@ -327,8 +312,7 @@ void token_lex::lex_others(token* result) {
         // 如果一个字符都没有匹配到，报错
         char error_tmp[2] = { *char_ptr, '\0' };
         error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_no_expect,
-            error_tmp);
+            language::error::syntaxerror_no_expect, error_tmp);
     }
     }
     // 跳过当前字符
@@ -388,8 +372,7 @@ token* token_lex::get_token() {
     return result;
 }
 
-token_lex::token_lex(
-    const std::string& code, compiler_error* error_)
+token_lex::token_lex(const std::string& code, compiler_error* error_)
     : error_(error_)
     , rawcode(code)
     , char_ptr(rawcode.c_str()) {
@@ -400,8 +383,7 @@ token_lex::~token_lex() {
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
         error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_expect,
-            check_brace.top());
+            language::error::syntaxerror_expect, check_brace.top());
     }
 }
 

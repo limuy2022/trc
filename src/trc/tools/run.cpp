@@ -10,8 +10,7 @@
 
 namespace trc::tools {
 namespace tools_in {
-    void __run(
-        TVM_space::TVM* vm, const std::string& path) {
+    void __run(TVM_space::TVM* vm, const std::string& path) {
         if (loader::is_magic(path)) {
             /*是ctree文件*/
             loader::loader_ctree(vm, path);

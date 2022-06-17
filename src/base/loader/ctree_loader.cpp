@@ -20,25 +20,22 @@ static const int MAGIC_VALUE = 0xACFD;
 
 // 由于读入和写入是相对的，所以用宏定义来简化这一点
 // str:load or write
-#define LOAD_WRITE(file, vm, str)                          \
-    do {                                                   \
-        /* 整型常量池 */                              \
-        str##_pool((file), (vm)->static_data.const_i);     \
-        /* 浮点数常量池 */                           \
-        str##_pool((file), (vm)->static_data.const_f);     \
-        /* 字符串常量池 */                           \
-        str##_string_pool(                                 \
-            (file), (vm)->static_data.const_s);            \
-        /* 长整型常量池 */                           \
-        str##_string_pool(                                 \
-            (file), (vm)->static_data.const_long);         \
-        /* 变量名常量池 */                           \
-        str##_string_pool(                                 \
-            (file), (vm)->static_data.const_name);         \
-        /* 字节码常量池 */                           \
-        str##_bytecode((file), (vm)->static_data);         \
-        /* 函数字节码常量池 */                     \
-        str##_functions((file), (vm)->static_data.funcs);  \
+#define LOAD_WRITE(file, vm, str)                                              \
+    do {                                                                       \
+        /* 整型常量池 */                                                  \
+        str##_pool((file), (vm)->static_data.const_i);                         \
+        /* 浮点数常量池 */                                               \
+        str##_pool((file), (vm)->static_data.const_f);                         \
+        /* 字符串常量池 */                                               \
+        str##_string_pool((file), (vm)->static_data.const_s);                  \
+        /* 长整型常量池 */                                               \
+        str##_string_pool((file), (vm)->static_data.const_long);               \
+        /* 变量名常量池 */                                               \
+        str##_string_pool((file), (vm)->static_data.const_name);               \
+        /* 字节码常量池 */                                               \
+        str##_bytecode((file), (vm)->static_data);                             \
+        /* 函数字节码常量池 */                                         \
+        str##_functions((file), (vm)->static_data.funcs);                      \
     } while (0)
 
 /**
@@ -50,8 +47,7 @@ static void fread_all(void* a, int b, int c, FILE* d) {
     fread(a, b, c, d);
     /*为大端则转成小端*/
     if (!trc::def::byte_order) {
-        trc::utils::bytes_order_change(
-            (trc::def::byte_t*)a, b * c);
+        trc::utils::bytes_order_change((trc::def::byte_t*)a, b * c);
     }
 }
 
@@ -60,13 +56,11 @@ static void fread_all(void* a, int b, int c, FILE* d) {
  * 包装fwrite函数，使它能够自动统一为大端字节序
  * @warning 用法与fwrite相同
  */
-static void fwrite_all(
-    const void* a, int b, int c, FILE* d) {
+static void fwrite_all(const void* a, int b, int c, FILE* d) {
     fwrite(a, b, c, d);
     /*为小端则转成大端*/
     if (!trc::def::byte_order) {
-        trc::utils::bytes_order_change(
-            (trc::def::byte_t*)a, b * c);
+        trc::utils::bytes_order_change((trc::def::byte_t*)a, b * c);
     }
 }
 
@@ -88,8 +82,7 @@ static char* load_string_one(FILE* file) {
 /**
  * @brief 写入单个字符串
  */
-static void write_string_one(
-    FILE* file, const std::string& data) {
+static void write_string_one(FILE* file, const std::string& data) {
     int n = data.length();
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
@@ -104,12 +97,10 @@ static void write_string_one(
  * @param const_pool 常量池
  */
 template <typename T>
-static void write_pool(
-    FILE* file, std::vector<T>& const_pool) {
+static void write_pool(FILE* file, std::vector<T>& const_pool) {
     int size = const_pool.size();
     fwrite(&size, sizeof(size), 1, file);
-    fwrite(
-        &const_pool[0], sizeof(T), const_pool.size(), file);
+    fwrite(&const_pool[0], sizeof(T), const_pool.size(), file);
 }
 
 /**
@@ -119,8 +110,7 @@ static void write_pool(
  * @param const_pool 常量池
  */
 template <typename T>
-static void load_pool(
-    FILE* file, std::vector<T>& const_pool) {
+static void load_pool(FILE* file, std::vector<T>& const_pool) {
     int size;
     fread(&size, sizeof(size), 1, file);
     const_pool.resize(size);
@@ -134,8 +124,7 @@ static void load_pool(
  * @param file 文件
  * @param const_pool 字符串型常量池
  */
-static void write_string_pool(
-    FILE* file, std::vector<char*>& const_pool) {
+static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
     int size = const_pool.size();
     // 数据长度
     fwrite(&size, sizeof(size), 1, file);
@@ -151,8 +140,7 @@ static void write_string_pool(
  * @param file 文件
  * @param const_pool 字符串型常量池
  */
-static void load_string_pool(
-    FILE* file, std::vector<char*>& const_pool) {
+static void load_string_pool(FILE* file, std::vector<char*>& const_pool) {
     int size;
     // 数据长度
     fread(&size, sizeof(size), 1, file);
@@ -167,21 +155,18 @@ static void load_string_pool(
  * @param file 文件
  * @param static_data 静态数据
  */
-static void write_bytecode(FILE* file,
-    trc::TVM_space::TVM_static_data& static_data) {
+static void write_bytecode(
+    FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
     int size = static_data.byte_codes.size();
     fwrite(&size, sizeof(size), 1, file);
     // 是否带有行号表
-    size_t line_numeber_size
-        = static_data.line_number_table.size();
-    fwrite(&line_numeber_size, sizeof(line_numeber_size), 1,
-        file);
+    size_t line_numeber_size = static_data.line_number_table.size();
+    fwrite(&line_numeber_size, sizeof(line_numeber_size), 1, file);
     if (size != 0) {
         // 为是，写入行号表
         fwrite(&static_data.line_number_table[0],
-            sizeof(decltype(static_data.line_number_table)::
-                    value_type),
+            sizeof(decltype(static_data.line_number_table)::value_type),
             line_numeber_size, file);
     }
     // 具体字节码
@@ -196,8 +181,8 @@ static void write_bytecode(FILE* file,
  * @param file 文件
  * @param static_data 静态数据存放变量
  */
-static void load_bytecode(FILE* file,
-    trc::TVM_space::TVM_static_data& static_data) {
+static void load_bytecode(
+    FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
     int size;
     trc::TVM_space::bytecode_t name;
@@ -205,14 +190,11 @@ static void load_bytecode(FILE* file,
     fread(&size, sizeof(size), 1, file);
     // 读取长度判断是否有行号表
     size_t line_number_size;
-    fread(&line_number_size, sizeof(line_number_size), 1,
-        file);
+    fread(&line_number_size, sizeof(line_number_size), 1, file);
     if (size) {
-        static_data.line_number_table.resize(
-            line_number_size);
+        static_data.line_number_table.resize(line_number_size);
         fread(&static_data.line_number_table[0],
-            sizeof(decltype(static_data.line_number_table)::
-                    value_type),
+            sizeof(decltype(static_data.line_number_table)::value_type),
             line_number_size, file);
     }
     // 读取具体字节码
@@ -221,8 +203,7 @@ static void load_bytecode(FILE* file,
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
         static_data.byte_codes.push_back(
-            new trc::TVM_space::TVM_bytecode {
-                name, argv });
+            new trc::TVM_space::TVM_bytecode { name, argv });
     }
 }
 
@@ -236,9 +217,8 @@ static void load_bytecode(FILE* file,
  * @brief 从文件中读取函数
  * @param file 文件
  */
-static void load_functions(FILE* file,
-    std::map<std::string, trc::TVM_space::func_*>&
-        const_funcl) {
+static void load_functions(
+    FILE* file, std::map<std::string, trc::TVM_space::func_*>& const_funcl) {
     // int len;
     // trc::TVM_space::func_ *tmp;
     // fread(&len, sizeof(len), 1, file);
@@ -254,9 +234,8 @@ static void load_functions(FILE* file,
  * @brief 写入函数
  * @param file 文件
  */
-static void write_functions(FILE* file,
-    std::map<std::string, trc::TVM_space::func_*>&
-        const_funcl) {
+static void write_functions(
+    FILE* file, std::map<std::string, trc::TVM_space::func_*>& const_funcl) {
     // for (const auto &i: const_funcl) {
     //     write_string_one(file, i.first);
     //     write_bytecode(file,
@@ -268,27 +247,25 @@ namespace trc::loader {
 bool is_magic(const std::string& path) {
     FILE* file = fopen(path.c_str(), "rb");
     if (!file)
-        error::send_error(error::OpenFileError,
-            language::error::openfileerror, path.c_str());
+        error::send_error(
+            error::OpenFileError, language::error::openfileerror, path.c_str());
     int magic;
     fread(&magic, sizeof(magic), 1, file);
     fclose(file);
     return magic == MAGIC_VALUE;
 }
 
-void loader_ctree(
-    TVM_space::TVM* vm, const std::string& path) {
+void loader_ctree(TVM_space::TVM* vm, const std::string& path) {
     FILE* file = fopen(path.c_str(), "rb");
     if (!file)
-        error::send_error(error::OpenFileError,
-            language::error::openfileerror, path.c_str());
+        error::send_error(
+            error::OpenFileError, language::error::openfileerror, path.c_str());
     // 读取魔数
     // ACFD
     int magic;
     fread(&magic, sizeof(magic), 1, file);
     if (magic != MAGIC_VALUE) {
-        fprintf(stderr, language::error::magic_value_error,
-            path.c_str());
+        fprintf(stderr, language::error::magic_value_error, path.c_str());
         exit(1);
     }
 
@@ -296,10 +273,8 @@ void loader_ctree(
     float ver_;
     fread(&ver_, sizeof(ver_), 1, file);
     if (ver_ > def::version) {
-        error::send_error(error::VersionError,
-            language::error::versionerror,
-            std::to_string(ver_).c_str(),
-            std::to_string(def::version).c_str());
+        error::send_error(error::VersionError, language::error::versionerror,
+            std::to_string(ver_).c_str(), std::to_string(def::version).c_str());
     }
     vm->static_data.ver_ = ver_;
     // 开始正式读写
@@ -307,12 +282,11 @@ void loader_ctree(
     fclose(file);
 }
 
-void save_ctree(
-    TVM_space::TVM* vm, const std::string& path) {
+void save_ctree(TVM_space::TVM* vm, const std::string& path) {
     FILE* file = fopen(path.c_str(), "wb");
     if (file == nullptr) {
-        error::send_error(error::OpenFileError,
-            language::error::openfileerror, path.c_str());
+        error::send_error(
+            error::OpenFileError, language::error::openfileerror, path.c_str());
     }
     // 写入魔数
     // ACFD

@@ -26,16 +26,14 @@ public:
      * @param head 头节点
      * @param code 读取对象代码
      */
-    void compile_get_value(
-        treenode* head, const vecs& code);
+    void compile_get_value(treenode* head, const vecs& code);
 
     /**
      * @brief 编译从map或者从array中创建对象的代码
      * @param head 根节点指针
      * @param code 创建对象代码
      */
-    void compile_create_obj(
-        treenode* head, const vecs& code);
+    void compile_create_obj(treenode* head, const vecs& code);
 
     ~grammar_data_control();
 
@@ -72,19 +70,16 @@ private:
 void grammar_data_control::array_get_value(treenode* head) {
 }
 
-void grammar_data_control::create_array(
-    treenode* head, const vecs& code) {
+void grammar_data_control::create_array(treenode* head, const vecs& code) {
 }
 
 void grammar_data_control::map_get_value(treenode* head) {
 }
 
-void grammar_data_control::create_map(
-    treenode* head, const vecs& code) {
+void grammar_data_control::create_map(treenode* head, const vecs& code) {
 }
 
-void grammar_data_control::compile_get_value(
-    treenode* head, const vecs& code) {
+void grammar_data_control::compile_get_value(treenode* head, const vecs& code) {
 }
 
 void grammar_data_control::compile_create_obj(
@@ -100,18 +95,16 @@ grammar_lex::~grammar_lex() {
     delete env;
 }
 
-void grammar_lex::assign(is_not_end_node* head,
-    trc::compiler::token_ticks oper,
+void grammar_lex::assign(is_not_end_node* head, trc::compiler::token_ticks oper,
     const code_type& code) {
     // 申请新的树节点
-    auto ass = new trc::compiler::node_base_tick(
-        trc::compiler::VAR_DEFINE, oper);
+    auto ass
+        = new trc::compiler::node_base_tick(trc::compiler::VAR_DEFINE, oper);
     treenode* name;
     if (code.size() == 1) {
         // 数组之类的名字比一个长
-        name = new trc::compiler::
-            node_base_data_without_sons(
-                DATA, code.front()->data);
+        name = new trc::compiler::node_base_data_without_sons(
+            DATA, code.front()->data);
     } else {
     }
     // 父节点留下子节点记录
@@ -132,12 +125,10 @@ void grammar_lex::callfunction(
     token* lex_tmp;
     while (1) {
         lex_tmp = token_.get_token();
-        if (lex_tmp->tick
-            == token_ticks::RIGHT_SMALL_BRACE) {
+        if (lex_tmp->tick == token_ticks::RIGHT_SMALL_BRACE) {
             delete lex_tmp;
             break;
-        } else if (lex_tmp->tick
-            != trc::compiler::token_ticks::COMMA) {
+        } else if (lex_tmp->tick != trc::compiler::token_ticks::COMMA) {
             argv_node->connect(get_node());
         } else {
             //逗号
@@ -146,26 +137,20 @@ void grammar_lex::callfunction(
     }
 
     // 由于栈先进后出的特征，在此处将参数进行反转
-    std::reverse(
-        argv_node->son.begin(), argv_node->son.end());
+    std::reverse(argv_node->son.begin(), argv_node->son.end());
 
-    auto* len = new node_base_int_without_sons(
-        NUMBER, argv_node->son.size());
+    auto* len = new node_base_int_without_sons(NUMBER, argv_node->son.size());
     functree->connect(len);
 
     // 函数名问题：判断内置函数和自定义函数
     if (funcname.size() == 1) {
-        if (trc::utils::check_in(funcname[0]->data,
-                loader::num_func.begin(),
+        if (trc::utils::check_in(funcname[0]->data, loader::num_func.begin(),
                 loader::num_func.end())) {
             // 内置函数
-            auto builtin = new node_base_data(
-                trc::compiler::BUILTIN_FUNC);
-            auto bycode = new node_base_data_without_sons(
-                trc::compiler::DATA);
-            auto nodeargv
-                = new node_base_int_without_sons(NUMBER,
-                    loader::func_num[funcname[0]->data]);
+            auto builtin = new node_base_data(trc::compiler::BUILTIN_FUNC);
+            auto bycode = new node_base_data_without_sons(trc::compiler::DATA);
+            auto nodeargv = new node_base_int_without_sons(
+                NUMBER, loader::func_num[funcname[0]->data]);
 
             bycode->data = (char*)"CALL_BUILTIN";
 
@@ -174,13 +159,10 @@ void grammar_lex::callfunction(
             functree->connect(builtin);
         } else {
             // 自定义函数
-            auto builtin = new node_base_data(
-                trc::compiler::CALL_FUNC);
-            auto bycode = new node_base_data_without_sons(
-                trc::compiler::DATA);
-            auto nodeargv
-                = new node_base_int_without_sons(NUMBER,
-                    loader::func_num[funcname[0]->data]);
+            auto builtin = new node_base_data(trc::compiler::CALL_FUNC);
+            auto bycode = new node_base_data_without_sons(trc::compiler::DATA);
+            auto nodeargv = new node_base_int_without_sons(
+                NUMBER, loader::func_num[funcname[0]->data]);
             // 原因是释放的标志位未开启，而字符串位于静态储存区作为常量储存，整个程序运行期间都不会被回收，所以可以直接使用
             bycode->data = (char*)"CALL_FUNCTION";
 
@@ -227,8 +209,7 @@ void grammar_lex::sentence_tree(
         }
     }
     // 将参数反转，因为栈先进后出
-    std::reverse(
-        argv_node->son.begin(), argv_node->son.end());
+    std::reverse(argv_node->son.begin(), argv_node->son.end());
 
     auto len = new node_base_int_without_sons(NUMBER, argc);
     head->connect(argv_node);
@@ -236,8 +217,7 @@ void grammar_lex::sentence_tree(
 }
 
 void grammar_lex::while_loop_tree(is_not_end_node* head) {
-    auto while_argv = new node_base_tick(
-        OPCODE_ARGV, token_ticks::WHILE);
+    auto while_argv = new node_base_tick(OPCODE_ARGV, token_ticks::WHILE);
     // 条件表达式
     head->connect(get_node());
     head->connect(while_argv);
@@ -245,8 +225,7 @@ void grammar_lex::while_loop_tree(is_not_end_node* head) {
     size_t while_start_line = error_->line;
     for (;;) {
         token_data = token_.get_token();
-        if (token_data->tick
-            == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
+        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
             delete token_data;
             break;
         } else {
@@ -255,29 +234,26 @@ void grammar_lex::while_loop_tree(is_not_end_node* head) {
         }
     }
     // 如果条件不满足，调到goto语句之后出循环
-    auto data_node = new node_base_int_without_sons(
-        LINE_NUMBER, error_->line + 1);
+    auto data_node
+        = new node_base_int_without_sons(LINE_NUMBER, error_->line + 1);
     while_argv->connect(data_node);
 
-    auto* goto_while_line = new node_base_tick(
-        OPCODE_ARGV, token_ticks::GOTO);
-    auto line_node = new node_base_int_without_sons(
-        LINE_NUMBER, while_start_line);
+    auto* goto_while_line = new node_base_tick(OPCODE_ARGV, token_ticks::GOTO);
+    auto line_node
+        = new node_base_int_without_sons(LINE_NUMBER, while_start_line);
     goto_while_line->connect(line_node);
     head->connect(goto_while_line);
 }
 
 void grammar_lex::if_tree(is_not_end_node* head) {
-    auto* if_with_argv
-        = new node_base_tick(OPCODE_ARGV, token_ticks::IF);
+    auto* if_with_argv = new node_base_tick(OPCODE_ARGV, token_ticks::IF);
     // 条件表达式
     head->connect(get_node());
     head->connect(if_with_argv);
     token* token_data;
     for (;;) {
         token_data = token_.get_token();
-        if (token_data->tick
-            == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
+        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
             delete token_data;
             break;
         } else {
@@ -285,18 +261,16 @@ void grammar_lex::if_tree(is_not_end_node* head) {
             head->connect(get_node());
         }
     }
-    auto* data_node = new node_base_int_without_sons(
-        LINE_NUMBER, error_->line);
+    auto* data_node = new node_base_int_without_sons(LINE_NUMBER, error_->line);
     if_with_argv->connect(data_node);
 }
 
 void grammar_lex::func_define(is_not_end_node* head) {
     auto name = check_excepted(token_ticks::NAME);
-    auto* func_node = new node_base_data(
-        trc::compiler::FUNC_DEFINE, name->data);
+    auto* func_node
+        = new node_base_data(trc::compiler::FUNC_DEFINE, name->data);
     delete name;
-    auto* line_node = new node_base_data_without_sons(
-        trc::compiler::DATA, "");
+    auto* line_node = new node_base_data_without_sons(trc::compiler::DATA, "");
 
     func_node->connect(line_node);
     head->connect(func_node);
@@ -304,8 +278,7 @@ void grammar_lex::func_define(is_not_end_node* head) {
 
 treenode* grammar_lex::get_node() {
     trc::compiler::token* now = token_.get_token();
-    if (now->tick
-        == trc::compiler::token_ticks::END_OF_TOKENS) {
+    if (now->tick == trc::compiler::token_ticks::END_OF_TOKENS) {
         delete now;
         return nullptr;
     }
@@ -318,9 +291,8 @@ treenode* grammar_lex::get_node() {
             now = token_.get_token();
             if (is_end_token(now->tick)) {
                 /*匹配到结尾还没有匹配到，一定是数据*/
-                auto datanode
-                    = new node_base_data_without_sons(
-                        DATA, got_tokens[0]->data);
+                auto datanode = new node_base_data_without_sons(
+                    DATA, got_tokens[0]->data);
                 return datanode;
             }
             if (is_as_token(now->tick)) {
@@ -329,23 +301,20 @@ treenode* grammar_lex::get_node() {
                 assign(head, now->tick, got_tokens);
                 delete now;
                 return head;
-            } else if (is_cal_token(now->tick)
-                || is_condit_token(now->tick)) {
+            } else if (is_cal_token(now->tick) || is_condit_token(now->tick)) {
                 /*表达式*/
                 auto head = new is_not_end_node;
                 got_tokens.push_back(now);
                 change_to_last_expr(head, got_tokens);
                 return head;
-            } else if (now->tick
-                == token_ticks::LEFT_SMALL_BRACE) {
+            } else if (now->tick == token_ticks::LEFT_SMALL_BRACE) {
                 /*函数调用*/
                 auto head = new node_base_data;
                 delete now;
                 callfunction(head, got_tokens);
             } else {
                 /*数据符号*/
-                auto head = new node_base_data_without_sons(
-                    DATA, now->data);
+                auto head = new node_base_data_without_sons(DATA, now->data);
                 delete now;
                 return head;
             }
@@ -371,20 +340,18 @@ treenode* grammar_lex::get_node() {
         delete now;
         return head;
     }
-    error_->send_error_module(
-        error::SyntaxError, language::error::syntaxerror);
+    error_->send_error_module(error::SyntaxError, language::error::syntaxerror);
 }
 
-grammar_lex::grammar_lex(const std::string& codes_str,
-    trc::compiler::compiler_error* error_)
+grammar_lex::grammar_lex(
+    const std::string& codes_str, trc::compiler::compiler_error* error_)
     : error_(error_)
     , env(new trc::compiler::grammar_data_control)
     , token_(codes_str, error_) {
 }
 
 void grammar_lex::ConvertDataToExpressions(token* raw_lex,
-    std::vector<treenode*>& st,
-    std::stack<token_ticks>& oper_tmp) {
+    std::vector<treenode*>& st, std::stack<token_ticks>& oper_tmp) {
     token_ticks quicktmp;
     auto tick = raw_lex->tick;
     if (is_cal_value(tick)) {
@@ -393,10 +360,8 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
         return;
     }
     if (tick == token_ticks::RIGHT_SMALL_BRACE) {
-        while ((quicktmp = oper_tmp.top())
-            != token_ticks::LEFT_SMALL_BRACE) {
-            st.push_back(
-                new node_base_tick(OPCODE, quicktmp));
+        while ((quicktmp = oper_tmp.top()) != token_ticks::LEFT_SMALL_BRACE) {
+            st.push_back(new node_base_tick(OPCODE, quicktmp));
             oper_tmp.pop();
         }
         oper_tmp.pop();
@@ -405,26 +370,21 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
     if (tick != token_ticks::LEFT_SMALL_BRACE) {
         int quickorder;
         while (!oper_tmp.empty()
-            && (quickorder = cal_priority[(
-                    quicktmp = oper_tmp.top())])
-                != '('
+            && (quickorder = cal_priority[(quicktmp = oper_tmp.top())]) != '('
             && cal_priority[tick] <= quickorder) {
-            st.push_back(
-                new node_base_tick(OPCODE, quicktmp));
+            st.push_back(new node_base_tick(OPCODE, quicktmp));
             oper_tmp.pop();
         }
     }
     oper_tmp.push(raw_lex->tick);
 }
 
-void grammar_lex::change_to_last_expr(
-    is_not_end_node* head, code_type& code) {
+void grammar_lex::change_to_last_expr(is_not_end_node* head, code_type& code) {
     std::vector<treenode*> st;
     is_not_end_node* expr_node = new node_base_data;
     std::stack<token_ticks> oper_tmp;
     for (auto i : code) {
-        ConvertDataToExpressions(
-            i, expr_node->son, oper_tmp);
+        ConvertDataToExpressions(i, expr_node->son, oper_tmp);
     }
     memory::free_array_obj(code);
     for (;;) {
@@ -433,14 +393,12 @@ void grammar_lex::change_to_last_expr(
             delete raw_lex;
             break;
         }
-        ConvertDataToExpressions(
-            raw_lex, expr_node->son, oper_tmp);
+        ConvertDataToExpressions(raw_lex, expr_node->son, oper_tmp);
         delete raw_lex;
     }
     while (!oper_tmp.empty()) {
         token_ticks tmp = oper_tmp.top();
-        expr_node->son.push_back(
-            new node_base_tick(OPCODE, tmp));
+        expr_node->son.push_back(new node_base_tick(OPCODE, tmp));
         oper_tmp.pop();
     }
     head->connect(expr_node);
@@ -452,8 +410,7 @@ token* grammar_lex::check_excepted(token_ticks tick) {
         auto out_error_msg = res->data;
         delete res;
         error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_no_expect,
-            out_error_msg.c_str());
+            language::error::syntaxerror_no_expect, out_error_msg.c_str());
     }
     return res;
 }

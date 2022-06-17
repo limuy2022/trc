@@ -4,8 +4,7 @@
 #include <cstdio>
 
 namespace trc::TVM_space::types {
-const RUN_TYPE_TICK trc_array::type
-    = RUN_TYPE_TICK::array_T;
+const RUN_TYPE_TICK trc_array::type = RUN_TYPE_TICK::array_T;
 
 trc_array::trc_array() {
     head = new listnode;
@@ -93,8 +92,7 @@ void trc_array::putline(FILE* out) {
 bool trc_array::check_in_(def::OBJ data) {
     listnode* t = head->next;
     while (t != nullptr) {
-        if (TVM_share::obj_to_bool(
-                data->operator==(t->data)))
+        if (TVM_share::obj_to_bool(data->operator==(t->data)))
             return true;
         t = t->next;
     }

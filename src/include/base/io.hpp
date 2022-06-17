@@ -18,8 +18,7 @@ namespace trc::io {
  * 参数必须是未分配内存的，已分配的需要在进函数之前释放掉
  * @return true:正确读取，false:读取完毕(字符串可以正常使用)
  */
-TRC_base_func_api bool readstr(
-    char*&, FILE* stream = stdin);
+TRC_base_func_api bool readstr(char*&, FILE* stream = stdin);
 
 // 用来占位的变量,不要读取，可能是无意义的值
 extern bool readflagdefault;
@@ -31,8 +30,7 @@ extern bool readflagdefault;
  * @tparam T 整数类型int，long等
  */
 template <typename T>
-T fast_int_read(FILE* stream = stdin,
-    bool& readflag = readflagdefault) {
+T fast_int_read(FILE* stream = stdin, bool& readflag = readflagdefault) {
     T res = 0;
     int f = 1;
     int c;
@@ -63,8 +61,7 @@ T fast_int_read(FILE* stream = stdin,
  * @details 设置两层包装是为了提高性能，减少无用判断
  */
 template <typename T>
-static inline void fast_int_write_internal(
-    T num, FILE* stream) {
+static inline void fast_int_write_internal(T num, FILE* stream) {
     if (num < 10) {
         fputc(num + '0', stream);
     } else {
@@ -78,8 +75,7 @@ static inline void fast_int_write_internal(
  * @param stream 输出流
  * @param num 整数
  */
-template <typename T>
-void fast_int_write(T num, FILE* stream = stdout) {
+template <typename T> void fast_int_write(T num, FILE* stream = stdout) {
     if (num < 0) {
         fputc('-', stream);
         fast_int_write_internal(-num, stream);

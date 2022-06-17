@@ -6,8 +6,7 @@
 #include <string>
 
 namespace trc::TVM_space::types {
-const RUN_TYPE_TICK trc_flong::type
-    = RUN_TYPE_TICK::float_T;
+const RUN_TYPE_TICK trc_flong::type = RUN_TYPE_TICK::float_T;
 
 trc_flong::trc_flong(const std::string&) {
 }

@@ -13,8 +13,7 @@
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
-const RUN_TYPE_TICK trc_long::type
-    = RUN_TYPE_TICK::trc_long_T;
+const RUN_TYPE_TICK trc_long::type = RUN_TYPE_TICK::trc_long_T;
 
 trc_long::trc_long(const std::string& a) {
     size_t l_s = a.length();
@@ -36,8 +35,8 @@ trc_long::trc_long(const std::string& a) {
 }
 
 trc_long::trc_long()
-    : value((char*)(MALLOC(sizeof(char)
-        * 2))) { // 至少申请一个符号位，否则在realloc的过程中会卡死
+    : value((char*)(MALLOC(
+        sizeof(char) * 2))) { // 至少申请一个符号位，否则在realloc的过程中会卡死
     // 默认为+0
     value[0] = 0;
     value[1] = 0;
@@ -120,12 +119,10 @@ def::OBJ trc_long::operator*(def::OBJ b) {
 }
 
 void trc_long::set_alloc(size_t size_) {
-    value
-        = (char*)REALLOC(value, size, size_ * sizeof(char));
+    value = (char*)REALLOC(value, size, size_ * sizeof(char));
     /* 将多余的部分初始化为零 */
     if (size_ > size)
-        memset(
-            value + size, 0, (size_ - size) * sizeof(char));
+        memset(value + size, 0, (size_ - size) * sizeof(char));
     size = size_;
 }
 

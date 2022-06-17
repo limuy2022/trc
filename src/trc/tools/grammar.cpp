@@ -38,9 +38,7 @@ namespace tools_in {
         // 这种写法的意思是为NUMBER或LINE_NUMBER
         case compiler::NUMBER:
         case compiler::LINE_NUMBER: {
-            auto tmp
-                = (compiler::node_base_int_without_sons*)
-                    data;
+            auto tmp = (compiler::node_base_int_without_sons*)data;
             printf("%d", tmp->value);
             break;
         }
@@ -51,8 +49,7 @@ namespace tools_in {
         }
         putchar(',');
         if (data->has_son()) {
-            compiler::is_not_end_node* tmp
-                = (compiler::is_not_end_node*)data;
+            compiler::is_not_end_node* tmp = (compiler::is_not_end_node*)data;
             for (int i = 0; i < tmp->son.size(); ++i)
                 out(tmp->son[i]);
         }

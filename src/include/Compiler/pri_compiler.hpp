@@ -180,9 +180,8 @@ public:
 /**
  * @brief 基于token符号的节点
  */
-class TRC_Compiler_api node_base_tick
-    : public is_not_end_node,
-      public tick_node {
+class TRC_Compiler_api node_base_tick : public is_not_end_node,
+                                        public tick_node {
 public:
     node_base_tick(grammar_type type, token_ticks tick);
 };
@@ -190,12 +189,10 @@ public:
 /**
  * @brief 基于数据的节点
  */
-class TRC_Compiler_api node_base_data
-    : public is_not_end_node,
-      public data_node {
+class TRC_Compiler_api node_base_data : public is_not_end_node,
+                                        public data_node {
 public:
-    node_base_data(
-        grammar_type type_argv, const std::string& data);
+    node_base_data(grammar_type type_argv, const std::string& data);
 
     explicit node_base_data(grammar_type type = TREE);
 };
@@ -203,23 +200,19 @@ public:
 /**
  * @brief 基于标签的没有子节点的类型
  */
-class TRC_Compiler_api node_base_tick_without_sons
-    : public is_end_node,
-      public tick_node {
+class TRC_Compiler_api node_base_tick_without_sons : public is_end_node,
+                                                     public tick_node {
 public:
-    node_base_tick_without_sons(
-        grammar_type type, token_ticks);
+    node_base_tick_without_sons(grammar_type type, token_ticks);
 };
 
 /**
  * @brief 基于字符串的没有子节点的节点
  */
-class TRC_Compiler_api node_base_data_without_sons
-    : public data_node,
-      public is_end_node {
+class TRC_Compiler_api node_base_data_without_sons : public data_node,
+                                                     public is_end_node {
 public:
-    node_base_data_without_sons(
-        grammar_type type, const std::string& name);
+    node_base_data_without_sons(grammar_type type, const std::string& name);
 
     explicit node_base_data_without_sons(grammar_type type);
 
@@ -229,13 +222,11 @@ public:
 /**
  * @brief 基于整型的没有子节点的类型
  */
-class TRC_Compiler_api node_base_int_without_sons
-    : public is_not_end_node {
+class TRC_Compiler_api node_base_int_without_sons : public is_not_end_node {
 public:
     int value;
 
-    node_base_int_without_sons(
-        grammar_type type, int value);
+    node_base_int_without_sons(grammar_type type, int value);
 };
 
 /**
@@ -283,8 +274,7 @@ struct token {
  * @param tick token
  */
 inline bool is_cal_value(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::NAME, token_ticks::INT_VALUE, tick);
+    return utils::inrange(token_ticks::NAME, token_ticks::INT_VALUE, tick);
 }
 
 /**
@@ -292,8 +282,7 @@ inline bool is_cal_value(token_ticks tick) {
  * @param tick token
  */
 inline bool is_as_token(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::ASSIGN, token_ticks::STORE, tick);
+    return utils::inrange(token_ticks::ASSIGN, token_ticks::STORE, tick);
 }
 
 /**
@@ -301,8 +290,7 @@ inline bool is_as_token(token_ticks tick) {
  * @param tick token
  */
 inline bool is_condit_token(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::AND, token_ticks::GREATER_EQUAL, tick);
+    return utils::inrange(token_ticks::AND, token_ticks::GREATER_EQUAL, tick);
 }
 
 /**
@@ -310,8 +298,7 @@ inline bool is_condit_token(token_ticks tick) {
  * @param tick token
  */
 inline bool is_cal_token(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::ADD, token_ticks::POW, tick);
+    return utils::inrange(token_ticks::ADD, token_ticks::POW, tick);
 }
 
 /**
@@ -319,13 +306,11 @@ inline bool is_cal_token(token_ticks tick) {
  * @param tick token
  */
 inline bool is_sentence_token(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::IMPORT, token_ticks::ASSERT, tick);
+    return utils::inrange(token_ticks::IMPORT, token_ticks::ASSERT, tick);
 }
 
 inline bool is_sentence_with_one_argv(token_ticks tick) {
-    return utils::inrange(
-        token_ticks::GOTO, token_ticks::GOTO, tick);
+    return utils::inrange(token_ticks::GOTO, token_ticks::GOTO, tick);
 }
 
 /**
@@ -350,7 +335,6 @@ inline bool is_end_token(token_ticks tick) {
 }
 
 inline bool is_blocked_token(token_ticks tick) {
-    return utils::inrange(
-        tick, token_ticks::FOR, token_ticks::CLASS);
+    return utils::inrange(tick, token_ticks::FOR, token_ticks::CLASS);
 }
 }

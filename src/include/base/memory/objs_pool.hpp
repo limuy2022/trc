@@ -28,8 +28,7 @@ public:
 
     ~objs_pool();
 
-    template <typename... P>
-    T* trcmalloc(const P&... data_argv);
+    template <typename... P> T* trcmalloc(const P&... data_argv);
 
 private:
     // 此函数为真正实现内存分配的函数
@@ -58,8 +57,7 @@ objs_pool<T>::objs_pool()
     : free_head(OBJS_POOL_SIZE) {
     T* start = new T[OBJS_POOL_SIZE];
     blocks.push_back(start);
-    typename std::list<T*>::iterator tmp
-        = free_head.begin();
+    typename std::list<T*>::iterator tmp = free_head.begin();
     for (int i = 0; i < OBJS_POOL_SIZE; ++i, ++tmp) {
         *tmp = start + i;
     }
@@ -72,8 +70,7 @@ template <typename T> void objs_pool<T>::add() {
      */
     T* add_ptr = new T[OBJS_ADD_SIZE];
     blocks.push_back(add_ptr);
-    typename std::list<T*>::iterator add_iter
-        = free_head.end();
+    typename std::list<T*>::iterator add_iter = free_head.end();
     free_head.resize(free_head.size() + OBJS_ADD_SIZE);
     for (int i = 0; i < OBJS_ADD_SIZE; ++i, ++add_iter) {
         *add_iter = add_ptr + i;
@@ -122,14 +119,12 @@ template <typename T> void objs_pool<T>::gc() {
      * 当垃圾回收运行时，字节码运行也暂停，这里并不会采取多线程运行，也不允许出现内存访问错误的现象
      */
     T* tmp;
-    typename std::list<T*>::iterator index_re
-        = used_head.begin();
+    typename std::list<T*>::iterator index_re = used_head.begin();
     for (int i = 0, n = used_head.size(); i < n; ++i) {
         tmp = *index_re;
         if (!tmp->refs) {
             tmp->delete_();
-            typename std::list<T*>::iterator tmp_iter
-                = index_re++;
+            typename std::list<T*>::iterator tmp_iter = index_re++;
             used_head.erase(tmp_iter);
             free_head.push_front(tmp);
         } else {

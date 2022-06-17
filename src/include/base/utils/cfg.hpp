@@ -49,8 +49,7 @@ namespace utils {
         std::ifstream file(path);
         if (!file.is_open()) {
             error::send_error(error::OpenFileError,
-                language::error::openfileerror,
-                path.c_str());
+                language::error::openfileerror, path.c_str());
         }
         t1 tmp1;
         t2 tmp2;

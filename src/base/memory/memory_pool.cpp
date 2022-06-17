@@ -74,19 +74,16 @@ void memory_pool::delete_list(int num) {
 void memory_pool::init_list(int num) {
     // 先还原头结点
     size_t blocks_of_size = get_block_size(num);
-    auto* mem_tmp = (def::byte_t*)malloc(
-        INIT_NODE_SIZE * blocks_of_size);
+    auto* mem_tmp = (def::byte_t*)malloc(INIT_NODE_SIZE * blocks_of_size);
     malloc_mem_heads.push_back(mem_tmp);
     if (!mem_tmp) {
-        error::send_error(error::MemoryError,
-            language::error::memoryerror);
+        error::send_error(error::MemoryError, language::error::memoryerror);
     }
     node_mem*& head = memory_heads[num];
     head = new node_mem(mem_tmp);
     node_mem* now = head;
     auto* now_begin_of_mem = mem_tmp + blocks_of_size;
-    for (int i = 0;;
-         ++i, now_begin_of_mem += blocks_of_size) {
+    for (int i = 0;; ++i, now_begin_of_mem += blocks_of_size) {
         now->next = new node_mem(now_begin_of_mem);
         if (i == INIT_NODE_SIZE) {
             now->next->next = nullptr;
@@ -100,12 +97,10 @@ void memory_pool::malloc_more(int num) {
     node_mem*& head = memory_heads[num];
     int block_size = get_block_size(num);
     // 这十五个另外开辟内存空间，避免影响到原有的内存
-    auto* mem_tmp
-        = (def::byte_t*)malloc(REALLOC_SIZE * block_size);
+    auto* mem_tmp = (def::byte_t*)malloc(REALLOC_SIZE * block_size);
     malloc_mem_heads.push_back(mem_tmp);
     if (!mem_tmp)
-        error::send_error(error::MemoryError,
-            language::error::memoryerror);
+        error::send_error(error::MemoryError, language::error::memoryerror);
     auto* now_begin_of_mem = mem_tmp;
     auto now = head;
     for (int i = 0;; ++i, now_begin_of_mem += block_size) {
@@ -118,15 +113,12 @@ void memory_pool::malloc_more(int num) {
     }
 }
 
-void* memory_pool::mem_realloc(
-    void* p, size_t before, size_t size_) {
-    if (before > MEMORY_CUT_LINE
-        && size_ > MEMORY_CUT_LINE) {
+void* memory_pool::mem_realloc(void* p, size_t before, size_t size_) {
+    if (before > MEMORY_CUT_LINE && size_ > MEMORY_CUT_LINE) {
         // 都超过memory_pool分割线，意味着全都是利用malloc和realloc分配
         void* tmp = realloc(p, size_);
         if (!tmp)
-            error::send_error(error::MemoryError,
-                language::error::memoryerror);
+            error::send_error(error::MemoryError, language::error::memoryerror);
         return tmp;
     }
     if (get_list(before) == get_list(size_)) {

@@ -21,14 +21,14 @@ trc_long::trc_long(const std::string& a) {
         size = l_s;
         value = (char*)(MALLOC(sizeof(char) * size));
         value[0] = 1;
-        for (int i = 1; i < l_s; ++i) {
+        for (size_t i = 1; i < l_s; ++i) {
             value[i] = a[l_s - i] - '0';
         }
     } else {
         size = l_s + 1;
         value = (char*)(MALLOC(sizeof(char) * size));
         value[0] = 0;
-        for (int i = 1; i <= l_s; ++i) {
+        for (size_t i = 1; i <= l_s; ++i) {
             value[i] = a[l_s - i] - '0';
         }
     }

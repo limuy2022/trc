@@ -36,7 +36,7 @@ TRC_base_func_api bool file_exists(const std::string& path);
  * @code math.lang -> math/lang @endcode
  * @details 不采用正则表达式处理
  */
-TRC_base_func_api std::string import_to_path(std::string import_name);
+TRC_base_func_api void import_to_path(std::string& import_name);
 
 /**
  * @brief 读取文件并将字符存入file_data

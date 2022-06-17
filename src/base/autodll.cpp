@@ -33,7 +33,7 @@ void dllfree(dll_t name) {
 }
 
 void* dllfuncload(dll_t dll, const char* funcname) {
-    void* func = GetProcAddress(dll, funcname);
+    void* func = (void*)GetProcAddress(dll, funcname);
     if (func == nullptr) {
         error::send_error(error::SystemError, language::error::dll_open_err);
     }

@@ -49,9 +49,9 @@ namespace tools_in {
         }
         putchar(',');
         if (data->has_son()) {
-            compiler::is_not_end_node* tmp = (compiler::is_not_end_node*)data;
-            for (int i = 0; i < tmp->son.size(); ++i)
-                out(tmp->son[i]);
+            auto* tmp = (compiler::is_not_end_node*)data;
+            for (auto & i : tmp->son)
+                out(i);
         }
         outtab();
         putchar(']');

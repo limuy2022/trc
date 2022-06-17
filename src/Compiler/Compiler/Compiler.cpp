@@ -3,7 +3,6 @@
  */
 
 #include "TVM/TVM_data.h"
-#include "TVM/memory.h"
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
@@ -66,7 +65,7 @@ private:
      * @brief 把数据添加进相对应的vm常量池
      * @return 数据在常量池中所占的索引
      */
-    TVM_space::bytecode_index_t add(
+    static TVM_space::bytecode_index_t add(
         TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type, char* data_value);
 
     /**
@@ -75,7 +74,7 @@ private:
      * @param data 符号
      * @param index 索引
      */
-    TVM_space::TVM_bytecode* build_opcode(
+    static TVM_space::TVM_bytecode* build_opcode(
         token_ticks symbol, TVM_space::bytecode_index_t index = 0);
 
     /**
@@ -83,7 +82,7 @@ private:
      * @param data 符号
      * @param index 索引
      */
-    TVM_space::TVM_bytecode* build_var(
+    static TVM_space::TVM_bytecode* build_var(
         token_ticks data, TVM_space::bytecode_index_t index = 0);
 
     /**

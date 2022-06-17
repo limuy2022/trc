@@ -45,13 +45,12 @@ bool file_exists(const std::string& path) {
     }
 }
 
-std::string import_to_path(std::string import_name) {
-    for (int i = 0, n = import_name.length(); i < n; ++i) {
-        if (import_name[i] == '.') {
-            import_name[i] = '/';
+void import_to_path(std::string& import_name) {
+    for (char & i : import_name) {
+        if (i == '.') {
+            i = '/';
         }
     }
-    return import_name;
 }
 
 /**

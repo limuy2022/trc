@@ -87,7 +87,7 @@ namespace trc {
  */
 static void debug(const std::string& code) {
     char* instruction = nullptr;
-
+    TVM_space::free_TVM(vm);
     trc::compiler::Compiler(vm, code);
     // 用于输出代码行信息
     const vecs& out_data = cutlines(code);
@@ -129,8 +129,7 @@ static void debug(const std::string& code) {
     free(instruction);
 }
 
-namespace tools {
-    namespace tools_out {
+namespace tools::tools_out {
         void tdb() {
             // 输出开始提示
             puts(language::tdb::start_tip);
@@ -152,5 +151,4 @@ namespace tools {
             free(file_path);
         }
     }
-}
 }

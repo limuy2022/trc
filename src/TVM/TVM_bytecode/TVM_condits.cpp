@@ -1,6 +1,6 @@
-﻿#include <TVM/TVM.h>
-#include <TVMbase/TRE.h>
-#include <TVMbase/types/string.h>
+﻿#include "TVM/TRE.h"
+#include <TVM/TVM.h>
+#include <TVM/types/string.h>
 #include <base/Error.h>
 #include <base/trcdef.h>
 #include <language/error.h>

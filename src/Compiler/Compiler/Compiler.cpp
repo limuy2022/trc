@@ -2,13 +2,13 @@
  * 字节码最终在此生成，是编译器的另一个核心
  */
 
+#include "TVM/TVM_data.h"
+#include "TVM/memory.h"
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVMdef.h>
 #include <TVM/func.h>
-#include <TVMbase/TVM_data.h>
-#include <TVMbase/memory.h>
 #include <base/Error.h>
 #include <base/code_loader.h>
 #include <base/utils/data.hpp>
@@ -345,8 +345,6 @@ void free_tree(treenode* head) {
 }
 
 void Compiler(TVM_space::TVM* vm, const std::string& codes) {
-    // 先释放所有的内存
-    TVM_space::free_TVM(vm);
     compiler_error error_("__main__");
     // 不会开始解析
     grammar_lex grammar_lexer(codes, &error_);

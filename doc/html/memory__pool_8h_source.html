@@ -81,7 +81,7 @@ $(function() {
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// 内存链表个数</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="memory__pool_8h.html#abb4ac10f16637acd8ae5df95f0146fa4">   17</a></span><span class="preprocessor">#define MEMORY_LISTS_NUM MEMORY_BASE_SIZE / MEMORY_BLOCKS_SIZE</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;base/library.h&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;<a class="code" href="base_2library_8h.html">base/library.h</a>&gt;</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1memory.html">trc::memory</a> {</div>
@@ -117,6 +117,7 @@ $(function() {
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keywordtype">int</span> malloc_from_os = 0;</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>};</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>}</div>
+<div class="ttc" id="abase_2library_8h_html"><div class="ttname"><a href="base_2library_8h.html">library.h</a></div></div>
 <div class="ttc" id="abase_2library_8h_html_a5994764d4f7f16f10736804a4d94e874"><div class="ttname"><a href="base_2library_8h.html#a5994764d4f7f16f10736804a4d94e874">TRC_base_api</a></div><div class="ttdeci">#define TRC_base_api</div><div class="ttdef"><b>Definition:</b> library.h:14</div></div>
 <div class="ttc" id="aclasstrc_1_1memory_1_1memory__pool_html"><div class="ttname"><a href="classtrc_1_1memory_1_1memory__pool.html">trc::memory::memory_pool</a></div><div class="ttdoc">内存池 对象存放在对象池中，由对象创建的特殊对象存放在公共对象池中 只有对象申请的内存才会被存放到内存池中 两者的区别在于：对象池大小固定，效率更高； 而内存池可以申请大小不固定的内存，效率稍低</div><div class="ttdef"><b>Definition:</b> memory_pool.h:45</div></div>
 <div class="ttc" id="amemory__pool_8h_html_abb4ac10f16637acd8ae5df95f0146fa4"><div class="ttname"><a href="memory__pool_8h.html#abb4ac10f16637acd8ae5df95f0146fa4">MEMORY_LISTS_NUM</a></div><div class="ttdeci">#define MEMORY_LISTS_NUM</div><div class="ttdef"><b>Definition:</b> memory_pool.h:17</div></div>

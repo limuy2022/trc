@@ -2,8 +2,6 @@
 
 ### 程序入口：trc.exe
 
-### TVM底层交互：TVMbase.dll
-
 ### TVM:TVM.dll
 
 ### 编译器:Compiler.dll

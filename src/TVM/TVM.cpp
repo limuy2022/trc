@@ -1,6 +1,6 @@
-﻿#include <TVM/TVM.h>
+﻿#include "TVM/memory.h"
+#include <TVM/TVM.h>
 #include <TVM/func.h>
-#include <TVMbase/memory.h>
 #include <base/Error.h>
 #include <base/memory/memory.h>
 #include <base/trcdef.h>

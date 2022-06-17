@@ -7,8 +7,6 @@ var searchData=
   ['trc_5flanguage_5fapi_4',['TRC_language_api',['../language_2library_8h.html#a7fbdf7bf8bd8aa19921b8141aeca5cde',1,'library.h']]],
   ['trc_5ftvm_5fapi_5',['TRC_TVM_api',['../_t_v_m_2library_8h.html#aa8edf0db5c0cd9d5e52bd32e87debeef',1,'library.h']]],
   ['trc_5ftvm_5ffunc_5fapi_6',['TRC_TVM_func_api',['../_t_v_m_2library_8h.html#aad3dad54db5701611d9a3fe280f48a4b',1,'library.h']]],
-  ['trc_5ftvmbase_5fapi_7',['TRC_TVMbase_api',['../_t_v_mbase_2library_8h.html#a426c03f6783b52a45d57b6ccd3ee7644',1,'library.h']]],
-  ['trc_5ftvmbase_5ffunc_5fapi_8',['TRC_TVMbase_func_api',['../_t_v_mbase_2library_8h.html#a6b67f37dada046db3b7bbcc144282027',1,'library.h']]],
-  ['trc_5fxxx_5fapi_9',['TRC_xxx_api',['../sharelib_8h.html#aaa0c4a4dabaa8f7d9528440d5b8238c7',1,'sharelib.h']]],
-  ['trc_5fxxx_5ffunc_5fapi_10',['TRC_xxx_func_api',['../sharelib_8h.html#a58410943730a1ab0c8a3c1f10e75cd49',1,'sharelib.h']]]
+  ['trc_5fxxx_5fapi_7',['TRC_xxx_api',['../sharelib_8h.html#aaa0c4a4dabaa8f7d9528440d5b8238c7',1,'sharelib.h']]],
+  ['trc_5fxxx_5ffunc_5fapi_8',['TRC_xxx_func_api',['../sharelib_8h.html#a58410943730a1ab0c8a3c1f10e75cd49',1,'sharelib.h']]]
 ];

@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include "TRE.h"
+#include "TVM_data.h"
 #include <TVM/library.h>
-#include <TVMbase/TRE.h>
-#include <TVMbase/TVM_data.h>
 #include <base/utils/bytes.h>
 #include <stack>
 #include <string>

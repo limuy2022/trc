@@ -2,10 +2,10 @@
  * 虚拟机内置函数定义处
  */
 
+#include "TVM/TRE.h"
+#include "TVM/memory.h"
 #include <TVM/TVM.h>
-#include <TVMbase/TRE.h>
-#include <TVMbase/memory.h>
-#include <TVMbase/types/string.h>
+#include <TVM/types/string.h>
 #include <base/Error.h>
 #include <base/memory/objs_pool.hpp>
 #include <cstdio>

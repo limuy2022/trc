@@ -111,6 +111,7 @@ private:
  * 传入一台虚拟机和未编译的代码，将代码编译后填充进vm中
  * @param vm 可以是编译过的虚拟机
  * @param codes 源代码
+ * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
 TRC_Compiler_func_api void Compiler(
     TVM_space::TVM* vm, const std::string& codes);

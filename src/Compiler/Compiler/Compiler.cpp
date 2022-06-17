@@ -14,7 +14,6 @@
 #include <base/utils/data.hpp>
 #include <climits>
 #include <cstring>
-#include <iostream>
 #include <language/error.h>
 #include <string>
 #include <vector>

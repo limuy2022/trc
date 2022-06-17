@@ -5,7 +5,6 @@
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
 #include <gtest/gtest.h>
-#include <iostream>
 #include <vector>
 using namespace trc;
 

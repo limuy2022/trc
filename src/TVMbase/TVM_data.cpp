@@ -1,5 +1,4 @@
 ﻿#include <TVMbase/TVM_data.h>
-#include <iostream>
 
 namespace trc::TVM_space {
 symbol_form::~symbol_form() {

@@ -45,7 +45,7 @@ char* redirect_to_platform(const std::string& name) {
     size_t n = name.length();
     char* res = new char[n + 1 + 4];
     memcpy(res, name.c_str(), n);
-    memcpy(res + n, ".dll", 4);
+    strcpy(res + n, ".dll");
     return res;
 }
 
@@ -79,16 +79,19 @@ char* redirect_to_platform(const std::string& name) {
     auto name_path = fs::path(name);
     const std::string& parent_path
         = name_path.parent_path().string();
-    memcpy(res, parent_path.c_str(), parent_path.length());
+    strcpy(res, parent_path.c_str());
     res[parent_path.length()] = '/';
-    memcpy(res + parent_path.length() + 1, "lib", 3);
+
+    strcpy(res + parent_path.length() + 1, "lib");
+
     const std::string& filename_path
         = name_path.filename().string();
-    memcpy(res + parent_path.length() + 1 + 3,
-        filename_path.c_str(), filename_path.length());
-    memcpy(res + parent_path.length() + 1 + 3
+    strcpy(res + parent_path.length() + 1 + 3,
+        filename_path.c_str());
+
+    strcpy(res + parent_path.length() + 1 + 3
             + filename_path.length(),
-        ".so", 3);
+        ".so");
     return res;
 }
 

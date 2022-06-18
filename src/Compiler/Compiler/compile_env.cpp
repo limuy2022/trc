@@ -2,7 +2,9 @@
 #include <cstring>
 
 namespace trc::compiler {
-CompileEnvironment::CompileEnvironment():var_names_list_global(1){}
+CompileEnvironment::CompileEnvironment()
+    : var_names_list_global(1) {
+}
 
 size_t CompileEnvironment::get_global_name_size() {
     return var_names_list_global.size();

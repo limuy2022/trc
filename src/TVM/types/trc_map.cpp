@@ -17,7 +17,8 @@
 namespace trc::TVM_space::types {
 namespace map_space {
     /**
-     * 数据块，哈希表将会申请一块类型为data_info的数组
+     * @brief 数据块
+     * 哈希表将会申请一块类型为data_info的数组
      * 将每一个元素都当成链表来使用
      */
     class data_info {

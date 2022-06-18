@@ -59,77 +59,77 @@ def::OBJ trcobj::to_bool() {
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator<(def::OBJ value_i) {
+def::INTOBJ trcobj::operator<([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("<");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator>(def::OBJ value_i) {
+def::INTOBJ trcobj::operator>([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG(">");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator<=(def::OBJ value_i) {
+def::INTOBJ trcobj::operator<=([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("<=");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator>=(def::OBJ value_i) {
+def::INTOBJ trcobj::operator>=([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG(">=");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::operator+(def::OBJ value_i) {
+def::OBJ trcobj::operator+([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("+");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::operator-(def::OBJ value_i) {
+def::OBJ trcobj::operator-([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("-");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::operator*(def::OBJ value_i) {
+def::OBJ trcobj::operator*([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("*");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::operator/(def::OBJ value_i) {
+def::OBJ trcobj::operator/([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("/");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::operator%(def::OBJ value_i) {
+def::OBJ trcobj::operator%([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("%");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::pow_(def::OBJ value_i) {
+def::OBJ trcobj::pow_([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("**");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::OBJ trcobj::zdiv(def::OBJ value_i) {
+def::OBJ trcobj::zdiv([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("//");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
@@ -143,14 +143,14 @@ def::INTOBJ trcobj::operator!() {
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator&&(def::OBJ value_i) {
+def::INTOBJ trcobj::operator&&([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("&&");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;
     return nullptr;
 }
 
-def::INTOBJ trcobj::operator||(def::OBJ value_i) {
+def::INTOBJ trcobj::operator||([[maybe_unused]] def::OBJ value_i) {
     // char *error_msg = ERROR_OPER_MSG("||");
     // error::send_error(error::SyntaxError,
     // error_msg); delete[] error_msg;

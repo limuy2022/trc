@@ -42,9 +42,7 @@ trc_string& trc_string::operator=(const std::string& init) {
 trc_string::trc_string(const std::string& init)
     : char_num(init.length())
     , value((char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
-    /**
-     * 由于常量池，所以兼容string
-     */
+    // 由于常量池，所以兼容string
     strcpy(value, init.c_str());
 }
 

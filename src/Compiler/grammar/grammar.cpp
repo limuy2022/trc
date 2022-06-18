@@ -341,6 +341,7 @@ treenode* grammar_lex::get_node() {
         return head;
     }
     error_->send_error_module(error::SyntaxError, language::error::syntaxerror);
+    return nullptr;
 }
 
 grammar_lex::grammar_lex(

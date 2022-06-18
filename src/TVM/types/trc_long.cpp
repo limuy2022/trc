@@ -255,9 +255,6 @@ def::OBJ trc_long::to_string() {
 }
 
 def::OBJ trc_long::to_float() {
-    /**
-     * 注意，这里是转成高精度小数
-     */
     def::FLONGOBJ res = MALLOCFLONG();
     return res;
 }

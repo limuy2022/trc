@@ -28,6 +28,7 @@ int zdiv_(const int& a, const int& b) {
         return a / b;
     error::send_error(error::ZeroDivError, language::error::zerodiverror,
         std::to_string(b).c_str());
+    return 0;
 }
 
 int mod(const int& a, const int& b) {
@@ -35,6 +36,8 @@ int mod(const int& a, const int& b) {
         return a % b;
     error::send_error(error::ZeroDivError, language::error::zerodiverror,
         std::to_string(b).c_str());
+    // 没什么作用，这是无法被执行到的代码，主要为了消除警告
+    return 0;
 }
 
 int _pow(const int& a, const int& b) {

@@ -67,6 +67,9 @@ public:
 
     def::OBJ to_string();
 
+    /**
+     * @warning 这里是转成高精度小数
+     */
     def::OBJ to_float();
 
     def::OBJ to_bool();

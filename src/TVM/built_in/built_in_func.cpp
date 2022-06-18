@@ -21,9 +21,9 @@ void LENGTH(int argc, TVM* vm) {
     vm->push(new types::trc_int(firsts->len()));
 }
 
-void HELP(int argc, TVM* vm) {
+void HELP([[maybe_unused]] int argc, [[maybe_unused]] TVM* vm) {
     puts("\nWelcome to Tree!If this is your "
-         "first time using Tree,you "
+         "first time using Trcs,you "
          "can read the Doc to find help.");
 }
 

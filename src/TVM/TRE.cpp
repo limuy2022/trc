@@ -14,11 +14,10 @@ def::STRINGOBJ firsts, seconds;
 
 def::LONGOBJ firstl, secondl;
 
+/**
+ * TVM共享的信息
+ */
 namespace TVM_share {
-    /**
-     * TVM共享的信息
-     */
-
     // 由于真假是很常用的值，所以会被提前实例化
     def::INTOBJ true_, false_;
     types::trc_int int_cache[INT_CACHE_LEN];

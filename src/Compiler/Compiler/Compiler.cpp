@@ -50,6 +50,9 @@ static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::ASSERT_,
 };
 
+/**
+ * @brief 编译器的细节
+ */
 class detail_compiler {
 public:
     detail_compiler(compiler_error&, TVM_space::TVM_static_data&);
@@ -194,6 +197,7 @@ TVM_space::bytecode_index_t detail_compiler::add(
         NOREACH;
     }
     }
+    return 0;
 }
 
 bytecode_t detail_compiler::build_opcode(token_ticks symbol) {

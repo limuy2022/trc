@@ -14,7 +14,6 @@
 #include <vector>
 
 enum class byteCodeNumber {
-    UNKNOWN,
     LOAD_INT_,
     ADD_,
     NOP_,
@@ -53,8 +52,10 @@ enum class byteCodeNumber {
     LOAD_LONG_,
     LOAD_ARRAY_,
     CALL_METHOD_,
-    LOAD_MAP_
+    LOAD_MAP_,
+    UNKNOWN
 };
+
 namespace trc::TVM_space {
 /**
  * @brief trc的核心部分，负责执行字节码
@@ -110,10 +111,11 @@ public:
      * @param bycode 字节码
      */
     inline void run_bycode(TVM_bytecode* bycode) {
-        if (bycode->index == 0)
+        if (bycode->index == 0) {
             (this->*TVM_RUN_CODE_NOARG_FUNC[bycode->bycode])();
-        else
+        } else {
             (this->*TVM_RUN_CODE_ARG_FUNC[bycode->bycode])(bycode->index);
+        }
     }
 
     /**

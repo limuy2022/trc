@@ -14,7 +14,7 @@ namespace trc::compiler {
  */
 class CompileEnvironment {
 public:
-    CompileEnvironment() = default;
+    CompileEnvironment();
     /**
      * @brief 获取全局的符号表的大小
      */

@@ -2,6 +2,8 @@
 #include <cstring>
 
 namespace trc::compiler {
+CompileEnvironment::CompileEnvironment():var_names_list_global(1){}
+
 size_t CompileEnvironment::get_global_name_size() {
     return var_names_list_global.size();
 }
@@ -12,7 +14,7 @@ size_t CompileEnvironment::get_local_name_size(const std::string& name) {
 
 size_t CompileEnvironment::get_index_of_globalvar(const char* name) {
     size_t n = var_names_list_global.size();
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 1; i < n; ++i) {
         if (!strcmp(var_names_list_global[i], name)) {
             return i;
         }
@@ -27,7 +29,7 @@ size_t CompileEnvironment::get_index_of_localvar(
     const std::string& localspace_name, const char* localvar_name) {
     auto& l = var_names_list_local[localspace_name];
     size_t n = l.size();
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 1; i < n; i++) {
         if (!strcmp(l[i], localvar_name)) {
             return i;
         }

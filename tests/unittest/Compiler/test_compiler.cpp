@@ -29,9 +29,9 @@ TEST(compiler, var) {
     compiler::Compiler(vm, "a:=90");
     ASSERT_EQ(vm->static_data.const_i.size(), 2);
     EXPECT_EQ(vm->static_data.const_i[1], 90);
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
+    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 0 } },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
     delete vm;
 }

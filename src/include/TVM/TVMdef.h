@@ -17,7 +17,7 @@ typedef def::byte_t bytecode_t;
 // 字节码索引的类型
 typedef uint16_t bytecode_index_t;
 // 储存所有字节码的类型
-typedef std::vector<TVM_bytecode*> struct_codes;
+typedef std::vector<TVM_bytecode> struct_codes;
 // 指向内置函数的指针
 typedef void (*TVM_BUILTINS_FUNC)(int argc, TVM* vm);
 

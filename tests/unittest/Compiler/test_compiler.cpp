@@ -14,7 +14,8 @@ using namespace trc;
  * @param vm
  */
 static void bytecode_check(
-    const std::vector<TVM_space::struct_codes>& expect, TVM_space::TVM* vm) {
+    const TVM_space::struct_codes& expect, TVM_space::TVM* vm) {
+
 }
 
 TEST(compiler, var) {
@@ -24,6 +25,7 @@ TEST(compiler, var) {
     EXPECT_EQ(vm->static_data.const_i[1], 90);
     ASSERT_EQ(vm->static_data.const_name.size(), 2);
     EXPECT_STREQ(vm->static_data.const_name[1], "a");
+    //bytecode_check({byteCodeNumber::LOAD_INT_, 1}, vm);
     delete vm;
 }
 

@@ -171,8 +171,8 @@ static void write_bytecode(
     }
     // 具体字节码
     for (const auto& i : static_data.byte_codes) {
-        fwrite(&i->bycode, sizeof(i->bycode), 1, file);
-        fwrite(&i->index, sizeof(i->index), 1, file);
+        fwrite(&i.bycode, sizeof(i.bycode), 1, file);
+        fwrite(&i.index, sizeof(i.index), 1, file);
     }
 }
 
@@ -202,8 +202,7 @@ static void load_bytecode(
     for (int i = 0; i < size; ++i) {
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
-        static_data.byte_codes.push_back(
-            new trc::TVM_space::TVM_bytecode { name, argv });
+        static_data.byte_codes.push_back(trc::TVM_space::TVM_bytecode{name, argv});
     }
 }
 

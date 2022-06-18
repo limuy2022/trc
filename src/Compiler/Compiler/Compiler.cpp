@@ -74,21 +74,21 @@ private:
      * @param data 符号
      * @param index 索引
      */
-    static TVM_space::TVM_bytecode* build_opcode(
-        token_ticks symbol, TVM_space::bytecode_index_t index = 0);
+    static bytecode_t build_opcode(
+        token_ticks symbol);
 
     /**
      * @brief 构建有关变量的字节码
      * @param data 符号
      * @param index 索引
      */
-    static TVM_space::TVM_bytecode* build_var(
-        token_ticks data, TVM_space::bytecode_index_t index = 0);
+    static bytecode_t build_var(
+        token_ticks data);
 
     /**
      * @brief 添加字节码，并完善对应环境
      */
-    void add_opcode(TVM_space::TVM_bytecode*);
+    void add_opcode(bytecode_t, TVM_space::bytecode_index_t index);
 
     /**
      * @brief 解析函数字节码
@@ -105,8 +105,8 @@ private:
     std::vector<int> line_to_bycodeindex_table;
 };
 
-void detail_compiler::add_opcode(TVM_space::TVM_bytecode* opcode) {
-    static_data.byte_codes.push_back(opcode);
+void detail_compiler::add_opcode(bytecode_t opcode, TVM_space::bytecode_index_t index) {
+    static_data.byte_codes.push_back(TVM_space::TVM_bytecode{opcode, index});
     static_data.line_number_table.push_back(error_.line);
     if (error_.line != prev_value) {
         line_to_bycodeindex_table.resize(error_.line + 1);
@@ -205,21 +205,16 @@ TVM_space::bytecode_index_t detail_compiler::add(
     }
 }
 
-TVM_space::TVM_bytecode* detail_compiler::build_opcode(
-    token_ticks symbol, TVM_space::bytecode_index_t index) {
-    return new TVM_space::TVM_bytecode { (bytecode_t)opcodesym_int[(int)symbol],
-        index };
+bytecode_t detail_compiler::build_opcode(
+    token_ticks symbol) {
+    return (bytecode_t)opcodesym_int[(int)symbol];
 }
 
-TVM_space::TVM_bytecode* detail_compiler::build_var(
-    token_ticks data, TVM_space::bytecode_index_t index) {
+bytecode_t detail_compiler::build_var(
+    token_ticks data) {
     if (data == token_ticks::ASSIGN)
-        return new TVM_space::TVM_bytecode {
-            (bytecode_t)byteCodeNumber::CHANGE_VALUE_, index
-        };
-    return new TVM_space::TVM_bytecode {
-        (bytecode_t)byteCodeNumber::STORE_NAME_, index
-    };
+        return (bytecode_t)byteCodeNumber::CHANGE_VALUE_;
+    return (bytecode_t)byteCodeNumber::STORE_NAME_;
 }
 
 void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
@@ -238,7 +233,7 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             // 内置函数
             auto* code = (node_base_tick_without_sons*)root->son[0];
             auto* index_ = (node_base_int_without_sons*)root->son[1];
-            add_opcode(build_opcode(code->tick, index_->value));
+            add_opcode(build_opcode(code->tick), index_->value);
             break;
         }
         case OPCODE_ARGV: {
@@ -246,8 +241,7 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             // 参数
             auto* argv_ = (node_base_data_without_sons*)root->son[0];
             COMPILE_TYPE_TICK type_data = what_type(argv_->data);
-            add_opcode(build_opcode(((node_base_tick*)root)->tick,
-                add(vm, type_data, argv_->data)));
+            add_opcode(build_opcode(((node_base_tick*)root)->tick),add(vm, type_data, argv_->data));
             break;
         }
         case FUNC_DEFINE: {
@@ -263,7 +257,7 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             auto* argv_ = (node_base_data_without_sons*)root->son[0];
             short index_argv
                 = add(vm, COMPILE_TYPE_TICK::VAR_TICK, argv_->data);
-            add_opcode(build_var(((node_base_tick*)root)->tick, index_argv));
+            add_opcode(build_var(((node_base_tick*)root)->tick), index_argv);
             break;
         }
         case CALL_FUNC: {
@@ -275,7 +269,7 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
                     error::NameError, language::error::nameerror, nodedata);
             auto* code = (node_base_tick_without_sons*)root->son[0];
             auto* index_ = (node_base_int_without_sons*)root->son[1];
-            add_opcode(build_opcode(code->tick, index_->value));
+            add_opcode(build_opcode(code->tick), index_->value);
             break;
         }
         default: {
@@ -291,20 +285,15 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             TVM_space::bytecode_index_t index_argv
                 = add(vm, type_data, nodedata);
             if (type_data == string_TICK) {
-                add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv });
+                add_opcode((bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv);
             } else if (type_data == int_TICK || type_data == CONST_TICK) {
-                add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_INT_, index_argv });
+                add_opcode((bytecode_t)byteCodeNumber::LOAD_INT_, index_argv);
             } else if (type_data == float_TICK) {
-                add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_FLOAT_, index_argv });
+                add_opcode((bytecode_t)byteCodeNumber::LOAD_FLOAT_, index_argv);
             } else if (type_data == VAR_TICK) {
-                add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_NAME_, index_argv });
+                add_opcode((bytecode_t)byteCodeNumber::LOAD_NAME_, index_argv);
             } else if (type_data == LONG_TICK) {
-                add_opcode(new TVM_space::TVM_bytecode {
-                    (bytecode_t)byteCodeNumber::LOAD_LONG_, index_argv });
+                add_opcode((bytecode_t)byteCodeNumber::LOAD_LONG_, index_argv);
             }
             break;
         }
@@ -314,9 +303,9 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             break;
         }
         case OPCODE: {
-            // 生成字节码, -1代表没有参数
+            // 生成字节码, 0代表没有参数
             token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
-            add_opcode(build_opcode(tick));
+            add_opcode(build_opcode(tick), 0);
             break;
         }
         default: {

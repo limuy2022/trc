@@ -47,12 +47,11 @@ struct TRC_TVM_api TVM_static_data {
     TVM_static_data();
 };
 
-struct TVM_dyna_data {
-    /**
-     * TVM运行过程中动态数据的存放地
-     * 派生类：例如：TVM， frame_
-     */
-
+/**
+ * @brief TVM运行过程中动态数据的存放地
+ * 派生类：例如：TVM， frame_
+ */
+struct TVM_dyna_data { 
     // 变量
     std::map<std::string, def::OBJ> var_names;
     // 操作数栈
@@ -61,11 +60,11 @@ struct TVM_dyna_data {
     std::stack<frame_*> frames;
 };
 
+/**
+ * @brief 符号表，保存变量信息
+ * 就是凭借这个结构优化变量访问速度为O(1)
+ */
 class symbol_form {
-    /**
-     * 符号表，保存变量信息
-     * 就是凭借这个结构优化变量访问速度为O(1)
-     */
 public:
     int* vars;
 

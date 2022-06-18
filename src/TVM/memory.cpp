@@ -11,7 +11,6 @@ void free_var_vm(TVM_dyna_data* data) {
 }
 
 void free_TVM(TVM_space::TVM* vm) {
-    memory::free_array_obj(vm->static_data.byte_codes);
     vm->static_data.byte_codes.clear();
 
     vm->static_data.const_i.clear();

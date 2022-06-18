@@ -116,7 +116,7 @@ public:
      * @warning 这个函数不会检查是否越界
      */
     inline void run_one_bycode() {
-        run_bycode(static_data.byte_codes[run_index]);
+        run_bycode(&static_data.byte_codes[run_index]);
         run_index++;
     }
 

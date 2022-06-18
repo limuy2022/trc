@@ -84,7 +84,7 @@ void TVM::run_all() {
     size_t n;
     for (run_index = 0, n = static_data.byte_codes.size(); run_index < n;
          ++run_index) {
-        this->run_bycode(static_data.byte_codes[run_index]);
+        this->run_bycode(&static_data.byte_codes[run_index]);
     }
 }
 

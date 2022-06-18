@@ -26,7 +26,7 @@ namespace tools_in {
             printf("    %zu:%s|%hd, \n",
                 static_data.static_data
                     .line_number_table[static_data.run_index],
-                loader::int_code[bycode->bycode], bycode->index);
+                loader::int_code[bycode.bycode], bycode.index);
         }
         size_t n;
         // 输出常量池

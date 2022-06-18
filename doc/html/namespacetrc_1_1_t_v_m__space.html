@@ -101,16 +101,18 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html">objs_pool_TVM</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1_t_v_m__space_1_1symbol__form.html">symbol_form</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">符号表，保存变量信息 就是凭借这个结构优化变量访问速度为O(1)  <a href="classtrc_1_1_t_v_m__space_1_1symbol__form.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">trc的核心部分，负责执行字节码  <a href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html">TVM_dyna_data</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html">TVM_dyna_data</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">TVM运行过程中动态数据的存放地 派生类：例如：TVM， <a class="el" href="classtrc_1_1_t_v_m__space_1_1frame__.html">frame_</a>.  <a href="classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_static_data</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">静态数据 本类用于分离TVM的职责，装载编译时的数据，如常量池等 并且降低TVM和Compiler之间的耦合度  <a href="structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_static_data</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">静态数据 本类用于分离TVM的职责，装载编译时的数据，如常量池等 并且降低TVM和Compiler之间的耦合度  <a href="classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -119,8 +121,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a69f45768cf6e8aa1d30762edab706f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17aa43725f24e4afba985b8d2fbdc1aa"><td class="memItemLeft" align="right" valign="top">typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">bytecode_index_t</a></td></tr>
 <tr class="separator:a17aa43725f24e4afba985b8d2fbdc1aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25fdd3a6fdfb63c8ebe12cc02bb0ed89"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a25fdd3a6fdfb63c8ebe12cc02bb0ed89">struct_codes</a></td></tr>
-<tr class="separator:a25fdd3a6fdfb63c8ebe12cc02bb0ed89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2bac53609189e7b7381b72f6793fa80"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#aa2bac53609189e7b7381b72f6793fa80">struct_codes</a></td></tr>
+<tr class="separator:aa2bac53609189e7b7381b72f6793fa80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85cef7438d5d252b20026c3ed514b7e5"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a85cef7438d5d252b20026c3ed514b7e5">TVM_BUILTINS_FUNC</a>) (int argc, <a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> *vm)</td></tr>
 <tr class="separator:a85cef7438d5d252b20026c3ed514b7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a283bc93753cdcc8d8e067c49160263e3"><td class="memItemLeft" align="right" valign="top">typedef void(TVM::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a283bc93753cdcc8d8e067c49160263e3">ARGV_TVM_METHOD</a>) (<a class="el" href="namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa">bytecode_index_t</a>)</td></tr>
@@ -145,9 +147,6 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad81a11aebc3e8d01fb52854b524285f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_t_v_m_2library_8h.html#aad3dad54db5701611d9a3fe280f48a4b">TRC_TVM_func_api</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#ad81a11aebc3e8d01fb52854b524285f2">free_var_vm</a> (<a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html">TVM_dyna_data</a> *vm)</td></tr>
-<tr class="memdesc:ad81a11aebc3e8d01fb52854b524285f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除TVM变量信息  <a href="namespacetrc_1_1_t_v_m__space.html#ad81a11aebc3e8d01fb52854b524285f2">More...</a><br /></td></tr>
-<tr class="separator:ad81a11aebc3e8d01fb52854b524285f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c1eac1bcdfe3c792e88979d0c76ccb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_t_v_m_2library_8h.html#aad3dad54db5701611d9a3fe280f48a4b">TRC_TVM_func_api</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0">free_TVM</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> *vm)</td></tr>
 <tr class="memdesc:a7c1eac1bcdfe3c792e88979d0c76ccb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除TVM中的栈信息，常量池，字节码  <a href="namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0">More...</a><br /></td></tr>
 <tr class="separator:a7c1eac1bcdfe3c792e88979d0c76ccb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,14 +247,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a25fdd3a6fdfb63c8ebe12cc02bb0ed89" name="a25fdd3a6fdfb63c8ebe12cc02bb0ed89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25fdd3a6fdfb63c8ebe12cc02bb0ed89">&#9670;&nbsp;</a></span>struct_codes</h2>
+<a id="aa2bac53609189e7b7381b72f6793fa80" name="aa2bac53609189e7b7381b72f6793fa80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2bac53609189e7b7381b72f6793fa80">&#9670;&nbsp;</a></span>struct_codes</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::vector&lt;<a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a>*&gt; <a class="el" href="namespacetrc_1_1_t_v_m__space.html#a25fdd3a6fdfb63c8ebe12cc02bb0ed89">trc::TVM_space::struct_codes</a></td>
+          <td class="memname">typedef std::vector&lt;<a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html">TVM_bytecode</a>&gt; <a class="el" href="namespacetrc_1_1_t_v_m__space.html#aa2bac53609189e7b7381b72f6793fa80">trc::TVM_space::struct_codes</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -363,26 +362,6 @@ Variables</h2></td></tr>
 
 <p>删除TVM中的栈信息，常量池，字节码 </p>
 <dl class="section warning"><dt>Warning</dt><dd>会保留变量信息（tshell） </dd></dl>
-
-</div>
-</div>
-<a id="ad81a11aebc3e8d01fb52854b524285f2" name="ad81a11aebc3e8d01fb52854b524285f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad81a11aebc3e8d01fb52854b524285f2">&#9670;&nbsp;</a></span>free_var_vm()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void trc::TVM_space::free_var_vm </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html">TVM_dyna_data</a> *&#160;</td>
-          <td class="paramname"><em>vm</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>删除TVM变量信息 </p>
 
 </div>
 </div>

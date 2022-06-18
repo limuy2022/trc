@@ -1,6 +1,6 @@
-﻿#include <TVM/memory.h>
-#include <TVM/TVM.h>
+﻿#include <TVM/TVM.h>
 #include <TVM/func.h>
+#include <TVM/memory.h>
 #include <base/Error.h>
 #include <base/memory/memory.h>
 #include <base/trcdef.h>
@@ -45,7 +45,10 @@ TVM::TVM(std::string name)
     : name(std::move(name)) {
     // 初始化TVM
     TVM_space::init_mem();
-    dyna_data.var_names["__name__"] = new types::trc_string("__main__");
+}
+
+void TVM::reload_data() {
+    dyna_data.reset_global_symbol_table(static_data.global_symbol_table_size);
 }
 
 void free_module(TVM* vm) {

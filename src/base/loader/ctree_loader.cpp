@@ -31,7 +31,7 @@ static const int MAGIC_VALUE = 0xACFD;
         /* 长整型常量池 */                                               \
         str##_string_pool((file), (vm)->static_data.const_long);               \
         /* 变量名常量池 */                                               \
-        str##_string_pool((file), (vm)->static_data.const_name);               \
+        str##_var_form((file), (vm)->static_data.global_symbol_table_size);    \
         /* 字节码常量池 */                                               \
         str##_bytecode((file), (vm)->static_data);                             \
         /* 函数字节码常量池 */                                         \
@@ -151,6 +151,22 @@ static void load_string_pool(FILE* file, std::vector<char*>& const_pool) {
 }
 
 /**
+ * @brief 读入符号表大小
+ * @param file 文件
+ * @param table_size 符号表大小
+ */
+static void load_var_form(FILE* file, size_t& table_size) {
+    fread(&table_size, sizeof(table_size), 1, file);
+}
+
+/**
+ * @brief 写入符号表大小
+ */
+static void write_var_form(FILE* file, size_t table_size) {
+    fwrite(&table_size, sizeof(table_size), 1, file);
+}
+
+/**
  * @brief 向文件写入字节码和行号表
  * @param file 文件
  * @param static_data 静态数据
@@ -202,7 +218,8 @@ static void load_bytecode(
     for (int i = 0; i < size; ++i) {
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
-        static_data.byte_codes.push_back(trc::TVM_space::TVM_bytecode{name, argv});
+        static_data.byte_codes.push_back(
+            trc::TVM_space::TVM_bytecode { name, argv });
     }
 }
 

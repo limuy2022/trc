@@ -71,6 +71,11 @@ public:
     def::OBJ pop();
 
     /**
+     * @brief 重新加载数据(编译完之后需要执行)
+     */
+    void reload_data();
+
+    /**
      * @brief 弹出栈顶值，但
      * @warning 不会析构对象
      * @details

@@ -3,8 +3,8 @@
  */
 
 #include <TVM/TRE.h>
-#include <TVM/memory.h>
 #include <TVM/TVM.h>
+#include <TVM/memory.h>
 #include <TVM/types/trc_string.h>
 #include <base/Error.h>
 #include <base/memory/objs_pool.hpp>

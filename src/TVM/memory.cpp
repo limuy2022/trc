@@ -1,15 +1,11 @@
-﻿#include <TVM/memory.h>
-#include <TVM/TRE.h>
+﻿#include <TVM/TRE.h>
 #include <TVM/TVM.h>
 #include <TVM/TVM_data.h>
+#include <TVM/memory.h>
 #include <base/memory/memory.hpp>
 #include <map>
 
 namespace trc::TVM_space {
-void free_var_vm(TVM_dyna_data* data) {
-    data->var_names.clear();
-}
-
 void free_TVM(TVM_space::TVM* vm) {
     vm->static_data.byte_codes.clear();
 

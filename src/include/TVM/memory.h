@@ -2,10 +2,10 @@
 
 #include <TVM/types/base.h>
 #include <TVM/types/trc_float.h>
-#include <TVM/types/trc_string.h>
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_int.h>
 #include <TVM/types/trc_long.h>
+#include <TVM/types/trc_string.h>
 #include <base/library.h>
 #include <base/memory/objs_pool.hpp>
 #include <platform.h>
@@ -18,7 +18,7 @@
 #define MALLOCFLONG trc::TVM_space::global_objs_pool->flong_pool.trcmalloc
 
 namespace trc::TVM_space {
-struct TVM_dyna_data;
+class TVM_dyna_data;
 struct TRC_TVM_api objs_pool_TVM {
     /**
      * 对对象池的基本封装，对象池面向全体对象
@@ -30,11 +30,6 @@ struct TRC_TVM_api objs_pool_TVM {
     memory::objs_pool<types::trc_long> long_pool;
     memory::objs_pool<types::trc_flong> flong_pool;
 };
-
-/**
- * @brief 删除TVM变量信息
- */
-TRC_TVM_func_api void free_var_vm(TVM_dyna_data* vm);
 
 /**
  * @brief 删除TVM中的栈信息，常量池，字节码

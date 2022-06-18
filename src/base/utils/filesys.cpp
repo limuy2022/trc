@@ -45,7 +45,7 @@ bool file_exists(const std::string& path) {
 }
 
 void import_to_path(std::string& import_name) {
-    for (char & i : import_name) {
+    for (char& i : import_name) {
         if (i == '.') {
             i = '/';
         }

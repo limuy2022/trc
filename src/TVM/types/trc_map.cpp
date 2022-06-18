@@ -7,9 +7,9 @@
 
 #include <TVM/TVMdef.h>
 #include <TVM/types/trc_float.h>
-#include <TVM/types/trc_string.h>
 #include <TVM/types/trc_int.h>
 #include <TVM/types/trc_map.h>
+#include <TVM/types/trc_string.h>
 #include <base/Error.h>
 #include <cstdlib>
 #include <language/error.h>

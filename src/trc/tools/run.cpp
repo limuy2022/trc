@@ -20,6 +20,7 @@ namespace tools_in {
             utils::readcode(scodes, path);
             compiler::Compiler(vm, scodes);
         }
+        vm->reload_data();
         vm->run_all();
     }
 }

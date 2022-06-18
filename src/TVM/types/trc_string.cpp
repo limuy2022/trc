@@ -11,8 +11,8 @@
 #include <TVM/TRE.h>
 #include <TVM/TVMdef.h>
 #include <TVM/memory.h>
-#include <TVM/types/trc_string.h>
 #include <TVM/types/trc_flong.h>
+#include <TVM/types/trc_string.h>
 #include <base/Error.h>
 #include <base/memory/memory.h>
 #include <base/trcdef.h>

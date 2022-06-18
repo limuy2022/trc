@@ -2,9 +2,9 @@
  * trc交互式界面，无需文件即可执行
  */
 
-#include <TVM/memory.h>
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
+#include <TVM/memory.h>
 #include <base/Error.h>
 #include <base/io.hpp>
 #include <cstdio>
@@ -72,6 +72,7 @@ namespace tools::tools_out {
             }
             TVM_space::free_TVM(vm);
             compiler::Compiler(vm, code_str);
+            vm->reload_data();
             vm->run_all();
         }
         free(code);

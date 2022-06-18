@@ -56,13 +56,6 @@ namespace tools_in {
         for (size_t i = 0; i < n; ++i) {
             printf("    %zu:%s\n", i, static_data.static_data.const_long[i]);
         }
-
-        // 输出名字列表
-        n = static_data.static_data.const_name.size();
-        puts("\nname:");
-        for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i, static_data.static_data.const_name[i]);
-        }
         // 输出函数
         n = static_data.static_data.funcs.size();
         puts("\nfunctions:");

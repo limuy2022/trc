@@ -5,9 +5,9 @@
  * @copyright Copyright (c) 2022
  */
 
-#include <TVM/memory.h>
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
+#include <TVM/memory.h>
 #include <algorithm>
 #include <base/io.hpp>
 #include <base/utils/data.hpp>
@@ -25,15 +25,15 @@ static trc::TVM_space::TVM* vm;
  * @param instruction 指令
  */
 static void var_lex(const std::string& instruction) {
-    const std::string& var_ = instruction.substr(
-        instruction.find("var") + 4, instruction.length() - 3);
-    if (!trc::utils::map_check_in_first(vm->dyna_data.var_names, var_)) {
-        printf("%s%s%s", language::tdb::var, var_.c_str(),
-            language::tdb::not_defined);
-        return;
-    }
-    vm->dyna_data.var_names[var_]->putline(stdout);
-    putchar('\n');
+    // const std::string& var_ = instruction.substr(
+    //     instruction.find("var") + 4, instruction.length() - 3);
+    // if (!trc::utils::map_check_in_first(vm->dyna_data.var_names, var_)) {
+    //     printf("%s%s%s", language::tdb::var, var_.c_str(),
+    //         language::tdb::not_defined);
+    //     return;
+    // }
+    // vm->dyna_data.var_names[var_]->putline(stdout);
+    // putchar('\n');
 }
 
 /**
@@ -89,6 +89,7 @@ static void debug(const std::string& code) {
     char* instruction = nullptr;
     TVM_space::free_TVM(vm);
     trc::compiler::Compiler(vm, code);
+    vm->reload_data();
     // 用于输出代码行信息
     const vecs& out_data = cutlines(code);
     size_t n = out_data.size();
@@ -130,25 +131,24 @@ static void debug(const std::string& code) {
 }
 
 namespace tools::tools_out {
-        void tdb() {
-            // 输出开始提示
-            puts(language::tdb::start_tip);
-            char* file_path = nullptr;
-            std::string tmp;
-            vm = TVM_space::create_TVM();
-            for (;;) {
-                // 读取需要debug的文件
-                printf("%s", "file>");
-                free(file_path);
-                io::readstr(file_path, stdin);
-                if (!strcmp(file_path, "exit"))
-                    break;
-                utils::readcode(tmp, file_path);
-                debug(tmp);
-                TVM_space::free_var_vm(&vm->dyna_data);
-            }
-            delete vm;
+    void tdb() {
+        // 输出开始提示
+        puts(language::tdb::start_tip);
+        char* file_path = nullptr;
+        std::string tmp;
+        vm = TVM_space::create_TVM();
+        for (;;) {
+            // 读取需要debug的文件
+            printf("%s", "file>");
             free(file_path);
+            io::readstr(file_path, stdin);
+            if (!strcmp(file_path, "exit"))
+                break;
+            utils::readcode(tmp, file_path);
+            debug(tmp);
         }
+        delete vm;
+        free(file_path);
     }
+}
 }

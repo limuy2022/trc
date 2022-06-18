@@ -19,5 +19,5 @@ var searchData=
   ['_7etrcobj_16',['~trcobj',['../classtrc_1_1_t_v_m__space_1_1types_1_1trcobj.html#aafc087b948d5aba5a4fc7e4b4f3d21c4',1,'trc::TVM_space::types::trcobj']]],
   ['_7etreenode_17',['~treenode',['../classtrc_1_1compiler_1_1treenode.html#a550288a2e3a3183d8ecc57319728c38d',1,'trc::compiler::treenode']]],
   ['_7etvm_18',['~TVM',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a35a5b251d5074bec252e00afd31d9ac2',1,'trc::TVM_space::TVM']]],
-  ['_7etvm_5fstatic_5fdata_19',['~TVM_static_data',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a8711f036421fe3852675f77c17d308f4',1,'trc::TVM_space::TVM_static_data']]]
+  ['_7etvm_5fstatic_5fdata_19',['~TVM_static_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a8711f036421fe3852675f77c17d308f4',1,'trc::TVM_space::TVM_static_data']]]
 ];

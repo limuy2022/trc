@@ -2,10 +2,11 @@
  * 字节码最终在此生成，是编译器的另一个核心
  */
 
-#include <TVM/TVM_data.h>
+#include "compile_env.h"
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
+#include <TVM/TVM_data.h>
 #include <TVM/TVMdef.h>
 #include <TVM/func.h>
 #include <base/Error.h>
@@ -59,13 +60,15 @@ public:
      * @param vm 需要编译的虚拟机
      */
     void compile(TVM_space::TVM* vm, treenode* head);
+    // 编译时信息记录
+    CompileEnvironment infoenv;
 
 private:
     /**
      * @brief 把数据添加进相对应的vm常量池
      * @return 数据在常量池中所占的索引
      */
-    static TVM_space::bytecode_index_t add(
+    TVM_space::bytecode_index_t add(
         TVM_space::TVM* vm, COMPILE_TYPE_TICK data_type, char* data_value);
 
     /**
@@ -74,16 +77,14 @@ private:
      * @param data 符号
      * @param index 索引
      */
-    static bytecode_t build_opcode(
-        token_ticks symbol);
+    static bytecode_t build_opcode(token_ticks symbol);
 
     /**
      * @brief 构建有关变量的字节码
      * @param data 符号
      * @param index 索引
      */
-    static bytecode_t build_var(
-        token_ticks data);
+    static bytecode_t build_var(token_ticks data);
 
     /**
      * @brief 添加字节码，并完善对应环境
@@ -105,8 +106,9 @@ private:
     std::vector<int> line_to_bycodeindex_table;
 };
 
-void detail_compiler::add_opcode(bytecode_t opcode, TVM_space::bytecode_index_t index) {
-    static_data.byte_codes.push_back(TVM_space::TVM_bytecode{opcode, index});
+void detail_compiler::add_opcode(
+    bytecode_t opcode, TVM_space::bytecode_index_t index) {
+    static_data.byte_codes.push_back(TVM_space::TVM_bytecode { opcode, index });
     static_data.line_number_table.push_back(error_.line);
     if (error_.line != prev_value) {
         line_to_bycodeindex_table.resize(error_.line + 1);
@@ -160,18 +162,7 @@ TVM_space::bytecode_index_t detail_compiler::add(
         }
     }
     case VAR_TICK: {
-        size_t size = vm->static_data.const_name.size();
-        int index = utils::str_check_in_i(data_value,
-            vm->static_data.const_name.begin() + 1,
-            vm->static_data.const_name.end());
-        if (index != -1) {
-            return index + 1;
-        } else {
-            char* copy = new char[strlen(data_value) + 1];
-            strcpy(copy, data_value);
-            vm->static_data.const_name.push_back(copy);
-            return size;
-        }
+        return infoenv.get_index_of_globalvar(data_value);
     }
     case LONG_TICK: {
         size_t size = vm->static_data.const_long.size();
@@ -205,13 +196,11 @@ TVM_space::bytecode_index_t detail_compiler::add(
     }
 }
 
-bytecode_t detail_compiler::build_opcode(
-    token_ticks symbol) {
+bytecode_t detail_compiler::build_opcode(token_ticks symbol) {
     return (bytecode_t)opcodesym_int[(int)symbol];
 }
 
-bytecode_t detail_compiler::build_var(
-    token_ticks data) {
+bytecode_t detail_compiler::build_var(token_ticks data) {
     if (data == token_ticks::ASSIGN)
         return (bytecode_t)byteCodeNumber::CHANGE_VALUE_;
     return (bytecode_t)byteCodeNumber::STORE_NAME_;
@@ -241,7 +230,8 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             // 参数
             auto* argv_ = (node_base_data_without_sons*)root->son[0];
             COMPILE_TYPE_TICK type_data = what_type(argv_->data);
-            add_opcode(build_opcode(((node_base_tick*)root)->tick),add(vm, type_data, argv_->data));
+            add_opcode(build_opcode(((node_base_tick*)root)->tick),
+                add(vm, type_data, argv_->data));
             break;
         }
         case FUNC_DEFINE: {
@@ -285,7 +275,8 @@ void detail_compiler::compile(TVM_space::TVM* vm, treenode* head) {
             TVM_space::bytecode_index_t index_argv
                 = add(vm, type_data, nodedata);
             if (type_data == string_TICK) {
-                add_opcode((bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv);
+                add_opcode(
+                    (bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv);
             } else if (type_data == int_TICK || type_data == CONST_TICK) {
                 add_opcode((bytecode_t)byteCodeNumber::LOAD_INT_, index_argv);
             } else if (type_data == float_TICK) {
@@ -348,5 +339,8 @@ void Compiler(TVM_space::TVM* vm, const std::string& codes) {
         lex_d.compile(vm, now_get);
         free_tree(now_get);
     }
+    // 设置全局符号表
+    vm->static_data.global_symbol_table_size
+        = lex_d.infoenv.get_global_name_size();
 }
 }

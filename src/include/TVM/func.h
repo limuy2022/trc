@@ -11,7 +11,7 @@ class frame_ {
 public:
     TVM_dyna_data dyna_data;
 
-    frame_();
+    frame_(func_* func);
 };
 
 class func_ {
@@ -22,6 +22,8 @@ public:
 
     // 字节码信息
     struct_codes bytecodes;
+    // 符号表长度
+    size_t symbol_form_size;
 
     /**
      * @brief 执行函数

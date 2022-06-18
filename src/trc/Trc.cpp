@@ -74,6 +74,7 @@ int main(int argc, char* argv[]) {
     // 设置命令行参数
     trc::tools::argv = argv;
     trc::tools::argc = argc;
+    // 初始化命令行解析器
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     if (argc == 1) {
@@ -83,7 +84,7 @@ int main(int argc, char* argv[]) {
         // 指定模式，匹配调用模式
         find_mode_to_run(argv[1]);
     }
-    // 执行正常情况下卸载内存，不正常的话就崩溃了
+    // 卸载内存，做收尾工作
     trc::memory::quit_mem();
     return 0;
 }

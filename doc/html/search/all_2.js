@@ -15,7 +15,7 @@ var searchData=
   ['builtin_5ffunc_12',['BUILTIN_FUNC',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa83ffe31c7c7c1a80b54e6dd12b8e204f',1,'trc::compiler']]],
   ['builtin_5ffuncs_13',['builtin_funcs',['../namespacetrc_1_1_t_v_m__space.html#a1b1066cb4d55bd96c344d94689ae5e0a',1,'trc::TVM_space']]],
   ['bycode_14',['bycode',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a6235781272a07fa3566bc6b04522da2b',1,'trc::TVM_space::TVM_bytecode']]],
-  ['byte_5fcodes_15',['byte_codes',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a29e1665b491b2395fce108a0c72d848b',1,'trc::TVM_space::TVM_static_data']]],
+  ['byte_5fcodes_15',['byte_codes',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a29e1665b491b2395fce108a0c72d848b',1,'trc::TVM_space::TVM_static_data']]],
   ['byte_5forder_16',['byte_order',['../namespacetrc_1_1def.html#a6c0916fe5a90fd2ddd821da61aa09c59',1,'trc::def']]],
   ['byte_5ft_17',['byte_t',['../namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b',1,'trc::def']]],
   ['bytecode_5findex_5ft_18',['bytecode_index_t',['../namespacetrc_1_1_t_v_m__space.html#a17aa43725f24e4afba985b8d2fbdc1aa',1,'trc::TVM_space']]],

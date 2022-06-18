@@ -16,10 +16,10 @@ void TVM::CALL_BUILTIN(bytecode_index_t name) {
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {
-    func_* fast = static_data.funcs[static_data.const_name[index]];
-    run_func_str = fast->name;
-    frame_* frame_var = new frame_;
-    dyna_data.frames.push(frame_var);
+    // func_* fast = static_data.funcs[static_data.const_name[index]];
+    // run_func_str = fast->name;
+    // frame_* frame_var = new frame_(fast);
+    // dyna_data.frames.push(frame_var);
     // 调用函数
     // this->run_func(fast->bytecodes, LINE_NOW);
 }

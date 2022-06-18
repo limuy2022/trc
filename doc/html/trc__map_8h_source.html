@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.4"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trc: src/include/TVM/types/map.h Source File</title>
+<title>Trc: src/include/TVM/types/trc_map.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,19 +66,19 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="headertitle"><div class="title">map.h</div></div>
+  <div class="headertitle"><div class="title">trc_map.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="map_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="trc__map_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="_t_v_mdef_8h.html">TVM/TVMdef.h</a>&quot;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="_t_v_m_2library_8h.html">TVM/library.h</a>&quot;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="base_8h.html">base.h</a>&quot;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;<a class="code" href="trcdef_8h.html">base/trcdef.h</a>&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="_t_v_mdef_8h.html">TVM/TVMdef.h</a>&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="_t_v_m_2library_8h.html">TVM/library.h</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="base_8h.html">TVM/types/base.h</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="trcdef_8h.html">base/trcdef.h</a>&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// 哈希表大小</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">   13</a></span><span class="preprocessor">#define MAP_MIN_SIZE 50</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="trc__map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">   13</a></span><span class="preprocessor">#define MAP_MIN_SIZE 50</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1_t_v_m__space_1_1types.html">trc::TVM_space::types</a> {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="namespacetrc_1_1_t_v_m__space_1_1types_1_1map__space.html">   16</a></span><span class="keyword">namespace </span>map_space {</div>
@@ -101,7 +101,7 @@ $(function() {
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">private</span>:</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">// 哈希表长度</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordtype">int</span> length = <a class="code hl_define" href="map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">MAP_MIN_SIZE</a>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keywordtype">int</span> length = <a class="code hl_define" href="trc__map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">MAP_MIN_SIZE</a>;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// 数据</span></div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_class" href="classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html">map_space::data_info</a>* data_;</div>
@@ -126,11 +126,11 @@ $(function() {
 <div class="ttc" id="a_t_v_mdef_8h_html"><div class="ttname"><a href="_t_v_mdef_8h.html">TVMdef.h</a></div></div>
 <div class="ttc" id="abase_8h_html"><div class="ttname"><a href="base_8h.html">base.h</a></div></div>
 <div class="ttc" id="aclasstrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info_html"><div class="ttname"><a href="classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html">trc::TVM_space::types::map_space::data_info</a></div><div class="ttdef"><b>Definition:</b> trc_map.cpp:23</div></div>
-<div class="ttc" id="aclasstrc_1_1_t_v_m__space_1_1types_1_1trc__map_html"><div class="ttname"><a href="classtrc_1_1_t_v_m__space_1_1types_1_1trc__map.html">trc::TVM_space::types::trc_map</a></div><div class="ttdef"><b>Definition:</b> map.h:20</div></div>
+<div class="ttc" id="aclasstrc_1_1_t_v_m__space_1_1types_1_1trc__map_html"><div class="ttname"><a href="classtrc_1_1_t_v_m__space_1_1types_1_1trc__map.html">trc::TVM_space::types::trc_map</a></div><div class="ttdef"><b>Definition:</b> trc_map.h:20</div></div>
 <div class="ttc" id="aclasstrc_1_1_t_v_m__space_1_1types_1_1trcobj_html"><div class="ttname"><a href="classtrc_1_1_t_v_m__space_1_1types_1_1trcobj.html">trc::TVM_space::types::trcobj</a></div><div class="ttdoc">所有数据类型的基类(包括用户自定义类，这些函数可以不实现) 包含析构函数，比较函数，运算函数， 逻辑运算符 注意：类不可实例化 类型系统中的所有类都不是给项目本身使用的， 仅仅服务于虚拟机，所以千万不要...</div><div class="ttdef"><b>Definition:</b> base.h:22</div></div>
-<div class="ttc" id="amap_8h_html_a87c92adbd1f4322b9624df6b49aae91a"><div class="ttname"><a href="map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">MAP_MIN_SIZE</a></div><div class="ttdeci">#define MAP_MIN_SIZE</div><div class="ttdef"><b>Definition:</b> map.h:13</div></div>
 <div class="ttc" id="anamespacetrc_1_1_t_v_m__space_1_1types_html"><div class="ttname"><a href="namespacetrc_1_1_t_v_m__space_1_1types.html">trc::TVM_space::types</a></div><div class="ttdef"><b>Definition:</b> trcdef.h:28</div></div>
 <div class="ttc" id="anamespacetrc_1_1_t_v_m__space_html_aac100ee4aa450fb829dede002c97774e"><div class="ttname"><a href="namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774e">trc::TVM_space::RUN_TYPE_TICK</a></div><div class="ttdeci">RUN_TYPE_TICK</div><div class="ttdef"><b>Definition:</b> TVMdef.h:31</div></div>
+<div class="ttc" id="atrc__map_8h_html_a87c92adbd1f4322b9624df6b49aae91a"><div class="ttname"><a href="trc__map_8h.html#a87c92adbd1f4322b9624df6b49aae91a">MAP_MIN_SIZE</a></div><div class="ttdeci">#define MAP_MIN_SIZE</div><div class="ttdef"><b>Definition:</b> trc_map.h:13</div></div>
 <div class="ttc" id="atrcdef_8h_html"><div class="ttname"><a href="trcdef_8h.html">trcdef.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

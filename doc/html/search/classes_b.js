@@ -14,6 +14,6 @@ var searchData=
   ['treenode_11',['treenode',['../classtrc_1_1compiler_1_1treenode.html',1,'trc::compiler']]],
   ['tvm_12',['TVM',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html',1,'trc::TVM_space']]],
   ['tvm_5fbytecode_13',['TVM_bytecode',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html',1,'trc::TVM_space']]],
-  ['tvm_5fdyna_5fdata_14',['TVM_dyna_data',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html',1,'trc::TVM_space']]],
-  ['tvm_5fstatic_5fdata_15',['TVM_static_data',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html',1,'trc::TVM_space']]]
+  ['tvm_5fdyna_5fdata_14',['TVM_dyna_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html',1,'trc::TVM_space']]],
+  ['tvm_5fstatic_5fdata_15',['TVM_static_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html',1,'trc::TVM_space']]]
 ];

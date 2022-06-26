@@ -9,5 +9,5 @@ add_executable(unittest
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/tests/unittest/testdata/autodll)
 add_library(create_dll SHARED
         testdata/autodll/create_dll.cpp
-        )
+)
 target_include_directories(unittest PUBLIC "include/")

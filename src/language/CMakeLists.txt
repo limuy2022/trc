@@ -1,3 +1,4 @@
+# 编译为dll才可以更换语言，所以无法支持One编译模式
 add_library(Chinese SHARED
     chinese.cpp
 )

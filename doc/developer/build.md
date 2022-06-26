@@ -16,31 +16,32 @@
 注：如果编译器不满足上述要求仍然可以编译，
 但操作系统不满足就会直接报错，无法编译
 
-## cmake操作:
-### 编译debug需要添加的参数
+## cmake操作
+
+### 编译debug版本
 
 ```
 -DCMAKE_BUILD_TYPE=Debug
 ```
 
-### 编译release需要添加的参数
+### 编译release版本
 
 ```
 -DCMAKE_BUILD_TYPE=Release
 ```
 
-### 启动单元测试需要的参数(不加就是默认不启动)
+### 启动单元测试
 
 ```
 -DTRC_BUILD_TYPE=Test
 ```
 
-### 不启动单元测试需要的参数(显式指定不编译单元测试)
+### 编译为单个可执行文件(当不需要通过动态链接库调用trc的api时，建议选择该选项)
 
 ```
--DTRC_BUILD_TYPE=Run
+-DTRC_BUILD_TYPE=One
 ```
 
-## xmake操作:
+## xmake操作
 
 ## 注：要求编译器必须支持c++20标准

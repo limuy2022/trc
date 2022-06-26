@@ -30,10 +30,10 @@ link_directories(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(third_party)
 add_subdirectory(src)
 
+message("${TRC_BUILD_TYPE}")
 # 将主程序编译为静态链接库，单元测试链接它执行
 # 添加单元测试
 if("${TRC_BUILD_TYPE}" STREQUAL "Test")
-	message("Test")
 	add_subdirectory(tests/unittest)
 	find_library(gtest_path gtest)
 	if(NOT gtest_path)

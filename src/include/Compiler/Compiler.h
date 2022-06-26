@@ -113,8 +113,7 @@ private:
  * @param codes 源代码
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
-TRC_Compiler_c_api void Compiler(
-    TVM_space::TVM* vm, const std::string& codes);
+TRC_Compiler_c_api void Compiler(TVM_space::TVM* vm, const std::string& codes);
 
 /**
  * @brief 释放整棵树的内存

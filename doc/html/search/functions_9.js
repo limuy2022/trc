@@ -14,10 +14,11 @@ var searchData=
   ['is_5fcal_5ftoken_11',['is_cal_token',['../namespacetrc_1_1compiler.html#a9747d88bc8d17113b760362ad8756b47',1,'trc::compiler']]],
   ['is_5fcal_5fvalue_12',['is_cal_value',['../namespacetrc_1_1compiler.html#a91e35d10b3e8fc8565fb99ff3f8df2a5',1,'trc::compiler']]],
   ['is_5fcondit_5ftoken_13',['is_condit_token',['../namespacetrc_1_1compiler.html#a50e5ec407cdf9e72418b3623dc13a0c3',1,'trc::compiler']]],
-  ['is_5fend_5ftoken_14',['is_end_token',['../namespacetrc_1_1compiler.html#a1360fb843a853f2dec5054e8582b8a2c',1,'trc::compiler']]],
-  ['is_5fenglish_15',['is_english',['../namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9',1,'trc::compiler']]],
-  ['is_5fleft_5fvalue_16',['is_left_value',['../namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc',1,'trc::compiler']]],
-  ['is_5fmagic_17',['is_magic',['../namespacetrc_1_1loader.html#ab87e099f032f48972457d5993fb39675',1,'trc::loader']]],
-  ['is_5fsentence_5ftoken_18',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
-  ['is_5fsentence_5fwith_5fone_5fargv_19',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]]
+  ['is_5fconst_5fvalue_14',['is_const_value',['../namespacetrc_1_1compiler.html#a450c2f7e50642a5e0d0ed46b0d83a113',1,'trc::compiler']]],
+  ['is_5fend_5ftoken_15',['is_end_token',['../namespacetrc_1_1compiler.html#a1360fb843a853f2dec5054e8582b8a2c',1,'trc::compiler']]],
+  ['is_5fenglish_16',['is_english',['../namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9',1,'trc::compiler']]],
+  ['is_5fleft_5fvalue_17',['is_left_value',['../namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc',1,'trc::compiler']]],
+  ['is_5fmagic_18',['is_magic',['../namespacetrc_1_1loader.html#ab87e099f032f48972457d5993fb39675',1,'trc::loader']]],
+  ['is_5fsentence_5ftoken_19',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
+  ['is_5fsentence_5fwith_5fone_5fargv_20',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]]
 ];

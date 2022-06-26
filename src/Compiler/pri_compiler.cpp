@@ -3,6 +3,8 @@
  */
 
 #include <Compiler/pri_compiler.hpp>
+#include <TVM/types/trc_flong.h>
+#include <TVM/types/trc_long.h>
 #include <array>
 #include <base/Error.h>
 #include <cstring>
@@ -83,10 +85,20 @@ node_base_data_without_sons::node_base_data_without_sons(
 
 node_base_data_without_sons::node_base_data_without_sons() = default;
 
-node_base_int_without_sons::node_base_int_without_sons(
-    grammar_type type, int value)
+node_base_string_without_sons::node_base_string_without_sons(
+    const std::string& data)
+    : data_node(data) {
+    this->type = STRING;
+}
+
+node_base_int_without_sons::node_base_int_without_sons(int value)
     : value(value) {
-    this->type = type;
+    this->type = NUMBER;
+}
+
+node_base_float_without_sons::node_base_float_without_sons(double value)
+    : value(value) {
+    this->type = FLOAT;
 }
 
 COMPILE_TYPE_TICK what_type(const std::string& value) {
@@ -98,7 +110,7 @@ COMPILE_TYPE_TICK what_type(const std::string& value) {
     if (isdigit(front)) {
         if (value.find('.') != std::string::npos) {
             // 小数
-            if (lenght >= 12)
+            if (lenght - 1 > FLOAT_LONGFLOAT_LINE)
                 return compiler::FLOAT_L_TICK;
             return compiler::float_TICK;
         }
@@ -106,7 +118,7 @@ COMPILE_TYPE_TICK what_type(const std::string& value) {
         if (lenght >= 2 && front == '0')
             error::send_error(error::SyntaxError,
                 language::error::syntaxerror_int, value.c_str());
-        if (lenght >= 12)
+        if (lenght > INT_LONGINT_LINE)
             return LONG_TICK;
 
         return int_TICK;

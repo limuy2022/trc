@@ -55,8 +55,13 @@ enum class token_ticks {
     ASSIGN, // =
     STORE, // :=
     NAME, // 名称
+    NULL_, // null
+    TRUE, // true
+    FALSE, // false
     STRING_VALUE, // 字符串值
+    LONG_FLOAT_VALUE, //长浮点型值
     FLOAT_VALUE, // 浮点数值
+    LONG_INT_VALUE, //长整型值
     INT_VALUE, // 整型值
     LEFT_BIG_BRACE, // {
     RIGHT_BIG_BRACE, // }
@@ -105,10 +110,18 @@ enum grammar_type {
     VAR_DEFINE,
     // 调用自定义函数
     CALL_FUNC,
-    // 行号节点，区别在于会转换成字节码索引
-    LINE_NUMBER,
     // 整型节点
-    NUMBER
+    NUMBER,
+    // 浮点型节点
+    FLOAT,
+    //字符串型节点
+    STRING,
+    // 长整型节点
+    LONG_INT,
+    // 长浮点型节点
+    LONG_FLOAT,
+    // 变量名节点
+    VAR_NAME
 };
 
 /**
@@ -220,13 +233,32 @@ public:
 };
 
 /**
+ * @brief 基于字符串的没有子节点的节点
+ */
+class TRC_Compiler_api node_base_string_without_sons : public is_end_node,
+                                                       public data_node {
+public:
+    node_base_string_without_sons(const std::string& data);
+};
+
+/**
  * @brief 基于整型的没有子节点的类型
  */
-class TRC_Compiler_api node_base_int_without_sons : public is_not_end_node {
+class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
 public:
     int value;
 
-    node_base_int_without_sons(grammar_type type, int value);
+    node_base_int_without_sons(int value);
+};
+
+/**
+ * @brief 基于浮点型的没有子节点的类型
+ */
+class TRC_Compiler_api node_base_float_without_sons : public is_end_node {
+public:
+    double value;
+
+    node_base_float_without_sons(double value);
 };
 
 /**
@@ -309,8 +341,18 @@ inline bool is_sentence_token(token_ticks tick) {
     return utils::inrange(token_ticks::IMPORT, token_ticks::ASSERT, tick);
 }
 
+/**
+ * @brief 判断是不是带参数的语句token
+ */
 inline bool is_sentence_with_one_argv(token_ticks tick) {
     return utils::inrange(token_ticks::GOTO, token_ticks::GOTO, tick);
+}
+
+/**
+ * @brief 判断是不是常量token
+ */
+inline bool is_const_value(token_ticks tick) {
+    return utils::inrange(token_ticks::NULL_, token_ticks::FALSE, tick);
 }
 
 /**

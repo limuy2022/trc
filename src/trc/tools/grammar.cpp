@@ -35,9 +35,7 @@ namespace tools_in {
             printf("%s", "builtin_func");
             break;
         }
-        // 这种写法的意思是为NUMBER或LINE_NUMBER
-        case compiler::NUMBER:
-        case compiler::LINE_NUMBER: {
+        case compiler::NUMBER: {
             auto tmp = (compiler::node_base_int_without_sons*)data;
             printf("%d", tmp->value);
             break;

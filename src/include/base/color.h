@@ -37,7 +37,7 @@ typedef int color_type;
 
 namespace trc::color {
 #ifdef WINDOWS_PLAT
-TRC_base_c_api extern HANDLE hout;
+TRC_base_c_api HANDLE hout;
 #endif
 
 class TRC_base_api color_st {
@@ -68,5 +68,5 @@ void color_st::operator()(const char* fmt, const argvs&... data) const {
 #endif
 }
 
-TRC_base_c_api extern color_st yellow, blue, red, green, white, purple;
+TRC_base_c_api color_st yellow, blue, red, green, white, purple;
 }

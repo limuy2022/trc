@@ -6,6 +6,6 @@
 #include <string>
 
 namespace trc::loader {
-TRC_base_c_api extern std::array<std::string, 11> num_func;
-TRC_base_c_api extern std::map<std::string, short> func_num;
+TRC_base_c_api std::array<std::string, 11> num_func;
+TRC_base_c_api std::map<std::string, short> func_num;
 }

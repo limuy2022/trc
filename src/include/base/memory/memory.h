@@ -27,5 +27,5 @@ TRC_base_c_api void quit_mem();
 /**
  * @brief 管理虚拟机对象分配内存的内存池
  */
-TRC_base_c_api extern memory_pool global_memory_pool;
+TRC_base_c_api memory_pool global_memory_pool;
 }

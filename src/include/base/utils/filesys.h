@@ -42,8 +42,7 @@ TRC_base_c_api void import_to_path(std::string& import_name);
  * @brief 读取文件并将字符存入file_data
  * @warning 失败会直接停止程序
  */
-TRC_base_c_api void readcode(
-    std::string& file_data, const std::string& path);
+TRC_base_c_api void readcode(std::string& file_data, const std::string& path);
 
 /**
  * @brief 读取文件并将字符存入file_data

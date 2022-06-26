@@ -123,6 +123,12 @@ TEST(token, float_int_lex) {
     test_tokens("1_2_4._23_1+1_",
         { { token_ticks::FLOAT_VALUE, "124.231" }, { token_ticks::ADD, "" },
             { token_ticks::INT_VALUE, "1" } });
+    // 测试长整型解析
+    test_tokens("11111111111111111111",
+        { { token_ticks::LONG_INT_VALUE, "11111111111111111111" } });
+    // 测试长浮点型解析
+    test_tokens("11111111111111111111.11",
+        { { token_ticks::LONG_FLOAT_VALUE, "11111111111111111111.11" } });
 }
 
 // 测试英文字符解析
@@ -138,4 +144,9 @@ TEST(token, english) {
             { token_ticks::IMPORT, "" }, { token_ticks::GOTO, "" },
             { token_ticks::FUNC, "" }, { token_ticks::NOT, "" },
             { token_ticks::OR, "" }, { token_ticks::AND, "" } });
+    // 特殊常量的解析
+    test_tokens("null:=true+false",
+        { { token_ticks::NULL_, "" }, { token_ticks::STORE, "" },
+            { token_ticks::TRUE, "" }, { token_ticks::ADD, "" },
+            { token_ticks::FALSE, "" } });
 }

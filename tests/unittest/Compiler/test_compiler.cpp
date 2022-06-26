@@ -4,6 +4,7 @@
 
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
+#include <TVM/memory.h>
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -24,16 +25,40 @@ static void bytecode_check(
     }
 }
 
+/*测试变量赋值解析*/
 TEST(compiler, var) {
     TVM* vm = create_TVM();
-    compiler::Compiler(vm, "a:=90");
+    // 测试缓冲区内整形赋值
+    compiler::Compiler(vm, "a:=80");
     ASSERT_EQ(vm->static_data.const_i.size(), 2);
-    EXPECT_EQ(vm->static_data.const_i[1], 90);
+    EXPECT_EQ(vm->static_data.const_i[1], 80);
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
+    free_TVM(vm);
+    // 测试缓冲区外整形赋值
+    compiler::Compiler(vm, "a:=900");
+    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    EXPECT_EQ(vm->static_data.const_i[1], 900);
+    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
+        vm);
+    free_TVM(vm);
+    // 测试字符串赋值
+    compiler::Compiler(vm, "a:=\"ppp\"");
+    ASSERT_EQ(vm->static_data.const_s.size(), 2);
+    EXPECT_STREQ(vm->static_data.const_s[1], "ppp");
+    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_STRING_, 1 },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
+        vm);
+    free_TVM(vm);
     delete vm;
+}
+
+TEST(compiler, function_call) {
 }
 
 TEST(compiler, if_lex) {

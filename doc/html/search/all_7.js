@@ -24,7 +24,7 @@ var searchData=
   ['greater_5f_21',['GREATER_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaa168f2f6e595c4e2df4853617f42ff04',1,'TVM.h']]],
   ['greater_5f_22',['greater_',['../namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9',1,'trc::compiler']]],
   ['greater_5fequal_23',['GREATER_EQUAL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a87e6b203bf40967d37a33f9a4438561a',1,'trc::compiler']]],
-  ['greater_5fequal_5f_24',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
-  ['greater_5fequal_5f_25',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
+  ['greater_5fequal_5f_24',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
+  ['greater_5fequal_5f_25',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
   ['green_26',['green',['../namespacetrc_1_1color.html#ab5878987981b385e2e9a7bd6f3523adf',1,'trc::color']]]
 ];

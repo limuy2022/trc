@@ -1,5 +1,7 @@
 ﻿#include <Compiler/Compiler.h>
 #include <Compiler/pri_compiler.hpp>
+#include <TVM/types/trc_flong.h>
+#include <TVM/types/trc_long.h>
 #include <base/Error.h>
 #include <base/utils/data.hpp>
 #include <language/error.h>
@@ -101,26 +103,38 @@ void token_lex::lex_int_float(token* result) {
         result->data += *char_ptr;
         get_next_char();
     }
+    // 尝试纠正为长整型和长浮点型
+    switch (result->tick) {
+    case token_ticks::FLOAT_VALUE: {
+        if (result->data.length() - 1 > FLOAT_LONGFLOAT_LINE) {
+            result->tick = token_ticks::LONG_FLOAT_VALUE;
+        }
+        break;
+    }
+    case token_ticks::INT_VALUE: {
+        if (result->data.length() > INT_LONGINT_LINE) {
+            result->tick = token_ticks::LONG_INT_VALUE;
+        }
+        break;
+    }
+    default: {
+        NOREACH;
+    }
+    }
 }
 
 bool token_lex::end_of_lex() const noexcept {
     return *char_ptr == '\n' || *char_ptr == '\0';
 }
 
-std::pair<const char*, token_ticks> keywords_[] = {
-    { "for", token_ticks::FOR },
-    { "while", token_ticks::WHILE },
-    { "import", token_ticks::IMPORT },
-    { "goto", token_ticks::GOTO },
-    { "del", token_ticks::DEL },
-    { "assert", token_ticks::ASSERT },
-    { "if", token_ticks::IF },
-    { "class", token_ticks::CLASS },
-    { "func", token_ticks::FUNC },
-    { "and", token_ticks::AND },
-    { "or", token_ticks::OR },
-    { "not", token_ticks::NOT },
-};
+std::pair<const char*, token_ticks> keywords_[] = { { "for", token_ticks::FOR },
+    { "while", token_ticks::WHILE }, { "import", token_ticks::IMPORT },
+    { "goto", token_ticks::GOTO }, { "del", token_ticks::DEL },
+    { "assert", token_ticks::ASSERT }, { "if", token_ticks::IF },
+    { "class", token_ticks::CLASS }, { "func", token_ticks::FUNC },
+    { "and", token_ticks::AND }, { "or", token_ticks::OR },
+    { "not", token_ticks::NOT }, { "null", token_ticks::NULL_ },
+    { "true", token_ticks::TRUE }, { "false", token_ticks::FALSE } };
 
 void token_lex::lex_english(token* result) {
     result->data += *char_ptr;

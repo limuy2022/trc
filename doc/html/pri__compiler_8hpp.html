@@ -110,8 +110,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__data__without__sons.html">trc::compiler::node_base_data_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于字符串的没有子节点的节点  <a href="classtrc_1_1compiler_1_1node__base__data__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__string__without__sons.html">trc::compiler::node_base_string_without_sons</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于字符串的没有子节点的节点  <a href="classtrc_1_1compiler_1_1node__base__string__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int__without__sons.html">trc::compiler::node_base_int_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__float__without__sons.html">trc::compiler::node_base_float_without_sons</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1cal__priority__class.html">trc::compiler::cal_priority_class</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">用于返回优先级的类  <a href="classtrc_1_1compiler_1_1cal__priority__class.html#details">More...</a><br /></td></tr>
@@ -175,21 +181,27 @@ Enumerations</h2></td></tr>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a3cfba54f6873dfd55b0b09d32910b20e">trc::compiler::STORE</a>
 , <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aad32e604e17467fc435538334fbddf3e">trc::compiler::NAME</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aa833d6893ea57e4ffc5155cc2f44e6cb">trc::compiler::STRING_VALUE</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a1d937b8e75a80dab97faa117b84239d4">trc::compiler::FLOAT_VALUE</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a7f12111b3f331d04dc056ee57986f3b3">trc::compiler::INT_VALUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a6d67bdfe4ae19f38aff8f363bca42892">trc::compiler::NULL_</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ac0d83f0b82a6b30de8811e69e6d95c61">trc::compiler::TRUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a946003f97ccc52d5d3b54ac0ec31bbfc">trc::compiler::FALSE</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a21b9033eda58eb069cd134064891d1f5">trc::compiler::LEFT_BIG_BRACE</a>
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aa833d6893ea57e4ffc5155cc2f44e6cb">trc::compiler::STRING_VALUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2e02aa7c515398e12748659a73da366a">trc::compiler::LONG_FLOAT_VALUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a1d937b8e75a80dab97faa117b84239d4">trc::compiler::FLOAT_VALUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ad2c551340860bd6e456ed09de18ed68f">trc::compiler::LONG_INT_VALUE</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a7f12111b3f331d04dc056ee57986f3b3">trc::compiler::INT_VALUE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a21b9033eda58eb069cd134064891d1f5">trc::compiler::LEFT_BIG_BRACE</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ad1ca82eb453ad159d8d9d8d246790500">trc::compiler::RIGHT_BIG_BRACE</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a427b58cc7cb78012dede972567dbb49b">trc::compiler::LEFT_SMALL_BRACE</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ae22e68a6cf9ed2f54c99bfcf7218f55d">trc::compiler::RIGHT_SMALL_BRACE</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a185b92d7b5de1f8913b39b56c96701ed">trc::compiler::LEFT_MID_BRACE</a>
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ae22e68a6cf9ed2f54c99bfcf7218f55d">trc::compiler::RIGHT_SMALL_BRACE</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a185b92d7b5de1f8913b39b56c96701ed">trc::compiler::LEFT_MID_BRACE</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a97879d06f75ccde64044b02d1f74f2a6">trc::compiler::RIGHT_MID_BRACE</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aaebdbcb765394d25d6a604589a890f82">trc::compiler::POINT</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a4d9b3e9fc12849d060371eb65154c751">trc::compiler::COMMA</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3">trc::compiler::UNKNOWN</a>
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a4d9b3e9fc12849d060371eb65154c751">trc::compiler::COMMA</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3">trc::compiler::UNKNOWN</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a02b8688c59b2832ffc57c8f47ad9e717">trc::compiler::END_OF_TOKENS</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aa61685a08b8ddb7936032a222b7e01a6">trc::compiler::END_OF_LINE</a>
 <br />
@@ -218,8 +230,13 @@ Enumerations</h2></td></tr>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa86eea4f90e03794df4330a59ad0c20a8">trc::compiler::VAR_DEFINE</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa239de0f9ed62b74785ed60b2a168b013">trc::compiler::CALL_FUNC</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efabfef188690f04473e4de2452039665f5">trc::compiler::LINE_NUMBER</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efac2a911fcc3d93527d633b77e489b8765">trc::compiler::NUMBER</a>
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efac2a911fcc3d93527d633b77e489b8765">trc::compiler::NUMBER</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa0b71a43c152e78b528c8abef5eaca121">trc::compiler::FLOAT</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efae8595af24ef3d2cb90d0c6761ebc2688">trc::compiler::STRING</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa63460c838c2e0aabf418e99fff746caa">trc::compiler::LONG_INT</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaf021dd4dd083edbd8a58b8f711a1dccb">trc::compiler::LONG_FLOAT</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efac583fb6135f8356690e308469ad6d8f9">trc::compiler::VAR_NAME</a>
 <br />
  }</td></tr>
 <tr class="separator:a4bcc8ae504de95341ebb688e6fcf56ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,7 +265,11 @@ Functions</h2></td></tr>
 <tr class="memdesc:a5c4ec4059941e0c3dc039a727ba1ca4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是语句token  <a href="namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f">More...</a><br /></td></tr>
 <tr class="separator:a5c4ec4059941e0c3dc039a727ba1ca4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cd702879f86ff794468d349572185ea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea">trc::compiler::is_sentence_with_one_argv</a> (token_ticks tick)</td></tr>
+<tr class="memdesc:a8cd702879f86ff794468d349572185ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是带参数的语句token  <a href="namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea">More...</a><br /></td></tr>
 <tr class="separator:a8cd702879f86ff794468d349572185ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a450c2f7e50642a5e0d0ed46b0d83a113"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a450c2f7e50642a5e0d0ed46b0d83a113">trc::compiler::is_const_value</a> (token_ticks tick)</td></tr>
+<tr class="memdesc:a450c2f7e50642a5e0d0ed46b0d83a113"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是常量token  <a href="namespacetrc_1_1compiler.html#a450c2f7e50642a5e0d0ed46b0d83a113">More...</a><br /></td></tr>
+<tr class="separator:a450c2f7e50642a5e0d0ed46b0d83a113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9048dde6b8f9958999716fb9fa7f7bdc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc">trc::compiler::is_left_value</a> (token_ticks tick)</td></tr>
 <tr class="memdesc:a9048dde6b8f9958999716fb9fa7f7bdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否为左值  <a href="namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc">More...</a><br /></td></tr>
 <tr class="separator:a9048dde6b8f9958999716fb9fa7f7bdc"><td class="memSeparator" colspan="2">&#160;</td></tr>

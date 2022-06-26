@@ -43,7 +43,7 @@ namespace TVM_share {
 }
 
 namespace type_int {
-    TRC_TVM_c_api extern std::map<std::string, int> name_int_s;
-    TRC_TVM_c_api extern std::string int_name_s[];
+    TRC_TVM_c_api std::map<std::string, int> name_int_s;
+    TRC_TVM_c_api std::string int_name_s[];
 }
 }

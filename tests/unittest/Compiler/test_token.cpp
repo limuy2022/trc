@@ -119,6 +119,8 @@ TEST(token, float_int_lex) {
             { token_ticks::FLOAT_VALUE, "3.98" }, { token_ticks::SUB, "" },
             { token_ticks::INT_VALUE, "1" } });
     test_tokens("1.90001", { { token_ticks::FLOAT_VALUE, "1.90001" } });
+    test_tokens("1_2_3", {{token_ticks::INT_VALUE, "123"}});
+    test_tokens("1_2_4._23_1+1_", {{token_ticks::FLOAT_VALUE, "124.231"}, {token_ticks::ADD, ""}, {token_ticks::INT_VALUE,"1"}});
 }
 
 // 测试英文字符解析

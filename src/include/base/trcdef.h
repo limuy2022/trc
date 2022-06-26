@@ -50,10 +50,10 @@ namespace def {
     // 字节类型
     typedef unsigned char byte_t;
     // 版本号
-    TRC_base_api extern const float version;
+    TRC_base_func_api extern const float version;
     // github项目地址
-    TRC_base_api extern const char* repo_github;
+    TRC_base_func_api extern const char* repo_github;
     // gitee项目地址
-    TRC_base_api extern const char* repo_gitee;
+    TRC_base_func_api extern const char* repo_gitee;
 }
 }

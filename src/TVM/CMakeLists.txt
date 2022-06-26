@@ -11,4 +11,3 @@ add_library(TVM SHARED
 target_compile_definitions(TVM PRIVATE BUILD_TVM_DLL)
 target_compile_definitions(TVM PRIVATE shared_lib)
 endif()
-

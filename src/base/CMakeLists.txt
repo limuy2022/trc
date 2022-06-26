@@ -9,6 +9,5 @@ add_library(base SHARED
     ${SRCS}
 )
 target_compile_definitions(base PRIVATE BUILD_base_DLL)
-target_compile_definitions(base PRIVATE shared_lib)
+target_compile_definitions(base PUBLIC shared_lib)
 endif()
-

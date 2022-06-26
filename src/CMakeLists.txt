@@ -19,6 +19,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 target_link_libraries(base language easyloggingpp)
-target_link_libraries(TVM language base Compiler)
 target_link_libraries(Compiler language base)
+target_link_libraries(TVM language base Compiler)
 target_link_libraries(Trc language base TVM Compiler gflags::gflags)

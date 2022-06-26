@@ -11,4 +11,3 @@ add_library(Compiler SHARED
 target_compile_definitions(Compiler PRIVATE BUILD_Compiler_DLL)
 target_compile_definitions(Compiler PRIVATE shared_lib)
 endif()
-

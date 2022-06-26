@@ -35,11 +35,11 @@ struct TRC_TVM_api objs_pool_TVM {
  * @brief 删除TVM中的栈信息，常量池，字节码
  * @warning 会保留变量信息（tshell）
  */
-TRC_TVM_func_api void free_TVM(TVM* vm);
+TRC_TVM_c_api void free_TVM(TVM* vm);
 
-TRC_TVM_func_api void quit_mem();
+TRC_TVM_c_api void quit_mem();
 
-TRC_TVM_func_api void init_mem();
+TRC_TVM_c_api void init_mem();
 
 TRC_TVM_api extern objs_pool_TVM* global_objs_pool;
 }

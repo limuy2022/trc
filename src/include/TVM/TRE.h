@@ -17,15 +17,11 @@
 
 namespace trc::TVM_space {
 // 中间变量，便于使用
-TRC_TVM_api extern def::OBJ firstv, secondv;
-
-TRC_TVM_api extern def::INTOBJ firsti, secondi;
-
-TRC_TVM_api extern def::FLOATOBJ firstf, secondf;
-
-TRC_TVM_api extern def::STRINGOBJ firsts, seconds;
-
-TRC_TVM_api extern def::LONGOBJ firstl, secondl;
+extern def::OBJ firstv, secondv;
+extern def::INTOBJ firsti, secondi;
+extern def::FLOATOBJ firstf, secondf;
+extern def::STRINGOBJ firsts, seconds;
+extern def::LONGOBJ firstl, secondl;
 
 namespace TVM_share {
     /**
@@ -33,9 +29,9 @@ namespace TVM_share {
      */
 
     // 布尔值
-    TRC_TVM_api extern def::INTOBJ true_, false_;
+    extern def::INTOBJ true_, false_;
     // 整型缓存
-    TRC_TVM_api extern types::trc_int int_cache[INT_CACHE_LEN];
+    extern types::trc_int int_cache[INT_CACHE_LEN];
 
     /**
      * @brief
@@ -47,7 +43,7 @@ namespace TVM_share {
 }
 
 namespace type_int {
-    TRC_TVM_api extern std::map<std::string, int> name_int_s;
-    TRC_TVM_api extern std::string int_name_s[];
+    TRC_TVM_c_api extern std::map<std::string, int> name_int_s;
+    TRC_TVM_c_api extern std::string int_name_s[];
 }
 }

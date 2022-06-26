@@ -18,7 +18,7 @@ namespace trc::io {
  * 参数必须是未分配内存的，已分配的需要在进函数之前释放掉
  * @return true:正确读取，false:读取完毕(字符串可以正常使用)
  */
-TRC_base_func_api bool readstr(char*&, FILE* stream = stdin);
+TRC_base_c_api bool readstr(char*&, FILE* stream = stdin);
 
 // 用来占位的变量,不要读取，可能是无意义的值
 extern bool readflagdefault;

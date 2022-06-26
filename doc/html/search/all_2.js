@@ -2,7 +2,7 @@ var searchData=
 [
   ['base_2ecpp_0',['base.cpp',['../base_8cpp.html',1,'']]],
   ['base_2eh_1',['base.h',['../base_8h.html',1,'']]],
-  ['blue_2',['blue',['../namespacetrc_1_1color.html#a2551e86a59fd0932233da18230ea235d',1,'trc::color']]],
+  ['blue_2',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
   ['bool_5f_3',['BOOL_',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae206eec981a0b4c4f53e0280607ee23d',1,'trc::TVM_space::builtin']]],
   ['bp_4',['bp',['../namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642',1,'trc::compiler']]],
   ['break_5',['BREAK',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a14d6a3e0201f58bfe7c01e775973e80e',1,'trc::compiler']]],
@@ -24,5 +24,5 @@ var searchData=
   ['bytecodes_21',['bytecodes',['../classtrc_1_1_t_v_m__space_1_1func__.html#ab4e97b48a1ddba3c2825960c2eebe20a',1,'trc::TVM_space::func_']]],
   ['bytes_2ecpp_22',['bytes.cpp',['../bytes_8cpp.html',1,'']]],
   ['bytes_2eh_23',['bytes.h',['../bytes_8h.html',1,'']]],
-  ['bytes_5forder_5fchange_24',['bytes_order_change',['../namespacetrc_1_1utils.html#a93485107982f515d1f9a861d023909f6',1,'trc::utils']]]
+  ['bytes_5forder_5fchange_24',['bytes_order_change',['../namespacetrc_1_1utils.html#a8c3565bdfa768f4e145e91285a55c74c',1,'trc::utils']]]
 ];

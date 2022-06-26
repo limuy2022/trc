@@ -376,5 +376,5 @@ private:
     // 指令集定义结束
 };
 
-TRC_TVM_func_api TVM* create_TVM(const std::string& name = "__main__");
+TRC_TVM_c_api TVM* create_TVM(const std::string& name = "__main__");
 }

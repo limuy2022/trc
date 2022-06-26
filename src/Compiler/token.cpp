@@ -90,7 +90,7 @@ void token_lex::lex_int_float(token* result) {
             if (*char_ptr == '.') {
                 // 小数点，开启调整类型为浮点数
                 result->tick = token_ticks::FLOAT_VALUE;
-            } else if(*char_ptr == '_'){
+            } else if (*char_ptr == '_') {
                 // 忽略123_456中间的下划线
                 get_next_char();
                 continue;

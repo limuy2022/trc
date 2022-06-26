@@ -17,16 +17,16 @@
 #ifdef WINDOWS_PLAT
 #ifdef BUILD_xxx_DLL
 #define TRC_xxx_api __declspec(dllexport)
-#define TRC_xxx_func_api extern "C" __declspec(dllexport)
+#define TRC_xxx_c_api extern "C" __declspec(dllexport)
 #else
 #define TRC_xxx_api__declspec(dllimport)
-#define TRC_xxx_func_api extern "C" __declspec(dllimport)
+#define TRC_xxx_c_api extern "C" __declspec(dllimport)
 #endif
 #else
 #define TRC_xxx_api __attribute__((visibility("default")))
-#define TRC_xxx_func_api extern "C" __attribute__((visibility("default")))
+#define TRC_xxx_c_api extern "C" __attribute__((visibility("default")))
 #endif
 #else
 #define TRC_xxx_api
-#define TRC_xxx_func_api
+#define TRC_xxx_c_api
 #endif

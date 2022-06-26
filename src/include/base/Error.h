@@ -63,7 +63,7 @@ public:
  * can't be %", "int", "string")
  * @endcode
  */
-TRC_base_func_api void send_error(int name, ...);
+TRC_base_c_api void send_error(int name, ...);
 
 /**
  * @brief 报出有模块有行号的异常
@@ -74,7 +74,7 @@ TRC_base_func_api void send_error(int name, ...);
  * 0, "% can't be
  * %", "int", "string") @endcode
  */
-TRC_base_func_api void send_error_module_aplist(
+TRC_base_c_api void send_error_module_aplist(
     int name, const std::string& module, size_t line_index, va_list& ap);
 
 /**
@@ -83,13 +83,13 @@ TRC_base_func_api void send_error_module_aplist(
  * @param ap 可变参数
  * @warning 使用完请释放，并且使用free释放！
  */
-TRC_base_func_api char* make_error_msg(int error_name, va_list& ap);
+TRC_base_c_api char* make_error_msg(int error_name, va_list& ap);
 
 /**
  * @brief 输出报错信息
  * @warning
  * 不接收可变参数，接受已经处理好的报错信息和数据
  */
-TRC_base_func_api void send_error_(
+TRC_base_c_api void send_error_(
     const char* error_msg, const char* module, size_t line_index) noexcept;
 }

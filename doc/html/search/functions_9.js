@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['import_5fto_5fpath_0',['import_to_path',['../namespacetrc_1_1utils.html#a3bfe2857b6bac7cdcbe81b926067212f',1,'trc::utils']]],
+  ['import_5fto_5fpath_0',['import_to_path',['../namespacetrc_1_1utils.html#a0a08de04ef526105de0c79a30d8a00c8',1,'trc::utils']]],
   ['in_1',['in',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#ab330d3aefb017fe28211cca464f73a07',1,'trc::TVM_space::types::trc_string']]],
   ['index_5fstrstl_2',['index_strstl',['../namespacetrc_1_1utils.html#aafd8c9edaea665a1ef515564ffbc8146',1,'trc::utils']]],
   ['index_5fvector_3',['index_vector',['../namespacetrc_1_1utils.html#a21766feaf8fe2f917fae728e2ddac0a0',1,'trc::utils']]],
-  ['init_5fmem_4',['init_mem',['../namespacetrc_1_1memory.html#a05739738bf9ed50fc58e88689ff738b1',1,'trc::memory::init_mem()'],['../namespacetrc_1_1_t_v_m__space.html#a77884e238dfcc7be5cfea40714d7d5be',1,'trc::TVM_space::init_mem()']]],
+  ['init_5fmem_4',['init_mem',['../namespacetrc_1_1memory.html#a3b4c2049a327c96e65e2ace23638fd61',1,'trc::memory::init_mem()'],['../namespacetrc_1_1_t_v_m__space.html#a77884e238dfcc7be5cfea40714d7d5be',1,'trc::TVM_space::init_mem()']]],
   ['input_5',['INPUT',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#acb9c3fcc42f473199d3bf19230054760',1,'trc::TVM_space::builtin']]],
   ['inrange_6',['inrange',['../namespacetrc_1_1utils.html#ac2783f73889aa4e6cf0279dc2bfe2c77',1,'trc::utils']]],
   ['insert_7',['insert',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__array.html#acba80fcc85029580025b12279fb87d8a',1,'trc::TVM_space::types::trc_array']]],
@@ -17,7 +17,7 @@ var searchData=
   ['is_5fend_5ftoken_14',['is_end_token',['../namespacetrc_1_1compiler.html#a1360fb843a853f2dec5054e8582b8a2c',1,'trc::compiler']]],
   ['is_5fenglish_15',['is_english',['../namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9',1,'trc::compiler']]],
   ['is_5fleft_5fvalue_16',['is_left_value',['../namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc',1,'trc::compiler']]],
-  ['is_5fmagic_17',['is_magic',['../namespacetrc_1_1loader.html#a541f7e92f907e6ee28f34bb6b69d8ae7',1,'trc::loader']]],
+  ['is_5fmagic_17',['is_magic',['../namespacetrc_1_1loader.html#ab87e099f032f48972457d5993fb39675',1,'trc::loader']]],
   ['is_5fsentence_5ftoken_18',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
   ['is_5fsentence_5fwith_5fone_5fargv_19',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]]
 ];

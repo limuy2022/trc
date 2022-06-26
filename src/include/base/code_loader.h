@@ -4,5 +4,5 @@
 #include <base/library.h>
 
 namespace trc::loader {
-TRC_base_func_api extern const char* int_code[];
+TRC_base_c_api extern const char* int_code[];
 }

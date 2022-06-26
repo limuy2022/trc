@@ -22,7 +22,7 @@ namespace trc {
  * @brief
  * 在不能被执行到的地方放上这条语句，出现问题会强行停止程序
  */
-TRC_base_func_api void noreach_internal(
+TRC_base_c_api void noreach_internal(
     size_t line, const char* funcname, const char* filename);
 
 namespace TVM_space::types {
@@ -50,10 +50,10 @@ namespace def {
     // 字节类型
     typedef unsigned char byte_t;
     // 版本号
-    TRC_base_func_api extern const float version;
+    TRC_base_c_api extern const float version;
     // github项目地址
-    TRC_base_func_api extern const char* repo_github;
+    TRC_base_c_api extern const char* repo_github;
     // gitee项目地址
-    TRC_base_func_api extern const char* repo_gitee;
+    TRC_base_c_api extern const char* repo_gitee;
 }
 }

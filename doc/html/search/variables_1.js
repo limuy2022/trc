@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['blue_0',['blue',['../namespacetrc_1_1color.html#a2551e86a59fd0932233da18230ea235d',1,'trc::color']]],
+  ['blue_0',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
   ['builtin_5ffuncs_1',['builtin_funcs',['../namespacetrc_1_1_t_v_m__space.html#a1b1066cb4d55bd96c344d94689ae5e0a',1,'trc::TVM_space']]],
   ['bycode_2',['bycode',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a6235781272a07fa3566bc6b04522da2b',1,'trc::TVM_space::TVM_bytecode']]],
   ['byte_5fcodes_3',['byte_codes',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a29e1665b491b2395fce108a0c72d848b',1,'trc::TVM_space::TVM_static_data']]],

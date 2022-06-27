@@ -81,17 +81,6 @@ extern std::array<std::string, 8> opti_condits;
 extern std::array<std::string, 3> const_values;
 extern std::map<std::string, int> change_const;
 
-// 编译时类型标识
-enum COMPILE_TYPE_TICK {
-    VAR_TICK = 1,
-    int_TICK,
-    float_TICK,
-    string_TICK,
-    LONG_TICK,
-    FLOAT_L_TICK,
-    CONST_TICK,
-};
-
 // 语法生成树中的标识
 enum grammar_type {
     // 纯粹数据
@@ -268,12 +257,6 @@ public:
 inline bool is_english(char c) {
     return isalpha(c) || c == '_';
 }
-
-/**
- * @brief 编译时判断传入的字符串实际代表的类型
- * @return 类型
- */
-COMPILE_TYPE_TICK what_type(const std::string& value);
 
 /**
  * @brief 用于返回优先级的类

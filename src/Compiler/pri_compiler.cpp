@@ -101,33 +101,6 @@ node_base_float_without_sons::node_base_float_without_sons(double value)
     this->type = FLOAT;
 }
 
-COMPILE_TYPE_TICK what_type(const std::string& value) {
-    char front = value.front(), back = value.back();
-    size_t lenght = value.length();
-    if (('\'' == front && '\'' == back) || (front == '"' && back == '"'))
-        return string_TICK;
-
-    if (isdigit(front)) {
-        if (value.find('.') != std::string::npos) {
-            // 小数
-            if (lenght - 1 > FLOAT_LONGFLOAT_LINE)
-                return compiler::FLOAT_L_TICK;
-            return compiler::float_TICK;
-        }
-        // 检查数据,前导零
-        if (lenght >= 2 && front == '0')
-            error::send_error(error::SyntaxError,
-                language::error::syntaxerror_int, value.c_str());
-        if (lenght > INT_LONGINT_LINE)
-            return LONG_TICK;
-
-        return int_TICK;
-    }
-    if (utils::check_in(value, const_values.begin(), const_values.end()))
-        return CONST_TICK;
-    return VAR_TICK;
-}
-
 // 可以优化的运算符
 std::array<std::string, 7> opti_opers = { "+", "-", "**", "*", "//", "%", "/" };
 // 可以优化的条件运算符

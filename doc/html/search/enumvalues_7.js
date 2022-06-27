@@ -6,6 +6,5 @@ var searchData=
   ['import_5f_3',['IMPORT_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcadba13384b9146c327c04b901d5007282',1,'TVM.h']]],
   ['indexerror_4',['IndexError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1affd67f3adcaaf41dbf64e289fd19a861',1,'trc::error']]],
   ['int_5ft_5',['int_T',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774eaebbb68987b0d2917a4c1ee5451920660',1,'trc::TVM_space']]],
-  ['int_5ftick_6',['int_TICK',['../namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a446b137017c07702442b2a5356b36a40',1,'trc::compiler']]],
-  ['int_5fvalue_7',['INT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a7f12111b3f331d04dc056ee57986f3b3',1,'trc::compiler']]]
+  ['int_5fvalue_6',['INT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a7f12111b3f331d04dc056ee57986f3b3',1,'trc::compiler']]]
 ];

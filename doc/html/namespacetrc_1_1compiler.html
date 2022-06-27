@@ -94,6 +94,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">关于对象的代码转换为节点以及对象信息保存和识别  <a href="classtrc_1_1compiler_1_1grammar__data__control.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成语法树的解析器  <a href="classtrc_1_1compiler_1_1grammar__lex.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1is__end__node.html">is_end_node</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述终结节点  <a href="classtrc_1_1compiler_1_1is__end__node.html#details">More...</a><br /></td></tr>
@@ -109,6 +110,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__float__without__sons.html">node_base_float_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int.html">node_base_int</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整形的有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int__without__sons.html">node_base_int_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int__without__sons.html#details">More...</a><br /></td></tr>
@@ -136,6 +140,8 @@ Classes</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:a5f709f8451b10da66b9a1982d91957ee"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classtrc_1_1error_1_1error__module.html">error::error_module</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a5f709f8451b10da66b9a1982d91957ee">compiler_error</a></td></tr>
 <tr class="separator:a5f709f8451b10da66b9a1982d91957ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafd1809b0dea42c95d2419ef2cd0e832"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="structtrc_1_1compiler_1_1token.html">token</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">code_type</a></td></tr>
+<tr class="separator:aafd1809b0dea42c95d2419ef2cd0e832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24aca9ce1fc291f2865ef482c55aaeeb"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">ip</a>) (const int &amp;, const int &amp;)</td></tr>
 <tr class="separator:a24aca9ce1fc291f2865ef482c55aaeeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7e126531ec9020b6a41aa71bbc58642"><td class="memItemLeft" align="right" valign="top">typedef bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">bp</a>) (const int &amp;, const int &amp;)</td></tr>
@@ -216,18 +222,6 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a0845b90df8765369e37eadfd4b4ff452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba187f3805414fb815519efb1ba7e175"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175">COMPILE_TYPE_TICK</a> { <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175aeba779924fb81b5570de1633c324a144">VAR_TICK</a> = 1
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a446b137017c07702442b2a5356b36a40">int_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a9009fbab2a569e29b2abb77d1600c936">float_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ac5ce0620febf0ebe6a4908d595223f66">string_TICK</a>
-, <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ada8acd9426e54131abd522db5904556c">LONG_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a085a1af6c28f8f7f8234f32edd339181">FLOAT_L_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175aa8bdbe844292687fe16f844c4fa884d2">CONST_TICK</a>
-<br />
- }</td></tr>
-<tr class="separator:aba187f3805414fb815519efb1ba7e175"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bcc8ae504de95341ebb688e6fcf56ef"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">grammar_type</a> { <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaf63b1819000c7ce993ed9c1cb6f3035a">DATA</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa4a090bfc3c53a01d010d712a1afff982">OPCODE</a>
@@ -258,6 +252,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a9eb9c42580cc8841e61ae17d670013c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a9eb9c42580cc8841e61ae17d670013c9">Compiler</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM_space::TVM</a> *vm, const std::string &amp;codes)</td></tr>
 <tr class="memdesc:a9eb9c42580cc8841e61ae17d670013c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">传入一台虚拟机和未编译的代码，将代码编译后填充进vm中  <a href="namespacetrc_1_1compiler.html#a9eb9c42580cc8841e61ae17d670013c9">More...</a><br /></td></tr>
 <tr class="separator:a9eb9c42580cc8841e61ae17d670013c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad66b9abb6605077be1c76a7e53e3c7f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ad66b9abb6605077be1c76a7e53e3c7f2">make_data_node</a> (const <a class="el" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">code_type</a> &amp;got_tokens)</td></tr>
+<tr class="separator:ad66b9abb6605077be1c76a7e53e3c7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dae35a7d622b4875c6ff196c539cbb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a8dae35a7d622b4875c6ff196c539cbb1">add</a> (const int &amp;a, const int &amp;b)</td></tr>
 <tr class="separator:a8dae35a7d622b4875c6ff196c539cbb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad27f6fa6fa76eb517a1c73024d9ab4d9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ad27f6fa6fa76eb517a1c73024d9ab4d9">sub</a> (const int &amp;a, const int &amp;b)</td></tr>
@@ -286,9 +282,6 @@ Functions</h2></td></tr>
 <tr class="separator:abb07fd8d03f393e9813d56b1736c3404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23d97f6dbdcbda12808b58e3b424d2c9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a23d97f6dbdcbda12808b58e3b424d2c9">or_</a> (const int &amp;a, const int &amp;b)</td></tr>
 <tr class="separator:a23d97f6dbdcbda12808b58e3b424d2c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175">COMPILE_TYPE_TICK</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">what_type</a> (const std::string &amp;value)</td></tr>
-<tr class="memdesc:a822452e66a495f0e0c6da5adcf7ea36c"><td class="mdescLeft">&#160;</td><td class="mdescRight">编译时判断传入的字符串实际代表的类型  <a href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">More...</a><br /></td></tr>
-<tr class="separator:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9">is_english</a> (char c)</td></tr>
 <tr class="memdesc:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否为字母，包括_  <a href="namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9">More...</a><br /></td></tr>
 <tr class="separator:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -363,6 +356,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aafd1809b0dea42c95d2419ef2cd0e832" name="aafd1809b0dea42c95d2419ef2cd0e832"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafd1809b0dea42c95d2419ef2cd0e832">&#9670;&nbsp;</a></span>code_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::vector&lt;<a class="el" href="structtrc_1_1compiler_1_1token.html">token</a>*&gt; <a class="el" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">trc::compiler::code_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a5f709f8451b10da66b9a1982d91957ee" name="a5f709f8451b10da66b9a1982d91957ee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5f709f8451b10da66b9a1982d91957ee">&#9670;&nbsp;</a></span>compiler_error</h2>
 
@@ -392,29 +399,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="aba187f3805414fb815519efb1ba7e175" name="aba187f3805414fb815519efb1ba7e175"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba187f3805414fb815519efb1ba7e175">&#9670;&nbsp;</a></span>COMPILE_TYPE_TICK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175">trc::compiler::COMPILE_TYPE_TICK</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175aeba779924fb81b5570de1633c324a144" name="aba187f3805414fb815519efb1ba7e175aeba779924fb81b5570de1633c324a144"></a>VAR_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175a446b137017c07702442b2a5356b36a40" name="aba187f3805414fb815519efb1ba7e175a446b137017c07702442b2a5356b36a40"></a>int_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175a9009fbab2a569e29b2abb77d1600c936" name="aba187f3805414fb815519efb1ba7e175a9009fbab2a569e29b2abb77d1600c936"></a>float_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175ac5ce0620febf0ebe6a4908d595223f66" name="aba187f3805414fb815519efb1ba7e175ac5ce0620febf0ebe6a4908d595223f66"></a>string_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175ada8acd9426e54131abd522db5904556c" name="aba187f3805414fb815519efb1ba7e175ada8acd9426e54131abd522db5904556c"></a>LONG_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175a085a1af6c28f8f7f8234f32edd339181" name="aba187f3805414fb815519efb1ba7e175a085a1af6c28f8f7f8234f32edd339181"></a>FLOAT_L_TICK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aba187f3805414fb815519efb1ba7e175aa8bdbe844292687fe16f844c4fa884d2" name="aba187f3805414fb815519efb1ba7e175aa8bdbe844292687fe16f844c4fa884d2"></a>CONST_TICK&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-</div>
-</div>
 <a id="a4bcc8ae504de95341ebb688e6fcf56ef" name="a4bcc8ae504de95341ebb688e6fcf56ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4bcc8ae504de95341ebb688e6fcf56ef">&#9670;&nbsp;</a></span>grammar_type</h2>
 
@@ -1169,6 +1153,24 @@ false </dd></dl>
 
 </div>
 </div>
+<a id="ad66b9abb6605077be1c76a7e53e3c7f2" name="ad66b9abb6605077be1c76a7e53e3c7f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad66b9abb6605077be1c76a7e53e3c7f2">&#9670;&nbsp;</a></span>make_data_node()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> * trc::compiler::make_data_node </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">code_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>got_tokens</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a8866abe49552ebf108ee6f9cc34bf0d3" name="a8866abe49552ebf108ee6f9cc34bf0d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8866abe49552ebf108ee6f9cc34bf0d3">&#9670;&nbsp;</a></span>mod()</h2>
 
@@ -1306,27 +1308,6 @@ false </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="a822452e66a495f0e0c6da5adcf7ea36c" name="a822452e66a495f0e0c6da5adcf7ea36c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a822452e66a495f0e0c6da5adcf7ea36c">&#9670;&nbsp;</a></span>what_type()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175">COMPILE_TYPE_TICK</a> trc::compiler::what_type </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>value</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>编译时判断传入的字符串实际代表的类型 </p>
-<dl class="section return"><dt>Returns</dt><dd>类型 </dd></dl>
 
 </div>
 </div>

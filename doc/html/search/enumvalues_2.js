@@ -8,6 +8,5 @@ var searchData=
   ['change_5fvalue_5f_5',['CHANGE_VALUE_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaf9681778afd8c7b60cbf58acaac5d12e',1,'TVM.h']]],
   ['class_6',['CLASS',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ac18e8f1f430ea227dbd63d0d9a2bc5fb',1,'trc::compiler']]],
   ['comma_7',['COMMA',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a4d9b3e9fc12849d060371eb65154c751',1,'trc::compiler']]],
-  ['const_5ftick_8',['CONST_TICK',['../namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175aa8bdbe844292687fe16f844c4fa884d2',1,'trc::compiler']]],
-  ['continue_9',['CONTINUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2f453cfe638e57e27bb0c9512436111e',1,'trc::compiler']]]
+  ['continue_8',['CONTINUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2f453cfe638e57e27bb0c9512436111e',1,'trc::compiler']]]
 ];

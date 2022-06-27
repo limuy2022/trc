@@ -3,12 +3,12 @@
 #include <Compiler/Compiler.h>
 
 namespace trc::compiler {
+typedef std::vector<token*> code_type;
+
 /**
- * 语言的解析细节
+ * @brief 生成语法树的解析器
  */
 class TRC_Compiler_api grammar_lex {
-    typedef std::vector<token*> code_type;
-
 public:
     /**
      * @brief 解析一段完整的代码成为语法树
@@ -61,7 +61,7 @@ private:
      * @param head 根节点指针
      * @param code 整条语句
      */
-    void callfunction(node_base_data* functree, const code_type& funcname);
+    treenode* callfunction(const code_type& funcname);
 
     /**
      * @brief 生成语句执行节点

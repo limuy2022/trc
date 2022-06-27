@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['grammar_5ftype_0',['grammar_type',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef',1,'trc::compiler']]]
+  ['run_5ftype_5ftick_0',['RUN_TYPE_TICK',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774e',1,'trc::TVM_space']]]
 ];

@@ -6,6 +6,13 @@ CompileEnvironment::CompileEnvironment()
     : var_names_list_global(1) {
 }
 
+CompileEnvironment::~CompileEnvironment() {
+    // 释放掉变量名内存
+    for (size_t i = 1, n = var_names_list_global.size(); i < n; ++i) {
+        delete[] var_names_list_global[i];
+    }
+}
+
 size_t CompileEnvironment::get_global_name_size() {
     return var_names_list_global.size();
 }
@@ -23,7 +30,9 @@ size_t CompileEnvironment::get_index_of_globalvar(const char* name) {
     }
     // 并不在当前符号表
     // 添加进符号表
-    var_names_list_global.push_back(name);
+    char* copy = new char[strlen(name) + 1];
+    strcpy(copy, name);
+    var_names_list_global.push_back(copy);
     return n;
 }
 

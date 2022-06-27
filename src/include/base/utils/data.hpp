@@ -1,12 +1,22 @@
 ﻿#pragma once
 
 #include <algorithm>
+#include <climits>
+#include <cmath>
 #include <cstring>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace trc::utils {
+/**
+ * @brief 由于浮点数有细微的误差，所以需要建立专门的判断函数
+ * @tparam floattype double或float
+ */
+template <typename floattype> bool isequal(floattype a, floattype b) {
+    return std::fabs(a - b) < 1e-7;
+}
+
 /**
  * @brief 判断是否在start到end的区间中
  * @param start 开始

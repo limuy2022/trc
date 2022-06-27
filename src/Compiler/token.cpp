@@ -348,15 +348,16 @@ token* token_lex::get_token() {
         return back_token;
     }
     auto* result = new token;
-    if (*char_ptr == '\0') {
-        // 解析结束
-        result->tick = token_ticks::END_OF_TOKENS;
-        return result;
-    }
     if (*char_ptr == '\n') {
         // 加一行
         error_->line++;
         result->tick = token_ticks::END_OF_LINE;
+        get_next_char();
+        return result;
+    }
+    if (*char_ptr == '\0') {
+        // 解析结束
+        result->tick = token_ticks::END_OF_TOKENS;
         return result;
     }
     while (*char_ptr == ' ' || *char_ptr == '\t') {

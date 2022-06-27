@@ -12,10 +12,9 @@ var searchData=
   ['store_5fname_5f_9',['STORE_NAME_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca409b47fc6861b7da766f535c3cd85c01',1,'TVM.h']]],
   ['string_10',['STRING',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efae8595af24ef3d2cb90d0c6761ebc2688',1,'trc::compiler']]],
   ['string_5ft_11',['string_T',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774eaa135a20f0ff5be810098ad33087f146b',1,'trc::TVM_space']]],
-  ['string_5ftick_12',['string_TICK',['../namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ac5ce0620febf0ebe6a4908d595223f66',1,'trc::compiler']]],
-  ['string_5fvalue_13',['STRING_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aa833d6893ea57e4ffc5155cc2f44e6cb',1,'trc::compiler']]],
-  ['sub_14',['SUB',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a241dd841abade20fcb27b8a9f494e1eb',1,'trc::compiler']]],
-  ['sub_5f_15',['SUB_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca4b2dc9092de4084406e110af0dd19b05',1,'TVM.h']]],
-  ['syntaxerror_16',['SyntaxError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0',1,'trc::error']]],
-  ['systemerror_17',['SystemError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211',1,'trc::error']]]
+  ['string_5fvalue_12',['STRING_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452aa833d6893ea57e4ffc5155cc2f44e6cb',1,'trc::compiler']]],
+  ['sub_13',['SUB',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a241dd841abade20fcb27b8a9f494e1eb',1,'trc::compiler']]],
+  ['sub_5f_14',['SUB_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca4b2dc9092de4084406e110af0dd19b05',1,'TVM.h']]],
+  ['syntaxerror_15',['SyntaxError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0',1,'trc::error']]],
+  ['systemerror_16',['SystemError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211',1,'trc::error']]]
 ];

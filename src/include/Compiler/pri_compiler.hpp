@@ -237,7 +237,17 @@ class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
 public:
     int value;
 
-    node_base_int_without_sons(int value);
+    node_base_int_without_sons(int value, grammar_type type = NUMBER);
+};
+
+/**
+ * @brief 基于整形的有子节点的类型
+ */
+class TRC_Compiler_api node_base_int : public is_not_end_node {
+public:
+    int value;
+
+    node_base_int(int value, grammar_type type = NUMBER);
 };
 
 /**

@@ -118,6 +118,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">get_byte_order</a> ()</td></tr>
 <tr class="memdesc:a60e0b7d72054ff094840174a0d5d9fd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取字节序  <a href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">More...</a><br /></td></tr>
 <tr class="separator:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cda5221c3794b0059ed3ac33b79e00a"><td class="memTemplParams" colspan="2">template&lt;typename floattype &gt; </td></tr>
+<tr class="memitem:a4cda5221c3794b0059ed3ac33b79e00a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a4cda5221c3794b0059ed3ac33b79e00a">isequal</a> (floattype a, floattype b)</td></tr>
+<tr class="memdesc:a4cda5221c3794b0059ed3ac33b79e00a"><td class="mdescLeft">&#160;</td><td class="mdescRight">由于浮点数有细微的误差，所以需要建立专门的判断函数  <a href="namespacetrc_1_1utils.html#a4cda5221c3794b0059ed3ac33b79e00a">More...</a><br /></td></tr>
+<tr class="separator:a4cda5221c3794b0059ed3ac33b79e00a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ac2783f73889aa4e6cf0279dc2bfe2c77">inrange</a> (const T &amp;start, const T &amp;end, const T &amp;data)</td></tr>
 <tr class="memdesc:ac2783f73889aa4e6cf0279dc2bfe2c77"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否在start到end的区间中  <a href="namespacetrc_1_1utils.html#ac2783f73889aa4e6cf0279dc2bfe2c77">More...</a><br /></td></tr>
@@ -519,6 +523,44 @@ template&lt;typename T &gt; </div>
     <tr><td class="paramname">start</td><td>开始 </td></tr>
     <tr><td class="paramname">end</td><td>结尾 </td></tr>
     <tr><td class="paramname">data</td><td>数据 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4cda5221c3794b0059ed3ac33b79e00a" name="a4cda5221c3794b0059ed3ac33b79e00a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cda5221c3794b0059ed3ac33b79e00a">&#9670;&nbsp;</a></span>isequal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename floattype &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trc::utils::isequal </td>
+          <td>(</td>
+          <td class="paramtype">floattype&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">floattype&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>由于浮点数有细微的误差，所以需要建立专门的判断函数 </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">floattype</td><td>double或float </td></tr>
   </table>
   </dd>
 </dl>

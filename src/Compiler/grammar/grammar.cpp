@@ -103,9 +103,10 @@ void grammar_lex::assign(is_not_end_node* head, trc::compiler::token_ticks oper,
     treenode* name;
     if (code.size() == 1) {
         // 数组之类的名字比一个长
-        name = new trc::compiler::node_base_data_without_sons(
-            DATA, code.front()->data);
+        name = new trc::compiler::node_base_string_without_sons(
+            code.front()->data);
     } else {
+        NOREACH;
     }
     // 父节点留下子节点记录
     head->connect(ass);
@@ -115,60 +116,47 @@ void grammar_lex::assign(is_not_end_node* head, trc::compiler::token_ticks oper,
     ass->connect(get_node());
 }
 
-void grammar_lex::callfunction(
-    node_base_data* functree, const code_type& funcname) {
+treenode* grammar_lex::callfunction(const code_type& funcname) {
     auto argv_node = new is_not_end_node;
-    functree->connect(argv_node);
-
     // 这一段是在切割参数，划分好自己的参数
-
     token* lex_tmp;
-    while (1) {
+    for (;;) {
         lex_tmp = token_.get_token();
         if (lex_tmp->tick == token_ticks::RIGHT_SMALL_BRACE) {
             delete lex_tmp;
             break;
         } else if (lex_tmp->tick != trc::compiler::token_ticks::COMMA) {
+            token_.unget_token(lex_tmp);
             argv_node->connect(get_node());
         } else {
             //逗号
             delete lex_tmp;
         }
     }
-
     // 由于栈先进后出的特征，在此处将参数进行反转
     std::reverse(argv_node->son.begin(), argv_node->son.end());
 
     auto* len = new node_base_int_without_sons(argv_node->son.size());
-    functree->connect(len);
 
     // 函数名问题：判断内置函数和自定义函数
     if (funcname.size() == 1) {
-        if (trc::utils::check_in(funcname[0]->data, loader::num_func.begin(),
-                loader::num_func.end())) {
+        if (trc::utils::check_in(funcname[0]->data,
+                loader::num_func.begin() + 1, loader::num_func.end())) {
             // 内置函数
-            auto builtin = new node_base_data(trc::compiler::BUILTIN_FUNC);
-            auto bycode = new node_base_data_without_sons(trc::compiler::DATA);
-            auto nodeargv = new node_base_int_without_sons(
-                loader::func_num[funcname[0]->data]);
-
-            bycode->data = (char*)"CALL_BUILTIN";
-
-            builtin->connect(bycode);
-            builtin->connect(nodeargv);
-            functree->connect(builtin);
+            auto builtin
+                = new node_base_int(loader::func_num[funcname[0]->data],
+                    trc::compiler::BUILTIN_FUNC);
+            builtin->connect(argv_node);
+            builtin->connect(len);
+            return builtin;
         } else {
             // 自定义函数
-            auto builtin = new node_base_data(trc::compiler::CALL_FUNC);
-            auto bycode = new node_base_data_without_sons(trc::compiler::DATA);
-            auto nodeargv = new node_base_int_without_sons(
-                loader::func_num[funcname[0]->data]);
-            // 原因是释放的标志位未开启，而字符串位于静态储存区作为常量储存，整个程序运行期间都不会被回收，所以可以直接使用
-            bycode->data = (char*)"CALL_FUNCTION";
+            auto user_defined = new node_base_data(
+                trc::compiler::CALL_FUNC, funcname[0]->data);
 
-            builtin->connect(bycode);
-            builtin->connect(nodeargv);
-            functree->connect(builtin);
+            user_defined->connect(argv_node);
+            user_defined->connect(len);
+            return user_defined;
         }
     }
 }
@@ -274,13 +262,52 @@ void grammar_lex::func_define(is_not_end_node* head) {
     head->connect(func_node);
 }
 
+treenode* make_data_node(const code_type& got_tokens) {
+    is_end_node* data_node = nullptr;
+    auto tmp = got_tokens[0]->tick;
+    if (tmp == token_ticks::INT_VALUE) {
+        data_node
+            = new node_base_int_without_sons(atoi(got_tokens[0]->data.c_str()));
+    } else if (tmp == token_ticks::FLOAT_VALUE) {
+        data_node = new node_base_float_without_sons(
+            atof(got_tokens[0]->data.c_str()));
+    } else if (tmp == token_ticks::STRING_VALUE) {
+        data_node = new node_base_string_without_sons(got_tokens[0]->data);
+    } else if (tmp == token_ticks::NAME) {
+        data_node
+            = new node_base_data_without_sons(VAR_NAME, got_tokens[0]->data);
+    } else if (is_const_value(tmp)) {
+        // 在此将常量转换成数字
+        data_node
+            = new node_base_int_without_sons(change_const[got_tokens[0]->data]);
+    } else if (tmp == token_ticks::LONG_INT_VALUE) {
+        data_node
+            = new node_base_data_without_sons(LONG_INT, got_tokens[0]->data);
+    } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
+        data_node
+            = new node_base_data_without_sons(LONG_FLOAT, got_tokens[0]->data);
+    } else {
+        // 不可能执行到别的代码，执行到就是出bug了
+        NOREACH;
+    }
+    return data_node;
+}
+
 treenode* grammar_lex::get_node() {
-    trc::compiler::token* now = token_.get_token();
+    trc::compiler::token* now;
+    do {
+        now = token_.get_token();
+        if (now->tick == token_ticks::END_OF_LINE) {
+            delete now;
+            continue;
+        } else {
+            break;
+        }
+    } while (1);
     if (now->tick == trc::compiler::token_ticks::END_OF_TOKENS) {
         delete now;
         return nullptr;
     }
-
     if (is_cal_value(now->tick)) {
         /*是一个可运算符号*/
         std::vector<token*> got_tokens;
@@ -289,36 +316,11 @@ treenode* grammar_lex::get_node() {
             now = token_.get_token();
             if (is_end_token(now->tick)) {
                 /*匹配到结尾还没有匹配到，一定是数据*/
-                is_end_node* data_node = nullptr;
-                auto tmp = got_tokens[0]->tick;
-                if (tmp == token_ticks::INT_VALUE) {
-                    data_node = new node_base_int_without_sons(
-                        atoi(got_tokens[0]->data.c_str()));
-                } else if (tmp == token_ticks::FLOAT_VALUE) {
-                    data_node = new node_base_float_without_sons(
-                        atof(got_tokens[0]->data.c_str()));
-                } else if (tmp == token_ticks::STRING_VALUE) {
-                    data_node = new node_base_string_without_sons(
-                        got_tokens[0]->data);
-                } else if (tmp == token_ticks::NAME) {
-                    data_node = new node_base_data_without_sons(
-                        VAR_NAME, got_tokens[0]->data);
-                } else if (is_const_value(tmp)) {
-                    // 在此将常量转换成数字
-                    data_node = new node_base_int_without_sons(
-                        change_const[now->data]);
-                } else if (tmp == token_ticks::LONG_INT_VALUE) {
-                    data_node = new node_base_data_without_sons(
-                        LONG_INT, got_tokens[0]->data);
-                } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
-                    data_node = new node_base_data_without_sons(
-                        LONG_FLOAT, got_tokens[0]->data);
-                } else {
-                    // 不可能执行到别的代码，执行到就是出bug了
-                    NOREACH;
-                }
                 delete now;
-                return data_node;
+                return make_data_node(got_tokens);
+            } else if (now->tick == token_ticks::RIGHT_SMALL_BRACE) {
+                token_.unget_token(now);
+                return make_data_node(got_tokens);
             }
             if (is_as_token(now->tick)) {
                 /*赋值语句*/
@@ -334,9 +336,8 @@ treenode* grammar_lex::get_node() {
                 return head;
             } else if (now->tick == token_ticks::LEFT_SMALL_BRACE) {
                 /*函数调用*/
-                auto head = new node_base_data;
                 delete now;
-                callfunction(head, got_tokens);
+                return callfunction(got_tokens);
             }
         }
     }
@@ -431,7 +432,9 @@ token* grammar_lex::check_excepted(token_ticks tick) {
         delete res;
         error_->send_error_module(error::SyntaxError,
             language::error::syntaxerror_no_expect, out_error_msg.c_str());
+        return nullptr;
+    } else {
+        return res;
     }
-    return res;
 }
 }

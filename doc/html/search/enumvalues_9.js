@@ -18,6 +18,5 @@ var searchData=
   ['long_5ffloat_15',['LONG_FLOAT',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaf021dd4dd083edbd8a58b8f711a1dccb',1,'trc::compiler']]],
   ['long_5ffloat_5fvalue_16',['LONG_FLOAT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2e02aa7c515398e12748659a73da366a',1,'trc::compiler']]],
   ['long_5fint_17',['LONG_INT',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa63460c838c2e0aabf418e99fff746caa',1,'trc::compiler']]],
-  ['long_5fint_5fvalue_18',['LONG_INT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ad2c551340860bd6e456ed09de18ed68f',1,'trc::compiler']]],
-  ['long_5ftick_19',['LONG_TICK',['../namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ada8acd9426e54131abd522db5904556c',1,'trc::compiler']]]
+  ['long_5fint_5fvalue_18',['LONG_INT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ad2c551340860bd6e456ed09de18ed68f',1,'trc::compiler']]]
 ];

@@ -1,4 +1,4 @@
-#include <base/trcdef.h>
+﻿#include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <base/utils/filesys.h>
 #include <deque>
@@ -105,4 +105,11 @@ TEST(data, len) {
     EXPECT_EQ(trc::utils::len(-1000000), 7);
     EXPECT_EQ(trc::utils::len((unsigned int)0), 1);
     EXPECT_EQ(trc::utils::len((unsigned int)100), 3);
+}
+
+// 测试判断浮点数相等的函数
+TEST(data, isequal) {
+    EXPECT_TRUE(utils::isequal(1.0, 1.0));
+    EXPECT_FALSE(utils::isequal(1.0, 1.1));
+    EXPECT_FALSE(utils::isequal(1.0, 2.0));
 }

@@ -20,5 +20,6 @@ var searchData=
   ['is_5fleft_5fvalue_17',['is_left_value',['../namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc',1,'trc::compiler']]],
   ['is_5fmagic_18',['is_magic',['../namespacetrc_1_1loader.html#ab87e099f032f48972457d5993fb39675',1,'trc::loader']]],
   ['is_5fsentence_5ftoken_19',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
-  ['is_5fsentence_5fwith_5fone_5fargv_20',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]]
+  ['is_5fsentence_5fwith_5fone_5fargv_20',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]],
+  ['isequal_21',['isequal',['../namespacetrc_1_1utils.html#a4cda5221c3794b0059ed3ac33b79e00a',1,'trc::utils']]]
 ];

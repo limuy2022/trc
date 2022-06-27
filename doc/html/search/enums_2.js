@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['error_5ftype_0',['error_type',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1',1,'trc::error']]]
+  ['grammar_5ftype_0',['grammar_type',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef',1,'trc::compiler']]]
 ];

@@ -231,9 +231,21 @@ void detail_compiler::compile(treenode* head) {
         }
         case BUILTIN_FUNC: {
             // 内置函数
-            auto* code = (node_base_tick_without_sons*)root->son[0];
-            auto* index_ = (node_base_int_without_sons*)root->son[1];
-            add_opcode(build_opcode(code->tick), index_->value);
+            // 先递归编译参数
+            auto argv_nodes = (is_not_end_node*)root->son[0];
+            for (size_t i = 0, n = argv_nodes->son.size(); i < n; ++i) {
+                compile(argv_nodes->son[i]);
+            }
+            // 然后编译参数个数
+            int num_of_nodes
+                = ((node_base_int_without_sons*)root->son[1])->value;
+            add_opcode(
+                (bytecode_t)byteCodeNumber::LOAD_INT_, add_int(num_of_nodes));
+            // 最后加上调用函数
+            // 内置函数以编码形式保存，这是它的位置
+            int function_index = ((node_base_int*)root)->value;
+            add_opcode(
+                (bytecode_t)byteCodeNumber::CALL_BUILTIN_, function_index);
             break;
         }
         case OPCODE_ARGV: {

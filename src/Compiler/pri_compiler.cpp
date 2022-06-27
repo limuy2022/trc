@@ -91,9 +91,15 @@ node_base_string_without_sons::node_base_string_without_sons(
     this->type = STRING;
 }
 
-node_base_int_without_sons::node_base_int_without_sons(int value)
+node_base_int_without_sons::node_base_int_without_sons(
+    int value, grammar_type type)
     : value(value) {
-    this->type = NUMBER;
+    this->type = type;
+}
+
+node_base_int::node_base_int(int value, grammar_type type)
+    : value(value) {
+    this->type = type;
 }
 
 node_base_float_without_sons::node_base_float_without_sons(double value)

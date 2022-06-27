@@ -116,6 +116,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int__without__sons.html">trc::compiler::node_base_int_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int.html">trc::compiler::node_base_int</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整形的有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__float__without__sons.html">trc::compiler::node_base_float_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,18 +210,6 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a0845b90df8765369e37eadfd4b4ff452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba187f3805414fb815519efb1ba7e175"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175">trc::compiler::COMPILE_TYPE_TICK</a> { <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175aeba779924fb81b5570de1633c324a144">trc::compiler::VAR_TICK</a> = 1
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a446b137017c07702442b2a5356b36a40">trc::compiler::int_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a9009fbab2a569e29b2abb77d1600c936">trc::compiler::float_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ac5ce0620febf0ebe6a4908d595223f66">trc::compiler::string_TICK</a>
-, <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175ada8acd9426e54131abd522db5904556c">trc::compiler::LONG_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175a085a1af6c28f8f7f8234f32edd339181">trc::compiler::FLOAT_L_TICK</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#aba187f3805414fb815519efb1ba7e175aa8bdbe844292687fe16f844c4fa884d2">trc::compiler::CONST_TICK</a>
-<br />
- }</td></tr>
-<tr class="separator:aba187f3805414fb815519efb1ba7e175"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bcc8ae504de95341ebb688e6fcf56ef"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">trc::compiler::grammar_type</a> { <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaf63b1819000c7ce993ed9c1cb6f3035a">trc::compiler::DATA</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa4a090bfc3c53a01d010d712a1afff982">trc::compiler::OPCODE</a>
@@ -246,9 +237,6 @@ Functions</h2></td></tr>
 <tr class="memitem:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9">trc::compiler::is_english</a> (char c)</td></tr>
 <tr class="memdesc:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否为字母，包括_  <a href="namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9">More...</a><br /></td></tr>
 <tr class="separator:aa9bd462c48d52a2b82d3a15e9ac5edc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memItemLeft" align="right" valign="top">COMPILE_TYPE_TICK&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">trc::compiler::what_type</a> (const std::string &amp;value)</td></tr>
-<tr class="memdesc:a822452e66a495f0e0c6da5adcf7ea36c"><td class="mdescLeft">&#160;</td><td class="mdescRight">编译时判断传入的字符串实际代表的类型  <a href="namespacetrc_1_1compiler.html#a822452e66a495f0e0c6da5adcf7ea36c">More...</a><br /></td></tr>
-<tr class="separator:a822452e66a495f0e0c6da5adcf7ea36c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91e35d10b3e8fc8565fb99ff3f8df2a5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a91e35d10b3e8fc8565fb99ff3f8df2a5">trc::compiler::is_cal_value</a> (token_ticks tick)</td></tr>
 <tr class="memdesc:a91e35d10b3e8fc8565fb99ff3f8df2a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断枚举值是否是可运算的  <a href="namespacetrc_1_1compiler.html#a91e35d10b3e8fc8565fb99ff3f8df2a5">More...</a><br /></td></tr>
 <tr class="separator:a91e35d10b3e8fc8565fb99ff3f8df2a5"><td class="memSeparator" colspan="2">&#160;</td></tr>

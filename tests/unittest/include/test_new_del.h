@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace count_new_del {
 

@@ -6,10 +6,10 @@
 #include <Compiler/grammar.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
-#include <language/error.h>
 #include <string>
 #include <tools.h>
-#include <vector>
+
+using namespace trc::compiler;
 
 namespace trc::tools {
 namespace tools_in {
@@ -27,15 +27,15 @@ namespace tools_in {
         outtab();
         puts("[");
         switch (data->type) {
-        case compiler::TREE: {
+        case grammar_type::TREE: {
             printf("%s", "tree");
             break;
         }
-        case compiler::BUILTIN_FUNC: {
+        case grammar_type::BUILTIN_FUNC: {
             printf("%s", "builtin_func");
             break;
         }
-        case compiler::NUMBER: {
+        case grammar_type::NUMBER: {
             auto tmp = (compiler::node_base_int_without_sons*)data;
             printf("%d", tmp->value);
             break;

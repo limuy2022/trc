@@ -3,8 +3,6 @@
  */
 
 #include <Compiler/pri_compiler.hpp>
-#include <TVM/types/trc_flong.h>
-#include <TVM/types/trc_long.h>
 #include <array>
 #include <base/Error.h>
 #include <cstring>
@@ -88,7 +86,7 @@ node_base_data_without_sons::node_base_data_without_sons() = default;
 node_base_string_without_sons::node_base_string_without_sons(
     const std::string& data)
     : data_node(data) {
-    this->type = STRING;
+    this->type = grammar_type::STRING;
 }
 
 node_base_int_without_sons::node_base_int_without_sons(
@@ -104,7 +102,7 @@ node_base_int::node_base_int(int value, grammar_type type)
 
 node_base_float_without_sons::node_base_float_without_sons(double value)
     : value(value) {
-    this->type = FLOAT;
+    this->type = grammar_type::FLOAT;
 }
 
 // 可以优化的运算符

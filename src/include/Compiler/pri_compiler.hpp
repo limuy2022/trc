@@ -82,7 +82,7 @@ extern std::array<std::string, 3> const_values;
 extern std::map<std::string, int> change_const;
 
 // 语法生成树中的标识
-enum grammar_type {
+enum class grammar_type {
     // 纯粹数据
     DATA,
     // 生成无参数字节码
@@ -123,7 +123,7 @@ public:
 
     virtual bool has_son() = 0;
 
-    grammar_type type = TREE;
+    grammar_type type = grammar_type::TREE;
 };
 
 /**
@@ -196,7 +196,7 @@ class TRC_Compiler_api node_base_data : public is_not_end_node,
 public:
     node_base_data(grammar_type type_argv, const std::string& data);
 
-    explicit node_base_data(grammar_type type = TREE);
+    explicit node_base_data(grammar_type type = grammar_type::TREE);
 };
 
 /**
@@ -237,7 +237,7 @@ class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
 public:
     int value;
 
-    node_base_int_without_sons(int value, grammar_type type = NUMBER);
+    explicit node_base_int_without_sons(int value, grammar_type type = grammar_type::NUMBER);
 };
 
 /**
@@ -247,7 +247,7 @@ class TRC_Compiler_api node_base_int : public is_not_end_node {
 public:
     int value;
 
-    node_base_int(int value, grammar_type type = NUMBER);
+    explicit node_base_int(int value, grammar_type type = grammar_type::NUMBER);
 };
 
 /**
@@ -257,7 +257,7 @@ class TRC_Compiler_api node_base_float_without_sons : public is_end_node {
 public:
     double value;
 
-    node_base_float_without_sons(double value);
+    explicit node_base_float_without_sons(double value);
 };
 
 /**

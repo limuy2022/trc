@@ -2,7 +2,6 @@
  * 字节码最终在此生成，是编译器的另一个核心
  */
 
-#include <Compiler/compile_env.h>
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
@@ -137,14 +136,14 @@ void detail_compiler::compile(treenode* head) {
     if (head->has_son()) {
         auto* root = (is_not_end_node*)head;
         switch (type) {
-        case TREE: {
+        case grammar_type::TREE: {
             // 不是数据和传参节点，确认为树
             for (auto i : root->son) {
                 compile(i);
             }
             break;
         }
-        case BUILTIN_FUNC: {
+        case grammar_type::BUILTIN_FUNC: {
             // 内置函数
             // 先递归编译参数
             auto argv_nodes = (is_not_end_node*)root->son[0];
@@ -163,7 +162,7 @@ void detail_compiler::compile(treenode* head) {
                 (bytecode_t)byteCodeNumber::CALL_BUILTIN_, function_index);
             break;
         }
-        case OPCODE_ARGV: {
+        case grammar_type::OPCODE_ARGV: {
             // 带参数字节码
             // 参数
             auto argv_ = ((node_base_int_without_sons*)(root->son[0]))->value;
@@ -171,12 +170,12 @@ void detail_compiler::compile(treenode* head) {
                 build_opcode(((node_base_tick*)root)->tick), add_int(argv_));
             break;
         }
-        case FUNC_DEFINE: {
+        case grammar_type::FUNC_DEFINE: {
             // 函数定义
             func_lexer(head);
             break;
         }
-        case VAR_DEFINE: {
+        case grammar_type::VAR_DEFINE: {
             // 变量定义
             // 处理等式右边的数据
             compile(root->son[1]);
@@ -186,7 +185,7 @@ void detail_compiler::compile(treenode* head) {
             add_opcode(build_var(((node_base_tick*)root)->tick), index_argv);
             break;
         }
-        case CALL_FUNC: {
+        case grammar_type::CALL_FUNC: {
             // 调用自定义函数
             // 判断函数是否存在
             char* nodedata = ((node_base_data*)root)->data;
@@ -204,42 +203,42 @@ void detail_compiler::compile(treenode* head) {
         }
     } else {
         switch (type) {
-        case VAR_NAME: {
+        case grammar_type::VAR_NAME: {
             // 变量名节点，生成读取变量的节点
             char* nodedata = ((node_base_data_without_sons*)head)->data;
             auto index_argv = add_var(nodedata);
             add_opcode((bytecode_t)byteCodeNumber::LOAD_NAME_, index_argv);
             break;
         }
-        case NUMBER: {
+        case grammar_type::NUMBER: {
             // 整型节点
             auto value = ((node_base_int_without_sons*)head)->value;
             auto index_argv = add_int(value);
             add_opcode((bytecode_t)byteCodeNumber::LOAD_INT_, index_argv);
             break;
         }
-        case STRING: {
+        case grammar_type::STRING: {
             // 字符串节点
             auto value = ((node_base_string_without_sons*)head)->data;
             auto index_argv = add_string(value);
             add_opcode((bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv);
             break;
         }
-        case FLOAT: {
+        case grammar_type::FLOAT: {
             // 浮点型节点
             auto value = ((node_base_float_without_sons*)head)->value;
             auto index_argv = add_float(value);
             add_opcode((bytecode_t)byteCodeNumber::LOAD_FLOAT_, index_argv);
             break;
         }
-        case LONG_INT: {
+        case grammar_type::LONG_INT: {
             // 长整型节点
             auto value = ((node_base_data_without_sons*)head)->data;
             auto index_argv = add_long(value);
             add_opcode((bytecode_t)byteCodeNumber::LOAD_LONG_, index_argv);
             break;
         }
-        case OPCODE: {
+        case grammar_type::OPCODE: {
             // 生成字节码, 0代表没有参数
             token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
             add_opcode(build_opcode(tick), 0);

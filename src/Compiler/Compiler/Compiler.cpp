@@ -2,7 +2,7 @@
  * 字节码最终在此生成，是编译器的另一个核心
  */
 
-#include "compile_env.h"
+#include <Compiler/compile_env.h>
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
@@ -50,99 +50,14 @@ static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::ASSERT_,
 };
 
-/**
- * @brief 编译器的细节
- */
-class detail_compiler {
-public:
-    detail_compiler(
-        compiler_error&, TVM_space::TVM_static_data&, TVM_space::TVM* vm);
-
-    /**
-     * @brief 将一个节点解析成字节码
-     * @param head 根节点
-     * @param vm 需要编译的虚拟机
-     */
-    void compile(treenode* head);
-    // 编译时信息记录
-    CompileEnvironment infoenv;
-
-private:
-    /**
-     * @brief 将整形数据添加进const_i常量池
-     * @return 数据在常量池中的索引
-     */
-    TVM_space::bytecode_index_t add_int(int value);
-
-    /**
-     * @brief 将浮点型数据添加进const_f常量池
-     * @return 数据在常量池中的索引
-     */
-    TVM_space::bytecode_index_t add_float(float value);
-
-    /**
-     * @brief 将字符串型数据添加进const_s常量池
-     * @return 数据在常量池中的索引
-     */
-    TVM_space::bytecode_index_t add_string(const char* value);
-
-    /**
-     * @brief 将变量添加进符号表中
-     * @return 变量在符号表中的索引
-     */
-    TVM_space::bytecode_index_t add_var(const char* value);
-
-    /**
-     * @brief 将长整型添加进符号表中
-     * @return 变量在符号表中的索引
-     */
-    TVM_space::bytecode_index_t add_long(const char* value);
-
-    /**
-     * @brief
-     * 构建字节码，以data在opcodesym_int中的值和index初始化数组
-     * @param data 符号
-     * @param index 索引
-     */
-    static bytecode_t build_opcode(token_ticks symbol);
-
-    /**
-     * @brief 构建有关变量的字节码
-     * @param data 符号
-     * @param index 索引
-     */
-    static bytecode_t build_var(token_ticks data);
-
-    /**
-     * @brief 添加字节码，并完善对应环境
-     */
-    void add_opcode(bytecode_t, TVM_space::bytecode_index_t index);
-
-    /**
-     * @brief 解析函数字节码
-     */
-    void func_lexer(treenode* head);
-
-    compiler_error& error_;
-
-    TVM_space::TVM_static_data& static_data;
-
-    long long prev_value = LLONG_MAX;
-
-    // 行号转化为字节码每行的第一个字节码的索引
-    std::vector<int> line_to_bycodeindex_table;
-
-    TVM_space::TVM* vm;
-};
-
 void detail_compiler::add_opcode(
     bytecode_t opcode, TVM_space::bytecode_index_t index) {
-    static_data.byte_codes.push_back(TVM_space::TVM_bytecode { opcode, index });
-    static_data.line_number_table.push_back(error_.line);
+    vm->static_data.byte_codes.push_back(TVM_space::TVM_bytecode { opcode, index });
+    vm->static_data.line_number_table.push_back(error_.line);
     if (error_.line != prev_value) {
         line_to_bycodeindex_table.resize(error_.line + 1);
         line_to_bycodeindex_table[error_.line]
-            = static_data.line_number_table.size() - 1;
+            = vm->static_data.line_number_table.size() - 1;
         prev_value = error_.line;
     }
 }
@@ -338,10 +253,13 @@ void detail_compiler::compile(treenode* head) {
 }
 
 detail_compiler::detail_compiler(compiler_error& error_,
-    TVM_space::TVM_static_data& static_data, TVM_space::TVM* vm)
+    TVM_space::TVM* vm)
     : error_(error_)
-    , static_data(static_data)
     , vm(vm) {
+}
+
+void detail_compiler::retie(TVM_space::TVM* vm) {
+    this->vm = vm;
 }
 }
 
@@ -355,24 +273,68 @@ void free_tree(treenode* head) {
     delete head;
 }
 
-void Compiler(TVM_space::TVM* vm, const std::string& codes) {
-    compiler_error error_("__main__");
-    // 不会开始解析
-    grammar_lex grammar_lexer(codes, &error_);
+void detail_compiler::free_detail_compiler() {
+    delete &this->error_;
+}
+
+detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes, detail_compiler* compiler_ptr, bool return_compiler_ptr) {
     /* 正式进入虚拟机字节码生成环节*/
     vm->static_data.ver_ = def::version;
-    detail_compiler lex_d(error_, vm->static_data, vm);
     treenode* now_get;
-    for (;;) {
-        now_get = grammar_lexer.get_node();
-        if (now_get == nullptr) {
-            break;
+    if(compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
+        // 如果不需要返回变量信息或者没有提供指定编译器
+        // 不需要保存变量信息
+        compiler_error error_("__main__");
+            // 不会开始解析
+        grammar_lex grammar_lexer(codes, &error_);
+        detail_compiler lex_d(error_, vm);
+        
+        for (;;) {
+            now_get = grammar_lexer.get_node();
+            if (now_get == nullptr) {
+                break;
+            }
+            lex_d.compile(now_get);
+            free_tree(now_get);
         }
-        lex_d.compile(now_get);
-        free_tree(now_get);
-    }
-    // 设置全局符号表
-    vm->static_data.global_symbol_table_size
+        // 设置全局符号表
+        vm->static_data.global_symbol_table_size
         = lex_d.infoenv.get_global_name_size();
-}
+        return nullptr;
+    } else if(return_compiler_ptr == true) {
+        // 需要返回保存变量信息(tshell和tdb需要使用)
+        compiler_error* error_ = new compiler_error("__main__");
+        grammar_lex grammar_lexer(codes, error_);
+        detail_compiler* lex_d = new detail_compiler(*error_, vm);
+
+        for (;;) {
+            now_get = grammar_lexer.get_node();
+            if (now_get == nullptr) {
+                break;
+            }
+            lex_d->compile(now_get);
+            free_tree(now_get);
+        }
+        // 设置全局符号表
+        vm->static_data.global_symbol_table_size
+        = lex_d->infoenv.get_global_name_size();
+        return lex_d;
+    } else if(compiler_ptr != nullptr) {
+        // 使用已经保存了的信息类进行编译
+        compiler_ptr->retie(vm);
+        grammar_lex grammar_lexer(codes, &compiler_ptr->error_);
+        for(;;) {
+            now_get = grammar_lexer.get_node();
+            if (now_get == nullptr) {
+                break;
+            }
+            compiler_ptr->compile(now_get);
+            free_tree(now_get);
+            }
+        }
+        // 设置全局符号表
+    vm->static_data.global_symbol_table_size
+    = compiler_ptr->infoenv.get_global_name_size();
+        return nullptr;
+    }
 }

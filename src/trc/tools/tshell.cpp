@@ -1,5 +1,6 @@
 ﻿/**
  * trc交互式界面，无需文件即可执行
+ * repl:read-execute-print-loop
  */
 
 #include <Compiler/Compiler.h>
@@ -51,6 +52,7 @@ static void get_block(std::string& res) {
     }
     free(temp);
 }
+
 namespace tools::tools_out {
     void tshell() {
         printf("Trc %.1f\n\n", def::version);
@@ -60,6 +62,8 @@ namespace tools::tools_out {
         TVM_space::TVM* vm = TVM_space::create_TVM();
         // tshell报错但不终止程序
         error::error_env::quit = false;
+        // 先传入空代码获取对象
+        compiler::detail_compiler* info_saver = compiler::Compiler(vm, "", nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -70,13 +74,15 @@ namespace tools::tools_out {
             if (is_block(code)) {
                 get_block(code_str);
             }
-            TVM_space::free_TVM(vm);
-            compiler::Compiler(vm, code_str);
+            vm->static_data.byte_codes.clear();
+            compiler::Compiler(vm, code_str, info_saver, false);
             vm->reload_data();
             vm->run_all();
         }
         free(code);
+        info_saver->free_detail_compiler();
         delete vm;
+
         error::error_env::quit = true;
     }
 }

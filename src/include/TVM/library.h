@@ -17,5 +17,5 @@
 #endif
 #else
 #define TRC_TVM_api
-#define TRC_TVM_c_api
+#define TRC_TVM_c_api extern
 #endif

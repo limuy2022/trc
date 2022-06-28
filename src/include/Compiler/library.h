@@ -17,5 +17,5 @@
 #endif
 #else
 #define TRC_Compiler_api
-#define TRC_Compiler_c_api
+#define TRC_Compiler_c_api extern
 #endif

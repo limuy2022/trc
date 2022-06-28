@@ -63,7 +63,8 @@ namespace tools::tools_out {
         // tshell报错但不终止程序
         error::error_env::quit = false;
         // 先传入空代码获取对象
-        compiler::detail_compiler* info_saver = compiler::Compiler(vm, "", nullptr, true);
+        compiler::detail_compiler* info_saver
+            = compiler::Compiler(vm, "", nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);

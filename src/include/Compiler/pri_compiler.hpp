@@ -110,7 +110,9 @@ enum class grammar_type {
     // 长浮点型节点
     LONG_FLOAT,
     // 变量名节点
-    VAR_NAME
+    VAR_NAME,
+    // 描述一行条件表达式或者运算符表达式
+    EXPR
 };
 
 /**
@@ -132,6 +134,10 @@ public:
  */
 class TRC_Compiler_api is_not_end_node : public treenode {
 public:
+    is_not_end_node(grammar_type type);
+
+    is_not_end_node() = default;
+
     std::vector<treenode*> son;
 
     void connect(treenode* son_node);
@@ -237,7 +243,8 @@ class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
 public:
     int value;
 
-    explicit node_base_int_without_sons(int value, grammar_type type = grammar_type::NUMBER);
+    explicit node_base_int_without_sons(
+        int value, grammar_type type = grammar_type::NUMBER);
 };
 
 /**

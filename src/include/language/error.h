@@ -31,6 +31,10 @@ TRC_language_c_api const char* syntaxerror_expect;
 TRC_language_c_api const char* syntaxerror_escape_char;
 // 不明确的语法错误
 TRC_language_c_api const char* syntaxerror;
+// 左括号过多
+TRC_language_c_api const char* syntaxerror_more_left_braces;
+// 左括号过少
+TRC_language_c_api const char* syntaxerror_less_left_braces;
 
 // 断言的默认报错信息
 TRC_language_c_api const char* asserterror_default;

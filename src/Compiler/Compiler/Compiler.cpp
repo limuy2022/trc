@@ -51,7 +51,8 @@ static byteCodeNumber opcodesym_int[] = {
 
 void detail_compiler::add_opcode(
     bytecode_t opcode, TVM_space::bytecode_index_t index) {
-    vm->static_data.byte_codes.push_back(TVM_space::TVM_bytecode { opcode, index });
+    vm->static_data.byte_codes.push_back(
+        TVM_space::TVM_bytecode { opcode, index });
     vm->static_data.line_number_table.push_back(error_.line);
     if (error_.line != prev_value) {
         line_to_bycodeindex_table.resize(error_.line + 1);
@@ -197,6 +198,13 @@ void detail_compiler::compile(treenode* head) {
             add_opcode(build_opcode(code->tick), index_->value);
             break;
         }
+        case grammar_type::EXPR: {
+            // 运算符表达式或条件表达式
+            for (auto i : root->son) {
+                compile(i);
+            }
+            break;
+        }
         default: {
             NOREACH;
         }
@@ -251,8 +259,7 @@ void detail_compiler::compile(treenode* head) {
     }
 }
 
-detail_compiler::detail_compiler(compiler_error& error_,
-    TVM_space::TVM* vm)
+detail_compiler::detail_compiler(compiler_error& error_, TVM_space::TVM* vm)
     : error_(error_)
     , vm(vm) {
 }
@@ -276,18 +283,19 @@ void detail_compiler::free_detail_compiler() {
     delete &this->error_;
 }
 
-detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes, detail_compiler* compiler_ptr, bool return_compiler_ptr) {
+detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
+    detail_compiler* compiler_ptr, bool return_compiler_ptr) {
     /* 正式进入虚拟机字节码生成环节*/
     vm->static_data.ver_ = def::version;
     treenode* now_get;
-    if(compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
+    if (compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
         // 如果不需要返回变量信息或者没有提供指定编译器
         // 不需要保存变量信息
         compiler_error error_("__main__");
-            // 不会开始解析
+        // 不会开始解析
         grammar_lex grammar_lexer(codes, &error_);
         detail_compiler lex_d(error_, vm);
-        
+
         for (;;) {
             now_get = grammar_lexer.get_node();
             if (now_get == nullptr) {
@@ -298,9 +306,9 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes, detail_c
         }
         // 设置全局符号表
         vm->static_data.global_symbol_table_size
-        = lex_d.infoenv.get_global_name_size();
+            = lex_d.infoenv.get_global_name_size();
         return nullptr;
-    } else if(return_compiler_ptr == true) {
+    } else if (return_compiler_ptr == true) {
         // 需要返回保存变量信息(tshell和tdb需要使用)
         compiler_error* error_ = new compiler_error("__main__");
         grammar_lex grammar_lexer(codes, error_);
@@ -316,24 +324,24 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes, detail_c
         }
         // 设置全局符号表
         vm->static_data.global_symbol_table_size
-        = lex_d->infoenv.get_global_name_size();
+            = lex_d->infoenv.get_global_name_size();
         return lex_d;
-    } else if(compiler_ptr != nullptr) {
+    } else if (compiler_ptr != nullptr) {
         // 使用已经保存了的信息类进行编译
         compiler_ptr->retie(vm);
         grammar_lex grammar_lexer(codes, &compiler_ptr->error_);
-        for(;;) {
+        for (;;) {
             now_get = grammar_lexer.get_node();
             if (now_get == nullptr) {
                 break;
             }
             compiler_ptr->compile(now_get);
             free_tree(now_get);
-            }
         }
-        // 设置全局符号表
-    vm->static_data.global_symbol_table_size
-    = compiler_ptr->infoenv.get_global_name_size();
-        return nullptr;
     }
+    // 设置全局符号表
+    vm->static_data.global_symbol_table_size
+        = compiler_ptr->infoenv.get_global_name_size();
+    return nullptr;
+}
 }

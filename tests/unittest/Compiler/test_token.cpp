@@ -45,6 +45,9 @@ TEST(token, oper_lex) {
     test_tokens("2+ 1",
         { { token_ticks::INT_VALUE, "2" }, { token_ticks::ADD, "" },
             { token_ticks::INT_VALUE, "1" } });
+    test_tokens("1+4",
+        { { token_ticks::INT_VALUE, "1" }, { token_ticks::ADD, "" },
+            { token_ticks::INT_VALUE, "4" } });
     test_tokens("-+*/7.0+1-0",
         { { token_ticks::SUB, "" }, { token_ticks::ADD, "" },
             { token_ticks::MUL, "" }, { token_ticks::DIV, "" },

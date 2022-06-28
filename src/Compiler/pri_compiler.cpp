@@ -21,6 +21,10 @@ bool is_not_end_node::has_son() {
     return true;
 }
 
+is_not_end_node::is_not_end_node(grammar_type type) {
+    this->type = type;
+}
+
 bool is_end_node::has_son() {
     return false;
 }
@@ -82,6 +86,12 @@ node_base_data_without_sons::node_base_data_without_sons(
 }
 
 node_base_data_without_sons::node_base_data_without_sons() = default;
+
+node_base_tick_without_sons::node_base_tick_without_sons(
+    grammar_type type, token_ticks tick)
+    : tick_node(tick) {
+    this->type = type;
+}
 
 node_base_string_without_sons::node_base_string_without_sons(
     const std::string& data)

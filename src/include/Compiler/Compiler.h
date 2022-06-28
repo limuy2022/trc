@@ -112,8 +112,7 @@ private:
  */
 class TRC_Compiler_api detail_compiler {
 public:
-    detail_compiler(
-        compiler_error&, TVM_space::TVM* vm);
+    detail_compiler(compiler_error&, TVM_space::TVM* vm);
 
     /**
      * @brief 将一个节点解析成字节码
@@ -126,14 +125,15 @@ public:
 
     /**
      * @brief 删除多余的信息
-     * @details 为何不在析构函数中解决该问题？因为当该类作为外传的信息类时，就要承担起释放多余内存的责任
+     * @details
+     * 为何不在析构函数中解决该问题？因为当该类作为外传的信息类时，就要承担起释放多余内存的责任
      */
     void free_detail_compiler();
 
     /**
      * @brief 重新绑定数据
      */
-    void retie(TVM_space::TVM *vm);
+    void retie(TVM_space::TVM* vm);
 
     // 用于报错的类
     compiler_error& error_;
@@ -209,7 +209,9 @@ private:
  * @param codes 源代码
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
-TRC_Compiler_c_api detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes, detail_compiler* compiler_ptr = nullptr,bool return_compiler_ptr = false);
+TRC_Compiler_c_api detail_compiler* Compiler(TVM_space::TVM* vm,
+    const std::string& codes, detail_compiler* compiler_ptr = nullptr,
+    bool return_compiler_ptr = false);
 
 /**
  * @brief 释放整棵树的内存

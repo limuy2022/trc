@@ -95,16 +95,46 @@ TEST(compiler, function_call) {
     free_TVM(vm);
     // 带变量
     compiler::Compiler(vm, "a:=856\nprint(a)");
-    // ASSERT_EQ(vm->static_data.const_i.size(), 3);
-    // EXPECT_EQ(vm->static_data.const_i[1], 856);
-    // EXPECT_EQ(vm->static_data.const_i[2], 1);
-    // bytecode_check({{(bytecode_t)byteCodeNumber::LOAD_INT_, 1},
-    // {(bytecode_t)byteCodeNumber::STORE_NAME_, 1},
-    // {(bytecode_t)byteCodeNumber::LOAD_NAME_,
-    // 1},{(bytecode_t)byteCodeNumber::LOAD_INT_, 2},
-    // {(bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2}},vm);
+    ASSERT_EQ(vm->static_data.const_i.size(), 3);
+    EXPECT_EQ(vm->static_data.const_i[1], 856);
+    EXPECT_EQ(vm->static_data.const_i[2], 1);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_NAME_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
+                       { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2 } },
+        vm);
     free_TVM(vm);
+    // 函数中嵌套着函数
+    // compiler::Compiler(vm, "a:=int(input())");
     delete vm;
+}
+
+// 测试运算符表达式的解析
+TEST(compiler, oper) {
+    TVM* vm = create_TVM();
+    // 简单常量相加
+    compiler::Compiler(vm, "1+4");
+    ASSERT_EQ(vm->static_data.const_i.size(), 3);
+    EXPECT_EQ(vm->static_data.const_i[1], 1);
+    EXPECT_EQ(vm->static_data.const_i[2], 4);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
+                       { (bytecode_t)byteCodeNumber::ADD_, 0 } },
+        vm);
+    free_TVM(vm);
+    // 函数中包括运算符表达式
+    compiler::Compiler(vm, "print(1+1)");
+    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    EXPECT_EQ(vm->static_data.const_i[1], 1);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2 } },
+        vm);
+    free_TVM(vm);
+    // 函数返回值与函数返回值相加
 }
 
 // 测试条件判断的解析

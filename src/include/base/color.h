@@ -21,19 +21,9 @@ typedef const char* color_type;
 namespace trc::color {
 #ifdef WINDOWS_PLAT
 /**
- * @brief 初始化控制台，缓存一些数据
+ * @brief 初始化控制台，设置控制台为ANSI模式
  */
 TRC_base_c_api void console_init();
-
-/**
- * @brief 还原控制台，使它还原到使用trc之前的状态
- */
-TRC_base_c_api void color_quit();
-
-/**
- * @brief 设置控制台为ANSI模式
- */
-TRC_base_c_api void color_init();
 #endif
 
 class TRC_base_api color_st {
@@ -53,15 +43,9 @@ private:
 
 template <typename... argvs>
 void color_st::operator()(const char* fmt, const argvs&... data) const {
-#ifdef WINDOWS_PLAT
-    color_init();
-#endif
     printf(this->color);
     printf(fmt, data...);
     printf(CLOSE_COLOR);
-#ifdef WINDOWS_PLAT
-    color_quit();
-#endif
 }
 
 TRC_base_c_api color_st yellow, blue, red, green, white, purple;

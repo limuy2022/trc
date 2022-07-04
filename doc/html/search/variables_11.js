@@ -15,7 +15,9 @@ var searchData=
   ['syntaxerror_5fescape_5fchar_12',['syntaxerror_escape_char',['../namespacelanguage_1_1error.html#a2b018cdf7caa6ce6c9b29d86cbe77dd1',1,'language::error']]],
   ['syntaxerror_5fexpect_13',['syntaxerror_expect',['../namespacelanguage_1_1error.html#a47134cfe0a5a0fd7d8c70ee83e7b56b1',1,'language::error']]],
   ['syntaxerror_5fint_14',['syntaxerror_int',['../namespacelanguage_1_1error.html#a24bd655767ed8e29404f8de7f0384b58',1,'language::error']]],
-  ['syntaxerror_5flexanno_15',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
-  ['syntaxerror_5flexstring_16',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
-  ['syntaxerror_5fno_5fexpect_17',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]]
+  ['syntaxerror_5fless_5fleft_5fbraces_15',['syntaxerror_less_left_braces',['../namespacelanguage_1_1error.html#a09d87cdaf405321f58e930bbb6957f28',1,'language::error']]],
+  ['syntaxerror_5flexanno_16',['syntaxerror_lexanno',['../namespacelanguage_1_1error.html#a2e91233406aa89ea5990d4577b2d9c66',1,'language::error']]],
+  ['syntaxerror_5flexstring_17',['syntaxerror_lexstring',['../namespacelanguage_1_1error.html#a50ebecce4fff26596681e2e8df082e68',1,'language::error']]],
+  ['syntaxerror_5fmore_5fleft_5fbraces_18',['syntaxerror_more_left_braces',['../namespacelanguage_1_1error.html#ad4569e0ee426399a386e81d751808af9',1,'language::error']]],
+  ['syntaxerror_5fno_5fexpect_19',['syntaxerror_no_expect',['../namespacelanguage_1_1error.html#a3702428ffec82e27e45ad6b413bd179b',1,'language::error']]]
 ];

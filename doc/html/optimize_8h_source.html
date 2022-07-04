@@ -70,24 +70,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="optimize_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1compiler.html">trc::compiler</a> {</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">   10</a></span><span class="keyword">typedef</span> int (*<a class="code hl_typedef" href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">ip</a>)(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp;, <span class="keyword">const</span> <span class="keywordtype">int</span>&amp;);</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">   12</a></span><span class="keyword">typedef</span> bool (*<a class="code hl_typedef" href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">bp</a>)(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp;, <span class="keyword">const</span> <span class="keywordtype">int</span>&amp;);</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">extern</span> std::map&lt;std::string, bp&gt; <a class="code hl_variable" href="namespacetrc_1_1compiler.html#aa898db461b91dfbb38d2df4988db1d43">optimize_condit</a>;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">extern</span> std::map&lt;std::string, ip&gt; <a class="code hl_variable" href="namespacetrc_1_1compiler.html#a749e98cf00a40423a86c8e709fb06c23">optimize_number</a>;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>}</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1compiler.html">trc::compiler</a> {</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">   11</a></span><span class="keyword">typedef</span> int (*<a class="code hl_typedef" href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">ip</a>)(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp;, <span class="keyword">const</span> <span class="keywordtype">int</span>&amp;);</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">   13</a></span><span class="keyword">typedef</span> bool (*<a class="code hl_typedef" href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">bp</a>)(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp;, <span class="keyword">const</span> <span class="keywordtype">int</span>&amp;);</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">extern</span> std::map&lt;std::string, bp&gt; <a class="code hl_variable" href="namespacetrc_1_1compiler.html#aa898db461b91dfbb38d2df4988db1d43">optimize_condit</a>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">extern</span> std::map&lt;std::string, ip&gt; <a class="code hl_variable" href="namespacetrc_1_1compiler.html#a749e98cf00a40423a86c8e709fb06c23">optimize_number</a>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html"><div class="ttname"><a href="namespacetrc_1_1compiler.html">trc::compiler</a></div><div class="ttdef"><b>Definition:</b> compile_env.cpp:4</div></div>
-<div class="ttc" id="anamespacetrc_1_1compiler_html_a24aca9ce1fc291f2865ef482c55aaeeb"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">trc::compiler::ip</a></div><div class="ttdeci">int(* ip)(const int &amp;, const int &amp;)</div><div class="ttdef"><b>Definition:</b> optimize.h:10</div></div>
+<div class="ttc" id="anamespacetrc_1_1compiler_html_a24aca9ce1fc291f2865ef482c55aaeeb"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a24aca9ce1fc291f2865ef482c55aaeeb">trc::compiler::ip</a></div><div class="ttdeci">int(* ip)(const int &amp;, const int &amp;)</div><div class="ttdef"><b>Definition:</b> optimize.h:11</div></div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html_a749e98cf00a40423a86c8e709fb06c23"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a749e98cf00a40423a86c8e709fb06c23">trc::compiler::optimize_number</a></div><div class="ttdeci">std::map&lt; std::string, ip &gt; optimize_number</div><div class="ttdef"><b>Definition:</b> optimize.cpp:92</div></div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html_aa898db461b91dfbb38d2df4988db1d43"><div class="ttname"><a href="namespacetrc_1_1compiler.html#aa898db461b91dfbb38d2df4988db1d43">trc::compiler::optimize_condit</a></div><div class="ttdeci">std::map&lt; std::string, bp &gt; optimize_condit</div><div class="ttdef"><b>Definition:</b> optimize.cpp:81</div></div>
-<div class="ttc" id="anamespacetrc_1_1compiler_html_ad7e126531ec9020b6a41aa71bbc58642"><div class="ttname"><a href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">trc::compiler::bp</a></div><div class="ttdeci">bool(* bp)(const int &amp;, const int &amp;)</div><div class="ttdef"><b>Definition:</b> optimize.h:12</div></div>
+<div class="ttc" id="anamespacetrc_1_1compiler_html_ad7e126531ec9020b6a41aa71bbc58642"><div class="ttname"><a href="namespacetrc_1_1compiler.html#ad7e126531ec9020b6a41aa71bbc58642">trc::compiler::bp</a></div><div class="ttdeci">bool(* bp)(const int &amp;, const int &amp;)</div><div class="ttdef"><b>Definition:</b> optimize.h:13</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

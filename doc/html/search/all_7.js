@@ -6,7 +6,7 @@ var searchData=
   ['get_5findex_5fof_5fglobalvar_3',['get_index_of_globalvar',['../classtrc_1_1compiler_1_1_compile_environment.html#a749befb50e4620947349e3f1ef22dc90',1,'trc::compiler::CompileEnvironment']]],
   ['get_5findex_5fof_5flocalvar_4',['get_index_of_localvar',['../classtrc_1_1compiler_1_1_compile_environment.html#ac58dfe201340287f01993be4c5c3f10c',1,'trc::compiler::CompileEnvironment']]],
   ['get_5flocal_5fname_5fsize_5',['get_local_name_size',['../classtrc_1_1compiler_1_1_compile_environment.html#a8bb961a0e05e0f330897cd119935a6d4',1,'trc::compiler::CompileEnvironment']]],
-  ['get_5fnode_6',['get_node',['../classtrc_1_1compiler_1_1grammar__lex.html#aa1eb640ee7d8fbc294a5c97aede057e5',1,'trc::compiler::grammar_lex']]],
+  ['get_5fnode_6',['get_node',['../classtrc_1_1compiler_1_1grammar__lex.html#aa1eb640ee7d8fbc294a5c97aede057e5',1,'trc::compiler::grammar_lex::get_node()'],['../classtrc_1_1compiler_1_1grammar__lex.html#aafd7ff7d48ebc70fa61728b539d602ba',1,'trc::compiler::grammar_lex::get_node(const code_type &amp;code)']]],
   ['get_5ftoken_7',['get_token',['../classtrc_1_1compiler_1_1token__lex.html#a0283bc2322315d224156191338a55da5',1,'trc::compiler::token_lex']]],
   ['gettype_8',['gettype',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__map.html#a2897866663c5b1cb61e1c01c4d2c60df',1,'trc::TVM_space::types::trc_map::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#ae48d60e91a3b4f79df9ec2534ca185a0',1,'trc::TVM_space::types::trc_string::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trcobj.html#a959626923a4a5e0294068084ab03e6ac',1,'trc::TVM_space::types::trcobj::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__array.html#a719bf1c3ecbefe5dfe79433a7ba6d630',1,'trc::TVM_space::types::trc_array::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__float.html#ac70f8b19ed0c61be7c263352b2c8cd61',1,'trc::TVM_space::types::trc_float::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__flong.html#aab8aafa8221cc0b95eea270bd9ef6a52',1,'trc::TVM_space::types::trc_flong::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__int.html#a83259a88b649bd2a92db79fce8e446a4',1,'trc::TVM_space::types::trc_int::gettype()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__long.html#ae5d3e39334125b6e31e893e692017580',1,'trc::TVM_space::types::trc_long::gettype()']]],
   ['global_5fmemory_5fpool_9',['global_memory_pool',['../namespacetrc_1_1memory.html#aeb76db46789c7ca12fe4f22bd962ac47',1,'trc::memory']]],
@@ -21,10 +21,11 @@ var searchData=
   ['grammar_5flex_18',['grammar_lex',['../classtrc_1_1compiler_1_1grammar__lex.html#a1fc49c1faf88fdd9422ca26f300f4725',1,'trc::compiler::grammar_lex::grammar_lex()'],['../classtrc_1_1compiler_1_1grammar__lex.html',1,'trc::compiler::grammar_lex']]],
   ['grammar_5ftype_19',['grammar_type',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef',1,'trc::compiler']]],
   ['greater_20',['GREATER',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ae7e72355289e404b762d4cf88824d23b',1,'trc::compiler']]],
-  ['greater_5f_21',['GREATER_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaa168f2f6e595c4e2df4853617f42ff04',1,'TVM.h']]],
-  ['greater_5f_22',['greater_',['../namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9',1,'trc::compiler']]],
+  ['greater_5f_21',['greater_',['../namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9',1,'trc::compiler']]],
+  ['greater_5f_22',['GREATER_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaa168f2f6e595c4e2df4853617f42ff04',1,'TVM.h']]],
   ['greater_5fequal_23',['GREATER_EQUAL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a87e6b203bf40967d37a33f9a4438561a',1,'trc::compiler']]],
-  ['greater_5fequal_5f_24',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
-  ['greater_5fequal_5f_25',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
-  ['green_26',['green',['../namespacetrc_1_1color.html#ab5878987981b385e2e9a7bd6f3523adf',1,'trc::color']]]
+  ['greater_5fequal_5f_24',['greater_equal_',['../namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a',1,'trc::compiler']]],
+  ['greater_5fequal_5f_25',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
+  ['green_26',['GREEN',['../color_8h.html#acfbc006ea433ad708fdee3e82996e721',1,'color.h']]],
+  ['green_27',['green',['../namespacetrc_1_1color.html#ab5878987981b385e2e9a7bd6f3523adf',1,'trc::color']]]
 ];

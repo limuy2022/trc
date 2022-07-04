@@ -401,8 +401,9 @@ token_lex::~token_lex() {
     error_->line = 0;
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
+        char tmpstr[2] = {check_brace.top(),'\0'};
         error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_expect, check_brace.top());
+            language::error::syntaxerror_unmatched_char, tmpstr);
     }
 }
 

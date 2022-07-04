@@ -36,8 +36,7 @@ namespace error {
     const char* syntaxerror_escape_char
         = R"(Escape character % is not defined.)";
     const char* syntaxerror = "invalid syntax.";
-    const char* syntaxerror_more_left_braces = "unmatched '%'";
-    const char* syntaxerror_less_left_braces = "unmatched '%'";
+    const char* syntaxerror_unmatched_char = "unmatched '%'";
 
     const char* asserterror_default = "assert";
     const char* asserterror_user = "%";

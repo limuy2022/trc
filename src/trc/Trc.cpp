@@ -21,7 +21,7 @@
  * @brief 报出找不到模式错误
  */
 static inline void show_error(const char* mode) {
-    trc::color::red("\"%s\"%s", mode, language::trc::mode_not_found);
+    trc::color::red("Trc:\"%s\"%s", mode, language::trc::mode_not_found);
 }
 
 /**

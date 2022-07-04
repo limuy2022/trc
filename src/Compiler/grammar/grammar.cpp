@@ -483,12 +483,7 @@ void grammar_lex::change_to_last_expr(is_not_end_node* head, code_type& code) {
         }
         delete raw_lex;
     }
-    // 测试括号是否正确匹配上
-    if (correct_braces > 0) {
-        // 左小括号过多
-        error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_more_left_braces, "(");
-    }
+    // 无需测试括号是否正确匹配上，这是token的职责
     while (!oper_tmp.empty()) {
         token_ticks tmp = oper_tmp.top();
         head->son.push_back(

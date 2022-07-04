@@ -43,9 +43,9 @@ private:
 
 template <typename... argvs>
 void color_st::operator()(const char* fmt, const argvs&... data) const {
-    printf(this->color);
+    printf("%s", this->color);
     printf(fmt, data...);
-    printf(CLOSE_COLOR);
+    printf("%s", CLOSE_COLOR);
 }
 
 TRC_base_c_api color_st yellow, blue, red, green, white, purple;

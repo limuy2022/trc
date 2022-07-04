@@ -68,17 +68,19 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle"><div class="title">optimize.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="optimize_8h_source.html">Compiler/optimize.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="grammar_8h_source.html">Compiler/grammar.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="optimize_8h_source.html">Compiler/optimize.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">Compiler/pri_compiler.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="data_8hpp_source.html">base/utils/data.hpp</a>&gt;</code><br />
 <code>#include &lt;cmath&gt;</code><br />
+<code>#include &lt;cstring&gt;</code><br />
 <code>#include &lt;<a class="el" href="language_2_error_8h_source.html">language/error.h</a>&gt;</code><br />
-<code>#include &lt;map&gt;</code><br />
-<code>#include &lt;string&gt;</code><br />
+<code>#include &lt;stack&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -87,44 +89,54 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacetrc_1_1compiler"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html">trc::compiler</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a8dae35a7d622b4875c6ff196c539cbb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a8dae35a7d622b4875c6ff196c539cbb1">trc::compiler::add</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a8dae35a7d622b4875c6ff196c539cbb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad27f6fa6fa76eb517a1c73024d9ab4d9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ad27f6fa6fa76eb517a1c73024d9ab4d9">trc::compiler::sub</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:ad27f6fa6fa76eb517a1c73024d9ab4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76bafa800f0976e592763f9da639d9b8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a76bafa800f0976e592763f9da639d9b8">trc::compiler::mul</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a76bafa800f0976e592763f9da639d9b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae995dd4c5d2bf4a68eeb3cec66bb8d68"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ae995dd4c5d2bf4a68eeb3cec66bb8d68">trc::compiler::zdiv_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:ae995dd4c5d2bf4a68eeb3cec66bb8d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8866abe49552ebf108ee6f9cc34bf0d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a8866abe49552ebf108ee6f9cc34bf0d3">trc::compiler::mod</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a8866abe49552ebf108ee6f9cc34bf0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9f44cd14b78703fcc3483278d7f7254"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa9f44cd14b78703fcc3483278d7f7254">trc::compiler::_pow</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:aa9f44cd14b78703fcc3483278d7f7254"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1599338b9df5e011327a2af2dd77eed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ad1599338b9df5e011327a2af2dd77eed">trc::compiler::equal_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:ad1599338b9df5e011327a2af2dd77eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ac103f70f44e6ebe1c9cb60f0eb30d0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a4ac103f70f44e6ebe1c9cb60f0eb30d0">trc::compiler::unequal_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a4ac103f70f44e6ebe1c9cb60f0eb30d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0120a099047bf1e4b4cdcfad48a3ddb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a0120a099047bf1e4b4cdcfad48a3ddb3">trc::compiler::less_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a0120a099047bf1e4b4cdcfad48a3ddb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a042c50c15a918569a1767ae71e2c1de9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a042c50c15a918569a1767ae71e2c1de9">trc::compiler::greater_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a042c50c15a918569a1767ae71e2c1de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe8897f6aac8370c7015d71602edec5a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#abe8897f6aac8370c7015d71602edec5a">trc::compiler::greater_equal_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:abe8897f6aac8370c7015d71602edec5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13285d002b88df3c1ef9dcbb71d9b705"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a13285d002b88df3c1ef9dcbb71d9b705">trc::compiler::less_equal_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a13285d002b88df3c1ef9dcbb71d9b705"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb07fd8d03f393e9813d56b1736c3404"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#abb07fd8d03f393e9813d56b1736c3404">trc::compiler::and_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:abb07fd8d03f393e9813d56b1736c3404"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23d97f6dbdcbda12808b58e3b424d2c9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a23d97f6dbdcbda12808b58e3b424d2c9">trc::compiler::or_</a> (const int &amp;a, const int &amp;b)</td></tr>
-<tr class="separator:a23d97f6dbdcbda12808b58e3b424d2c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:aa898db461b91dfbb38d2df4988db1d43"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, bp &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa898db461b91dfbb38d2df4988db1d43">trc::compiler::optimize_condit</a></td></tr>
-<tr class="separator:aa898db461b91dfbb38d2df4988db1d43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a749e98cf00a40423a86c8e709fb06c23"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, ip &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a749e98cf00a40423a86c8e709fb06c23">trc::compiler::optimize_number</a></td></tr>
-<tr class="separator:a749e98cf00a40423a86c8e709fb06c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:aed226bc08ef8f871d51a4545e420d9bc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#aed226bc08ef8f871d51a4545e420d9bc">DELETE_NODE</a>(l,  n)</td></tr>
+<tr class="memdesc:aed226bc08ef8f871d51a4545e420d9bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除一个节点，同时释放它的内存  <a href="optimize_8cpp.html#aed226bc08ef8f871d51a4545e420d9bc">More...</a><br /></td></tr>
+<tr class="separator:aed226bc08ef8f871d51a4545e420d9bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="aed226bc08ef8f871d51a4545e420d9bc" name="aed226bc08ef8f871d51a4545e420d9bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed226bc08ef8f871d51a4545e420d9bc">&#9670;&nbsp;</a></span>DELETE_NODE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DELETE_NODE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">n&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
+<div class="line">        delete (*n);                                                           \</div>
+<div class="line">        (l)-&gt;son.erase((n));                                                   \</div>
+<div class="line">    } <span class="keywordflow">while</span> (0)</div>
+</div><!-- fragment -->
+<p>删除一个节点，同时释放它的内存 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">l</td><td>node,它的父节点 </td></tr>
+    <tr><td class="paramname">n</td><td>需要删除的子节点的迭代器 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

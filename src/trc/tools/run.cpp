@@ -6,6 +6,7 @@
 #include <TVM/TVM.h>
 #include <base/ctree_loader.h>
 #include <base/utils/filesys.h>
+#include <generated_params.h>
 #include <tools.h>
 
 namespace trc::tools {
@@ -18,7 +19,9 @@ namespace tools_in {
             /*是源文件*/
             std::string scodes;
             utils::readcode(scodes, path);
-            compiler::Compiler(vm, scodes);
+            auto option = generate_compiler_params();
+            compiler::Compiler(vm, scodes, option);
+            delete option;
         }
         vm->reload_data();
         vm->run_all();

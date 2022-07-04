@@ -36,23 +36,14 @@ static void showversion() {
 
 typedef void (*argv_func_tools)();
 
-static const char* tools_func_name[] = {
-    "tdb",
-    "help",
-    "version",
-    "run",
-    "token",
-    "dis",
-    "grammar",
-    "brun",
-    "build",
-};
+static const char* tools_func_name[] = { "tdb", "help", "version", "run",
+    "token", "dis", "grammar", "brun", "build", "style" };
 
-static const argv_func_tools tools_func[]
-    = { trc::tools::tools_out::tdb, trc::tools::tools_out::help, showversion,
-          trc::tools::tools_out::run, trc::tools::tools_out::out_token,
-          trc::tools::tools_out::dis, trc::tools::tools_out::out_grammar,
-          trc::tools::tools_out::brun, trc::tools::tools_out::build };
+static const argv_func_tools tools_func[] = { trc::tools::tools_out::tdb,
+    trc::tools::tools_out::help, showversion, trc::tools::tools_out::run,
+    trc::tools::tools_out::out_token, trc::tools::tools_out::dis,
+    trc::tools::tools_out::out_grammar, trc::tools::tools_out::brun,
+    trc::tools::tools_out::build, trc::tools::tools_out::style };
 
 /**
  * @brief 查找对应工具并运行

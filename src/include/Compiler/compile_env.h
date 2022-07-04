@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <Compiler/compiler_def.h>
+#include <Compiler/pri_compiler.hpp>
+#include <base/Error.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -14,7 +17,7 @@ namespace trc::compiler {
  */
 class CompileEnvironment {
 public:
-    CompileEnvironment();
+    CompileEnvironment(compiler_public_data& compiler_data);
 
     ~CompileEnvironment();
     /**
@@ -29,14 +32,21 @@ public:
 
     /**
      * @brief 获取某个变量在全局符号表中的位置，没有该符号则添加进符号表
+     * @param name 变量名
+     * @param maybe_not_in
+     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_globalvar(const char* name);
+    size_t get_index_of_globalvar(const char* name, bool maybe_not_in);
 
     /**
      * @brief 获取某个变量在局部变量表中的位置，没有该符号则添加进符号表
+     * @param localspace_name 局部空间名，如函数名
+     * @param localvar_name 变量名
+     * @param maybe_not_in
+     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_localvar(
-        const std::string& localspace_name, const char* localvar_name);
+    size_t get_index_of_localvar(const std::string& localspace_name,
+        const char* localvar_name, bool maybe_not_in);
 
 private:
     typedef std::vector<const char*> name_list_t;
@@ -44,5 +54,13 @@ private:
     name_list_t var_names_list_global;
     // 记录局部的变量名
     std::map<std::string, name_list_t> var_names_list_local;
+    // 编译期间要用到的公共数据
+    compiler_public_data& compiler_data;
+
+    /**
+     * @brief 从某列表中查找索引和添加数据
+     */
+    size_t get_index_from_list(
+        const char* name, name_list_t& list, bool maybe_not_in);
 };
 }

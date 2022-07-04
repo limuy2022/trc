@@ -16,6 +16,7 @@ TRC_language_c_api const char* modulenotfounderror;
 TRC_language_c_api const char* keyerror;
 TRC_language_c_api const char* indexerror;
 TRC_language_c_api const char* valueerror;
+TRC_language_c_api const char* operatorerror;
 
 // 对数字和浮点数的解析
 TRC_language_c_api const char* syntaxerror_int;

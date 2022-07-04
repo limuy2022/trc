@@ -8,14 +8,16 @@
 namespace language {
 namespace error {
     // 错误的信息具体定义，$标识待补充
-    const char* error_map[] = { "NameError:", "ValueError:", "SyntaxError:",
-        "VersionError:", "OpenFileError:", "ModuleNotFoundError:",
-        "ArgumentError:", "ZeroDivError:", "RunError:", "AssertError:",
-        "IndexError:", "MemoryError:", "KeyError:", "SystemError:" };
+    const char* error_map[]
+        = { "NameError:", "ValueError:", "SyntaxError:", "VersionError:",
+              "OpenFileError:", "ModuleNotFoundError:", "ArgumentError:",
+              "ZeroDivError:", "RunError:", "AssertError:", "IndexError:",
+              "MemoryError:", "KeyError:", "SystemError:", "OperatorError:" };
 
     const char* error_from = "Error from ";
     const char* error_in_line = "Error in line ";
 
+    // 格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
     const char* nameerror = "name \"%\" is not defined.";
     const char* openfileerror = "Could't open \"%\".";
     const char* versionerror = R"(Could't run them.Because % is higher than %)";
@@ -25,6 +27,7 @@ namespace error {
     const char* keyerror = "Key \"%\" is not defined.";
     const char* indexerror = R"(% is out of %)";
     const char* valueerror = R"("%" could not be "%")";
+    const char* operatorerror = R"(Couldn't use % for types:% and %)";
 
     const char* argumenterror = R"(% need % arguments.)";
 
@@ -36,7 +39,7 @@ namespace error {
     const char* syntaxerror_escape_char
         = R"(Escape character % is not defined.)";
     const char* syntaxerror = "invalid syntax.";
-    const char* syntaxerror_unmatched_char = "unmatched '%'";
+    const char* syntaxerror_unmatched_char = "unmatched '#'";
 
     const char* asserterror_default = "assert";
     const char* asserterror_user = "%";

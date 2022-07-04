@@ -170,6 +170,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memTemplItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">len</a> (T in)</td></tr>
 <tr class="memdesc:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="mdescLeft">&#160;</td><td class="mdescRight">求整型长度  <a href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">More...</a><br /></td></tr>
 <tr class="separator:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058ffcf31536578278ebf06c24fcc5a5"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a058ffcf31536578278ebf06c24fcc5a5"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">match_data</a> (const T &amp;a, const T &amp;b, const T &amp;c, const T &amp;d)</td></tr>
+<tr class="memdesc:a058ffcf31536578278ebf06c24fcc5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">求a,b是否满足与数据相匹配  <a href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">More...</a><br /></td></tr>
+<tr class="separator:a058ffcf31536578278ebf06c24fcc5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplParams" colspan="2">template&lt;typename outtype , typename intype &gt; </td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplItemLeft" align="right" valign="top">outtype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">to_type</a> (const intype &amp;value)</td></tr>
 <tr class="separator:a10fddf0485656e34179e2d7892bdd1cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -737,6 +741,62 @@ template&lt;typename T , typename O &gt; </div>
   </dd>
 </dl>
 
+</div>
+</div>
+<a id="a058ffcf31536578278ebf06c24fcc5a5" name="a058ffcf31536578278ebf06c24fcc5a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a058ffcf31536578278ebf06c24fcc5a5">&#9670;&nbsp;</a></span>match_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trc::utils::match_data </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>c</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>d</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>求a,b是否满足与数据相匹配 </p>
+<div class="fragment"><div class="line">a=1</div>
+<div class="line">b=2</div>
+<div class="line"><a class="code hl_function" href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">match_data</a>(a, b, 1, 2)和mathch_data(a,b,2,1)同样返回true</div>
+<div class="ttc" id="anamespacetrc_1_1utils_html_a058ffcf31536578278ebf06c24fcc5a5"><div class="ttname"><a href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">trc::utils::match_data</a></div><div class="ttdeci">bool match_data(const T &amp;a, const T &amp;b, const T &amp;c, const T &amp;d)</div><div class="ttdoc">求a,b是否满足与数据相匹配</div><div class="ttdef"><b>Definition:</b> data.hpp:210</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a7a0dd10fac9cf560ee5ff75e2bfda3b1" name="a7a0dd10fac9cf560ee5ff75e2bfda3b1"></a>

@@ -37,9 +37,5 @@ void init_mem() {
     // 整型缓存初始化，-5~256
     for (int i = INT_CACHE_BEGIN; i <= INT_CACHE_END; ++i)
         TVM_share::int_cache[i - INT_CACHE_BEGIN].value = i;
-    firsti = MALLOCINT(), secondi = MALLOCINT();
-    firstf = MALLOCFLOAT(), secondf = MALLOCFLOAT();
-    firsts = MALLOCSTRING(), seconds = MALLOCSTRING();
-    firstl = MALLOCLONG(), secondl = MALLOCLONG();
 }
 }

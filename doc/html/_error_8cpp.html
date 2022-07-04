@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Error.cpp File Reference</div></div>
@@ -90,6 +91,11 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacetrc_1_1error_1_1error__env"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error_1_1error__env.html">trc::error::error_env</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a4435ee84c20c3d8616aed8bb27a2975c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_error_8cpp.html#a4435ee84c20c3d8616aed8bb27a2975c">CHECK_AND_REALLOC_ERROR_MSG_STR</a>(will_added_len)</td></tr>
+<tr class="separator:a4435ee84c20c3d8616aed8bb27a2975c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ac007f620f0116efa2ae35e3c611c6198"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error.html#ac007f620f0116efa2ae35e3c611c6198">trc::error::make_error_msg</a> (int error_name, va_list &amp;ap)</td></tr>
@@ -107,9 +113,45 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:aaeab65ad16f08938b35864a7f0d651ce"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error_1_1error__env.html#aaeab65ad16f08938b35864a7f0d651ce">trc::error::error_env::quit</a> = true</td></tr>
-<tr class="separator:aaeab65ad16f08938b35864a7f0d651ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765f0f308309667ffaf7b9fe6f3fdcdd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error_1_1error__env.html#a765f0f308309667ffaf7b9fe6f3fdcdd">trc::error::error_env::quit</a> = true</td></tr>
+<tr class="separator:a765f0f308309667ffaf7b9fe6f3fdcdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6138b8b5d18d635c00961e388e3c9e7"><td class="memItemLeft" align="right" valign="top">jmp_buf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error_1_1error__env.html#ad6138b8b5d18d635c00961e388e3c9e7">trc::error::error_env::error_back_place</a></td></tr>
+<tr class="separator:ad6138b8b5d18d635c00961e388e3c9e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a4435ee84c20c3d8616aed8bb27a2975c" name="a4435ee84c20c3d8616aed8bb27a2975c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4435ee84c20c3d8616aed8bb27a2975c">&#9670;&nbsp;</a></span>CHECK_AND_REALLOC_ERROR_MSG_STR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CHECK_AND_REALLOC_ERROR_MSG_STR</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">will_added_len</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                                           \</div>
+<div class="line">        if (used_size &gt;= finally_out_length) {                                                     \</div>
+<div class="line">            <span class="comment">/* 需要的内存已经超过了申请的，之所以是等于，是因为还有\0 */</span> \</div>
+<div class="line">            <span class="comment">/* 多申请5个作预留 */</span>                                                           \</div>
+<div class="line">            finally_out_length += (will_added_len) + 5;                                            \</div>
+<div class="line">            finally_out = (<span class="keywordtype">char</span>*)realloc(finally_out, finally_out_length);                         \</div>
+<div class="line">            if (finally_out == <span class="keyword">nullptr</span>) {                                                          <a class="code hl_function" href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">\</a></div>
+<div class="line"><a class="code hl_function" href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">                error::send_error</a>(                                                                 \</div>
+<div class="line">                    <a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68">error::MemoryError</a>, <a class="code hl_variable" href="namespacelanguage_1_1error.html#a6481a04a2fb22974ddaf3f07d8f31bd8">language::error::memoryerror</a>);                             \</div>
+<div class="line">            }                                                                                      \</div>
+<div class="line">        }                                                                                          \</div>
+<div class="line">    } <span class="keywordflow">while</span> (0)</div>
+<div class="ttc" id="anamespacelanguage_1_1error_html_a6481a04a2fb22974ddaf3f07d8f31bd8"><div class="ttname"><a href="namespacelanguage_1_1error.html#a6481a04a2fb22974ddaf3f07d8f31bd8">language::error::memoryerror</a></div><div class="ttdeci">TRC_language_c_api const char * memoryerror</div><div class="ttdef"><b>Definition:</b> error.h:13</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68">trc::error::MemoryError</a></div><div class="ttdeci">@ MemoryError</div><div class="ttdef"><b>Definition:</b> Error.h:44</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_af76c99f76fbc24d063de5b3920fce5b6"><div class="ttname"><a href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:102</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -4,10 +4,12 @@
  */
 
 #include <Compiler/Compiler.h>
+#include <Compiler/compiler_def.h>
 #include <TVM/TVM.h>
 #include <TVM/memory.h>
 #include <base/Error.h>
 #include <base/io.hpp>
+#include <csetjmp>
 #include <cstdio>
 #include <string>
 
@@ -63,8 +65,8 @@ namespace tools::tools_out {
         // tshell报错但不终止程序
         error::error_env::quit = false;
         // 先传入空代码获取对象
-        compiler::detail_compiler* info_saver
-            = compiler::Compiler(vm, "", nullptr, true);
+        compiler::detail_compiler* info_saver = compiler::Compiler(
+            vm, "", &compiler::nooptimize_option, nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -76,14 +78,18 @@ namespace tools::tools_out {
                 get_block(code_str);
             }
             vm->static_data.byte_codes.clear();
-            compiler::Compiler(vm, code_str, info_saver, false);
-            vm->reload_data();
-            vm->run_all();
+            // 设置好报错时返回到的地址
+            if (!setjmp(error::error_env::error_back_place)) {
+                compiler::Compiler(vm, code_str, &compiler::nooptimize_option,
+                    info_saver, false);
+                vm->reload_data();
+                vm->run_all();
+            }
         }
         free(code);
         info_saver->free_detail_compiler();
         delete vm;
-
+        // 还原设置
         error::error_env::quit = true;
     }
 }

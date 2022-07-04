@@ -1,6 +1,9 @@
 ﻿#include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
+#include <Compiler/grammar_env.h>
+#include <Compiler/optimize.h>
 #include <Compiler/pri_compiler.hpp>
+#include <Compiler/token.h>
 #include <array>
 #include <base/Error.h>
 #include <base/func_loader.h>
@@ -13,90 +16,12 @@
 #include <vector>
 
 namespace trc::compiler {
-/**
- * @brief
- * 关于对象的代码转换为节点以及对象信息保存和识别
- * @details
- * 其实就相当于编译时的解释器，负责解析代码并把变量的作用域和类型做出标识，用于各种判断
- */
-class grammar_data_control {
-public:
-    /**
-     * @brief 编译从map或者从array中取值的代码
-     * @param head 头节点
-     * @param code 读取对象代码
-     */
-    void compile_get_value(treenode* head, const vecs& code);
-
-    /**
-     * @brief 编译从map或者从array中创建对象的代码
-     * @param head 根节点指针
-     * @param code 创建对象代码
-     */
-    void compile_create_obj(treenode* head, const vecs& code);
-
-    ~grammar_data_control();
-
-private:
-    // 保存数组的vector
-    vecs array_list;
-
-    // 保存map的vector，用于转成符号表索引
-    vecs map_list;
-
-    // 由于map和array获取值的方式相同但是生成的字节码不同，需要在定义时予以区分
-
-    /**
-     * @brief 生成从数组中获取值的节点
-     */
-    void array_get_value(treenode* head);
-
-    /**
-     * @brief 生成创建数组的节点
-     */
-    void create_array(treenode* head, const vecs& code);
-
-    /**
-     * @brief 生成从map中获取值的节点
-     */
-    void map_get_value(treenode* head);
-
-    /**
-     * @brief 生成创建map的节点
-     */
-    void create_map(treenode* head, const vecs& code);
-};
-
-void grammar_data_control::array_get_value(treenode* head) {
-}
-
-void grammar_data_control::create_array(treenode* head, const vecs& code) {
-}
-
-void grammar_data_control::map_get_value(treenode* head) {
-}
-
-void grammar_data_control::create_map(treenode* head, const vecs& code) {
-}
-
-void grammar_data_control::compile_get_value(treenode* head, const vecs& code) {
-}
-
-void grammar_data_control::compile_create_obj(
-    treenode* head, const vecs& code) {
-}
-
-grammar_data_control::~grammar_data_control() {
-    array_list.clear();
-    map_list.clear();
-}
-
 grammar_lex::~grammar_lex() {
     delete env;
 }
 
-void grammar_lex::assign(is_not_end_node* head, trc::compiler::token_ticks oper,
-    const code_type& code) {
+treenode* grammar_lex::assign(
+    trc::compiler::token_ticks oper, const code_type& code) {
     // 申请新的树节点
     auto ass
         = new trc::compiler::node_base_tick(grammar_type::VAR_DEFINE, oper);
@@ -108,12 +33,11 @@ void grammar_lex::assign(is_not_end_node* head, trc::compiler::token_ticks oper,
     } else {
         NOREACH;
     }
-    // 父节点留下子节点记录
-    head->connect(ass);
     // 保存变量名
     ass->connect(name);
     // 存放等号右边的值
     ass->connect(get_node());
+    return ass;
 }
 
 treenode* grammar_lex::callfunction(const code_type& funcname) {
@@ -157,8 +81,8 @@ treenode* grammar_lex::callfunction(const code_type& funcname) {
     }
 }
 
-void grammar_lex::sentence_tree(
-    node_base_tick* head, token_ticks sentence_name) {
+treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
+    auto head = new node_base_tick(grammar_type::TREE, sentence_name);
     size_t argc = 0;
 
     token* now = token_way->get_token();
@@ -166,7 +90,7 @@ void grammar_lex::sentence_tree(
         head->type = grammar_type::OPCODE;
         head->tick = sentence_name;
         delete now;
-        return;
+        return head;
     }
     token_way->unget_token(now);
 
@@ -176,7 +100,7 @@ void grammar_lex::sentence_tree(
         head->type = grammar_type::OPCODE_ARGV;
         auto* argv = get_node();
         head->connect(argv);
-        return;
+        return head;
     }
 
     while (true) {
@@ -198,16 +122,18 @@ void grammar_lex::sentence_tree(
     auto len = new node_base_int_without_sons(argc);
     head->connect(argv_node);
     head->connect(len);
+    return head;
 }
 
-void grammar_lex::while_loop_tree(is_not_end_node* head) {
+treenode* grammar_lex::while_loop_tree() {
+    auto head = new is_not_end_node;
     auto while_argv
         = new node_base_tick(grammar_type::OPCODE_ARGV, token_ticks::WHILE);
     // 条件表达式
     head->connect(get_node());
     head->connect(while_argv);
     token* token_data;
-    size_t while_start_line = error_->line;
+    size_t while_start_line = compiler_data.error.line;
     for (;;) {
         token_data = token_way->get_token();
         if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
@@ -219,7 +145,8 @@ void grammar_lex::while_loop_tree(is_not_end_node* head) {
         }
     }
     // 如果条件不满足，调到goto语句之后出循环
-    auto data_node = new node_base_int_without_sons(error_->line + 1);
+    auto data_node
+        = new node_base_int_without_sons(compiler_data.error.line + 1);
     while_argv->connect(data_node);
 
     auto* goto_while_line
@@ -227,9 +154,11 @@ void grammar_lex::while_loop_tree(is_not_end_node* head) {
     auto line_node = new node_base_int_without_sons(while_start_line);
     goto_while_line->connect(line_node);
     head->connect(goto_while_line);
+    return head;
 }
 
-void grammar_lex::if_tree(is_not_end_node* head) {
+treenode* grammar_lex::if_tree() {
+    auto head = new is_not_end_node;
     auto* if_with_argv
         = new node_base_tick(grammar_type::OPCODE_ARGV, token_ticks::IF);
     // 条件表达式
@@ -246,11 +175,13 @@ void grammar_lex::if_tree(is_not_end_node* head) {
             head->connect(get_node());
         }
     }
-    auto* data_node = new node_base_int_without_sons(error_->line);
+    auto* data_node = new node_base_int_without_sons(compiler_data.error.line);
     if_with_argv->connect(data_node);
+    return head;
 }
 
-void grammar_lex::func_define(is_not_end_node* head) {
+treenode* grammar_lex::func_define() {
+    auto head = new is_not_end_node;
     auto name = check_excepted(token_ticks::NAME);
     auto* func_node = new node_base_data(grammar_type::FUNC_DEFINE, name->data);
     delete name;
@@ -258,6 +189,7 @@ void grammar_lex::func_define(is_not_end_node* head) {
 
     func_node->connect(line_node);
     head->connect(func_node);
+    return head;
 }
 
 treenode* make_data_node(const code_type& got_tokens) {
@@ -305,7 +237,6 @@ token* grammar_lex::get_token_from_token_lex::get_token() {
 }
 
 token* grammar_lex::get_token_from_data::get_token() {
-
     if (index < data->size()) {
         token* res = data->operator[](index);
         index++;
@@ -346,15 +277,13 @@ treenode* grammar_lex::get_node(const code_type& code) {
 
 treenode* grammar_lex::get_node_interal() {
     trc::compiler::token* now;
-    do {
-        now = token_way->get_token();
-        if (now->tick == token_ticks::END_OF_LINE) {
-            delete now;
-            continue;
-        } else {
-            break;
-        }
-    } while (1);
+reget:
+    now = token_way->get_token();
+    if (now->tick == token_ticks::END_OF_LINE) {
+        delete now;
+        goto reget;
+    }
+
     if (now->tick == trc::compiler::token_ticks::END_OF_TOKENS) {
         delete now;
         return nullptr;
@@ -367,7 +296,7 @@ treenode* grammar_lex::get_node_interal() {
             now = token_way->get_token();
             if (is_end_token(now->tick)) {
                 /*匹配到结尾还没有匹配到，一定是数据*/
-                delete now;
+                token_way->unget_token(now);
                 return make_data_node(got_tokens);
             } else if (now->tick == token_ticks::RIGHT_SMALL_BRACE) {
                 token_way->unget_token(now);
@@ -375,16 +304,14 @@ treenode* grammar_lex::get_node_interal() {
             }
             if (is_as_token(now->tick)) {
                 /*赋值语句*/
-                auto head = new is_not_end_node;
-                assign(head, now->tick, got_tokens);
+                treenode* res = assign(now->tick, got_tokens);
                 delete now;
-                return head;
+                memory::free_array_obj(got_tokens);
+                return res;
             } else if (is_cal_token(now->tick) || is_condit_token(now->tick)) {
                 /*表达式*/
-                auto head = new is_not_end_node(grammar_type::EXPR);
                 token_way->unget_token(now);
-                change_to_last_expr(head, got_tokens);
-                return head;
+                return change_to_last_expr(got_tokens);
             } else if (now->tick == token_ticks::LEFT_SMALL_BRACE) {
                 /*函数调用*/
                 delete now;
@@ -394,36 +321,46 @@ treenode* grammar_lex::get_node_interal() {
     }
     if (is_sentence_token(now->tick)) {
         // 语句
-        auto head = new node_base_tick(grammar_type::TREE, now->tick);
-        sentence_tree(head, now->tick);
+        auto res = sentence_tree(now->tick);
         delete now;
-        return head;
+        return res;
     }
     if (is_blocked_token(now->tick)) {
-        auto head = new is_not_end_node;
-        if (now->tick == token_ticks::WHILE) {
-            while_loop_tree(head);
-        } else if (now->tick == token_ticks::IF) {
-            if_tree(head);
-        } else if (now->tick == token_ticks::FUNC) {
-            func_define(head);
+        treenode* res;
+        switch (now->tick) {
+        case token_ticks::WHILE: {
+            res = while_loop_tree();
+            break;
+        }
+        case token_ticks::IF: {
+            res = if_tree();
+            break;
+        }
+        case token_ticks::FUNC: {
+            res = func_define();
+            break;
+        }
+        default: {
+            NOREACH;
+        }
         }
         delete now;
-        return head;
+        return res;
     }
-    error_->send_error_module(error::SyntaxError, language::error::syntaxerror);
+    compiler_data.error.send_error_module(
+        error::SyntaxError, language::error::syntaxerror);
     return nullptr;
 }
 
 grammar_lex::grammar_lex(
-    const std::string& codes_str, trc::compiler::compiler_error* error_)
-    : error_(error_)
+    const std::string& codes_str, compiler_public_data& compiler_data)
+    : compiler_data(compiler_data)
     , env(new trc::compiler::grammar_data_control)
-    , token_(codes_str, error_) {
+    , token_(codes_str, compiler_data) {
 }
 
 void grammar_lex::ConvertDataToExpressions(token* raw_lex,
-    std::vector<treenode*>& st, std::stack<token_ticks>& oper_tmp,
+    decltype(is_not_end_node::son)& st, std::stack<token_ticks>& oper_tmp,
     int& correct_braces) {
     // 运用了很基础的将中缀表达式转为后缀表达式的技术
     token_ticks quicktmp;
@@ -462,16 +399,66 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
     oper_tmp.push(raw_lex->tick);
 }
 
-void grammar_lex::change_to_last_expr(is_not_end_node* head, code_type& code) {
+void grammar_lex::check_expr(is_not_end_node* root) {
+    std::stack<treenode*> check_struct;
+    for (auto i = root->son.begin(), n = root->son.end(); i != n; ++i) {
+        if ((*i)->type == grammar_type::OPCODE) {
+            // 运算符
+            treenode* a = check_struct.top();
+            check_struct.pop();
+            treenode* b = check_struct.top();
+            check_struct.pop();
+            auto t1 = a->type, t2 = b->type;
+            if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
+                // 变量类型不确定，没有检查的意义
+                continue;
+            }
+            if (!(is_no_var_data_node(t1) && is_no_var_data_node(t2))) {
+                // 非基础类型，todo:支持类和操作符重载后，非基础类型也要支持表达式检查，记得把优化器的非基础表达式检查加上
+                continue;
+            }
+            // 类型检查比较简单，检查字符型的运算就可以了
+            // 数字与字符串只能允许乘法运算
+            if (t1 == grammar_type::STRING && is_number_class_node(t2)) {
+                if (((node_base_tick_without_sons*)root)->tick
+                    != token_ticks::MUL) {
+                    compiler_data.error.send_error_module(
+                        OPERERROR_MSG(t1, t2, *i));
+                }
+                if (t1 != grammar_type::NUMBER) {
+                    compiler_data.error.send_error_module(
+                        OPERERROR_MSG(t1, t2, *i));
+                }
+            } else if (t2 == grammar_type::STRING && is_number_class_node(t2)) {
+                if (((node_base_tick_without_sons*)root)->tick
+                    != token_ticks::MUL) {
+                    compiler_data.error.send_error_module(
+                        OPERERROR_MSG(t1, t2, *i));
+                }
+                if (t2 != grammar_type::NUMBER) {
+                    compiler_data.error.send_error_module(
+                        OPERERROR_MSG(t1, t2, *i));
+                }
+            }
+        } else {
+            check_struct.push(*i);
+        }
+    }
+}
+
+#undef OPERERROR
+
+treenode* grammar_lex::change_to_last_expr(code_type& code) {
+    auto head = new is_not_end_node(grammar_type::EXPR);
     std::stack<token_ticks> oper_tmp;
     head->son.push_back(get_node(code));
     memory::free_array_obj(code);
-    // 1.为了检测括号是否正确匹配2.防止吞了别的语句的括号如函数
+    // 防止吞了别的语句的括号如函数,记录括号对数
     int correct_braces = 0;
     for (;;) {
         trc::compiler::token* raw_lex = token_way->get_token();
         if (is_end_token(raw_lex->tick)) {
-            delete raw_lex;
+            token_way->unget_token(raw_lex);
             break;
         }
         ConvertDataToExpressions(raw_lex, head->son, oper_tmp, correct_braces);
@@ -483,13 +470,23 @@ void grammar_lex::change_to_last_expr(is_not_end_node* head, code_type& code) {
         }
         delete raw_lex;
     }
-    // 无需测试括号是否正确匹配上，这是token的职责
+    // 无需测试括号是否正确匹配上，这是token_lex的职责
     while (!oper_tmp.empty()) {
         token_ticks tmp = oper_tmp.top();
         head->son.push_back(
             new node_base_tick_without_sons(grammar_type::OPCODE, tmp));
         oper_tmp.pop();
     }
+
+    // 此处已经成功且正确生成后缀表达式，在此检查参数判断是否进行常量折叠
+    if (compiler_data.option->optimize) {
+        // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型
+        optimize_expr(head);
+    } else {
+        // 不进行优化，就要额外进行类型检查
+        check_expr(head);
+    }
+    return head;
 }
 
 token* grammar_lex::check_excepted(token_ticks tick) {
@@ -497,7 +494,7 @@ token* grammar_lex::check_excepted(token_ticks tick) {
     if (res->tick != tick) {
         auto out_error_msg = res->data;
         delete res;
-        error_->send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module(error::SyntaxError,
             language::error::syntaxerror_no_expect, out_error_msg.c_str());
         return nullptr;
     } else {

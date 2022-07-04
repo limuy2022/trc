@@ -106,6 +106,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a49becb5b09fbfe9a51a7cb62c0a43f24">KeyError</a>
 , <a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211">SystemError</a>
+, <a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964">OperatorError</a>
 <br />
  }</td></tr>
 <tr class="separator:a2ce0d1f9b0a271e0d62ef5989882f1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,6 +153,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68" name="a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68"></a>MemoryError&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a2ce0d1f9b0a271e0d62ef5989882f1a1a49becb5b09fbfe9a51a7cb62c0a43f24" name="a2ce0d1f9b0a271e0d62ef5989882f1a1a49becb5b09fbfe9a51a7cb62c0a43f24"></a>KeyError&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211" name="a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211"></a>SystemError&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964" name="a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964"></a>OperatorError&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -228,8 +230,8 @@ Functions</h2></td></tr>
     <tr><td class="paramname">name</td><td>错误名 </td></tr>
     <tr><td class="paramname">可变参数：const</td><td>char* 类型的字符串 <div class="fragment"><div class="line"> <a class="code hl_function" href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">error::send_error</a>(<a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">error::ValueError</a>, <span class="stringliteral">&quot;%</span></div>
 <div class="line"><span class="stringliteral">can&#39;t be %&quot;</span>, <span class="stringliteral">&quot;int&quot;</span>, <span class="stringliteral">&quot;string&quot;</span>)</div>
-<div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">trc::error::ValueError</a></div><div class="ttdeci">@ ValueError</div><div class="ttdef"><b>Definition:</b> Error.h:20</div></div>
-<div class="ttc" id="anamespacetrc_1_1error_html_af76c99f76fbc24d063de5b3920fce5b6"><div class="ttname"><a href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:79</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">trc::error::ValueError</a></div><div class="ttdeci">@ ValueError</div><div class="ttdef"><b>Definition:</b> Error.h:34</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_af76c99f76fbc24d063de5b3920fce5b6"><div class="ttname"><a href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:102</div></div>
 </div><!-- fragment --> </td></tr>
   </table>
   </dd>
@@ -278,7 +280,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>输出报错信息 </p>
-<dl class="section warning"><dt>Warning</dt><dd>不接收可变参数，接受已经处理好的报错信息和数据 </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>不接收可变参数，接受已经处理好的报错信息和数据 注:格式化报错信息，规则：代表插入的是字符串，#代表插入的是字符 </dd></dl>
 
 </div>
 </div>

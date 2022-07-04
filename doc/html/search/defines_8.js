@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['purple_0',['PURPLE',['../color_8h.html#a0bb0b009e7a7390473ace4d98bd843c0',1,'color.h']]]
+  ['noreach_0',['NOREACH',['../trcdef_8h.html#a6f38405f5305de77c9298910b151cdb4',1,'trcdef.h']]]
 ];

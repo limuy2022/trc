@@ -10,9 +10,11 @@
 
 #include <Compiler/library.h>
 #include <array>
+#include <base/Error.h>
 #include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <cctype>
+#include <list>
 #include <string>
 
 namespace trc::compiler {
@@ -103,15 +105,15 @@ enum class grammar_type {
     NUMBER,
     // 浮点型节点
     FLOAT,
-    //字符串型节点
-    STRING,
     // 长整型节点
     LONG_INT,
     // 长浮点型节点
     LONG_FLOAT,
+    //字符串型节点
+    STRING,
     // 变量名节点
     VAR_NAME,
-    // 描述一行条件表达式或者运算符表达式
+    // 描述一件表达式或者运算符表达式
     EXPR
 };
 
@@ -138,7 +140,7 @@ public:
 
     is_not_end_node() = default;
 
-    std::vector<treenode*> son;
+    std::list<treenode*> son;
 
     void connect(treenode* son_node);
 
@@ -276,25 +278,57 @@ inline bool is_english(char c) {
 }
 
 /**
- * @brief 用于返回优先级的类
- * @warning 只有一个实例
+ * @brief 适用于相邻的多个元素访问，使用方法同map
  * @details
- * 为什么不直接使用map？很简单，因为map在这里太笨重了
+ * 为什么不直接使用map？很简单，因为map在这里太笨重了,相当于一种优化
+ * @tparam T 值的类型
+ * @tparam index_t 索引的类型，因为可能是枚举类
  */
-class cal_priority_class {
+template <typename T, typename index_t> class next_order_map {
 public:
-    int operator[](token_ticks tick) const;
+    /**
+     * @brief 访问元素
+     * @param index 索引
+     */
+    T& operator[](index_t index) const;
+
+    /**
+     * @param map_ 数据表
+     * @param begin 比较的基准
+     */
+    next_order_map(T* map_, index_t begin);
 
 private:
-    static const int map_[];
+    // 储存数据的表
+    T* map_;
+
+    // 比较的基准
+    const size_t begin;
 };
 
-extern const cal_priority_class cal_priority;
+template <typename T, typename index_t>
+T& next_order_map<T, index_t>::operator[](index_t index) const {
+    return map_[(size_t)index - begin];
+}
 
+template <typename T, typename index_t>
+next_order_map<T, index_t>::next_order_map(T* map_, index_t begin)
+    : map_(map_)
+    , begin((size_t)begin) {
+}
+
+// 用于获取运算符(条件运算符)优先级
+extern const next_order_map<int, token_ticks> cal_priority;
+// 用于对应grammar_type标识到字符串名称的表，便于报错
+extern const next_order_map<const char*, grammar_type> str_grammar_type_cal_map;
+// 用于对应token_ticks标识到字符串名称的表，便于报错
+extern const next_order_map<const char*, token_ticks> str_token_ticks_cal_map;
+
+/**
+ * @brief token
+ * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
+ */
 struct token {
-    /**
-     * 一个完整的token包括标识和值两部分
-     */
     // 标识
     token_ticks tick;
     // 值
@@ -303,7 +337,6 @@ struct token {
 
 /**
  * @brief 判断枚举值是否是可运算的
- * @param tick token
  */
 inline bool is_cal_value(token_ticks tick) {
     return utils::inrange(token_ticks::NAME, token_ticks::INT_VALUE, tick);
@@ -311,7 +344,6 @@ inline bool is_cal_value(token_ticks tick) {
 
 /**
  * @brief 判断token是否是=或:=
- * @param tick token
  */
 inline bool is_as_token(token_ticks tick) {
     return utils::inrange(token_ticks::ASSIGN, token_ticks::STORE, tick);
@@ -319,7 +351,6 @@ inline bool is_as_token(token_ticks tick) {
 
 /**
  * @brief 判断是不是条件运算符token
- * @param tick token
  */
 inline bool is_condit_token(token_ticks tick) {
     return utils::inrange(token_ticks::AND, token_ticks::GREATER_EQUAL, tick);
@@ -327,7 +358,6 @@ inline bool is_condit_token(token_ticks tick) {
 
 /**
  * @brief 判断是不是运算符token
- * @param tick token
  */
 inline bool is_cal_token(token_ticks tick) {
     return utils::inrange(token_ticks::ADD, token_ticks::POW, tick);
@@ -335,7 +365,6 @@ inline bool is_cal_token(token_ticks tick) {
 
 /**
  * @brief 判断是不是语句token
- * @param tick token
  */
 inline bool is_sentence_token(token_ticks tick) {
     return utils::inrange(token_ticks::IMPORT, token_ticks::ASSERT, tick);
@@ -357,9 +386,6 @@ inline bool is_const_value(token_ticks tick) {
 
 /**
  * @brief 判断是否为左值
- * @param tick
- * @return true
- * @return false
  */
 inline bool is_left_value(token_ticks tick) {
     return tick == token_ticks::NAME;
@@ -367,16 +393,32 @@ inline bool is_left_value(token_ticks tick) {
 
 /**
  * @brief 判断是否为\n或\0符号
- * @param tick
- * @return true
- * @return false
  */
 inline bool is_end_token(token_ticks tick) {
     return tick == token_ticks::END_OF_TOKENS
         || tick == token_ticks::END_OF_LINE;
 }
 
+/**
+ * @brief 判断是不是会引起语句块的节点
+ */
 inline bool is_blocked_token(token_ticks tick) {
-    return utils::inrange(tick, token_ticks::FOR, token_ticks::CLASS);
+    return utils::inrange(token_ticks::FOR, token_ticks::CLASS, tick);
+}
+
+/**
+ * @brief 判断是不是数据节点
+ */
+inline bool is_no_var_data_node(grammar_type node_type) {
+    return utils::inrange(
+        grammar_type::NUMBER, grammar_type::STRING, node_type);
+}
+
+/**
+ * @brief 判断是不是数字类型的节点，浮点数，整型，长整型等都算在内
+ */
+inline bool is_number_class_node(grammar_type node_type) {
+    return utils::inrange(
+        grammar_type::NUMBER, grammar_type::LONG_FLOAT, node_type);
 }
 }

@@ -3,6 +3,7 @@
  */
 
 #include <Compiler/Compiler.h>
+#include <Compiler/compiler_def.h>
 #include <Compiler/grammar.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
@@ -59,8 +60,9 @@ namespace tools_in {
         std::string file_data;
         utils::readcode(file_data, path);
 
-        compiler::compiler_error error_(path);
-        compiler::grammar_lex grammar_t(file_data, &error_);
+        compiler::compiler_public_data compiler_data { path,
+            &compiler::nooptimize_option };
+        compiler::grammar_lex grammar_t(file_data, compiler_data);
 
         printf("From file %s:\n", path.c_str());
 

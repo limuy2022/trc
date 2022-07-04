@@ -1,5 +1,6 @@
 ﻿#include <Compiler/Compiler.h>
 #include <Compiler/pri_compiler.hpp>
+#include <Compiler/token.h>
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_long.h>
 #include <base/Error.h>
@@ -66,7 +67,7 @@ void token_lex::lex_string(token* result) {
                 break;
             }
             default: {
-                error_->send_error_module(error::SyntaxError,
+                compiler_data.error.send_error_module(error::SyntaxError,
                     language::error::syntaxerror_escape_char);
             }
             }
@@ -77,7 +78,7 @@ void token_lex::lex_string(token* result) {
         get_next_char();
         if (end_of_lex()) {
             // 读到文件末尾了，说明字符串解析错误
-            error_->send_error_module(
+            compiler_data.error.send_error_module(
                 error::SyntaxError, language::error::syntaxerror_lexstring);
         }
     }
@@ -174,7 +175,7 @@ void token_lex::check_expected_char(char expected_char) {
     get_next_char();
     if (*char_ptr != expected_char) {
         char err_tmp[] = { *char_ptr, '\0' };
-        error_->send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module(error::SyntaxError,
             language::error::syntaxerror_no_expect, err_tmp);
     }
 }
@@ -253,12 +254,13 @@ void token_lex::lex_others(token* result) {
                             break;
                         } else if (*char_ptr == '\n') {
                             // 跨行注释也需要更新行号
-                            error_->line++;
+                            compiler_data.error.line++;
                         }
                     }
                     if (end_of_lex()) {
                         // 注释未结尾，报错
-                        error_->send_error_module(error::SyntaxError,
+                        compiler_data.error.send_error_module(
+                            error::SyntaxError,
                             language::error::syntaxerror_lexanno);
                     }
                     get_next_char();
@@ -284,7 +286,7 @@ void token_lex::lex_others(token* result) {
     case ')': {
         result->tick = token_ticks::RIGHT_SMALL_BRACE;
         if (check_brace.top() != '(') {
-            error_->send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, ")");
         }
         check_brace.pop();
@@ -298,7 +300,7 @@ void token_lex::lex_others(token* result) {
     case ']': {
         result->tick = token_ticks::RIGHT_MID_BRACE;
         if (check_brace.top() != '[') {
-            error_->send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "]");
         }
         check_brace.pop();
@@ -312,7 +314,7 @@ void token_lex::lex_others(token* result) {
     case '}': {
         result->tick = token_ticks::RIGHT_BIG_BRACE;
         if (check_brace.top() != '{') {
-            error_->send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "}");
         }
         check_brace.pop();
@@ -329,7 +331,7 @@ void token_lex::lex_others(token* result) {
     default: {
         // 如果一个字符都没有匹配到，报错
         char error_tmp[2] = { *char_ptr, '\0' };
-        error_->send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module(error::SyntaxError,
             language::error::syntaxerror_no_expect, error_tmp);
     }
     }
@@ -350,7 +352,7 @@ token* token_lex::get_token() {
     auto* result = new token;
     if (*char_ptr == '\n') {
         // 加一行
-        error_->line++;
+        compiler_data.error.line++;
         result->tick = token_ticks::END_OF_LINE;
         get_next_char();
         return result;
@@ -391,20 +393,20 @@ token* token_lex::get_token() {
     return result;
 }
 
-token_lex::token_lex(const std::string& code, compiler_error* error_)
-    : error_(error_)
+token_lex::token_lex(
+    const std::string& code, compiler_public_data& compiler_data)
+    : compiler_data(compiler_data)
     , rawcode(code)
     , char_ptr(rawcode.c_str()) {
 }
 
 token_lex::~token_lex() {
-    error_->line = 0;
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
-        char tmpstr[2] = {check_brace.top(),'\0'};
-        error_->send_error_module(error::SyntaxError,
-            language::error::syntaxerror_unmatched_char, tmpstr);
+        compiler_data.error.send_error_module(error::SyntaxError,
+            language::error::syntaxerror_unmatched_char, check_brace.top());
     }
+    compiler_data.error.line = 0;
 }
 
 void token_lex::get_next_char() noexcept {

@@ -1,100 +1,91 @@
-﻿/**
- * 常量折叠：加减乘除模运算
- */
-
+﻿#include <Compiler/grammar.h>
 #include <Compiler/optimize.h>
+#include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
+#include <base/utils/data.hpp>
 #include <cmath>
+#include <cstring>
 #include <language/error.h>
-#include <map>
-#include <string>
+#include <stack>
 
-// 关于数字的常量折叠
+/**
+ * @brief 删除一个节点，同时释放它的内存
+ * @param l node,它的父节点
+ * @param n 需要删除的子节点的迭代器
+ */
+#define DELETE_NODE(l, n)                                                      \
+    do {                                                                       \
+        delete (*n);                                                           \
+        (l)->son.erase((n));                                                   \
+    } while (0)
+
 namespace trc::compiler {
-int add(const int& a, const int& b) {
-    return a + b;
+// todo:加上长整型和长浮点型的常量折叠,转换等功能
+// todo:加上条件表达式的常量折叠功能
+void grammar_lex::optimize_expr(is_not_end_node* expr) {
+    // 方法很简单，首先模拟执行过程，如果都是同种数据就进行运算压栈，不同种数据或者有变量就原封不动放入栈，一边在栈中模拟运算一边修改节点值
+    std::stack<decltype(expr->son)::iterator> cal_struct;
+    for (auto i = expr->son.begin(), n = expr->son.end(); i != n; ++i) {
+        if ((*i)->type == grammar_type::OPCODE) {
+            // 运算符
+            auto a = cal_struct.top();
+            cal_struct.pop();
+            auto b = cal_struct.top();
+            cal_struct.pop();
+            auto t1 = (*a)->type, t2 = (*b)->type;
+            if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
+                // 有一个是变量就无法优化，todo:通过上文进行值推测进行变量优化
+                // todo:对于也要变量进行检查，检查是否支持该运算符操作等
+                continue;
+            }
+            // 多种情况判断优化
+            // 当类型相等可以直接优化
+            if (t1 == t2) {
+                switch (t1) {
+                case grammar_type::NUMBER: {
+                    // 优化执行过程，释放b点，以a点作为新的节点，避免多余的分配和释放
+                    ((node_base_int_without_sons*)*a)->value
+                        += ((node_base_int_without_sons*)*b)->value;
+                    DELETE_NODE(expr, b);
+                    break;
+                }
+                case grammar_type::STRING: {
+                    auto atmp = (node_base_string_without_sons*)*a,
+                         btmp = (node_base_string_without_sons*)*b;
+                    size_t astrlen = strlen(atmp->data);
+                    atmp->data = (char*)realloc(atmp->data,
+                        sizeof(char) * (astrlen + strlen(btmp->data) + 1));
+                    strcpy(atmp->data + astrlen, btmp->data);
+                    DELETE_NODE(expr, b);
+                    break;
+                }
+                case grammar_type::FLOAT: {
+                    ((node_base_float_without_sons*)*a)->value
+                        += ((node_base_float_without_sons*)*b)->value;
+                    DELETE_NODE(expr, b);
+                    break;
+                }
+                }
+            } else {
+                // 否则考虑提升类型
+                // todo:列举出所有的提升方案,优化该方案的写法使其更加简洁可读
+                // 这两种都是整型配浮点型
+                if (t1 == grammar_type::FLOAT && t2 == grammar_type::NUMBER) {
+
+                } else if (t1 == grammar_type::NUMBER
+                    && t2 == grammar_type::FLOAT) {
+
+                } else {
+                    // 类型不符合，报错
+                    compiler_data.error.send_error_module(
+                        OPERERROR_MSG(t1, t2, *i));
+                }
+            }
+            DELETE_NODE(expr, i);
+        } else {
+            // 数据
+            cal_struct.push(i);
+        }
+    }
 }
-
-int sub(const int& a, const int& b) {
-    return a - b;
-}
-
-int mul(const int& a, const int& b) {
-    return a * b;
-}
-
-int zdiv_(const int& a, const int& b) {
-    if (b)
-        return a / b;
-    error::send_error(error::ZeroDivError, language::error::zerodiverror,
-        std::to_string(b).c_str());
-    return 0;
-}
-
-int mod(const int& a, const int& b) {
-    if (b)
-        return a % b;
-    error::send_error(error::ZeroDivError, language::error::zerodiverror,
-        std::to_string(b).c_str());
-    // 没什么作用，这是无法被执行到的代码，主要为了消除警告
-    return 0;
-}
-
-int _pow(const int& a, const int& b) {
-    return pow(a, b);
-}
-
-//关于布尔值的常量折叠
-
-bool equal_(const int& a, const int& b) {
-    return a == b;
-}
-
-bool unequal_(const int& a, const int& b) {
-    return a != b;
-}
-
-bool less_(const int& a, const int& b) {
-    return a < b;
-}
-
-bool greater_(const int& a, const int& b) {
-    return a > b;
-}
-
-bool greater_equal_(const int& a, const int& b) {
-    return a >= b;
-}
-
-bool less_equal_(const int& a, const int& b) {
-    return a <= b;
-}
-
-bool and_(const int& a, const int& b) {
-    return a && b;
-}
-
-bool or_(const int& a, const int& b) {
-    return a || b;
-}
-
-std::map<std::string, bp> optimize_condit = {
-    { "==", equal_ },
-    { "!=", unequal_ },
-    { "<", less_ },
-    { ">", greater_ },
-    { ">=", greater_equal_ },
-    { "<=", less_equal_ },
-    { "and", and_ },
-    { "or", or_ },
-};
-
-std::map<std::string, ip> optimize_number = {
-    { "+", add },
-    { "-", sub },
-    { "*", mul },
-    { "//", zdiv_ },
-    { "%", mod },
-    { "**", _pow },
-};
 }

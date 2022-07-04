@@ -1,17 +1,31 @@
 ﻿#pragma once
 
 #include <base/library.h>
+#include <csetjmp>
 #include <string>
 
-namespace trc::error {
+/**
+ * @brief 生成符号不匹配报错信息的宏
+ * @param t1 参与类型1
+ * @param t2 参与类型2
+ * @param operator_node 参与运算的运算符的节点
+ */
+#define OPERERROR_MSG(t1, t2, operator_node)                                   \
+    error::OperatorError,                                                      \
+        str_token_ticks_cal_map                                                \
+            [((node_base_tick_without_sons*)(operator_node))->tick],           \
+        str_grammar_type_cal_map[(t1)], str_grammar_type_cal_map[(t2)]
 
+namespace trc::error {
 /**
  * 报错设置
  * 系统需要知道当前处于什么模式，以合适的模式应对发生的状况
  */
 namespace error_env {
     // 是否终止程序
-    TRC_base_api extern bool quit;
+    TRC_base_c_api bool quit;
+    // 当quit被设置为false时，会跳转到该地址
+    TRC_base_c_api jmp_buf error_back_place;
 }
 
 // 错误，增强可读性
@@ -29,7 +43,8 @@ enum error_type {
     IndexError,
     MemoryError,
     KeyError,
-    SystemError
+    SystemError,
+    OperatorError
 };
 
 /**
@@ -89,6 +104,7 @@ TRC_base_c_api char* make_error_msg(int error_name, va_list& ap);
  * @brief 输出报错信息
  * @warning
  * 不接收可变参数，接受已经处理好的报错信息和数据
+ * 注:格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
  */
 TRC_base_c_api void send_error_(
     const char* error_msg, const char* module, size_t line_index) noexcept;

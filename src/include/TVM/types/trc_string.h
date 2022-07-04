@@ -9,7 +9,7 @@
 namespace trc::TVM_space::types {
 class TRC_TVM_api trc_string : public trcobj {
 public:
-    // 字符数(不包括\0)
+    // 字符数(不包括\0的长度)
     size_t char_num = 0;
 
     char* value;
@@ -38,6 +38,11 @@ public:
 
     void putline(FILE* out) override;
 
+    /**
+     * @brief 读入数据
+     * @param in_ 文件流
+     * @warning 输入与标准库的方式不同，并不是读到空格停止，而是读到换行符停止
+     */
     void in(FILE* in_);
 
     def::OBJ to_int() override;
@@ -65,6 +70,10 @@ public:
     void delete_() override;
 
 private:
+    /**
+     * @brief 重新申请字符数
+     * @warning num中不包括\0
+     */
     void set_realloc(size_t num);
 
     // 整型标记类型

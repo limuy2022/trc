@@ -38,6 +38,8 @@ namespace tools {
         void __run(TVM_space::TVM* vm, const std::string& path);
 
         void __out_token(const std::string& path);
+
+        void __style_file(const char* filepath);
     }
 
     /**
@@ -73,6 +75,11 @@ namespace tools {
          * @brief Trc命令行操作帮助文档
          */
         void help();
+
+        /**
+         * @brief 格式化代码文件
+         */
+        void style();
     }
 }
 }

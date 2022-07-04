@@ -69,12 +69,14 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">Error.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="base_2library_8h_source.html">base/library.h</a>&gt;</code><br />
+<code>#include &lt;csetjmp&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div>
 <p><a href="base_2_error_8h_source.html">Go to the source code of this file.</a></p>
@@ -93,6 +95,12 @@ Namespaces</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacetrc_1_1error_1_1error__env"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error_1_1error__env.html">trc::error::error_env</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a8f30fd859d96de41a948e0867b4f36a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2_error_8h.html#a8f30fd859d96de41a948e0867b4f36a7">OPERERROR_MSG</a>(t1,  t2,  operator_node)</td></tr>
+<tr class="memdesc:a8f30fd859d96de41a948e0867b4f36a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成符号不匹配报错信息的宏  <a href="base_2_error_8h.html#a8f30fd859d96de41a948e0867b4f36a7">More...</a><br /></td></tr>
+<tr class="separator:a8f30fd859d96de41a948e0867b4f36a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -114,6 +122,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a49becb5b09fbfe9a51a7cb62c0a43f24">trc::error::KeyError</a>
 , <a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a69f7301954b6b71c796d83136a8e6211">trc::error::SystemError</a>
+, <a class="el" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964">trc::error::OperatorError</a>
 <br />
  }</td></tr>
 <tr class="separator:a2ce0d1f9b0a271e0d62ef5989882f1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,6 +142,57 @@ Functions</h2></td></tr>
 <tr class="memdesc:af3476a04bab6c13f1decdd13265e22ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出报错信息  <a href="namespacetrc_1_1error.html#af3476a04bab6c13f1decdd13265e22ca">More...</a><br /></td></tr>
 <tr class="separator:af3476a04bab6c13f1decdd13265e22ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a8f30fd859d96de41a948e0867b4f36a7" name="a8f30fd859d96de41a948e0867b4f36a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f30fd859d96de41a948e0867b4f36a7">&#9670;&nbsp;</a></span>OPERERROR_MSG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OPERERROR_MSG</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">t1, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">t2, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">operator_node&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964">error::OperatorError</a>,                                                      \</div>
+<div class="line">        str_token_ticks_cal_map                                                \</div>
+<div class="line">            [((node_base_tick_without_sons*)(operator_node))-&gt;tick],           \</div>
+<div class="line">        <a class="code hl_variable" href="namespacetrc_1_1compiler.html#adceb1973caa7cd9c69fc4997583c3ad5">str_grammar_type_cal_map</a>[(t1)], <a class="code hl_variable" href="namespacetrc_1_1compiler.html#adceb1973caa7cd9c69fc4997583c3ad5">str_grammar_type_cal_map</a>[(t2)]</div>
+<div class="ttc" id="anamespacetrc_1_1compiler_html_adceb1973caa7cd9c69fc4997583c3ad5"><div class="ttname"><a href="namespacetrc_1_1compiler.html#adceb1973caa7cd9c69fc4997583c3ad5">trc::compiler::str_grammar_type_cal_map</a></div><div class="ttdeci">const next_order_map&lt; const char *, grammar_type &gt; str_grammar_type_cal_map</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a4e5324e5d030423d3fb4dbe009b2c964">trc::error::OperatorError</a></div><div class="ttdeci">@ OperatorError</div><div class="ttdef"><b>Definition:</b> Error.h:47</div></div>
+</div><!-- fragment -->
+<p>生成符号不匹配报错信息的宏 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">t1</td><td>参与类型1 </td></tr>
+    <tr><td class="paramname">t2</td><td>参与类型2 </td></tr>
+    <tr><td class="paramname">operator_node</td><td>参与运算的运算符的节点 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

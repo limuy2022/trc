@@ -9,7 +9,22 @@
 namespace trc::error {
 namespace error_env {
     bool quit = true;
+    jmp_buf error_back_place;
 }
+
+#define CHECK_AND_REALLOC_ERROR_MSG_STR(will_added_len)                                            \
+    do {                                                                                           \
+        if (used_size >= finally_out_length) {                                                     \
+            /* 需要的内存已经超过了申请的，之所以是等于，是因为还有\0 */ \
+            /* 多申请5个作预留 */                                                           \
+            finally_out_length += (will_added_len) + 5;                                            \
+            finally_out = (char*)realloc(finally_out, finally_out_length);                         \
+            if (finally_out == nullptr) {                                                          \
+                error::send_error(                                                                 \
+                    error::MemoryError, language::error::memoryerror);                             \
+            }                                                                                      \
+        }                                                                                          \
+    } while (0)
 
 char* make_error_msg(int error_name, va_list& ap) {
     // 报错的模板字符串
@@ -32,26 +47,32 @@ char* make_error_msg(int error_name, va_list& ap) {
     // 字符串索引
     size_t res_string_index = error_name_map_len;
     for (size_t i = 0; i < base_string_len; ++i) {
-        if (base_string[i] == '%') {
+        switch (base_string[i]) {
+        case '%': {
+            // 插入字符串
             const char* addtmp = va_arg(ap, const char*);
             size_t addtmp_len = strlen(addtmp);
             used_size += addtmp_len;
-            if (used_size >= finally_out_length) {
-                // 需要的内存已经超过了申请的，之所以是等于，是因为还有\0
-                // 多申请5个作预留
-                finally_out_length += addtmp_len + 5;
-                finally_out = (char*)realloc(finally_out, finally_out_length);
-                if (finally_out == nullptr) {
-                    error::send_error(
-                        error::MemoryError, language::error::memoryerror);
-                }
-            }
+            CHECK_AND_REALLOC_ERROR_MSG_STR(addtmp_len);
+            // 不用strcat是因为效率更高一点
             strncpy(finally_out + res_string_index, addtmp, addtmp_len);
             res_string_index += addtmp_len;
-        } else {
+            break;
+        }
+        case '#': {
+            // 插入字符
+            char addchar = va_arg(ap, char);
+            used_size++;
+            CHECK_AND_REALLOC_ERROR_MSG_STR(1);
+            finally_out[res_string_index] = addchar;
+            res_string_index++;
+            break;
+        }
+        default: {
             finally_out[res_string_index] = base_string[i];
             res_string_index++;
             used_size++;
+        }
         }
     }
     finally_out[used_size] = '\0';
@@ -67,8 +88,10 @@ static void send_error_detail(int name, va_list& ap,
     char* error_msg = make_error_msg(name, ap);
     send_error_(error_msg, module.c_str(), line_index);
     free(error_msg);
-    if (error_env::quit)
-        exit(1);
+    if (error_env::quit) {
+        exit(EXIT_FAILURE);
+    }
+    longjmp(error_env::error_back_place, 1);
 }
 
 void send_error_module_aplist(

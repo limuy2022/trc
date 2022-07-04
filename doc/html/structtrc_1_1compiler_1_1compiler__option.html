@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.4"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trc: trc::compiler::cal_priority_class Class Reference</title>
+<title>Trc: trc::compiler::compiler_option Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,53 +62,62 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacetrc.html">trc</a></li><li class="navelem"><a class="el" href="namespacetrc_1_1compiler.html">compiler</a></li><li class="navelem"><a class="el" href="classtrc_1_1compiler_1_1cal__priority__class.html">cal_priority_class</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacetrc.html">trc</a></li><li class="navelem"><a class="el" href="namespacetrc_1_1compiler.html">compiler</a></li><li class="navelem"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classtrc_1_1compiler_1_1cal__priority__class-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">trc::compiler::cal_priority_class Class Reference</div></div>
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structtrc_1_1compiler_1_1compiler__option-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">trc::compiler::compiler_option Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>用于返回优先级的类  
- <a href="classtrc_1_1compiler_1_1cal__priority__class.html#details">More...</a></p>
+<p>编译器的参数  
+ <a href="structtrc_1_1compiler_1_1compiler__option.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">pri_compiler.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="compiler__def_8h_source.html">compiler_def.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:aa2e7f21c91008f8b3572262427ca9225"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1cal__priority__class.html#aa2e7f21c91008f8b3572262427ca9225">operator[]</a> (<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> tick) const</td></tr>
-<tr class="separator:aa2e7f21c91008f8b3572262427ca9225"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a1715bf897dabe55d23b894fde724277d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html#a1715bf897dabe55d23b894fde724277d">number_table</a></td></tr>
+<tr class="separator:a1715bf897dabe55d23b894fde724277d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8ebe134f95401f975e9d028b2239bb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html#ac8ebe134f95401f975e9d028b2239bb6">optimize</a></td></tr>
+<tr class="separator:ac8ebe134f95401f975e9d028b2239bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >用于返回优先级的类 </p>
-<dl class="section warning"><dt>Warning</dt><dd>只有一个实例</dd></dl>
-<p>为什么不直接使用map？很简单，因为map在这里太笨重了 </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa2e7f21c91008f8b3572262427ca9225" name="aa2e7f21c91008f8b3572262427ca9225"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2e7f21c91008f8b3572262427ca9225">&#9670;&nbsp;</a></span>operator[]()</h2>
+<div class="textblock"><p >编译器的参数 </p>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a1715bf897dabe55d23b894fde724277d" name="a1715bf897dabe55d23b894fde724277d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1715bf897dabe55d23b894fde724277d">&#9670;&nbsp;</a></span>number_table</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int trc::compiler::cal_priority_class::operator[] </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a>&#160;</td>
-          <td class="paramname"><em>tick</em></td><td>)</td>
-          <td> const</td>
+          <td class="memname">bool trc::compiler::compiler_option::number_table</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/include/Compiler/<a class="el" href="pri__compiler_8hpp_source.html">pri_compiler.hpp</a></li>
-<li>src/Compiler/<a class="el" href="pri__compiler_8cpp.html">pri_compiler.cpp</a></li>
+<a id="ac8ebe134f95401f975e9d028b2239bb6" name="ac8ebe134f95401f975e9d028b2239bb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8ebe134f95401f975e9d028b2239bb6">&#9670;&nbsp;</a></span>optimize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trc::compiler::compiler_option::optimize</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/include/Compiler/<a class="el" href="compiler__def_8h_source.html">compiler_def.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

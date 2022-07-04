@@ -7,13 +7,16 @@
  *
  */
 #include <Compiler/Compiler.h>
+#include <Compiler/compiler_def.h>
+#include <Compiler/token.h>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
 
 using namespace trc::compiler;
 
-static compiler_error error("token_unittest");
+static compiler_public_data compiler_data { std::string("token_unittest"),
+    &trc::compiler::nooptimize_option };
 
 /**
  * @brief 测试代码是否会输出相应的tokens
@@ -23,7 +26,7 @@ static compiler_error error("token_unittest");
  */
 static void test_tokens(
     const std::string& test_code, const std::vector<token>& a) {
-    auto* lex = new token_lex((test_code), &error);
+    auto* lex = new token_lex(test_code, compiler_data);
     token* tokendata;
     /* 一个个检查是否匹配上了测试数据 */
     for (const auto& iter : a) {

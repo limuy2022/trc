@@ -70,15 +70,18 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">pri_compiler.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="_compiler_2library_8h_source.html">Compiler/library.h</a>&gt;</code><br />
 <code>#include &lt;array&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="trcdef_8h_source.html">base/trcdef.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="data_8hpp_source.html">base/utils/data.hpp</a>&gt;</code><br />
 <code>#include &lt;cctype&gt;</code><br />
+<code>#include &lt;list&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div>
 <p><a href="pri__compiler_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -122,10 +125,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__float__without__sons.html">trc::compiler::node_base_float_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1cal__priority__class.html">trc::compiler::cal_priority_class</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">用于返回优先级的类  <a href="classtrc_1_1compiler_1_1cal__priority__class.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1next__order__map.html">trc::compiler::next_order_map&lt; T, index_t &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">适用于相邻的多个元素访问，使用方法同map  <a href="classtrc_1_1compiler_1_1next__order__map.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1compiler_1_1token.html">trc::compiler::token</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">token  <a href="structtrc_1_1compiler_1_1token.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -223,10 +227,10 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa34f55eca38e0605a84f169ff61a2a396">trc::compiler::NUMBER</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efae738c26bf4ce1037fa81b039a915cbf6">trc::compiler::FLOAT</a>
-, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa63b588d5559f64f89a416e656880b949">trc::compiler::STRING</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa5a83565c0ebc7dd6ce381b82021630bc">trc::compiler::LONG_INT</a>
+, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaa12d45b3e56c8b81c648a4c1ba28102e">trc::compiler::LONG_FLOAT</a>
 , <br />
-&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efaa12d45b3e56c8b81c648a4c1ba28102e">trc::compiler::LONG_FLOAT</a>
+&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa63b588d5559f64f89a416e656880b949">trc::compiler::STRING</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa04278d9c3e8692412e2d9cb9f7e0af30">trc::compiler::VAR_NAME</a>
 , <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efab0cd8af157ed30eaa1980da18b07a38d">trc::compiler::EXPR</a>
 <br />
@@ -267,7 +271,21 @@ Functions</h2></td></tr>
 或\0符号  <a href="namespacetrc_1_1compiler.html#a1360fb843a853f2dec5054e8582b8a2c">More...</a><br /></td></tr>
 <tr class="separator:a1360fb843a853f2dec5054e8582b8a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82b8d579d14585ccf814890e23603025"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a82b8d579d14585ccf814890e23603025">trc::compiler::is_blocked_token</a> (token_ticks tick)</td></tr>
+<tr class="memdesc:a82b8d579d14585ccf814890e23603025"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是会引起语句块的节点  <a href="namespacetrc_1_1compiler.html#a82b8d579d14585ccf814890e23603025">More...</a><br /></td></tr>
 <tr class="separator:a82b8d579d14585ccf814890e23603025"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6a74131a1c80b75031b982c6ae68d38"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ab6a74131a1c80b75031b982c6ae68d38">trc::compiler::is_no_var_data_node</a> (grammar_type node_type)</td></tr>
+<tr class="memdesc:ab6a74131a1c80b75031b982c6ae68d38"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是数据节点  <a href="namespacetrc_1_1compiler.html#ab6a74131a1c80b75031b982c6ae68d38">More...</a><br /></td></tr>
+<tr class="separator:ab6a74131a1c80b75031b982c6ae68d38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4976a24e9f5f2c6061ff2426eca9a746"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a4976a24e9f5f2c6061ff2426eca9a746">trc::compiler::is_number_class_node</a> (grammar_type node_type)</td></tr>
+<tr class="memdesc:a4976a24e9f5f2c6061ff2426eca9a746"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是不是数字类型的节点，浮点数，整型，长整型等都算在内  <a href="namespacetrc_1_1compiler.html#a4976a24e9f5f2c6061ff2426eca9a746">More...</a><br /></td></tr>
+<tr class="separator:a4976a24e9f5f2c6061ff2426eca9a746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:adceb1973caa7cd9c69fc4997583c3ad5"><td class="memItemLeft" align="right" valign="top">const next_order_map&lt; const char *, grammar_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#adceb1973caa7cd9c69fc4997583c3ad5">trc::compiler::str_grammar_type_cal_map</a></td></tr>
+<tr class="separator:adceb1973caa7cd9c69fc4997583c3ad5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab49158a2d5828aec391aa2e1111e37d3"><td class="memItemLeft" align="right" valign="top">const next_order_map&lt; const char *, token_ticks &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ab49158a2d5828aec391aa2e1111e37d3">trc::compiler::str_token_ticks_cal_map</a></td></tr>
+<tr class="separator:ab49158a2d5828aec391aa2e1111e37d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

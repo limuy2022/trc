@@ -44,9 +44,9 @@ void PRINTLN(int argc, TVM* vm) {
 
 void INPUT(int argc, TVM* vm) {
     for (int i = 0; i < argc; ++i) {
-        firsts = (def::STRINGOBJ)vm->pop();
-        firsts->putline(stdout);
+        ((def::STRINGOBJ)vm->pop())->putline(stdout);
     }
+    firsts = MALLOCSTRING();
     firsts->in(stdin);
     vm->push(firsts);
 }

@@ -3,11 +3,13 @@
  */
 
 #include <Compiler/Compiler.h>
+#include <Compiler/token.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
 #include <tools.h>
 
 // token标记映射到名称，便于输出
+// todo:从最新的token进行更新
 static const char* tokenticks_to_string[] = {
     "FOR", // for
     "WHILE", // while
@@ -71,7 +73,7 @@ namespace tools_in {
         bool change_line = true;
         for (;;) {
             if (change_line) {
-                printf("\n%zu:", token_c.error_->line);
+                printf("\n%zu:", token_c.compiler_data.error.line);
                 change_line = false;
             }
             token_lex = token_c.get_token();
@@ -90,9 +92,10 @@ namespace tools_in {
     void __out_token(const std::string& path) {
         std::string file_data;
         utils::readcode(file_data, path);
-        compiler::compiler_error error_(path);
+        compiler::compiler_public_data compiler_data { path,
+            &compiler::nooptimize_option };
         // 解析
-        compiler::token_lex token_c(file_data, &error_);
+        compiler::token_lex token_c(file_data, compiler_data);
         out(path, token_c);
     }
 }

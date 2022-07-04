@@ -7,7 +7,7 @@
 #include <base/ctree_loader.h>
 #include <base/utils/filesys.h>
 #include <filesystem>
-#include <gflags/gflags.h>
+#include <generated_params.h>
 #include <string>
 #include <tools.h>
 
@@ -18,14 +18,14 @@ namespace tools_in {
     void __build(TVM_space::TVM* vm, const std::string& path) {
         std::string scode;
         utils::readcode(scode, path);
-        compiler::Compiler(vm, scode);
+        auto option = generate_compiler_params();
+        compiler::Compiler(vm, scode, option);
+        delete option;
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());
     }
 }
 
-// 行号表参数
-DEFINE_bool(noline_number_table, false, "Controls whether a line number");
 namespace tools_out {
     void build() {
         TVM_space::TVM* vm = TVM_space::create_TVM();

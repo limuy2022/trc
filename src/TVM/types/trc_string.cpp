@@ -14,6 +14,7 @@
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_string.h>
 #include <base/Error.h>
+#include <base/io.hpp>
 #include <base/memory/memory.h>
 #include <base/trcdef.h>
 #include <cstdio>
@@ -25,7 +26,7 @@ const RUN_TYPE_TICK trc_string::type = RUN_TYPE_TICK::string_T;
 
 trc_string::trc_string(const trc_string& init)
     : char_num(init.char_num)
-    , value((char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
+    , value((char*)(malloc(sizeof(char) * (char_num + 1)))) {
     strcpy(value, init.value);
 }
 
@@ -41,17 +42,17 @@ trc_string& trc_string::operator=(const std::string& init) {
 
 trc_string::trc_string(const std::string& init)
     : char_num(init.length())
-    , value((char*)(MALLOC(sizeof(char) * (char_num + 1)))) {
+    , value((char*)(malloc(sizeof(char) * (char_num + 1)))) {
     // 由于常量池，所以兼容string
     strcpy(value, init.c_str());
 }
 
 trc_string::~trc_string() {
-    FREE(value, char_num + 1);
+    free(value);
 }
 
 trc_string::trc_string()
-    : value((char*)(MALLOC(sizeof(char)))) {
+    : value((char*)(malloc(sizeof(char)))) {
     *value = '\0';
 }
 
@@ -93,28 +94,15 @@ void trc_string::putline(FILE* out) {
 }
 
 void trc_string::in(FILE* in_) {
-    /**
-     * 输入与标准库的方式不同，并不是读到空格停止，而是读到换行符停止
-     */
-
     // 置空
-    set_realloc(0);
-    char ch;
-    for (;;) {
-        ch = fgetc(in_);
-        if (ch == '\n')
-            return;
-        set_realloc(char_num + 1);
-        value[char_num - 1] = ch;
-    }
+    free(value);
+    char_num = 0;
+    io::readstr(value, in_);
+    char_num = strlen(value);
 }
 
 void trc_string::set_realloc(size_t num) {
-    /**
-     * 重新申请字符数，不包括\0
-     */
-
-    value = (char*)REALLOC(value, char_num + 1, sizeof(char) * (num + 1));
+    value = (char*)realloc(value, sizeof(char) * (num + 1));
     char_num = num;
 }
 

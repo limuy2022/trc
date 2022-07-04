@@ -80,8 +80,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3536ae3e45ed9193d6d96d807ce35e93"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a3536ae3e45ed9193d6d96d807ce35e93">CompileEnvironment</a> ()</td></tr>
-<tr class="separator:a3536ae3e45ed9193d6d96d807ce35e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a728af5828eb035f449fc12f6220608fc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a728af5828eb035f449fc12f6220608fc">CompileEnvironment</a> (<a class="el" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a> &amp;compiler_data)</td></tr>
+<tr class="separator:a728af5828eb035f449fc12f6220608fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81f5853cd8418dd083ab6164f2626048"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a81f5853cd8418dd083ab6164f2626048">~CompileEnvironment</a> ()</td></tr>
 <tr class="separator:a81f5853cd8418dd083ab6164f2626048"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae64a0c30ac1af4232d0c381981d0cc41"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#ae64a0c30ac1af4232d0c381981d0cc41">get_global_name_size</a> ()</td></tr>
@@ -90,18 +90,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8bb961a0e05e0f330897cd119935a6d4"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a8bb961a0e05e0f330897cd119935a6d4">get_local_name_size</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a8bb961a0e05e0f330897cd119935a6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取局部的符号表的大小  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a8bb961a0e05e0f330897cd119935a6d4">More...</a><br /></td></tr>
 <tr class="separator:a8bb961a0e05e0f330897cd119935a6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a749befb50e4620947349e3f1ef22dc90"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a749befb50e4620947349e3f1ef22dc90">get_index_of_globalvar</a> (const char *name)</td></tr>
-<tr class="memdesc:a749befb50e4620947349e3f1ef22dc90"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在全局符号表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a749befb50e4620947349e3f1ef22dc90">More...</a><br /></td></tr>
-<tr class="separator:a749befb50e4620947349e3f1ef22dc90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac58dfe201340287f01993be4c5c3f10c"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#ac58dfe201340287f01993be4c5c3f10c">get_index_of_localvar</a> (const std::string &amp;localspace_name, const char *localvar_name)</td></tr>
-<tr class="memdesc:ac58dfe201340287f01993be4c5c3f10c"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#ac58dfe201340287f01993be4c5c3f10c">More...</a><br /></td></tr>
-<tr class="separator:ac58dfe201340287f01993be4c5c3f10c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0153aa50d087f5f0d867feb8cae1083"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#aa0153aa50d087f5f0d867feb8cae1083">get_index_of_globalvar</a> (const char *name, bool maybe_not_in)</td></tr>
+<tr class="memdesc:aa0153aa50d087f5f0d867feb8cae1083"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在全局符号表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#aa0153aa50d087f5f0d867feb8cae1083">More...</a><br /></td></tr>
+<tr class="separator:aa0153aa50d087f5f0d867feb8cae1083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a998883645be4d92bb583651817c69236"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a998883645be4d92bb583651817c69236">get_index_of_localvar</a> (const std::string &amp;localspace_name, const char *localvar_name, bool maybe_not_in)</td></tr>
+<tr class="memdesc:a998883645be4d92bb583651817c69236"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a998883645be4d92bb583651817c69236">More...</a><br /></td></tr>
+<tr class="separator:a998883645be4d92bb583651817c69236"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表 </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3536ae3e45ed9193d6d96d807ce35e93" name="a3536ae3e45ed9193d6d96d807ce35e93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3536ae3e45ed9193d6d96d807ce35e93">&#9670;&nbsp;</a></span>CompileEnvironment()</h2>
+<a id="a728af5828eb035f449fc12f6220608fc" name="a728af5828eb035f449fc12f6220608fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a728af5828eb035f449fc12f6220608fc">&#9670;&nbsp;</a></span>CompileEnvironment()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -109,7 +109,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">trc::compiler::CompileEnvironment::CompileEnvironment </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a> &amp;&#160;</td>
+          <td class="paramname"><em>compiler_data</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -154,8 +155,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a749befb50e4620947349e3f1ef22dc90" name="a749befb50e4620947349e3f1ef22dc90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a749befb50e4620947349e3f1ef22dc90">&#9670;&nbsp;</a></span>get_index_of_globalvar()</h2>
+<a id="aa0153aa50d087f5f0d867feb8cae1083" name="aa0153aa50d087f5f0d867feb8cae1083"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0153aa50d087f5f0d867feb8cae1083">&#9670;&nbsp;</a></span>get_index_of_globalvar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,18 +165,35 @@ Public Member Functions</h2></td></tr>
           <td class="memname">size_t trc::compiler::CompileEnvironment::get_index_of_globalvar </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>maybe_not_in</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>获取某个变量在全局符号表中的位置，没有该符号则添加进符号表 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>变量名 </td></tr>
+    <tr><td class="paramname">maybe_not_in</td><td>允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="ac58dfe201340287f01993be4c5c3f10c" name="ac58dfe201340287f01993be4c5c3f10c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac58dfe201340287f01993be4c5c3f10c">&#9670;&nbsp;</a></span>get_index_of_localvar()</h2>
+<a id="a998883645be4d92bb583651817c69236" name="a998883645be4d92bb583651817c69236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a998883645be4d92bb583651817c69236">&#9670;&nbsp;</a></span>get_index_of_localvar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -190,7 +208,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>localvar_name</em>&#160;</td>
+          <td class="paramname"><em>localvar_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>maybe_not_in</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -201,6 +225,14 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>获取某个变量在局部变量表中的位置，没有该符号则添加进符号表 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">localspace_name</td><td>局部空间名，如函数名 </td></tr>
+    <tr><td class="paramname">localvar_name</td><td>变量名 </td></tr>
+    <tr><td class="paramname">maybe_not_in</td><td>允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

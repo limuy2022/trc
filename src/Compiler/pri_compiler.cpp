@@ -129,11 +129,8 @@ std::map<std::string, int> change_const = {
     { "null", 0 },
 };
 
-// 优先级
-const cal_priority_class cal_priority;
-
 // 优先级列表，越小优先级越低
-const int cal_priority_class::map_[] = {
+int map_[] = {
     3, // +
     3, // -
     4, // *
@@ -152,7 +149,38 @@ const int cal_priority_class::map_[] = {
     1, // >=
 };
 
-int cal_priority_class::operator[](token_ticks tick) const {
-    return map_[(int)tick - (int)token_ticks::ADD];
-}
+const char* name_map_token[] = {
+    "+",
+    "-",
+    "*",
+    "/",
+    "//",
+    "%",
+    "**",
+    "and",
+    "or",
+    "not",
+    "==",
+    "!=",
+    "<",
+    ">",
+    "<=",
+    ">=",
+};
+
+const char* name_map_grammar[] = {
+    "int",
+    "float",
+    "long int",
+    "long float",
+    "string",
+};
+
+const next_order_map<int, token_ticks> cal_priority(map_, token_ticks::ADD);
+
+const next_order_map<const char*, grammar_type> str_grammar_type_cal_map(
+    name_map_grammar, grammar_type::NUMBER);
+
+const next_order_map<const char*, token_ticks> str_token_ticks_cal_map(
+    name_map_token, token_ticks::ADD);
 }

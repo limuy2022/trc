@@ -7,10 +7,10 @@
 
 namespace language {
 namespace error {
-    const char* error_map[]
-        = { "名字错误:", "值错误:", "语法错误:", "版本错误:", "文件打开错误:",
-              "模块找不到错误:", "参数错误:", "除零错误:", "运行错误:",
-              "断言错误:", "索引错误:", "内存错误:", "键错误:", "系统错误:" };
+    const char* error_map[] = { "名字错误:", "值错误:", "语法错误:",
+        "版本错误:", "文件打开错误:", "模块找不到错误:", "参数错误:",
+        "除零错误:", "运行错误:", "断言错误:", "索引错误:", "内存错误:",
+        "键错误:", "系统错误:", "运算符错误:" };
     const char* error_from = "错误来自";
     const char* error_in_line = "错误发生在行";
 
@@ -24,6 +24,7 @@ namespace error {
     const char* keyerror = "键\"%\"未定义";
     const char* indexerror = R"(%超出了%的范围)";
     const char* valueerror = R"("%"不能被转换为"%")";
+    const char* operatorerror = R"(不能使用运算符"%"对于类型:% and %)";
 
     const char* argumenterror = R"(%需要%个参数.)";
 
@@ -34,7 +35,7 @@ namespace error {
     const char* syntaxerror_lexanno = "多行注释应当以*/结尾";
     const char* syntaxerror_escape_char = R"(转义符%未定义)";
     const char* syntaxerror = "错误的语法";
-    const char* syntaxerror_unmatched_char = "未匹配的'%'";
+    const char* syntaxerror_unmatched_char = "未匹配的'#'";
 
     const char* asserterror_default = "断言";
     const char* asserterror_user = "%";

@@ -197,4 +197,17 @@ template <typename T> unsigned int len(T in) {
     } while (in != 0);
     return out;
 }
+
+/**
+ * @brief 求a,b是否满足与数据相匹配
+ * @code
+ * a=1
+ * b=2
+ * match_data(a, b, 1, 2)和mathch_data(a,b,2,1)同样返回true
+ * @endcode
+ */
+template <typename T>
+inline bool match_data(const T& a, const T& b, const T& c, const T& d) {
+    return (a == c && b == d) || (a == d && b == c);
+}
 }

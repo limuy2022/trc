@@ -86,7 +86,7 @@ static void write_string_one(FILE* file, const std::string& data) {
     int n = (int)data.length();
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
-    fwrite(data.c_str(), n, 1, file);
+    fwrite(data.c_str(), n, sizeof(char), file);
 }
 
 /**
@@ -98,9 +98,11 @@ static void write_string_one(FILE* file, const std::string& data) {
  */
 template <typename T>
 static void write_pool(FILE* file, std::vector<T>& const_pool) {
-    int size = const_pool.size();
+    int size = const_pool.size() - 1;
     fwrite(&size, sizeof(size), 1, file);
-    fwrite(&const_pool[0], sizeof(T), const_pool.size(), file);
+    if (size > 0) {
+        fwrite(&const_pool[1], sizeof(T), size, file);
+    }
 }
 
 /**
@@ -113,8 +115,9 @@ template <typename T>
 static void load_pool(FILE* file, std::vector<T>& const_pool) {
     int size;
     fread(&size, sizeof(size), 1, file);
-    const_pool.resize(size);
-    fread(&const_pool[0], sizeof(T), size, file);
+    // 留出占位的位置
+    const_pool.resize(size + 1);
+    fread(&const_pool[1], sizeof(T), size, file);
 }
 
 /**
@@ -125,11 +128,12 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
  * @param const_pool 字符串型常量池
  */
 static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
-    int size = (int)const_pool.size();
+    // 减去开头占位的数据
+    int size = (int)const_pool.size() - 1;
     // 数据长度
     fwrite(&size, sizeof(size), 1, file);
-    for (const auto& i : const_pool)
-        write_string_one(file, i);
+    for (size_t i = 1, n = const_pool.size(); i < n; ++i)
+        write_string_one(file, const_pool[i]);
 }
 
 /**
@@ -141,10 +145,12 @@ static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
  * @param const_pool 字符串型常量池
  */
 static void load_string_pool(FILE* file, std::vector<char*>& const_pool) {
+    const_pool.clear();
     int size;
     // 数据长度
     fread(&size, sizeof(size), 1, file);
     const_pool.reserve(size);
+    const_pool.push_back(nullptr);
     for (; size != 0; --size) {
         const_pool.push_back(load_string_one(file));
     }

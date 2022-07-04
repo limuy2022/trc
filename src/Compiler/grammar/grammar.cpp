@@ -136,8 +136,6 @@ treenode* grammar_lex::callfunction(const code_type& funcname) {
     // 由于栈先进后出的特征，在此处将参数进行反转
     std::reverse(argv_node->son.begin(), argv_node->son.end());
 
-    auto* len = new node_base_int_without_sons(argv_node->son.size());
-
     // 函数名问题：判断内置函数和自定义函数
     if (funcname.size() == 1) {
         if (trc::utils::check_in(funcname[0]->data,
@@ -147,7 +145,6 @@ treenode* grammar_lex::callfunction(const code_type& funcname) {
                 = new node_base_int(loader::func_num[funcname[0]->data],
                     grammar_type::BUILTIN_FUNC);
             builtin->connect(argv_node);
-            builtin->connect(len);
             return builtin;
         } else {
             // 自定义函数
@@ -155,7 +152,6 @@ treenode* grammar_lex::callfunction(const code_type& funcname) {
                 grammar_type::CALL_FUNC, funcname[0]->data);
 
             user_defined->connect(argv_node);
-            user_defined->connect(len);
             return user_defined;
         }
     }

@@ -30,22 +30,16 @@ static void bytecode_check(
 /*测试变量赋值解析*/
 TEST(compiler, var) {
     TVM* vm = create_TVM();
-    // 测试缓冲区内整形赋值
-    compiler::Compiler(vm, "a:=80");
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    // 测试整形赋值
+    compiler::Compiler(vm, "a:=80\nb:=900");
+    ASSERT_EQ(vm->static_data.const_i.size(), 3);
     EXPECT_EQ(vm->static_data.const_i[1], 80);
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
+    EXPECT_EQ(vm->static_data.const_i[2], 900);
+    ASSERT_EQ(vm->static_data.global_symbol_table_size, 3);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
-        vm);
-    free_TVM(vm);
-    // 测试缓冲区外整形赋值
-    compiler::Compiler(vm, "a:=900");
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
-    EXPECT_EQ(vm->static_data.const_i[1], 900);
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
-    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
+                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 2 } },
         vm);
     free_TVM(vm);
     // 测试字符串赋值
@@ -75,6 +69,7 @@ TEST(compiler, var) {
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_LONG_, 1 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
+    // 测试带参数
     delete vm;
 }
 
@@ -94,11 +89,13 @@ TEST(compiler, function_call) {
         vm);
     free_TVM(vm);
     // 带变量
-    compiler::Compiler(vm, "a:=856\nprint(a)");
+    compiler::Compiler(vm, "a:=856+1\nprint(a)");
     ASSERT_EQ(vm->static_data.const_i.size(), 3);
     EXPECT_EQ(vm->static_data.const_i[1], 856);
     EXPECT_EQ(vm->static_data.const_i[2], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
+                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 },
                        { (bytecode_t)byteCodeNumber::LOAD_NAME_, 1 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },

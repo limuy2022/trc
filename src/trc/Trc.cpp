@@ -14,6 +14,7 @@
 #include <cstring>
 #include <gflags/gflags.h>
 #include <language/language.h>
+#include <platform.h>
 #include <tools.h>
 
 /**
@@ -70,13 +71,18 @@ static inline void find_mode_to_run(char* mode) {
 }
 
 int main(int argc, char* argv[]) {
+// 初始化系统
+/*控制台初始化*/
+#ifdef WINDOWS_PLAT
+    trc::color::console_init();
+#endif
+    /* 内存初始化*/
     trc::memory::init_mem();
-    // 设置命令行参数
+    /* 设置命令行参数*/
     trc::tools::argv = argv;
     trc::tools::argc = argc;
-    // 初始化命令行解析器
+    /* 初始化命令行解析器*/
     gflags::ParseCommandLineFlags(&argc, &argv, true);
-
     if (argc == 1) {
         // 不指定模式，没有参数，默认为交互模式
         trc::tools::tools_out::tshell();
@@ -84,6 +90,7 @@ int main(int argc, char* argv[]) {
         // 指定模式，匹配调用模式
         find_mode_to_run(argv[1]);
     }
+    // 卸载系统
     // 卸载内存，做收尾工作
     trc::memory::quit_mem();
     return 0;

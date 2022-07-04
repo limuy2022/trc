@@ -137,6 +137,8 @@ void detail_compiler::compile(treenode* head) {
     if (head->has_son()) {
         auto* root = (is_not_end_node*)head;
         switch (type) {
+        case grammar_type::EXPR:
+        // 运算符表达式或条件表达式
         case grammar_type::TREE: {
             // 不是数据和传参节点，确认为树
             for (auto i : root->son) {
@@ -152,8 +154,7 @@ void detail_compiler::compile(treenode* head) {
                 compile(argv_nodes->son[i]);
             }
             // 然后编译参数个数
-            int num_of_nodes
-                = ((node_base_int_without_sons*)root->son[1])->value;
+            int num_of_nodes = ((is_not_end_node*)(root->son[0]))->son.size();
             add_opcode(
                 (bytecode_t)byteCodeNumber::LOAD_INT_, add_int(num_of_nodes));
             // 最后加上调用函数
@@ -196,13 +197,6 @@ void detail_compiler::compile(treenode* head) {
             auto* code = (node_base_tick_without_sons*)root->son[0];
             auto* index_ = (node_base_int_without_sons*)root->son[1];
             add_opcode(build_opcode(code->tick), index_->value);
-            break;
-        }
-        case grammar_type::EXPR: {
-            // 运算符表达式或条件表达式
-            for (auto i : root->son) {
-                compile(i);
-            }
             break;
         }
         default: {

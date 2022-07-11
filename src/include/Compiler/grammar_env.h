@@ -1,4 +1,4 @@
-#include <Compiler/pri_compiler.hpp>
+﻿#include <Compiler/pri_compiler.hpp>
 #include <base/trcdef.h>
 
 namespace trc::compiler {

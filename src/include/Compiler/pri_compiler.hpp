@@ -407,6 +407,13 @@ inline bool is_blocked_token(token_ticks tick) {
 }
 
 /**
+ * @brief 判断是不是非变量数据
+ */
+inline bool is_novar_data_token(token_ticks tick) {
+    return utils::inrange(token_ticks::NULL_, token_ticks::INT_VALUE, tick);
+}
+
+/**
  * @brief 判断是不是数据节点
  */
 inline bool is_no_var_data_node(grammar_type node_type) {

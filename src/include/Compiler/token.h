@@ -31,6 +31,7 @@ public:
     compiler_public_data& compiler_data;
 
 private:
+    // 标记是否有token储存着
     bool is_unget = false;
 
     token* back_token = nullptr;

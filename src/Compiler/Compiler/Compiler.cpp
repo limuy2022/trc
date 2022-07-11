@@ -190,7 +190,7 @@ void detail_compiler::compile(treenode* head) {
             // 处理等式右边的数据
             compile(*(++root->son.begin()));
             // 处理等式左边的数据
-            auto* argv_ = (node_base_string_without_sons*)*root->son.begin();
+            auto* argv_ = (node_base_data_without_sons*)*root->son.begin();
             short index_argv = add_var_allow_not_in(argv_->data);
             add_opcode(build_var(((node_base_tick*)root)->tick), index_argv);
             break;

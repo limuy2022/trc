@@ -5,6 +5,7 @@
 #include <TVM/types/trc_long.h>
 #include <base/Error.h>
 #include <base/utils/data.hpp>
+#include <cassert>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -340,6 +341,8 @@ void token_lex::lex_others(token* result) {
 }
 
 void token_lex::unget_token(token* token_data) {
+    // 必须没有储存token，否则就是出现了bug
+    assert(is_unget == false);
     back_token = token_data;
     is_unget = true;
 }

@@ -18,14 +18,6 @@ public:
     treenode* get_node();
 
     /**
-     * @brief 解析一段完整的代码成为语法树
-     * @return treenode* 返回根节点指针
-     * @details 该函数接受一段tokens，从这段tokens中获取token而不是从token解析器
-     * @warning 传入的token需要自己释放，该函数不会为你释放内存
-     */
-    treenode* get_node(const code_type& code);
-
-    /**
      * @param line 储存代码行的地方
      * @param error_ 报错模块
      */
@@ -36,56 +28,16 @@ public:
 
 private:
     /**
-     * @brief 封装获取token的函数接口
+     * @brief 检查下一个期待的token标签
+     * @param tick 标签
+     * @return token* 返回该符合要求的token
      */
-    class get_token_interface {
-    public:
-        virtual token* get_token() = 0;
-
-        virtual void unget_token(token*) = 0;
-    };
-
-    /**
-     * @brief 从数据获取token
-     */
-    class get_token_from_token_lex : public get_token_interface {
-    public:
-        token* get_token();
-
-        void unget_token(token*);
-
-        void reload(token_lex& token_);
-
-    private:
-        token_lex* token_;
-    } token_from_token_lex;
-
-    /**
-     * @brief 从token_lex获取token
-     */
-    class get_token_from_data : public get_token_interface {
-    public:
-        token* get_token();
-        void unget_token(token*);
-
-        void reload(const code_type& data);
-
-    private:
-        // 记录数据读取到哪里了
-        size_t index;
-        // 记录数据源
-        const code_type* data;
-    } token_from_data;
-
-    // 由于在同一时间只能使用一种获取token的方式，所以用它来统一获取token的方式
-    get_token_interface* token_way;
-
-    /**
-     * @brief get_node的内部接口实现
-     */
-    treenode* get_node_interal();
-
     token* check_excepted(token_ticks tick);
+
+    /**
+     * @brief 提前获取下一个token标签
+     */
+    token_ticks get_next_token_tick();
 
     /**
      * @brief 判断数据，然后将它转为后缀表达式
@@ -100,21 +52,23 @@ private:
 
     /**
      * @brief 将中缀表达式转换成后缀表达式
+     * @param first_data_node 生成第一个数据的节点
+     * @param first_cal_symbol 第一个运算符
      * @details 常量折叠在此进行
      */
-    treenode* change_to_last_expr(code_type& code);
+    treenode* change_to_last_expr(treenode* first_data_node);
 
     /**
      * @brief 生成赋值语句节点
      * @param oper 等号的标记
      */
-    treenode* assign(trc::compiler::token_ticks oper, const code_type& code);
+    treenode* assign(trc::compiler::token_ticks oper, treenode* left_value);
 
     /**
      * @brief 生成函数调用节点
      * @param code 整条语句
      */
-    treenode* callfunction(const code_type& funcname);
+    treenode* callfunction(token* funcname);
 
     /**
      * @brief 生成语句执行节点
@@ -152,11 +106,16 @@ private:
      */
     void check_expr(is_not_end_node* root);
 
+    // 编译期间要用到的数据
     trc::compiler::compiler_public_data& compiler_data;
 
     // 数据环境
     trc::compiler::grammar_data_control* env;
 
+    // token解析器
     trc::compiler::token_lex token_;
+
+    // 特殊的临时终结符，临时将某token_ticks提升到和\n一样的权限,记得撤销！
+    token_ticks special_tick_for_end = token_ticks::UNKNOWN;
 };
 }

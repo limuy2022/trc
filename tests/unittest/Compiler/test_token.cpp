@@ -51,6 +51,9 @@ TEST(token, oper_lex) {
     test_tokens("1+4",
         { { token_ticks::INT_VALUE, "1" }, { token_ticks::ADD, "" },
             { token_ticks::INT_VALUE, "4" } });
+    test_tokens("1+1.0",
+        { { token_ticks::INT_VALUE, "1" }, { token_ticks::ADD, "" },
+            { token_ticks::FLOAT_VALUE, "1.0" } });
     test_tokens("-+*/7.0+1-0",
         { { token_ticks::SUB, "" }, { token_ticks::ADD, "" },
             { token_ticks::MUL, "" }, { token_ticks::DIV, "" },
@@ -155,4 +158,23 @@ TEST(token, english) {
         { { token_ticks::NULL_, "" }, { token_ticks::STORE, "" },
             { token_ticks::TRUE, "" }, { token_ticks::ADD, "" },
             { token_ticks::FALSE, "" } });
+}
+
+// 退回token的期望结果
+std::vector<token> expr = { { token_ticks::INT_VALUE, "1" },
+    { token_ticks::ADD, "" }, { token_ticks::FLOAT_VALUE, "1.0" } };
+// 测试退回token的方法
+TEST(token, unget_token) {
+    auto* lex = new token_lex("1+1.0", compiler_data);
+    token* tdata = lex->get_token();
+    lex->unget_token(tdata);
+    tdata = lex->get_token();
+    lex->unget_token(tdata);
+    for (int i = 0; i < 3; ++i) {
+        tdata = lex->get_token();
+        EXPECT_EQ(tdata->tick, expr[i].tick) << (int)tdata->tick;
+        EXPECT_EQ(tdata->data, expr[i].data) << tdata->data;
+        delete tdata;
+    }
+    delete lex;
 }

@@ -31,9 +31,9 @@ static void bytecode_check(
 }
 
 /*测试变量赋值解析*/
-TEST(compiler, var) {
+// 测试整形赋值
+TEST(var_assign, int) {
     TVM* vm = create_TVM();
-    // 测试整形赋值
     compiler::Compiler(vm, "a:=80\nb:=900", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size(), 3);
     EXPECT_EQ(vm->static_data.const_i[1], 80);
@@ -44,8 +44,12 @@ TEST(compiler, var) {
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 2 } },
         vm);
-    free_TVM(vm);
-    // 测试字符串赋值
+    delete vm;
+}
+
+// 测试字符串赋值
+TEST(var_assign, string) {
+    TVM*vm=create_TVM();
     compiler::Compiler(vm, "a:=\"ppp\"", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_s.size(), 2);
     EXPECT_STREQ(vm->static_data.const_s[1], "ppp");
@@ -53,48 +57,63 @@ TEST(compiler, var) {
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_STRING_, 1 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
-    free_TVM(vm);
-    // 测试浮点型赋值
+    delete vm;
+}
+
+// 测试浮点型赋值
+TEST(var_assign, float){
+    TVM*vm = create_TVM();
     compiler::Compiler(vm, "a:=9.08", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_f.size(), 2);
-    EXPECT_TRUE(utils::isequal(vm->static_data.const_f[1], 9.08))
-        << vm->static_data.const_f[1];
+    EXPECT_TRUE(utils::isequal(vm->static_data.const_f[1], 9.08));
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_FLOAT_, 1 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
-    free_TVM(vm);
-    // 测试长整型赋值
+    delete vm;
+}
+
+// 测试长整型赋值
+TEST(var_assign, long_int) {
+    TVM*vm=create_TVM();
     compiler::Compiler(
-        vm, "a:=9999999999999999999", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_long.size(), 2);
-    EXPECT_STREQ(vm->static_data.const_long[1], "9999999999999999999");
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
-    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_LONG_, 1 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
-        vm);
-    free_TVM(vm);
-    // 测试带运算的赋值
+    vm, "a:=9999999999999999999", &compiler::nooptimize_option);
+ASSERT_EQ(vm->static_data.const_long.size(), 2);
+EXPECT_STREQ(vm->static_data.const_long[1], "9999999999999999999");
+ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
+bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_LONG_, 1 },
+                   { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
+    vm);
+    delete vm;
+}
+
+// 测试带运算的赋值
+TEST(var_assign, assign_with_oper) {
+    TVM*vm=create_TVM();
     compiler::Compiler(vm, "a:=1+34\n", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 3);
-    EXPECT_EQ(vm->static_data.const_i[1], 1);
-    EXPECT_EQ(vm->static_data.const_i[2], 34);
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
-    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
-                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
-        vm);
-    free_TVM(vm);
-    // 测试带函数的赋值
-    free_TVM(vm);
+ASSERT_EQ(vm->static_data.const_i.size(), 3);
+EXPECT_EQ(vm->static_data.const_i[1], 1);
+EXPECT_EQ(vm->static_data.const_i[2], 34);
+ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
+bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
+                   { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
+                   { (bytecode_t)byteCodeNumber::ADD_, 0 },
+                   { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
+    vm);
+    delete vm;
+}
+
+// 测试带函数的赋值
+TEST(var_assign, assign_with_func) {
+    TVM*vm=create_TVM();
+    compiler::Compiler(vm, "a:=int(input())", &compiler::nooptimize_option);
     delete vm;
 }
 
 // 测试函数调用的解析
-TEST(compiler, function_call) {
+// 测试内置变量的解析
+TEST(function_call, builtin) {
     TVM* vm = create_TVM();
-    // 测试内置变量的解析
     // 测试调用print函数
     // 不带变量
     compiler::Compiler(vm, "print(90)", &compiler::nooptimize_option);
@@ -120,35 +139,43 @@ TEST(compiler, function_call) {
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2 } },
         vm);
     free_TVM(vm);
-    // 函数中嵌套着函数
+    delete vm;
+}
+
+// 函数中嵌套着函数
+TEST(function_call, func_in_func) {
+    TVM* vm = create_TVM();
     compiler::Compiler(vm, "a:=int(input())", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size(), 3);
     EXPECT_EQ(vm->static_data.const_i[1], 0);
     EXPECT_EQ(vm->static_data.const_i[2], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 4 },
-                       { (byteCodeNumber::LOAD_INT_, 2) },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 8 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 1 } },
         vm);
-    free_TVM(vm);
     delete vm;
 }
 
 // 测试运算符表达式的解析
-TEST(compiler, oper) {
+// 简单常量相加
+TEST(oper, simple) {
     TVM* vm = create_TVM();
-    // 简单常量相加
     compiler::Compiler(vm, "1+4", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 3);
+    ASSERT_EQ(vm->static_data.const_i.size(), 3)<<vm->static_data.const_i[1];
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     EXPECT_EQ(vm->static_data.const_i[2], 4);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 2 },
                        { (bytecode_t)byteCodeNumber::ADD_, 0 } },
         vm);
-    free_TVM(vm);
-    // 函数中包括运算符表达式
+    delete vm;
+}
+
+// 函数中包括运算符表达式
+TEST(oper, expr_in_func) {
+    TVM* vm = create_TVM();
     compiler::Compiler(vm, "print(1+1)", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size(), 2);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
@@ -158,15 +185,50 @@ TEST(compiler, oper) {
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2 } },
         vm);
-    free_TVM(vm);
-    // 函数返回值与函数返回值相加
+    delete vm;
+}
+
+// 函数返回值与函数返回值相加
+TEST(oper, expr_with_func) {
+    TVM*vm=create_TVM();
     compiler::Compiler(
         vm, "print(int(input())+int(input()))", &compiler::nooptimize_option);
-    free_TVM(vm);
+    delete vm;
+}
+
+// 优化相同的表达式代码
+TEST(oper, optimize_same_types) {
+    TVM*vm = create_TVM();
+    compiler::Compiler(vm, "1+2*3", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    EXPECT_EQ(vm->static_data.const_i[1], 7);
+    delete vm;
+}
+
+// 类型不同的表达式代码优化
+TEST(oper, optimize_with_different_types) {
+    TVM*vm = create_TVM();    
+    compiler::Compiler(vm, "1.2*4", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_f.size(), 2);
+    EXPECT_EQ(vm->static_data.const_f[1], 4.8);
+    delete vm;
 }
 
 // 测试条件判断的解析
 TEST(compiler, if_lex) {
+    TVM*vm = create_TVM();
+    compiler::Compiler(vm, "if 1==1{\nprint(1)\n}", &compiler::nooptimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    EXPECT_EQ(vm->static_data.const_i[1], 1);
+    bytecode_check({{(bytecode_t)byteCodeNumber::LOAD_INT_, 1},
+     {(bytecode_t)byteCodeNumber::LOAD_INT_, 1},
+     {(bytecode_t)byteCodeNumber::EQUAL_},
+     {(bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 7},
+     {(bytecode_t)byteCodeNumber::LOAD_INT_, 1},
+     {(bytecode_t)byteCodeNumber::LOAD_INT_, 1},
+     {(bytecode_t)byteCodeNumber::CALL_BUILTIN_, 2}},vm);
+     free_TVM(vm);
+     delete vm;
 }
 
 // 测试while循环的解析

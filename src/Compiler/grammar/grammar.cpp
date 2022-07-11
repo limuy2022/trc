@@ -429,7 +429,7 @@ void grammar_lex::check_expr(is_not_end_node* root) {
                     compiler_data.error.send_error_module(
                         OPERERROR_MSG(t1, t2, *i));
                 }
-            } else if (t2 == grammar_type::STRING && is_number_class_node(t2)) {
+            } else if (t2 == grammar_type::STRING && is_number_class_node(t1)) {
                 if (((node_base_tick_without_sons*)root)->tick
                     != token_ticks::MUL) {
                     compiler_data.error.send_error_module(

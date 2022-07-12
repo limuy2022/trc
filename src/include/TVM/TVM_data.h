@@ -73,13 +73,16 @@ public:
 class TVM_dyna_data {
 public:
     // 操作数栈
-    std::stack<def::OBJ> stack_data;
+    def::OBJ* stack_data;
+    // 栈顶指针
+    def::OBJ* stack_top_ptr;
     // 帧栈
     std::stack<frame_*> frames;
     // 全局符号表
     symbol_form global_symbol_table;
     TVM_dyna_data(size_t global_symbol_table_size);
-    TVM_dyna_data() = default;
+    TVM_dyna_data();
+    ~TVM_dyna_data();
     void reset_global_symbol_table(size_t size);
 };
 }

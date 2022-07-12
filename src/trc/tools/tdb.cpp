@@ -19,7 +19,8 @@
 #include <stack>
 #include <string>
 
-static trc::TVM_space::TVM* vm;
+namespace trc {
+static TVM_space::TVM* vm;
 
 /**
  * @brief 输出变量值
@@ -48,16 +49,12 @@ static void setbreakpoint(size_t line) {
  * @brief 输出栈
  */
 static void stack_out() {
-    // 输出栈
-    // 要输出就要先将数据备份
-    // 注：虽然这是个对性能对着较大影响的方式，但是数据量绝对不会很大，时间损耗基本可以忽略
-    // 所以这段代码无需优化
-    std::stack<trc::def::OBJ> tmp(vm->dyna_data.stack_data);
-    for (int i = 0; !tmp.empty(); ++i) {
-        printf("%d:", i);
-        tmp.top()->putline(stdout);
+    size_t index = 0;
+    for (def::OBJ* i = vm->dyna_data.stack_data;
+         i != vm->dyna_data.stack_top_ptr + 1; ++i) {
+        printf("%zu:", index);
+        (*i)->putline(stdout);
         putchar('\n');
-        tmp.pop();
     }
 }
 
@@ -81,7 +78,6 @@ static vecs cutlines(const std::string& code) {
     return res;
 }
 
-namespace trc {
 /**
  * @brief 启动调试
  * @param code 代码

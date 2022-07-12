@@ -2,8 +2,8 @@ var searchData=
 [
   ['base_2ecpp_0',['base.cpp',['../base_8cpp.html',1,'']]],
   ['base_2eh_1',['base.h',['../base_8h.html',1,'']]],
-  ['blue_2',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
-  ['blue_3',['BLUE',['../color_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'color.h']]],
+  ['blue_2',['BLUE',['../color_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'color.h']]],
+  ['blue_3',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
   ['bool_5f_4',['BOOL_',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae206eec981a0b4c4f53e0280607ee23d',1,'trc::TVM_space::builtin']]],
   ['break_5',['BREAK',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a14d6a3e0201f58bfe7c01e775973e80e',1,'trc::compiler']]],
   ['brun_6',['brun',['../namespacetrc_1_1tools_1_1tools__out.html#a4421762c3d15ac6b818944f55f4f63c8',1,'trc::tools::tools_out']]],

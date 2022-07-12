@@ -70,17 +70,15 @@ TVM::~TVM() {
 }
 
 void TVM::push(def::OBJ a) {
-    dyna_data.stack_data.push(a);
+    *(++dyna_data.stack_top_ptr) = a;
 }
 
 void TVM::pop_value() {
-    dyna_data.stack_data.pop();
+    --dyna_data.stack_top_ptr;
 }
 
 def::OBJ TVM::pop() {
-    def::OBJ a = dyna_data.stack_data.top();
-    dyna_data.stack_data.pop();
-    return a;
+    return *(dyna_data.stack_top_ptr--);
 }
 
 void TVM::run_all() {

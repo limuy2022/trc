@@ -18,8 +18,20 @@ void TVM_dyna_data::reset_global_symbol_table(size_t size) {
     global_symbol_table.reset(size);
 }
 
+#define TVM_STACK_SIZE 1024
+
 TVM_dyna_data::TVM_dyna_data(size_t global_symbol_table_size)
     : global_symbol_table(global_symbol_table_size) {
+    new (this) TVM_dyna_data;
+}
+
+TVM_dyna_data::TVM_dyna_data()
+    : stack_data((def::OBJ*)malloc(sizeof(def::OBJ) * TVM_STACK_SIZE))
+    , stack_top_ptr(stack_data - 1) {
+}
+
+TVM_dyna_data::~TVM_dyna_data() {
+    free(stack_data);
 }
 
 void TVM_static_data::ReleaseStringData() {

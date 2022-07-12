@@ -194,16 +194,16 @@ treenode* make_data_node(token* data_token) {
     } else if (tmp == token_ticks::FLOAT_VALUE) {
         return new node_base_float_without_sons(atof(data_token->data));
     } else if (tmp == token_ticks::STRING_VALUE) {
-        return new node_base_string_without_sons(data_token->data);
+        return new node_base_string_without_sons(data_token);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
         return new node_base_int_without_sons(change_const[data_token->data]);
     } else if (tmp == token_ticks::LONG_INT_VALUE) {
         return new node_base_data_without_sons(
-            grammar_type::LONG_INT, data_token->data);
+            grammar_type::LONG_INT, data_token);
     } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
         return new node_base_data_without_sons(
-            grammar_type::LONG_FLOAT, data_token->data);
+            grammar_type::LONG_FLOAT, data_token);
     } else {
         // 不可能执行到别的代码，执行到就是出bug了
         NOREACH;
@@ -244,7 +244,7 @@ reget:
             if (nexttick != token_ticks::LEFT_SMALL_BRACE) {
                 // 是标识符且不为函数调用
                 now_node = new node_base_data_without_sons(
-                    grammar_type::VAR_NAME, now->data);
+                    grammar_type::VAR_NAME, now);
             } else {
                 // 函数调用
                 // warning:该地如果直接返回就会造成类似input()+input()这样的解析错误

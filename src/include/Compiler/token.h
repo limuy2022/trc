@@ -6,32 +6,6 @@
 
 namespace trc::compiler {
 /**
- * @brief token
- * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
- */
-class TRC_Compiler_api token {
-public:
-    // 标识
-    token_ticks tick;
-    // 值
-    char* data;
-
-    token(token_ticks, const char* data, size_t len);
-
-    token(token_ticks);
-
-    token() = default;
-
-    /**
-     * @brief 设置字符串大小
-     * @param len 字符串长度(不包括\0)
-     */
-    void set_size(size_t len);
-
-    ~token();
-};
-
-/**
  * @brief
  * 这是一个将字符串转换成token流按行输出的类
  */

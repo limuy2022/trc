@@ -78,6 +78,32 @@ enum class token_ticks {
     END_OF_LINE, //行结束
 };
 
+/**
+ * @brief token
+ * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
+ */
+class TRC_Compiler_api token {
+public:
+    // 标识
+    token_ticks tick;
+    // 值
+    char* data;
+
+    token(token_ticks, const char* data, size_t len);
+
+    token(token_ticks);
+
+    token() = default;
+
+    /**
+     * @brief 设置字符串大小
+     * @param len 字符串长度(不包括\0)
+     */
+    void set_size(size_t len);
+
+    ~token();
+};
+
 extern std::array<std::string, 7> opti_opers;
 extern std::array<std::string, 8> opti_condits;
 extern std::array<std::string, 3> const_values;
@@ -174,6 +200,13 @@ public:
 
     virtual ~data_node();
 
+    /**
+     * @brief 交换token对象中的const
+     * char*给此节点，只进行对象所有权的转移而消除了多次申请，释放和拷贝内存
+     * @param token_value
+     */
+    void swap_string_data(token* token_value);
+
 private:
     /**
      * @brief 重新设置大小
@@ -206,6 +239,8 @@ class TRC_Compiler_api node_base_data : public is_not_end_node,
 public:
     node_base_data(grammar_type type_argv, const char* data);
 
+    explicit node_base_data(grammar_type type, token* data);
+
     explicit node_base_data(grammar_type type = grammar_type::TREE);
 };
 
@@ -228,6 +263,8 @@ public:
 
     explicit node_base_data_without_sons(grammar_type type);
 
+    explicit node_base_data_without_sons(grammar_type type, token* data);
+
     node_base_data_without_sons();
 };
 
@@ -238,6 +275,8 @@ class TRC_Compiler_api node_base_string_without_sons : public is_end_node,
                                                        public data_node {
 public:
     node_base_string_without_sons(const char* data);
+
+    explicit node_base_string_without_sons(token* data);
 };
 
 /**

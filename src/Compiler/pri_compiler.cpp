@@ -53,6 +53,11 @@ void data_node::set(const char* new_data) {
     strcpy(this->data, new_data);
 }
 
+void data_node::swap_string_data(token* token_value) {
+    this->data = token_value->data;
+    token_value->data = nullptr;
+}
+
 data_node::~data_node() {
     // 直接释放是因为可以释放空指针
     free(data);
@@ -76,6 +81,11 @@ node_base_data::node_base_data(grammar_type type) {
     this->type = type;
 }
 
+node_base_data::node_base_data(grammar_type type, token* data) {
+    this->type = type;
+    this->swap_string_data(data);
+}
+
 node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
     : tick_node(tick) {
     this->type = type;
@@ -91,6 +101,12 @@ node_base_data_without_sons::node_base_data_without_sons(
     this->type = type;
 }
 
+node_base_data_without_sons::node_base_data_without_sons(
+    grammar_type type, token* data) {
+    this->type = type;
+    this->swap_string_data(data);
+}
+
 node_base_data_without_sons::node_base_data_without_sons() = default;
 
 node_base_tick_without_sons::node_base_tick_without_sons(
@@ -102,6 +118,11 @@ node_base_tick_without_sons::node_base_tick_without_sons(
 node_base_string_without_sons::node_base_string_without_sons(const char* data)
     : data_node(data) {
     this->type = grammar_type::STRING;
+}
+
+node_base_string_without_sons::node_base_string_without_sons(token* data) {
+    this->type = grammar_type::STRING;
+    this->swap_string_data(data);
 }
 
 node_base_int_without_sons::node_base_int_without_sons(

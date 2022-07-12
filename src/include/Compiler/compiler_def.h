@@ -5,7 +5,6 @@
 
 namespace trc::compiler {
 typedef error::error_module compiler_error;
-
 /**
  * @brief 编译器的参数
  */

@@ -188,31 +188,26 @@ treenode* grammar_lex::func_define() {
  * @warning 不负责变量节点的生成
  */
 treenode* make_data_node(token* data_token) {
-    is_end_node* data_node = nullptr;
     auto tmp = data_token->tick;
     if (tmp == token_ticks::INT_VALUE) {
-        data_node
-            = new node_base_int_without_sons(atoi(data_token->data.c_str()));
+        return new node_base_int_without_sons(atoi(data_token->data));
     } else if (tmp == token_ticks::FLOAT_VALUE) {
-        data_node
-            = new node_base_float_without_sons(atof(data_token->data.c_str()));
+        return new node_base_float_without_sons(atof(data_token->data));
     } else if (tmp == token_ticks::STRING_VALUE) {
-        data_node = new node_base_string_without_sons(data_token->data);
+        return new node_base_string_without_sons(data_token->data);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
-        data_node
-            = new node_base_int_without_sons(change_const[data_token->data]);
+        return new node_base_int_without_sons(change_const[data_token->data]);
     } else if (tmp == token_ticks::LONG_INT_VALUE) {
-        data_node = new node_base_data_without_sons(
+        return new node_base_data_without_sons(
             grammar_type::LONG_INT, data_token->data);
     } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
-        data_node = new node_base_data_without_sons(
+        return new node_base_data_without_sons(
             grammar_type::LONG_FLOAT, data_token->data);
     } else {
         // 不可能执行到别的代码，执行到就是出bug了
         NOREACH;
     }
-    return data_node;
 }
 
 treenode* grammar_lex::get_node() {
@@ -442,7 +437,7 @@ token* grammar_lex::check_excepted(token_ticks tick) {
         auto out_error_msg = res->data;
         delete res;
         compiler_data.error.send_error_module(error::SyntaxError,
-            language::error::syntaxerror_no_expect, out_error_msg.c_str());
+            language::error::syntaxerror_no_expect, out_error_msg);
         return nullptr;
     } else {
         return res;

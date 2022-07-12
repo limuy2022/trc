@@ -164,6 +164,8 @@ public:
 
     data_node(const std::string& data);
 
+    data_node(const char* data);
+
     void set(const std::string&);
 
     void set(const char*);
@@ -202,7 +204,7 @@ public:
 class TRC_Compiler_api node_base_data : public is_not_end_node,
                                         public data_node {
 public:
-    node_base_data(grammar_type type_argv, const std::string& data);
+    node_base_data(grammar_type type_argv, const char* data);
 
     explicit node_base_data(grammar_type type = grammar_type::TREE);
 };
@@ -222,7 +224,7 @@ public:
 class TRC_Compiler_api node_base_data_without_sons : public data_node,
                                                      public is_end_node {
 public:
-    node_base_data_without_sons(grammar_type type, const std::string& name);
+    node_base_data_without_sons(grammar_type type, const char* name);
 
     explicit node_base_data_without_sons(grammar_type type);
 
@@ -235,7 +237,7 @@ public:
 class TRC_Compiler_api node_base_string_without_sons : public is_end_node,
                                                        public data_node {
 public:
-    node_base_string_without_sons(const std::string& data);
+    node_base_string_without_sons(const char* data);
 };
 
 /**
@@ -323,17 +325,6 @@ extern const next_order_map<int, token_ticks> cal_priority;
 extern const next_order_map<const char*, grammar_type> str_grammar_type_cal_map;
 // 用于对应token_ticks标识到字符串名称的表，便于报错
 extern const next_order_map<const char*, token_ticks> str_token_ticks_cal_map;
-
-/**
- * @brief token
- * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
- */
-struct token {
-    // 标识
-    token_ticks tick;
-    // 值
-    std::string data;
-};
 
 /**
  * @brief 判断枚举值是否是可运算的

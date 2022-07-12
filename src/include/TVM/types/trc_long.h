@@ -15,7 +15,7 @@
 #include <string>
 
 // 整型和长整型的分界，大于十的就是长整型
-#define INT_LONGINT_LINE 10
+#define INT_LONGINT_LINE 9
 
 namespace trc::TVM_space::types {
 class TRC_TVM_api trc_long : public trcobj {

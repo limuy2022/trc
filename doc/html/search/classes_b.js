@@ -1,7 +1,7 @@
 var searchData=
 [
   ['tick_5fnode_0',['tick_node',['../classtrc_1_1compiler_1_1tick__node.html',1,'trc::compiler']]],
-  ['token_1',['token',['../structtrc_1_1compiler_1_1token.html',1,'trc::compiler']]],
+  ['token_1',['token',['../classtrc_1_1compiler_1_1token.html',1,'trc::compiler']]],
   ['token_5flex_2',['token_lex',['../classtrc_1_1compiler_1_1token__lex.html',1,'trc::compiler']]],
   ['trc_5farray_3',['trc_array',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__array.html',1,'trc::TVM_space::types']]],
   ['trc_5ffloat_4',['trc_float',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__float.html',1,'trc::TVM_space::types']]],

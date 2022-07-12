@@ -5,6 +5,31 @@
 #include <stack>
 
 namespace trc::compiler {
+/**
+ * @brief token
+ * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
+ */
+class TRC_Compiler_api token {
+public:
+    // 标识
+    token_ticks tick;
+    // 值
+    char* data;
+
+    token(token_ticks, const char* data, size_t len);
+
+    token(token_ticks);
+
+    token() = default;
+
+    /**
+     * @brief 设置字符串大小
+     * @param len 字符串长度(不包括\0)
+     */
+    void set_size(size_t len);
+
+    ~token();
+};
 
 /**
  * @brief
@@ -42,36 +67,30 @@ private:
     // 指向当前正在解析的字符
     const char* char_ptr;
 
-    // 获取下一个字符
-    void get_next_char() noexcept;
-
-    // 回到上一个字符处
-    void to_back_char() noexcept;
-
     // 判断是否解析到了终点
     bool end_of_lex() const noexcept;
 
     // 解析数字（包括浮点数）
-    void lex_int_float(token* result);
+    token* lex_int_float();
 
     /**
      * @brief 解析一个字符串
      * 注：会略过开头结尾的"和'符号
      */
-    void lex_string(token* result);
+    token* lex_string();
 
     /**
      * @brief
      * 解析英文符号（包含关键字和名称两种可能）
      */
-    void lex_english(token* result);
+    token* lex_english();
 
     /**
      * @brief 解析其他字符，如[],()等
      * @details
      * 在这里解析的字符都能被用token_ticks完整表达，所以不需要储存任何信息
      */
-    void lex_others(token* result);
+    token* lex_others();
 
     /**
      * 解析符号时遇到多种情况，例如读取*后可以为*，*=，**，**=四种情况

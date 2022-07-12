@@ -84,7 +84,7 @@ namespace tools_in {
                 change_line = true;
                 continue;
             }
-            printf("%s, %s", token_lex->data.c_str(),
+            printf("%s, %s", token_lex->data,
                 tokenticks_to_string[(int)token_lex->tick]);
         }
     }

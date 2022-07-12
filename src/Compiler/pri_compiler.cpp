@@ -38,6 +38,11 @@ data_node::data_node(const std::string& data)
     strcpy(this->data, data.c_str());
 }
 
+data_node::data_node(const char* data)
+    : data((char*)malloc(sizeof(char) * (strlen(data) + 1))) {
+    strcpy(this->data, data);
+}
+
 void data_node::set(const std::string& new_data) {
     set_alloc(new_data.length());
     strcpy(this->data, new_data.c_str());
@@ -59,9 +64,10 @@ void data_node::set_alloc(size_t sizes) {
     if (data == nullptr) {
         error::send_error(error::MemoryError, language::error::memoryerror);
     }
+    data[sizes] = '\0';
 }
 
-node_base_data::node_base_data(grammar_type type_argv, const std::string& data)
+node_base_data::node_base_data(grammar_type type_argv, const char* data)
     : data_node(data) {
     this->type = type_argv;
 }
@@ -80,7 +86,7 @@ node_base_data_without_sons::node_base_data_without_sons(grammar_type type) {
 }
 
 node_base_data_without_sons::node_base_data_without_sons(
-    grammar_type type, const std::string& data)
+    grammar_type type, const char* data)
     : data_node(data) {
     this->type = type;
 }
@@ -93,8 +99,7 @@ node_base_tick_without_sons::node_base_tick_without_sons(
     this->type = type;
 }
 
-node_base_string_without_sons::node_base_string_without_sons(
-    const std::string& data)
+node_base_string_without_sons::node_base_string_without_sons(const char* data)
     : data_node(data) {
     this->type = grammar_type::STRING;
 }

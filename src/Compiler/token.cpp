@@ -12,59 +12,79 @@
 
 // todo:完成代码检查功能
 namespace trc::compiler {
-void token_lex::lex_string(token* result) {
-    char string_begin = *char_ptr;
-    result->tick = token_ticks::STRING_VALUE;
+token* token_lex::lex_string() {
     // 略过当前"符号
-    get_next_char();
+    char string_begin = *char_ptr;
+    ++char_ptr;
+    const char* start = char_ptr;
     while (*char_ptr != string_begin) {
+        // 读入下一符号
         if (*char_ptr == '\\') {
+            char_ptr++;
+        }
+        if (end_of_lex()) {
+            // 读到文件末尾了，说明字符串解析错误
+            compiler_data.error.send_error_module(
+                error::SyntaxError, language::error::syntaxerror_lexstring);
+        }
+        ++char_ptr;
+    }
+    ptrdiff_t str_len = char_ptr - start;
+    ptrdiff_t backup = str_len;
+    token* str = new token(token_ticks::STRING_VALUE);
+    str->set_size(str_len);
+    // 为了性能，不使用标准库的拷贝函数，使用自定义的函数方便处理换行符，消除字符的移动
+    for (char *i = const_cast<char*>(start), *dataptr = str->data;
+         i != char_ptr; ++i, ++dataptr) {
+        if (*i == '\\') {
             // 转义符
+            // 减少的字符数
+            str_len--;
+            ++i;
             // 读出真实符号并匹配转为真实符号
-            get_next_char();
-            switch (*char_ptr) {
+            switch (*i) {
             case 'r': {
-                result->data += '\r';
+                *dataptr = '\r';
                 break;
             }
             case 'b': {
-                result->data += '\b';
+                *dataptr = '\b';
                 break;
             }
             case 'n': {
-                result->data += '\n';
+                *dataptr = '\n';
                 break;
             }
             case '\'': {
-                result->data += '\'';
+                *dataptr = '\'';
                 break;
             }
             case '"': {
-                result->data += '"';
+                *dataptr = '"';
                 break;
             }
             case 't': {
-                result->data += '\t';
+                *dataptr = '\t';
                 break;
             }
             case '\\': {
-                result->data += '\\';
+                *dataptr = '\\';
                 break;
             }
             case '0': {
-                result->data += '\0';
+                *dataptr = '\0';
                 break;
             }
             case 'a': {
-                result->data += '\a';
+                *dataptr = '\a';
                 break;
             }
             case 'f': {
-                result->data += '\f';
+                *dataptr = '\f';
                 break;
             }
             case 'v': {
-                result->data += '\v';
+                *dataptr = '\v';
                 break;
             }
             default: {
@@ -73,49 +93,60 @@ void token_lex::lex_string(token* result) {
             }
             }
         } else {
-            result->data += *char_ptr;
-        }
-        // 读入下一符号
-        get_next_char();
-        if (end_of_lex()) {
-            // 读到文件末尾了，说明字符串解析错误
-            compiler_data.error.send_error_module(
-                error::SyntaxError, language::error::syntaxerror_lexstring);
+            *dataptr = *i;
         }
     }
+    // 换行符会减少一个字符，所以此处计算减少多少个字符
+    if (backup != str_len) {
+        str->set_size(str_len);
+    }
     // 略过字符串终结符
-    get_next_char();
+    ++char_ptr;
+    return str;
 }
 
-void token_lex::lex_int_float(token* result) {
-    result->tick = token_ticks::INT_VALUE;
-    while (!end_of_lex()) {
+token* token_lex::lex_int_float() {
+    const char* start = char_ptr;
+    token_ticks tick_for_res = token_ticks::INT_VALUE;
+    do {
         if (!isdigit(*char_ptr)) {
             if (*char_ptr == '.') {
                 // 小数点，开启调整类型为浮点数
-                result->tick = token_ticks::FLOAT_VALUE;
-            } else if (*char_ptr == '_') {
-                // 忽略123_456中间的下划线
-                get_next_char();
-                continue;
-            } else {
-                return;
+                tick_for_res = token_ticks::FLOAT_VALUE;
+            } else if (*char_ptr != '_') {
+                break;
             }
         }
-        result->data += *char_ptr;
-        get_next_char();
+        ++char_ptr;
+    } while (!end_of_lex());
+    token* result = new token();
+    ptrdiff_t res_len = char_ptr - start, backup = res_len;
+    result->set_size(res_len);
+    for (char *i = const_cast<char*>(start), *dataptr = result->data;
+         i != char_ptr; ++i, ++dataptr) {
+        if (*i == '_') {
+            // 忽略123_456中间的下划线
+            res_len--;
+            dataptr--;
+        } else {
+            *dataptr = *i;
+        }
+    }
+    if (res_len != backup) {
+        // 长度改变，缩减长度
+        result->set_size(res_len);
     }
     // 尝试纠正为长整型和长浮点型
-    switch (result->tick) {
+    switch (tick_for_res) {
     case token_ticks::FLOAT_VALUE: {
-        if (result->data.length() - 1 > FLOAT_LONGFLOAT_LINE) {
-            result->tick = token_ticks::LONG_FLOAT_VALUE;
+        if (res_len > FLOAT_LONGFLOAT_LINE) {
+            tick_for_res = token_ticks::LONG_FLOAT_VALUE;
         }
         break;
     }
     case token_ticks::INT_VALUE: {
-        if (result->data.length() > INT_LONGINT_LINE) {
-            result->tick = token_ticks::LONG_INT_VALUE;
+        if (res_len > INT_LONGINT_LINE) {
+            tick_for_res = token_ticks::LONG_INT_VALUE;
         }
         break;
     }
@@ -123,6 +154,8 @@ void token_lex::lex_int_float(token* result) {
         NOREACH;
     }
     }
+    result->tick = tick_for_res;
+    return result;
 }
 
 bool token_lex::end_of_lex() const noexcept {
@@ -138,42 +171,36 @@ std::pair<const char*, token_ticks> keywords_[] = { { "for", token_ticks::FOR },
     { "not", token_ticks::NOT }, { "null", token_ticks::NULL_ },
     { "true", token_ticks::TRUE }, { "false", token_ticks::FALSE } };
 
-void token_lex::lex_english(token* result) {
-    result->data += *char_ptr;
-    get_next_char();
-    for (;;) {
-        if (!(is_english(*char_ptr) || isdigit(*char_ptr)) || end_of_lex()) {
-            // 不满足字母，数字，下划线
-            break;
-        }
-        result->data += *char_ptr;
-        get_next_char();
-    }
-    for (size_t i = 0, n = utils::sizeof_static_array(keywords_); i < n; ++i) {
-        if (result->data == keywords_[i].first) {
+token* token_lex::lex_english() {
+    const char* start = char_ptr;
+    do {
+        ++char_ptr;
+    } while ((is_english(*char_ptr) || isdigit(*char_ptr)) && !end_of_lex());
+    ptrdiff_t len = char_ptr - start;
+    for (size_t i = 0; i < utils::sizeof_static_array(keywords_); ++i) {
+        if (strlen(keywords_[i].first) == len
+            && !strncmp(start, keywords_[i].first, len)) {
             // 注：传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
-            result->data.clear();
-            result->tick = keywords_[i].second;
-            return;
+            return new token(keywords_[i].second);
         }
     }
     // 啥关键字都不是，只能是名称了
-    result->tick = token_ticks::NAME;
+    return new token(token_ticks::NAME, start, len);
 }
 
 token_ticks token_lex::get_binary_ticks(
     char expected_char, token_ticks expected, token_ticks unexpected) {
-    get_next_char();
+    ++char_ptr;
     if (*char_ptr == expected_char) {
         return expected;
     } else {
-        to_back_char();
+        --char_ptr;
         return unexpected;
     }
 }
 
 void token_lex::check_expected_char(char expected_char) {
-    get_next_char();
+    ++char_ptr;
     if (*char_ptr != expected_char) {
         char err_tmp[] = { *char_ptr, '\0' };
         compiler_data.error.send_error_module(error::SyntaxError,
@@ -181,41 +208,42 @@ void token_lex::check_expected_char(char expected_char) {
     }
 }
 
-void token_lex::lex_others(token* result) {
+token* token_lex::lex_others() {
+    token* result = nullptr;
     switch (*char_ptr) {
     case '<': {
-        result->tick
-            = get_binary_ticks('=', token_ticks::LESS_EQUAL, token_ticks::LESS);
+        result = new token(
+            get_binary_ticks('=', token_ticks::LESS_EQUAL, token_ticks::LESS));
         break;
     }
     case '>': {
-        result->tick = get_binary_ticks(
-            '=', token_ticks::GREATER_EQUAL, token_ticks::GREATER);
+        result = new token(get_binary_ticks(
+            '=', token_ticks::GREATER_EQUAL, token_ticks::GREATER));
         break;
     }
     case '=': {
-        result->tick
-            = get_binary_ticks('=', token_ticks::EQUAL, token_ticks::ASSIGN);
+        result = new token(
+            get_binary_ticks('=', token_ticks::EQUAL, token_ticks::ASSIGN));
         break;
     }
     case '!': {
         check_expected_char('=');
-        result->tick = token_ticks::UNEQUAL;
+        result = new token(token_ticks::UNEQUAL);
         break;
     }
     case ':': {
         check_expected_char('=');
-        result->tick = token_ticks::STORE;
+        result = new token(token_ticks::STORE);
         break;
     }
     case '+': {
-        result->tick
-            = get_binary_ticks('=', token_ticks::SELFADD, token_ticks::ADD);
+        result = new token(
+            get_binary_ticks('=', token_ticks::SELFADD, token_ticks::ADD));
         break;
     }
     case '-': {
-        result->tick
-            = get_binary_ticks('=', token_ticks::SELFSUB, token_ticks::SUB);
+        result = new token(
+            get_binary_ticks('=', token_ticks::SELFSUB, token_ticks::SUB));
         break;
     }
     case '*': {
@@ -223,12 +251,12 @@ void token_lex::lex_others(token* result) {
         if (get_binary_ticks('*', token_ticks::POW, token_ticks::UNKNOWN)
             == token_ticks::POW) {
             // 确认有两个**
-            result->tick
-                = get_binary_ticks('=', token_ticks::SELFPOW, token_ticks::POW);
+            result = new token(
+                get_binary_ticks('=', token_ticks::SELFPOW, token_ticks::POW));
         } else {
             // 只有一个*
-            result->tick
-                = get_binary_ticks('=', token_ticks::SELFMUL, token_ticks::MUL);
+            result = new token(
+                get_binary_ticks('=', token_ticks::SELFMUL, token_ticks::MUL));
         }
         break;
     }
@@ -237,8 +265,8 @@ void token_lex::lex_others(token* result) {
         if (get_binary_ticks('/', token_ticks::ZDIV, token_ticks::UNKNOWN)
             == token_ticks::ZDIV) {
             // 确认有两个//
-            result->tick = get_binary_ticks(
-                '=', token_ticks::SELFZDIV, token_ticks::ZDIV);
+            result = new token(get_binary_ticks(
+                '=', token_ticks::SELFZDIV, token_ticks::ZDIV));
         } else {
             // 只有一个/
             if (get_binary_ticks('*', token_ticks::MUL, token_ticks::UNKNOWN)
@@ -246,11 +274,11 @@ void token_lex::lex_others(token* result) {
                 // 说明是/*符号，开启注释
 
                 // 略过当前的*字符
-                get_next_char();
+                ++char_ptr;
                 for (;;) {
                     if (*char_ptr == '*') {
                         // 遇到*/的开头，可能可以退出,不是也不用退格，反正都是注释里的，没有实际意义
-                        get_next_char();
+                        ++char_ptr;
                         if (*char_ptr == '/') {
                             break;
                         } else if (*char_ptr == '\n') {
@@ -264,28 +292,28 @@ void token_lex::lex_others(token* result) {
                             error::SyntaxError,
                             language::error::syntaxerror_lexanno);
                     }
-                    get_next_char();
+                    ++char_ptr;
                 }
             } else {
-                result->tick = get_binary_ticks(
-                    '=', token_ticks::SELFDIV, token_ticks::DIV);
+                result = new token(get_binary_ticks(
+                    '=', token_ticks::SELFDIV, token_ticks::DIV));
             }
         }
         break;
     }
     case '%': {
-        result->tick
-            = get_binary_ticks('=', token_ticks::SELFMOD, token_ticks::MOD);
+        result = new token(
+            get_binary_ticks('=', token_ticks::SELFMOD, token_ticks::MOD));
         break;
     }
     /* 以下的这些括号需要进行括号匹配进行验证 */
     case '(': {
-        result->tick = token_ticks::LEFT_SMALL_BRACE;
+        result = new token(token_ticks::LEFT_SMALL_BRACE);
         check_brace.push('(');
         break;
     }
     case ')': {
-        result->tick = token_ticks::RIGHT_SMALL_BRACE;
+        result = new token(token_ticks::RIGHT_SMALL_BRACE);
         if (check_brace.top() != '(') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, ")");
@@ -294,12 +322,12 @@ void token_lex::lex_others(token* result) {
         break;
     }
     case '[': {
-        result->tick = token_ticks::LEFT_MID_BRACE;
+        result = new token(token_ticks::LEFT_MID_BRACE);
         check_brace.push('[');
         break;
     }
     case ']': {
-        result->tick = token_ticks::RIGHT_MID_BRACE;
+        result = new token(token_ticks::RIGHT_MID_BRACE);
         if (check_brace.top() != '[') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "]");
@@ -308,12 +336,12 @@ void token_lex::lex_others(token* result) {
         break;
     }
     case '{': {
-        result->tick = token_ticks::LEFT_BIG_BRACE;
+        result = new token(token_ticks::LEFT_BIG_BRACE);
         check_brace.push('{');
         break;
     }
     case '}': {
-        result->tick = token_ticks::RIGHT_BIG_BRACE;
+        result = new token(token_ticks::RIGHT_BIG_BRACE);
         if (check_brace.top() != '{') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "}");
@@ -322,11 +350,11 @@ void token_lex::lex_others(token* result) {
         break;
     }
     case ',': {
-        result->tick = token_ticks::COMMA;
+        result = new token(token_ticks::COMMA);
         break;
     }
     case '.': {
-        result->tick = token_ticks::POINT;
+        result = new token(token_ticks::POINT);
         break;
     }
     default: {
@@ -337,7 +365,8 @@ void token_lex::lex_others(token* result) {
     }
     }
     // 跳过当前字符
-    get_next_char();
+    ++char_ptr;
+    return result;
 }
 
 void token_lex::unget_token(token* token_data) {
@@ -352,48 +381,41 @@ token* token_lex::get_token() {
         is_unget = false;
         return back_token;
     }
-    auto* result = new token;
     if (*char_ptr == '\n') {
         // 加一行
         compiler_data.error.line++;
-        result->tick = token_ticks::END_OF_LINE;
-        get_next_char();
-        return result;
+        ++char_ptr;
+        return new token(token_ticks::END_OF_LINE);
     }
     if (*char_ptr == '\0') {
         // 解析结束
-        result->tick = token_ticks::END_OF_TOKENS;
-        return result;
+        return new token(token_ticks::END_OF_TOKENS);
     }
     while (*char_ptr == ' ' || *char_ptr == '\t') {
         /*略过空白符和制表符*/
-        get_next_char();
+        ++char_ptr;
     }
     while (*char_ptr == '#') {
         /*忽略注释*/
         while (!end_of_lex()) {
             // 只要不读完文件或本行，就往下读
-            get_next_char();
+            ++char_ptr;
         }
     }
     if (*char_ptr == '\'' || *char_ptr == '"') {
         /*解析字符串*/
-        lex_string(result);
-        return result;
+        return lex_string();
     }
     if (isdigit(*char_ptr)) {
         /*解析数字*/
-        lex_int_float(result);
-        return result;
+        return lex_int_float();
     }
     if (is_english(*char_ptr)) {
         /*英文字符，有多种可能，累计直到匹配到关键字（关键字）或者不为英文字符（名称）*/
-        lex_english(result);
-        return result;
+        return lex_english();
     }
     // 各种符号的解析，不满足会报错
-    lex_others(result);
-    return result;
+    return lex_others();
 }
 
 token_lex::token_lex(
@@ -412,11 +434,31 @@ token_lex::~token_lex() {
     compiler_data.error.line = 0;
 }
 
-void token_lex::get_next_char() noexcept {
-    char_ptr++;
+token::~token() {
+    free(data);
 }
 
-void token_lex::to_back_char() noexcept {
-    char_ptr--;
+token::token(token_ticks tick, const char* data, size_t len)
+    : tick(tick)
+    , data((char*)(malloc(sizeof(char) * (len + 1)))) {
+    if (data == nullptr) {
+        error::send_error(error::MemoryError, language::error::memoryerror);
+    }
+    strncpy(this->data, data, len);
+    this->data[len] = '\0';
+}
+
+token::token(token_ticks tick)
+    : tick(tick)
+    , data(nullptr) {
+}
+
+void token::set_size(size_t len) {
+    // 第一次申请内存也可以使用，因为当data为零是等价于malloc
+    data = (char*)realloc(data, sizeof(char) * (1 + len));
+    if (data == nullptr) {
+        error::send_error(error::MemoryError, language::error::memoryerror);
+    }
+    data[len] = '\0';
 }
 }

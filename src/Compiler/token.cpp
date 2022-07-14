@@ -162,14 +162,30 @@ bool token_lex::end_of_lex() const noexcept {
     return *char_ptr == '\n' || *char_ptr == '\0';
 }
 
-std::pair<const char*, token_ticks> keywords_[] = { { "for", token_ticks::FOR },
-    { "while", token_ticks::WHILE }, { "import", token_ticks::IMPORT },
-    { "goto", token_ticks::GOTO }, { "del", token_ticks::DEL },
-    { "assert", token_ticks::ASSERT }, { "if", token_ticks::IF },
-    { "class", token_ticks::CLASS }, { "func", token_ticks::FUNC },
-    { "and", token_ticks::AND }, { "or", token_ticks::OR },
-    { "not", token_ticks::NOT }, { "null", token_ticks::NULL_ },
-    { "true", token_ticks::TRUE }, { "false", token_ticks::FALSE } };
+#define CREATE_KEYWORD(str, tick)                                              \
+    { str, tick, sizeof(str) - 1 }
+
+struct {
+    const char* str;
+    token_ticks tick;
+    size_t len;
+} keywords_[] = { CREATE_KEYWORD("for", token_ticks::FOR),
+    CREATE_KEYWORD("while", token_ticks::WHILE),
+    CREATE_KEYWORD("import", token_ticks::IMPORT),
+    CREATE_KEYWORD("goto", token_ticks::GOTO),
+    CREATE_KEYWORD("del", token_ticks::DEL),
+    CREATE_KEYWORD("assert", token_ticks::ASSERT),
+    CREATE_KEYWORD("if", token_ticks::IF),
+    CREATE_KEYWORD("class", token_ticks::CLASS),
+    CREATE_KEYWORD("func", token_ticks::FUNC),
+    CREATE_KEYWORD("and", token_ticks::AND),
+    CREATE_KEYWORD("or", token_ticks::OR),
+    CREATE_KEYWORD("not", token_ticks::NOT),
+    CREATE_KEYWORD("null", token_ticks::NULL_),
+    CREATE_KEYWORD("true", token_ticks::TRUE),
+    CREATE_KEYWORD("false", token_ticks::FALSE) };
+
+#undef CREATE_KEYWORD
 
 token* token_lex::lex_english() {
     const char* start = char_ptr;
@@ -178,10 +194,9 @@ token* token_lex::lex_english() {
     } while ((is_english(*char_ptr) || isdigit(*char_ptr)) && !end_of_lex());
     ptrdiff_t len = char_ptr - start;
     for (size_t i = 0; i < utils::sizeof_static_array(keywords_); ++i) {
-        if (strlen(keywords_[i].first) == len
-            && !strncmp(start, keywords_[i].first, len)) {
+        if (keywords_[i].len == len && !strncmp(start, keywords_[i].str, len)) {
             // 注：传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
-            return new token(keywords_[i].second);
+            return new token(keywords_[i].tick);
         }
     }
     // 啥关键字都不是，只能是名称了

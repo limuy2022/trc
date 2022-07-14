@@ -1,7 +1,7 @@
 var searchData=
 [
   ['data_0',['DATA',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efae44f9e348e41cb272efa87387728571b',1,'trc::compiler']]],
-  ['data_1',['data',['../classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10',1,'trc::compiler::data_node::data()'],['../classtrc_1_1compiler_1_1token.html#a3e86e8884fb187fef4e4bcc4f1c4a9e1',1,'trc::compiler::token::data()']]],
+  ['data_1',['data',['../classtrc_1_1compiler_1_1token.html#a3e86e8884fb187fef4e4bcc4f1c4a9e1',1,'trc::compiler::token::data()'],['../classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10',1,'trc::compiler::data_node::data()']]],
   ['data_2ehpp_2',['data.hpp',['../data_8hpp.html',1,'']]],
   ['data_5finfo_3',['data_info',['../classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html',1,'trc::TVM_space::types::map_space']]],
   ['data_5fnode_4',['data_node',['../classtrc_1_1compiler_1_1data__node.html#ada4af51efeddf50ca1731d540ef60db7',1,'trc::compiler::data_node::data_node(const std::string &amp;data)'],['../classtrc_1_1compiler_1_1data__node.html#aaade74f3a4c58504ef5361c145f78d08',1,'trc::compiler::data_node::data_node(const char *data)'],['../classtrc_1_1compiler_1_1data__node.html#a3d7a0c8fe7f362eafb0571e5f335b5c7',1,'trc::compiler::data_node::data_node()=default'],['../classtrc_1_1compiler_1_1data__node.html',1,'trc::compiler::data_node']]],

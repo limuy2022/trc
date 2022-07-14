@@ -16,5 +16,6 @@ var searchData=
   ['str_5ftoken_5fticks_5fcal_5fmap_13',['str_token_ticks_cal_map',['../namespacetrc_1_1compiler.html#a33f3e1d1748bd19c3494b897d59ffd28',1,'trc::compiler']]],
   ['string_5f_14',['STRING_',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae047552a515e8a364a219e1493e09500',1,'trc::TVM_space::builtin']]],
   ['style_15',['style',['../namespacetrc_1_1tools_1_1tools__out.html#a7e01cce7e872e7ef1b4b77127fa501ed',1,'trc::tools::tools_out']]],
-  ['symbol_5fform_16',['symbol_form',['../classtrc_1_1_t_v_m__space_1_1symbol__form.html#aca294de8cc2b08403f514e1a99e1c88c',1,'trc::TVM_space::symbol_form::symbol_form(size_t size)'],['../classtrc_1_1_t_v_m__space_1_1symbol__form.html#ae6ff5a347861ef17a92e3ed03f20a1e5',1,'trc::TVM_space::symbol_form::symbol_form()=default']]]
+  ['swap_5fstring_5fdata_16',['swap_string_data',['../classtrc_1_1compiler_1_1data__node.html#ae18749f5902925c432a483e01361efa9',1,'trc::compiler::data_node']]],
+  ['symbol_5fform_17',['symbol_form',['../classtrc_1_1_t_v_m__space_1_1symbol__form.html#aca294de8cc2b08403f514e1a99e1c88c',1,'trc::TVM_space::symbol_form::symbol_form(size_t size)'],['../classtrc_1_1_t_v_m__space_1_1symbol__form.html#ae6ff5a347861ef17a92e3ed03f20a1e5',1,'trc::TVM_space::symbol_form::symbol_form()=default']]]
 ];

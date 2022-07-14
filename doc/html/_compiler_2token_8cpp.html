@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">token.cpp File Reference</div></div>
 </div><!--header-->
@@ -91,11 +92,52 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacetrc_1_1compiler"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html">trc::compiler</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a9b50aadf6559a42b5362dc148267e35e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a>(str,  tick)&#160;&#160;&#160;    { str, tick, sizeof(str) - 1 }</td></tr>
+<tr class="separator:a9b50aadf6559a42b5362dc148267e35e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a96b5dfba4789528985985f6250e66831"><td class="memItemLeft" align="right" valign="top">std::pair&lt; const char *, token_ticks &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a96b5dfba4789528985985f6250e66831">trc::compiler::keywords_</a> []</td></tr>
-<tr class="separator:a96b5dfba4789528985985f6250e66831"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e2753859f702ea35cde9b6bfdff55f0"><td class="memItemLeft" >struct {</td></tr>
+<tr class="memitem:ab073318e3171bc82a58cdec05462c37d"><td class="memItemLeft" >&#160;&#160;&#160;const char *&#160;&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a711538ce0d9330f7b01d8d0df6773364">trc::compiler::str</a></td></tr>
+<tr class="separator:ab073318e3171bc82a58cdec05462c37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf12b5b48a8767823befb5162f6871f8"><td class="memItemLeft" >&#160;&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a>&#160;&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#aef3ef9bea630fd4fe1ccb47a692351d4">trc::compiler::tick</a></td></tr>
+<tr class="separator:abf12b5b48a8767823befb5162f6871f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d4b0338085285541c000de13b35b7d6"><td class="memItemLeft" >&#160;&#160;&#160;size_t&#160;&#160;&#160;<a class="el" href="namespacetrc_1_1compiler.html#a0c54c2149a258e275f81be1b197907a3">trc::compiler::len</a></td></tr>
+<tr class="separator:a6d4b0338085285541c000de13b35b7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e2753859f702ea35cde9b6bfdff55f0"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a8e2753859f702ea35cde9b6bfdff55f0">trc::compiler::keywords_</a> []</td></tr>
+<tr class="separator:a8e2753859f702ea35cde9b6bfdff55f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a9b50aadf6559a42b5362dc148267e35e" name="a9b50aadf6559a42b5362dc148267e35e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b50aadf6559a42b5362dc148267e35e">&#9670;&nbsp;</a></span>CREATE_KEYWORD</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CREATE_KEYWORD</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">str, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">tick&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    { str, tick, sizeof(str) - 1 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

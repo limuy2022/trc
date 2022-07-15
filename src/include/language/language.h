@@ -3,6 +3,11 @@
 #include <language/library.h>
 
 namespace language {
+/**
+ * @brief 地域化初始化设置
+ */
+TRC_language_c_api void locale_init();
+
 namespace help {
     TRC_language_c_api const char* help_msg;
 }

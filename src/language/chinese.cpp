@@ -1,74 +1,79 @@
-/**
- * ÖĞÎÄ£¬gbk±àÂë
+ï»¿/**
+ * ä¸­æ–‡ï¼Œgbkç¼–ç ,ä½œä¸ºdllæ’ä»¶æä¾›ä¸åŒè¯­è¨€
  */
 
 #include <language/error.h>
 #include <language/language.h>
+#include <locale>
 
 namespace language {
 namespace error {
-    const char* error_map[] = { "Ãû×Ö´íÎó:", "Öµ´íÎó:", "Óï·¨´íÎó:",
-        "°æ±¾´íÎó:", "ÎÄ¼ş´ò¿ª´íÎó:", "Ä£¿éÕÒ²»µ½´íÎó:", "²ÎÊı´íÎó:",
-        "³ıÁã´íÎó:", "ÔËĞĞ´íÎó:", "¶ÏÑÔ´íÎó:", "Ë÷Òı´íÎó:", "ÄÚ´æ´íÎó:",
-        "¼ü´íÎó:", "ÏµÍ³´íÎó:", "ÔËËã·û´íÎó:" };
-    const char* error_from = "´íÎóÀ´×Ô";
-    const char* error_in_line = "´íÎó·¢ÉúÔÚĞĞ";
+    const char* error_map[] = { "åå­—é”™è¯¯:", "å€¼é”™è¯¯:", "è¯­æ³•é”™è¯¯:",
+        "ç‰ˆæœ¬é”™è¯¯:", "æ–‡ä»¶æ‰“å¼€é”™è¯¯:", "æ¨¡å—æ‰¾ä¸åˆ°é”™è¯¯:", "å‚æ•°é”™è¯¯:",
+        "é™¤é›¶é”™è¯¯:", "è¿è¡Œé”™è¯¯:", "æ–­è¨€é”™è¯¯:", "ç´¢å¼•é”™è¯¯:", "å†…å­˜é”™è¯¯:",
+        "é”®é”™è¯¯:", "ç³»ç»Ÿé”™è¯¯:", "è¿ç®—ç¬¦é”™è¯¯:" };
+    const char* error_from = "é”™è¯¯æ¥è‡ª";
+    const char* error_in_line = "é”™è¯¯å‘ç”Ÿåœ¨è¡Œ";
 
-    const char* nameerror = "Ãû×Ö\"%\"Ã»ÓĞ±»¶¨Òå.";
-    const char* openfileerror = "ÎŞ·¨´ò¿ª?\"%\".";
+    const char* nameerror = "åå­—\"%\"æ²¡æœ‰è¢«å®šä¹‰.";
+    const char* openfileerror = "æ— æ³•æ‰“å¼€?\"%\".";
     const char* versionerror
-        = R"(ÎŞ·¨Ö´ĞĞËüÃÇ£¬ÒòÎªËûÃÇµÄ°æ±¾ºÅ%±Ètrc°æ±¾ºÅ%¸ß)";
-    const char* memoryerror = "ÎŞ·¨´Ó²Ù×÷ÏµÍ³ÖĞÉêÇëÄÚ´æ.";
-    const char* zerodiverror = "\"%\"±»Áã³ı";
-    const char* modulenotfounderror = "ÎŞ·¨ÕÒµ½\"%\"Ä£¿é.";
-    const char* keyerror = "¼ü\"%\"Î´¶¨Òå";
-    const char* indexerror = R"(%³¬³öÁË%µÄ·¶Î§)";
-    const char* valueerror = R"("%"²»ÄÜ±»×ª»»Îª"%")";
-    const char* operatorerror = R"(²»ÄÜÊ¹ÓÃÔËËã·û"%"¶ÔÓÚÀàĞÍ:% and %)";
+        = R"(æ— æ³•æ‰§è¡Œå®ƒä»¬ï¼Œå› ä¸ºä»–ä»¬çš„ç‰ˆæœ¬å·%æ¯”trcç‰ˆæœ¬å·%é«˜)";
+    const char* memoryerror = "æ— æ³•ä»æ“ä½œç³»ç»Ÿä¸­ç”³è¯·å†…å­˜.";
+    const char* zerodiverror = "\"%\"è¢«é›¶é™¤";
+    const char* modulenotfounderror = "æ— æ³•æ‰¾åˆ°\"%\"æ¨¡å—.";
+    const char* keyerror = "é”®\"%\"æœªå®šä¹‰";
+    const char* indexerror = R"(%è¶…å‡ºäº†%çš„èŒƒå›´)";
+    const char* valueerror = R"("%"ä¸èƒ½è¢«è½¬æ¢ä¸º"%")";
+    const char* operatorerror = R"(ä¸èƒ½ä½¿ç”¨è¿ç®—ç¬¦"%"å¯¹äºç±»å‹:% and %)";
 
-    const char* argumenterror = R"(%ĞèÒª%¸ö²ÎÊı.)";
+    const char* argumenterror = R"(%éœ€è¦%ä¸ªå‚æ•°.)";
 
-    const char* syntaxerror_int = R"(Êı×Ö%²»ÕıÈ·.)";
-    const char* syntaxerror_lexstring = R"(Õâ¸ö×Ö·û´®²»ÒÔ"»ò'½áÎ²)";
-    const char* syntaxerror_no_expect = R"(%ÊÇ²»±»ÆÚ´ıµÄ)";
-    const char* syntaxerror_expect = R"(%ÊÇ±»ÆÚ´ıµÄ.)";
-    const char* syntaxerror_lexanno = "¶àĞĞ×¢ÊÍÓ¦µ±ÒÔ*/½áÎ²";
-    const char* syntaxerror_escape_char = R"(×ªÒå·û%Î´¶¨Òå)";
-    const char* syntaxerror = "´íÎóµÄÓï·¨";
-    const char* syntaxerror_unmatched_char = "Î´Æ¥ÅäµÄ'#'";
+    const char* syntaxerror_int = R"(æ•°å­—%ä¸æ­£ç¡®.)";
+    const char* syntaxerror_lexstring = R"(è¿™ä¸ªå­—ç¬¦ä¸²ä¸ä»¥"æˆ–'ç»“å°¾)";
+    const char* syntaxerror_no_expect = R"(%æ˜¯ä¸è¢«æœŸå¾…çš„)";
+    const char* syntaxerror_expect = R"(%æ˜¯è¢«æœŸå¾…çš„.)";
+    const char* syntaxerror_lexanno = "å¤šè¡Œæ³¨é‡Šåº”å½“ä»¥*/ç»“å°¾";
+    const char* syntaxerror_escape_char = R"(è½¬ä¹‰ç¬¦%æœªå®šä¹‰)";
+    const char* syntaxerror = "é”™è¯¯çš„è¯­æ³•";
+    const char* syntaxerror_unmatched_char = "æœªåŒ¹é…çš„'#'";
 
-    const char* asserterror_default = "¶ÏÑÔ";
+    const char* asserterror_default = "æ–­è¨€";
     const char* asserterror_user = "%";
 
-    const char* dll_open_err = "ÕÒ²»µ½dll\"%\"";
+    const char* dll_open_err = "æ‰¾ä¸åˆ°dll\"%\"";
 
-    const char* noreach = "Õâ¸öÏîÄ¿ÔËĞĞÁË²»Ó¦¸Ã±»ÔËĞĞµÄ´úÂë"
-                          ".Çë½«Õâ¸öÎÊÌâ±¨¸æ¸øgithub²Ö¿â";
+    const char* noreach = "è¿™ä¸ªé¡¹ç›®è¿è¡Œäº†ä¸åº”è¯¥è¢«è¿è¡Œçš„ä»£ç "
+                          ".è¯·å°†è¿™ä¸ªé—®é¢˜æŠ¥å‘Šç»™githubä»“åº“";
     const char* magic_value_error
-        = "Trc:\"%s\"²»ÊÇÒ»¸öctreeÎÄ¼ş.ÒòÎªËüµÄÄ§Êı²»ÕıÈ·."
+        = "Trc:\"%s\"ä¸æ˜¯ä¸€ä¸ªctreeæ–‡ä»¶.å› ä¸ºå®ƒçš„é­”æ•°ä¸æ­£ç¡®."
           "\n";
 }
 namespace help {
-    const char* help_msg = "TrcÊÇÒ»ÃÅ»ùÓÚÕ»µÄ±à³ÌÓïÑÔ¡£Õâ¸öÏîÄ¿ÊµÏÖ"
-                           "ÁË´ó²¿·ÖÏÖ´ú±à³ÌÓïÑÔµÄ¹¦ÄÜ£¬Ìá¹©ÁËÒ»¸öÍê"
-                           "ÉÆµÄ¹¤¾ßÁ´¡£ËüºÜ·½±ã±»Ç¶Èëµ½ÄãµÄÏîÄ¿ÖĞ»ò"
-                           "Õß×÷Îª¹¤×÷½Å±¾£¬Ò²¿ÉÒÔ°ïÖúÄãÈ¥Ñ§Ï°±àÒëÔ­Àí.";
+    const char* help_msg = "Trcæ˜¯ä¸€é—¨åŸºäºæ ˆçš„ç¼–ç¨‹è¯­è¨€ã€‚è¿™ä¸ªé¡¹ç›®å®ç°"
+                           "äº†å¤§éƒ¨åˆ†ç°ä»£ç¼–ç¨‹è¯­è¨€çš„åŠŸèƒ½ï¼Œæä¾›äº†ä¸€ä¸ªå®Œ"
+                           "å–„çš„å·¥å…·é“¾ã€‚å®ƒå¾ˆæ–¹ä¾¿è¢«åµŒå…¥åˆ°ä½ çš„é¡¹ç›®ä¸­æˆ–"
+                           "è€…ä½œä¸ºå·¥ä½œè„šæœ¬ï¼Œä¹Ÿå¯ä»¥å¸®åŠ©ä½ å»å­¦ä¹ ç¼–è¯‘åŸç†.";
 }
 
 namespace TVM {
-    const char* type_change_error_msg = "²»ÄÜ×ª»»Îª";
-    const char* oper_not_def_error_msg = "ÎŞ·¨Ê¹ÓÃ";
+    const char* type_change_error_msg = "ä¸èƒ½è½¬æ¢ä¸º";
+    const char* oper_not_def_error_msg = "æ— æ³•ä½¿ç”¨";
 }
 
 namespace trc {
-    const char* mode_not_found = "Ä£Ê½Ã»ÓĞ±»¶¨Òå\n";
+    const char* mode_not_found = "æ¨¡å¼æ²¡æœ‰è¢«å®šä¹‰\n";
 }
 
 namespace tdb {
-    const char* var = "±äÁ¿";
-    const char* not_defined = "Ã»ÓĞ±»¶¨Òå";
-    const char* start_tip = "trcµÄµ÷ÊÔÆ÷ÕıÔÚÔËĞĞ.Äã¿ÉÒÔÔÄ¶Á'Doc/"
-                            "use/TDB.txt'ÒÔÑ°ÕÒ°ïÖú.\n";
-    const char* instruction = "Ö¸Áî";
+    const char* var = "å˜é‡";
+    const char* not_defined = "æ²¡æœ‰è¢«å®šä¹‰";
+    const char* start_tip = "trcçš„è°ƒè¯•å™¨æ­£åœ¨è¿è¡Œ.ä½ å¯ä»¥é˜…è¯»'Doc/"
+                            "use/TDB.txt'ä»¥å¯»æ‰¾å¸®åŠ©.\n";
+    const char* instruction = "æŒ‡ä»¤";
+}
+
+void locale_init() {
+    std::locale::global(std::locale("zh_CN.UTF-8"));
 }
 }

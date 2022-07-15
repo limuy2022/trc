@@ -4,6 +4,7 @@
 
 #include <language/error.h>
 #include <language/language.h>
+#include <locale>
 
 namespace language {
 namespace error {
@@ -79,5 +80,9 @@ namespace tdb {
     const char* start_tip
         = R"(trc debugger is running.You can read 'Doc/use/TDB.txt' to find the help.\n)";
     const char* instruction = "instruction ";
+}
+
+void locale_init() {
+    std::locale::global(std::locale("en_US.UTF-8"));
 }
 }

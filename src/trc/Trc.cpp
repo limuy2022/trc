@@ -62,7 +62,9 @@ static inline void find_mode_to_run(char* mode) {
 }
 
 int main(int argc, char* argv[]) {
-// 初始化系统
+    // 初始化系统
+    // 初始化地域化设置
+    language::locale_init();
 /*控制台初始化*/
 #ifdef WINDOWS_PLAT
     trc::color::console_init();

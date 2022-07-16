@@ -73,7 +73,7 @@ public:
  * @brief 报出错误，错误名称和错误信息
  * @warning 一般报错，不带模块和行号
  * @param name 错误名
- * @param 可变参数：const char* 类型的字符串
+ * @param 可变参数 const char* 类型的字符串
  * @code error::send_error(error::ValueError, "%
  * can't be %", "int", "string")
  * @endcode
@@ -104,7 +104,7 @@ TRC_base_c_api char* make_error_msg(int error_name, va_list& ap);
  * @brief 输出报错信息
  * @warning
  * 不接收可变参数，接受已经处理好的报错信息和数据
- * 注:格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
+ * @details 格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
  */
 TRC_base_c_api void send_error_(
     const char* error_msg, const char* module, size_t line_index) noexcept;

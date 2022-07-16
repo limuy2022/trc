@@ -25,6 +25,7 @@ typedef std::vector<std::vector<pos>> canvas_data;
 /**
  * @brief 画方块图的函数
  * @param pos_ 描述画布数据
+ * @param background 背景填充字符
  * @details
  * 数据描述方法：
  * 在第i行j列的位置放上a个方格

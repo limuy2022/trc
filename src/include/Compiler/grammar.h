@@ -18,8 +18,8 @@ public:
     treenode* get_node();
 
     /**
-     * @param line 储存代码行的地方
-     * @param error_ 报错模块
+     * @param codes_str 字符串代码
+     * @param compiler_data 编译期间的数据和公共对象
      */
     grammar_lex(
         const std::string& codes_str, compiler_public_data& compiler_data);

@@ -228,7 +228,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>错误名 </td></tr>
-    <tr><td class="paramname">可变参数：const</td><td>char* 类型的字符串 <div class="fragment"><div class="line"> <a class="code hl_function" href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">error::send_error</a>(<a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">error::ValueError</a>, <span class="stringliteral">&quot;%</span></div>
+    <tr><td class="paramname">可变参数</td><td>const char* 类型的字符串 <div class="fragment"><div class="line"> <a class="code hl_function" href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">error::send_error</a>(<a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">error::ValueError</a>, <span class="stringliteral">&quot;%</span></div>
 <div class="line"><span class="stringliteral">can&#39;t be %&quot;</span>, <span class="stringliteral">&quot;int&quot;</span>, <span class="stringliteral">&quot;string&quot;</span>)</div>
 <div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">trc::error::ValueError</a></div><div class="ttdeci">@ ValueError</div><div class="ttdef"><b>Definition:</b> Error.h:34</div></div>
 <div class="ttc" id="anamespacetrc_1_1error_html_af76c99f76fbc24d063de5b3920fce5b6"><div class="ttname"><a href="namespacetrc_1_1error.html#af76c99f76fbc24d063de5b3920fce5b6">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:102</div></div>
@@ -280,7 +280,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>输出报错信息 </p>
-<dl class="section warning"><dt>Warning</dt><dd>不接收可变参数，接受已经处理好的报错信息和数据 注:格式化报错信息，规则：代表插入的是字符串，#代表插入的是字符 </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>不接收可变参数，接受已经处理好的报错信息和数据</dd></dl>
+<p>格式化报错信息，规则：代表插入的是字符串，#代表插入的是字符 </p>
 
 </div>
 </div>

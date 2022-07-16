@@ -548,6 +548,8 @@ Variables</h2></td></tr>
     <tr><td class="paramname">vm</td><td>虚拟机,编译过的要用TVM_space::free_TVM去释放内存 </td></tr>
     <tr><td class="paramname">codes</td><td>源代码 </td></tr>
     <tr><td class="paramname">option</td><td>编译器参数 </td></tr>
+    <tr><td class="paramname">compiler_ptr</td><td>提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息 </td></tr>
+    <tr><td class="paramname">return_compiler_ptr</td><td>是否返回当前编译函数生成的编译器对象，可用于保存编译信息 </td></tr>
   </table>
   </dd>
 </dl>

@@ -71,11 +71,11 @@ int main(int argc, char* argv[]) {
 #endif
     /* 内存初始化*/
     trc::memory::init_mem();
+    /* 初始化命令行解析器*/
+    gflags::ParseCommandLineFlags(&argc, &argv, true);
     /* 设置命令行参数*/
     trc::tools::argv = argv;
     trc::tools::argc = argc;
-    /* 初始化命令行解析器*/
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
     if (argc == 1) {
         // 不指定模式，没有参数，默认为交互模式
         trc::tools::tools_out::tshell();

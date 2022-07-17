@@ -16,9 +16,9 @@ namespace fs = std::filesystem;
 namespace trc::tools {
 namespace tools_in {
     void __build(TVM_space::TVM* vm, const std::string& path) {
+        auto option = generate_compiler_params();
         std::string scode;
         utils::readcode(scode, path);
-        auto option = generate_compiler_params();
         compiler::Compiler(vm, scode, &option);
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());
@@ -29,7 +29,7 @@ namespace tools_out {
     void build() {
         TVM_space::TVM* vm = TVM_space::create_TVM();
         // 解析到命令行参数停止
-        for (int i = 2; i < argc && argv[i][0] != '-'; ++i) {
+        for (int i = 2; i < argc; ++i) {
             tools_in::__build(vm, argv[i]);
         }
         delete vm;

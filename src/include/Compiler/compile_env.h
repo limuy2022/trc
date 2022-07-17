@@ -10,12 +10,13 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <Compiler/library.h>
 
 namespace trc::compiler {
 /**
  * @brief 编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表
  */
-class CompileEnvironment {
+class TRC_Compiler_api CompileEnvironment {
 public:
     CompileEnvironment(compiler_public_data& compiler_data);
 

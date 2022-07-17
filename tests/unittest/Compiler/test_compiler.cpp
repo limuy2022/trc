@@ -204,7 +204,7 @@ TEST(oper, expr_with_func) {
     delete vm;
 }
 
-// 优化相同的表达式代码
+// 优化类型相同的表达式代码
 TEST(oper, optimize_same_types) {
     TVM* vm = create_TVM();
     compiler::Compiler(vm, "1+2*3", &compiler::optimize_option);
@@ -213,7 +213,7 @@ TEST(oper, optimize_same_types) {
     delete vm;
 }
 
-// 类型不同的表达式代码优化
+// 优化类型不同的表达式代码
 TEST(oper, optimize_with_different_types) {
     TVM* vm = create_TVM();
     compiler::Compiler(vm, "1.2*4", &compiler::optimize_option);

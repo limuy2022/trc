@@ -12,6 +12,7 @@
 #include <csetjmp>
 #include <cstdio>
 #include <string>
+#include <generated_params.h>
 
 /**
  * @brief 判断是否为新的语句块开始
@@ -67,12 +68,14 @@ namespace tools::tools_out {
         // 先传入空代码获取对象
         compiler::detail_compiler* info_saver = compiler::Compiler(
             vm, "", &compiler::nooptimize_option, nullptr, true);
+        // 解析命令行参数
+        auto option = generate_compiler_params();
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
             io::readstr(code, stdin);
             std::string code_str(code);
-            if (code_str == "exit()")
+            if (!strcmp(code, "exit()"))
                 break;
             if (is_block(code)) {
                 get_block(code_str);
@@ -80,14 +83,18 @@ namespace tools::tools_out {
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
             if (!setjmp(error::error_env::error_back_place)) {
-                compiler::Compiler(vm, code_str, &compiler::nooptimize_option,
+                compiler::Compiler(vm, code_str, &option,
                     info_saver, false);
                 vm->reload_data();
                 vm->run_all();
             }
         }
+        // 释放代码
         free(code);
+        // 删除编译器设置
         info_saver->free_detail_compiler();
+        delete info_saver;
+        // 删除虚拟机
         delete vm;
         // 还原设置
         error::error_env::quit = true;

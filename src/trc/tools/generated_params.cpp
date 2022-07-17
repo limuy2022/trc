@@ -8,8 +8,8 @@ DEFINE_bool(noline_number_table, false, "Controls whether a line number");
 DEFINE_bool(optimize, false, "Controls whether optimization code is generated");
 
 namespace trc::tools {
-compiler::compiler_option* generate_compiler_params() {
-    return new compiler::compiler_option { FLAGS_noline_number_table,
+compiler::compiler_option generate_compiler_params() {
+    return compiler::compiler_option { FLAGS_noline_number_table,
         FLAGS_optimize };
 }
 }

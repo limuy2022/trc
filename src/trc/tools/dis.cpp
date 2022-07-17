@@ -74,8 +74,7 @@ namespace tools_in {
             std::string codes;
             utils::readcode(codes, file_path);
             auto option = generate_compiler_params();
-            compiler::Compiler(vm, codes, option);
-            delete option;
+            compiler::Compiler(vm, codes, &option);
         }
         out(*vm, file_path);
     }

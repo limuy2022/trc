@@ -19,8 +19,7 @@ namespace tools_in {
         std::string scode;
         utils::readcode(scode, path);
         auto option = generate_compiler_params();
-        compiler::Compiler(vm, scode, option);
-        delete option;
+        compiler::Compiler(vm, scode, &option);
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());
     }

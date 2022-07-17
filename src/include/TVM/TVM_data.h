@@ -17,7 +17,9 @@ class func_;
 
 class frame_;
 
-struct TVM_bytecode {
+class TVM_bytecode {
+public:
+    TVM_bytecode(bytecode_t bycode, bytecode_index_t index) :bycode(bycode), index(index) {}
     bytecode_t bycode;
     bytecode_index_t index;
 };

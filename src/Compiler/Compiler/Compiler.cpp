@@ -51,8 +51,7 @@ static byteCodeNumber opcodesym_int[] = {
 
 void detail_compiler::add_opcode(
     bytecode_t opcode, TVM_space::bytecode_index_t index) {
-    vm->static_data.byte_codes.push_back(
-        TVM_space::TVM_bytecode { opcode, index });
+    vm->static_data.byte_codes.emplace_back(opcode, index);
     vm->static_data.line_number_table.push_back(compiler_data.error.line);
     if (compiler_data.error.line != prev_value) {
         line_to_bycodeindex_table.resize(compiler_data.error.line + 1);

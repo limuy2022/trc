@@ -10,7 +10,7 @@
 namespace trc::TVM_space {
 class TVM;
 
-struct TVM_bytecode;
+class TVM_bytecode;
 
 // 字节码的类型
 typedef def::byte_t bytecode_t;

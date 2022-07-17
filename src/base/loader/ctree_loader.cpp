@@ -101,7 +101,7 @@ static void write_pool(FILE* file, std::vector<T>& const_pool) {
     int size = const_pool.size() - 1;
     fwrite(&size, sizeof(size), 1, file);
     if (size > 0) {
-        fwrite(&const_pool[1], sizeof(T), size, file);
+        fwrite(const_pool.data() + 1, sizeof(T), size, file);
     }
 }
 
@@ -117,7 +117,7 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
     fread(&size, sizeof(size), 1, file);
     // 留出占位的位置
     const_pool.resize(size + 1);
-    fread(&const_pool[1], sizeof(T), size, file);
+    fread(const_pool.data() + 1, sizeof(T), size, file);
 }
 
 /**
@@ -187,7 +187,7 @@ static void write_bytecode(
     fwrite(&line_numeber_size, sizeof(line_numeber_size), 1, file);
     if (size != 0) {
         // 为是，写入行号表
-        fwrite(&static_data.line_number_table[0],
+        fwrite(static_data.line_number_table.data(),
             sizeof(decltype(static_data.line_number_table)::value_type),
             line_numeber_size, file);
     }
@@ -215,7 +215,7 @@ static void load_bytecode(
     fread(&line_number_size, sizeof(line_number_size), 1, file);
     if (size) {
         static_data.line_number_table.resize(line_number_size);
-        fread(&static_data.line_number_table[0],
+        fread(static_data.line_number_table.data(),
             sizeof(decltype(static_data.line_number_table)::value_type),
             line_number_size, file);
     }
@@ -224,8 +224,7 @@ static void load_bytecode(
     for (int i = 0; i < size; ++i) {
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
-        static_data.byte_codes.push_back(
-            trc::TVM_space::TVM_bytecode { name, argv });
+        static_data.byte_codes.emplace_back(name, argv );
     }
 }
 

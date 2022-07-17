@@ -11,8 +11,8 @@
 #include <base/io.hpp>
 #include <csetjmp>
 #include <cstdio>
-#include <string>
 #include <generated_params.h>
+#include <string>
 
 /**
  * @brief 判断是否为新的语句块开始
@@ -83,8 +83,7 @@ namespace tools::tools_out {
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
             if (!setjmp(error::error_env::error_back_place)) {
-                compiler::Compiler(vm, code_str, &option,
-                    info_saver, false);
+                compiler::Compiler(vm, code_str, &option, info_saver, false);
                 vm->reload_data();
                 vm->run_all();
             }

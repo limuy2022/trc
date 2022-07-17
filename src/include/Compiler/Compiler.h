@@ -128,8 +128,10 @@ private:
  * @param vm 虚拟机,编译过的要用TVM_space::free_TVM去释放内存
  * @param codes 源代码
  * @param option 编译器参数
- * @param compiler_ptr 提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息
- * @param return_compiler_ptr 是否返回当前编译函数生成的编译器对象，可用于保存编译信息
+ * @param compiler_ptr
+ * 提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息
+ * @param return_compiler_ptr
+ * 是否返回当前编译函数生成的编译器对象，可用于保存编译信息
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
 TRC_Compiler_c_api detail_compiler* Compiler(TVM_space::TVM* vm,

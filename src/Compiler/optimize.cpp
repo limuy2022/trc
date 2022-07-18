@@ -10,7 +10,7 @@
 
 /**
  * @brief 删除一个节点，同时释放它的内存
- * @param l node,它的父节点
+ * @param l node,链表
  * @param n 需要删除的子节点的迭代器
  */
 #define DELETE_NODE(l, n)                                                      \
@@ -43,9 +43,33 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
             if (t1 == t2) {
                 switch (t1) {
                 case grammar_type::NUMBER: {
+                    auto anode = ((node_base_int_without_sons*)*a),
+                         bnode = ((node_base_int_without_sons*)*b);
                     // 优化执行过程，释放b点，以a点作为新的节点，避免多余的分配和释放
-                    ((node_base_int_without_sons*)*a)->value
-                        += ((node_base_int_without_sons*)*b)->value;
+                    token_ticks operator_
+                        = ((node_base_tick_without_sons*)(*i))->tick;
+                    switch (operator_) {
+                    case token_ticks::ADD: {
+                        anode->value += bnode->value;
+                        break;
+                    }
+                    case token_ticks::SUB: {
+                        anode->value -= bnode->value;
+                        break;
+                    }
+                    case token_ticks::MUL: {
+                        anode->value *= bnode->value;
+                        break;
+                    }
+                    case token_ticks::DIV: {
+                        // todo:提升为浮点型
+                        break;
+                    }
+                    default: {
+                        NOREACH("Optimizer met an unexpected cal token %d",
+                            (int)(operator_));
+                    }
+                    }
                     DELETE_NODE(expr, b);
                     break;
                 }
@@ -60,8 +84,9 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                     break;
                 }
                 case grammar_type::FLOAT: {
-                    ((node_base_float_without_sons*)*a)->value
-                        += ((node_base_float_without_sons*)*b)->value;
+                    auto anode = ((node_base_float_without_sons*)*a),
+                         bnode = ((node_base_float_without_sons*)*b);
+                    anode->value += bnode->value;
                     DELETE_NODE(expr, b);
                     break;
                 }

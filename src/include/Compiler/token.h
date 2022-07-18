@@ -30,9 +30,7 @@ public:
     compiler_public_data& compiler_data;
 
 private:
-    // 标记是否有token储存着
-    bool is_unget = false;
-
+    // 为nullptr标记着没有储存
     token* back_token = nullptr;
 
     // 经过简单处理的原始字符串代码

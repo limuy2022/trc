@@ -224,7 +224,7 @@ static void load_bytecode(
     for (int i = 0; i < size; ++i) {
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
-        static_data.byte_codes.emplace_back(name, argv );
+        static_data.byte_codes.emplace_back(name, argv);
     }
 }
 

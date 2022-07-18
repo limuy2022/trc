@@ -207,7 +207,7 @@ void detail_compiler::compile(treenode* head) {
             break;
         }
         default: {
-            NOREACH;
+            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
         }
         }
     } else {
@@ -254,7 +254,7 @@ void detail_compiler::compile(treenode* head) {
             break;
         }
         default: {
-            NOREACH;
+            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
         }
         }
     }

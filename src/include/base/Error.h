@@ -11,7 +11,7 @@
  * @param operator_node 参与运算的运算符的节点
  */
 #define OPERERROR_MSG(t1, t2, operator_node)                                   \
-    error::OperatorError,                                                      \
+    error::OperatorError, language::error::operatorerror,                      \
         str_token_ticks_cal_map                                                \
             [((node_base_tick_without_sons*)(operator_node))->tick],           \
         str_grammar_type_cal_map[(t1)], str_grammar_type_cal_map[(t2)]

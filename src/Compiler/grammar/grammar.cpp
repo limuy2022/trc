@@ -206,7 +206,7 @@ treenode* make_data_node(token* data_token) {
             grammar_type::LONG_FLOAT, data_token);
     } else {
         // 不可能执行到别的代码，执行到就是出bug了
-        NOREACH;
+        NOREACH("Unexpected data token type %d", (int)tmp);
     }
 }
 
@@ -280,7 +280,7 @@ reget:
                 break;
             }
             default: {
-                NOREACH;
+                NOREACH("Unexpected grammar block token %d", (int)(now->tick));
             }
             }
             delete now;

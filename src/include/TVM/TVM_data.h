@@ -19,7 +19,10 @@ class frame_;
 
 class TVM_bytecode {
 public:
-    TVM_bytecode(bytecode_t bycode, bytecode_index_t index) :bycode(bycode), index(index) {}
+    TVM_bytecode(bytecode_t bycode, bytecode_index_t index)
+        : bycode(bycode)
+        , index(index) {
+    }
     bytecode_t bycode;
     bytecode_index_t index;
 };

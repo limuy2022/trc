@@ -20,7 +20,8 @@ progress_bar::progress_bar(
 void progress_bar::next() {
     if (now_progress > total_steps) {
         // 到达此处说明代码出现错误
-        NOREACH;
+        NOREACH("The progress %d has exceeded the total progress %d",
+            now_progress, total_steps);
     }
     now_progress++;
 }

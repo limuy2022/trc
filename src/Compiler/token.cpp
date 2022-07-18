@@ -151,7 +151,7 @@ token* token_lex::lex_int_float() {
         break;
     }
     default: {
-        NOREACH;
+        NOREACH("Another token tick %d", (int)tick_for_res);
     }
     }
     result->tick = tick_for_res;
@@ -386,15 +386,15 @@ token* token_lex::lex_others() {
 
 void token_lex::unget_token(token* token_data) {
     // 必须没有储存token，否则就是出现了bug
-    assert(is_unget == false);
+    assert(back_token == nullptr);
     back_token = token_data;
-    is_unget = true;
 }
 
 token* token_lex::get_token() {
-    if (is_unget) {
-        is_unget = false;
-        return back_token;
+    if (back_token != nullptr) {
+        token* return_temp = back_token;
+        back_token = nullptr;
+        return return_temp;
     }
     if (*char_ptr == '\n') {
         // 加一行

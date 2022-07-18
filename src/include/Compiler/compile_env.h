@@ -5,12 +5,12 @@
 #pragma once
 
 #include <Compiler/compiler_def.h>
+#include <Compiler/library.h>
 #include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
 #include <map>
 #include <string>
 #include <vector>
-#include <Compiler/library.h>
 
 namespace trc::compiler {
 /**

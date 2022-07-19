@@ -286,12 +286,33 @@ void detail_compiler::free_detail_compiler() {
     delete &this->compiler_data.error;
 }
 
+/**
+ * @brief 负责把节点编译成代码
+ * @param grammar_lexer grammar解析器
+ * @param lex_dcompiler 负责实现细节的编译器
+ * @param vm 虚拟机
+ */
+static void compile_node(grammar_lex& grammar_lexer,detail_compiler& lex_dcompiler ,TVM_space::TVM* vm) {
+    treenode* now_get;
+    for(;;) {
+        now_get = grammar_lexer.get_node();
+        if (now_get == nullptr) {
+            break;
+        }
+        lex_dcompiler.compile(now_get);
+        free_tree(now_get);
+    }
+    // 设置全局符号表
+    vm->static_data.global_symbol_table_size
+        = lex_dcompiler.infoenv.get_global_name_size();
+}
+
 detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
     const compiler_option* option, detail_compiler* compiler_ptr,
     bool return_compiler_ptr) {
     /* 正式进入虚拟机字节码生成环节*/
     vm->static_data.ver_ = def::version;
-    treenode* now_get;
+    
     if (compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
         // 如果不需要返回变量信息或者没有提供指定编译器
         // 不需要保存变量信息
@@ -300,18 +321,7 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
         // 不会开始解析
         grammar_lex grammar_lexer(codes, compiler_data);
         detail_compiler lex_d(compiler_data, vm);
-
-        for (;;) {
-            now_get = grammar_lexer.get_node();
-            if (now_get == nullptr) {
-                break;
-            }
-            lex_d.compile(now_get);
-            free_tree(now_get);
-        }
-        // 设置全局符号表
-        vm->static_data.global_symbol_table_size
-            = lex_d.infoenv.get_global_name_size();
+        compile_node(grammar_lexer, lex_d, vm);
         return nullptr;
     } else if (return_compiler_ptr == true) {
         // 需要返回保存变量信息(tshell和tdb需要使用)
@@ -319,34 +329,13 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
             = new compiler_public_data { std::string("__main__"), option };
         grammar_lex grammar_lexer(codes, *compiler_data);
         detail_compiler* lex_d = new detail_compiler(*compiler_data, vm);
-
-        for (;;) {
-            now_get = grammar_lexer.get_node();
-            if (now_get == nullptr) {
-                break;
-            }
-            lex_d->compile(now_get);
-            free_tree(now_get);
-        }
-        // 设置全局符号表
-        vm->static_data.global_symbol_table_size
-            = lex_d->infoenv.get_global_name_size();
+        compile_node(grammar_lexer, *lex_d, vm);
         return lex_d;
     } else if (compiler_ptr != nullptr) {
         // 使用已经保存了的信息类进行编译
         compiler_ptr->retie(vm);
         grammar_lex grammar_lexer(codes, compiler_ptr->compiler_data);
-        for (;;) {
-            now_get = grammar_lexer.get_node();
-            if (now_get == nullptr) {
-                break;
-            }
-            compiler_ptr->compile(now_get);
-            free_tree(now_get);
-        }
-        // 设置全局符号表
-        vm->static_data.global_symbol_table_size
-            = compiler_ptr->infoenv.get_global_name_size();
+        compile_node(grammar_lexer, *compiler_ptr, vm);
         return nullptr;
     }
 }

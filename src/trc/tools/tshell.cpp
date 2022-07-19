@@ -65,11 +65,11 @@ namespace tools::tools_out {
         TVM_space::TVM* vm = TVM_space::create_TVM();
         // tshell报错但不终止程序
         error::error_env::quit = false;
-        // 先传入空代码获取对象
-        compiler::detail_compiler* info_saver = compiler::Compiler(
-            vm, "", &compiler::nooptimize_option, nullptr, true);
         // 解析命令行参数
         auto option = generate_compiler_params();
+        // 先传入空代码获取对象
+        compiler::detail_compiler* info_saver = compiler::Compiler(
+            vm, "", &option, nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -83,7 +83,7 @@ namespace tools::tools_out {
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
             if (!setjmp(error::error_env::error_back_place)) {
-                compiler::Compiler(vm, code_str, &option, info_saver, false);
+                compiler::Compiler(vm, code_str, nullptr, info_saver, false);
                 vm->reload_data();
                 vm->run_all();
             }

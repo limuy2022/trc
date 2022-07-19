@@ -111,8 +111,6 @@ extern std::map<std::string, int> change_const;
 
 // 语法生成树中的标识
 enum class grammar_type {
-    // 纯粹数据
-    DATA,
     // 生成无参数字节码
     OPCODE,
     // 内置函数

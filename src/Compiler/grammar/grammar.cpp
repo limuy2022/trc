@@ -173,13 +173,13 @@ treenode* grammar_lex::if_tree() {
 
 treenode* grammar_lex::func_define() {
     auto head = new is_not_end_node;
-    auto name = check_excepted(token_ticks::NAME);
-    auto* func_node = new node_base_data(grammar_type::FUNC_DEFINE, name->data);
-    delete name;
-    auto* line_node = new node_base_data_without_sons(grammar_type::DATA, "");
+    //auto name = check_excepted(token_ticks::NAME);
+    //auto* func_node = new node_base_data(grammar_type::FUNC_DEFINE, name->data);
+    //delete name;
+    //auto* line_node = new node_base_data_without_sons(grammar_type::DATA, "");
 
-    func_node->connect(line_node);
-    head->connect(func_node);
+    //func_node->connect(line_node);
+    //head->connect(func_node);
     return head;
 }
 

@@ -15,7 +15,6 @@
 #include <TVM/TVM.h>
 #include <base/Error.h>
 #include <base/trcdef.h>
-#include <stack>
 
 namespace trc::compiler {
 class grammar_data_control;
@@ -127,7 +126,7 @@ private:
  * 传入一台虚拟机和未编译的代码，将代码编译后填充进vm中
  * @param vm 虚拟机,编译过的要用TVM_space::free_TVM去释放内存
  * @param codes 源代码
- * @param option 编译器参数
+ * @param option 编译器参数,如果已经指定编译器传入nullptr
  * @param compiler_ptr
  * 提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息
  * @param return_compiler_ptr

@@ -84,7 +84,7 @@ var searchData=
   ['tvm_2ecpp_81',['TVM.cpp',['../_t_v_m_8cpp.html',1,'']]],
   ['tvm_2eh_82',['TVM.h',['../_t_v_m_8h.html',1,'']]],
   ['tvm_5fbuiltins_5ffunc_83',['TVM_BUILTINS_FUNC',['../namespacetrc_1_1_t_v_m__space.html#a85cef7438d5d252b20026c3ed514b7e5',1,'trc::TVM_space']]],
-  ['tvm_5fbytecode_84',['TVM_bytecode',['../structtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html',1,'trc::TVM_space']]],
+  ['tvm_5fbytecode_84',['TVM_bytecode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html',1,'trc::TVM_space::TVM_bytecode'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a85ea11b687d0f87aef99b3f55e6c252c',1,'trc::TVM_space::TVM_bytecode::TVM_bytecode()']]],
   ['tvm_5fcondits_2ecpp_85',['TVM_condits.cpp',['../_t_v_m__condits_8cpp.html',1,'']]],
   ['tvm_5fdata_2ecpp_86',['TVM_data.cpp',['../_t_v_m__data_8cpp.html',1,'']]],
   ['tvm_5fdata_2eh_87',['TVM_data.h',['../_t_v_m__data_8h.html',1,'']]],

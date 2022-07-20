@@ -16,7 +16,7 @@
 #define DELETE_NODE(l, n)                                                      \
     do {                                                                       \
         delete (*n);                                                           \
-        (l)->son.erase((n));                                                   \
+        (l)->son.erase((n)++);                                                 \
     } while (0)
 
 namespace trc::compiler {
@@ -25,7 +25,7 @@ namespace trc::compiler {
 void grammar_lex::optimize_expr(is_not_end_node* expr) {
     // 方法很简单，首先模拟执行过程，如果都是同种数据就进行运算压栈，不同种数据或者有变量就原封不动放入栈，一边在栈中模拟运算一边修改节点值
     std::stack<decltype(expr->son)::iterator> cal_struct;
-    for (auto i = expr->son.begin(), n = expr->son.end(); i != n; ++i) {
+    for (auto i = expr->son.begin(), n = expr->son.end(); i != n;) {
         if ((*i)->type == grammar_type::OPCODE) {
             // 运算符
             auto a = cal_struct.top();
@@ -40,12 +40,12 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
             }
             // 多种情况判断优化
             // 当类型相等可以直接优化
+            // 优化执行过程，释放b点，以a点作为新的节点，避免多余的分配和释放
             if (t1 == t2) {
                 switch (t1) {
                 case grammar_type::NUMBER: {
                     auto anode = ((node_base_int_without_sons*)*a),
                          bnode = ((node_base_int_without_sons*)*b);
-                    // 优化执行过程，释放b点，以a点作为新的节点，避免多余的分配和释放
                     token_ticks operator_
                         = ((node_base_tick_without_sons*)(*i))->tick;
                     switch (operator_) {
@@ -70,6 +70,7 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                             (int)(operator_));
                     }
                     }
+                    cal_struct.push(a);
                     DELETE_NODE(expr, b);
                     break;
                 }
@@ -110,6 +111,7 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
         } else {
             // 数据
             cal_struct.push(i);
+            ++i;
         }
     }
 }

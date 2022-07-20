@@ -13,9 +13,10 @@ class TRC_Compiler_api grammar_lex {
 public:
     /**
      * @brief 解析一段完整的代码成为语法树
+     * @param end_with_oper 判断以操作符结尾
      * @return treenode* 返回根节点指针
      */
-    treenode* get_node();
+    treenode* get_node(bool end_with_oper = false);
 
     /**
      * @param codes_str 字符串代码

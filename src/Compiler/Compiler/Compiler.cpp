@@ -292,9 +292,10 @@ void detail_compiler::free_detail_compiler() {
  * @param lex_dcompiler 负责实现细节的编译器
  * @param vm 虚拟机
  */
-static void compile_node(grammar_lex& grammar_lexer,detail_compiler& lex_dcompiler ,TVM_space::TVM* vm) {
+static void compile_node(grammar_lex& grammar_lexer,
+    detail_compiler& lex_dcompiler, TVM_space::TVM* vm) {
     treenode* now_get;
-    for(;;) {
+    for (;;) {
         now_get = grammar_lexer.get_node();
         if (now_get == nullptr) {
             break;
@@ -312,7 +313,7 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
     bool return_compiler_ptr) {
     /* 正式进入虚拟机字节码生成环节*/
     vm->static_data.ver_ = def::version;
-    
+
     if (compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
         // 如果不需要返回变量信息或者没有提供指定编译器
         // 不需要保存变量信息

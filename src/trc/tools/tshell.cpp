@@ -68,8 +68,8 @@ namespace tools::tools_out {
         // 解析命令行参数
         auto option = generate_compiler_params();
         // 先传入空代码获取对象
-        compiler::detail_compiler* info_saver = compiler::Compiler(
-            vm, "", &option, nullptr, true);
+        compiler::detail_compiler* info_saver
+            = compiler::Compiler(vm, "", &option, nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);

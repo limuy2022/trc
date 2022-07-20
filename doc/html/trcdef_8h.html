@@ -76,6 +76,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;array&gt;</code><br />
 <code>#include &lt;<a class="el" href="base_2library_8h_source.html">base/library.h</a>&gt;</code><br />
+<code>#include &lt;cstdio&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div>
@@ -94,8 +95,8 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a6f38405f5305de77c9298910b151cdb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trcdef_8h.html#a6f38405f5305de77c9298910b151cdb4">NOREACH</a></td></tr>
-<tr class="separator:a6f38405f5305de77c9298910b151cdb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaad1b2880a4c42ea1131fead61be0a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trcdef_8h.html#abaad1b2880a4c42ea1131fead61be0a6">NOREACH</a>(str, ...)</td></tr>
+<tr class="separator:abaad1b2880a4c42ea1131fead61be0a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -123,22 +124,44 @@ Functions</h2></td></tr>
 <tr class="separator:a9609c6f5f536a04520f3b8383f45f9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6f38405f5305de77c9298910b151cdb4" name="a6f38405f5305de77c9298910b151cdb4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f38405f5305de77c9298910b151cdb4">&#9670;&nbsp;</a></span>NOREACH</h2>
+<a id="abaad1b2880a4c42ea1131fead61be0a6" name="abaad1b2880a4c42ea1131fead61be0a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaad1b2880a4c42ea1131fead61be0a6">&#9670;&nbsp;</a></span>NOREACH</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">#define NOREACH</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">str, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       <a class="code hl_function" href="namespacetrc.html#a9609c6f5f536a04520f3b8383f45f9e4">\</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
+<div class="line">        printf(<a class="code hl_variable" href="namespacetrc_1_1compiler.html#a711538ce0d9330f7b01d8d0df6773364">str</a> <span class="stringliteral">&quot;\n&quot;</span>, __VA_ARGS__);                                         <a class="code hl_function" href="namespacetrc.html#a9609c6f5f536a04520f3b8383f45f9e4">\</a></div>
 <div class="line"><a class="code hl_function" href="namespacetrc.html#a9609c6f5f536a04520f3b8383f45f9e4">        trc::noreach_internal</a>(__LINE__, __FUNCTION__, __FILE__);               \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
+<div class="ttc" id="anamespacetrc_1_1compiler_html_a711538ce0d9330f7b01d8d0df6773364"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a711538ce0d9330f7b01d8d0df6773364">trc::compiler::str</a></div><div class="ttdeci">const char * str</div><div class="ttdef"><b>Definition:</b> token.cpp:169</div></div>
 <div class="ttc" id="anamespacetrc_html_a9609c6f5f536a04520f3b8383f45f9e4"><div class="ttname"><a href="namespacetrc.html#a9609c6f5f536a04520f3b8383f45f9e4">trc::noreach_internal</a></div><div class="ttdeci">void noreach_internal(size_t line, const char *funcname, const char *filename)</div><div class="ttdoc">在不能被执行到的地方放上这条语句，出现问题会强行停止程序</div><div class="ttdef"><b>Definition:</b> trcdef.cpp:21</div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>报错的辅助输出信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>

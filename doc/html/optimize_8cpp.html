@@ -123,13 +123,13 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
 <div class="line">        delete (*n);                                                           \</div>
-<div class="line">        (l)-&gt;son.erase((n));                                                   \</div>
+<div class="line">        (l)-&gt;son.erase((n)++);                                                 \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 <p>删除一个节点，同时释放它的内存 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">l</td><td>node,它的父节点 </td></tr>
+    <tr><td class="paramname">l</td><td>node,链表 </td></tr>
     <tr><td class="paramname">n</td><td>需要删除的子节点的迭代器 </td></tr>
   </table>
   </dd>

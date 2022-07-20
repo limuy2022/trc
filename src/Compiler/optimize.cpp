@@ -16,7 +16,7 @@
 #define DELETE_NODE(l, n)                                                      \
     do {                                                                       \
         delete (*n);                                                           \
-        (l)->son.erase((n));                                                   \
+        n = (l)->son.erase((n));                                               \
     } while (0)
 
 namespace trc::compiler {
@@ -51,14 +51,17 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                     switch (operator_) {
                     case token_ticks::ADD: {
                         anode->value += bnode->value;
+                        cal_struct.push(a);
                         break;
                     }
                     case token_ticks::SUB: {
                         anode->value -= bnode->value;
+                        cal_struct.push(a);
                         break;
                     }
                     case token_ticks::MUL: {
                         anode->value *= bnode->value;
+                        cal_struct.push(a);
                         break;
                     }
                     case token_ticks::DIV: {
@@ -103,10 +106,11 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                 } else {
                     // 类型不符合，报错
                     compiler_data.error.send_error_module(
-                        OPERERROR_MSG(t1, t2, *i));
+                       OPERERROR_MSG(t1, t2, *i));
                 }
             }
             DELETE_NODE(expr, i);
+            i--;
         } else {
             // 数据
             cal_struct.push(i);

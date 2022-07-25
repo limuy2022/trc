@@ -9,5 +9,5 @@ var searchData=
   ['trc_5ftvm_5fc_5fapi_6',['TRC_TVM_c_api',['../_t_v_m_2library_8h.html#aae14e094fa3529923749c0ad9bb758e4',1,'library.h']]],
   ['trc_5fxxx_5fapi_7',['TRC_xxx_api',['../sharelib_8h.html#aaa0c4a4dabaa8f7d9528440d5b8238c7',1,'sharelib.h']]],
   ['trc_5fxxx_5fc_5fapi_8',['TRC_xxx_c_api',['../sharelib_8h.html#a46a5f242d0ebdc54da59f0c3a91e85aa',1,'sharelib.h']]],
-  ['tvm_5fstack_5fsize_9',['TVM_STACK_SIZE',['../_t_v_m__data_8cpp.html#ae2d0dd0cb569cdc97b8d7f4f04a0786d',1,'TVM_data.cpp']]]
+  ['tvm_5fstack_5fsize_9',['TVM_STACK_SIZE',['../_t_v_m__data_8h.html#ae2d0dd0cb569cdc97b8d7f4f04a0786d',1,'TVM_data.h']]]
 ];

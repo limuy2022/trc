@@ -1,4 +1,4 @@
-﻿#include <platform.h>
+#include <platform.h>
 
 namespace trc {
 namespace utils {

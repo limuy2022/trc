@@ -386,6 +386,7 @@ inline bool is_condit_token(token_ticks tick) {
 
 /**
  * @brief 判断是不是运算符token
+ * @warning 不包含常量运算符token
  */
 inline bool is_cal_token(token_ticks tick) {
     return utils::inrange(token_ticks::ADD, token_ticks::POW, tick);

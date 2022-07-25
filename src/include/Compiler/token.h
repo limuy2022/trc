@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Compiler/Compiler.h>
 #include <Compiler/pri_compiler.hpp>
@@ -25,7 +25,17 @@ public:
      */
     token* get_token();
 
+    /**
+     * @brief 退回并储存一个token
+     */
     void unget_token(token* token_data);
+
+    /**
+     * @brief 返回一个只读的指向当前编译字符的指针
+     */
+    const char* get_charptr() {
+        return char_ptr;
+    }
 
     compiler_public_data& compiler_data;
 

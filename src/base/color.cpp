@@ -1,4 +1,4 @@
-﻿#include <base/color.h>
+#include <base/color.h>
 #include <platform.h>
 #ifdef WINDOWS_PLAT
 #include <windows.h>

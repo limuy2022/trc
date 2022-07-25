@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 进度条
  */
 #include <base/trcdef.h>
@@ -17,6 +17,7 @@ progress_bar::progress_bar(
     }
     this->draw();
 }
+
 void progress_bar::next() {
     if (now_progress > total_steps) {
         // 到达此处说明代码出现错误

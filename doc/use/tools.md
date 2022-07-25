@@ -12,6 +12,7 @@
 | trc tdb     |     调试程序 |
 | trc help    |     输出帮助 |
 | trc version |    输出版本号 |
+| trc style | 格式化对应代码文件 |
 
 ## 注：以no开头的参数都是禁用某功能
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File    :   Trc.cpp
  * Time    :   2021/07/09 20:49:12
  * Author  :   李沐阳
@@ -34,6 +34,7 @@ static void showversion() {
     trc::eggs::draw_pictures(data);
 }
 
+// 命令函数的接口类型
 typedef void (*argv_func_tools)();
 
 static const char* tools_func_name[] = { "tdb", "help", "version", "run",

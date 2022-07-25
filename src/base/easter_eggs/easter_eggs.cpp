@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file easter_eggs.cpp
  * @brief 留的小彩蛋，可以自定义画出小方格
  * @date 2022-05-02
@@ -31,6 +31,7 @@ inline static size_t realy(size_t x, size_t y) {
     return y * 4 - x * 2;
 }
 
+// 设置的画布长和宽
 static constexpr int canvas_length = 1000;
 static constexpr int canvas_width = 1000;
 
@@ -42,7 +43,8 @@ class drawer {
 public:
     /**
      * @brief 计算出画布大小并初始化画布
-     * @param canvas
+     * @param canvas 关于画布的描述
+     * @param background 用于填充背景的字符
      */
     drawer(const canvas_data& canvas, char background);
 
@@ -62,16 +64,12 @@ private:
     /**
      * @brief 检查所在行是否全部为背景标识符
      * @param x 所在行
-     * @return true 是
-     * @return false 不是
      */
     bool check_x(int x);
 
     /**
      * @brief 检查所在列是否全部为背景标识符
      * @param y 所在列
-     * @return true 是
-     * @return false 不是
      */
     bool check_y(int y);
     // 画布具体数据
@@ -152,6 +150,7 @@ void draw_pictures(canvas_data& pos_, char background) {
     bool flag = false;
     size_t m = pos_.size(), n = pos_[0].size();
     while (true) {
+        // 一层一层地打印
         for (size_t i = 0; i < m; ++i) {
             for (size_t j = 0; j < n; ++j) {
                 if (pos_[i][j].count_ != 0) {

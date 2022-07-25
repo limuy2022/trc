@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 内存池实现
  * 有点像stl中的内存分配模式
  * 以空间换时间
@@ -14,11 +14,11 @@
 #include <utility>
 
 // 初次申请的node_mem个数
-#define INIT_NODE_SIZE 500
+constexpr unsigned int INIT_NODE_SIZE = 500;
 // 再次申请的node_mem个数
-#define REALLOC_SIZE 50
+constexpr unsigned int REALLOC_SIZE = 50;
 // full_gc启动条件
-#define condit_for_full_gc 500
+constexpr unsigned int condit_for_full_gc = 500;
 
 /**
  * @brief 获取与需要申请的大小相适配的内存块链表

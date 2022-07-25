@@ -71,6 +71,8 @@ public:
     TVM_static_data();
 };
 
+#define TVM_STACK_SIZE 1024
+
 /**
  * @brief TVM运行过程中动态数据的存放地
  * 派生类：例如：TVM， frame_
@@ -78,7 +80,7 @@ public:
 class TVM_dyna_data {
 public:
     // 操作数栈
-    def::OBJ* stack_data;
+    def::OBJ stack_data[TVM_STACK_SIZE];
     // 栈顶指针
     def::OBJ* stack_top_ptr;
     // 帧栈

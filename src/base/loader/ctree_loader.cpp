@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ctree文件的读取与写入
  * 类似Java的方式，把空间利用最大化
  * 注:大端小端将被统一为大端,因此具备跨平台能力
@@ -19,7 +19,7 @@
 static const int MAGIC_VALUE = 0xACFD;
 
 // 由于读入和写入是相对的，所以用宏定义来简化这一点
-// str:load or write
+// @param str load or write
 #define LOAD_WRITE(file, vm, str)                                              \
     do {                                                                       \
         /* 整型常量池 */                                                  \

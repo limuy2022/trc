@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file autodll.h
  * @brief 动态加载dll的接口
  * @date 2022-03-13

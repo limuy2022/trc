@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 在TVM中，内置函数是通过一个编号来表示的，最大化减小体积
  */
 
@@ -10,7 +10,7 @@
 namespace trc::loader {
 // 编码转函数
 std::array<std::string, 12> num_func = {
-    "",
+    "",// 零号位空置防止指令运行冲突
     "exit",
     "print",
     "println",

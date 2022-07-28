@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 管理内存申请
  */
 
@@ -19,6 +19,7 @@ static void nomemory() {
 memory_pool global_memory_pool;
 
 void init_mem() {
+    // 设置内存不足时的处理函数
     std::set_new_handler(nomemory);
 }
 }

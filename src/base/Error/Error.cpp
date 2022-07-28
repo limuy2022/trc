@@ -1,4 +1,4 @@
-﻿#include <base/Error.h>
+#include <base/Error.h>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -12,6 +12,7 @@ namespace error_env {
     jmp_buf error_back_place;
 }
 
+// 检查并重新申请内存
 #define CHECK_AND_REALLOC_ERROR_MSG_STR(will_added_len)                                            \
     do {                                                                                           \
         if (used_size >= finally_out_length) {                                                     \
@@ -88,9 +89,12 @@ static void send_error_detail(int name, va_list& ap,
     char* error_msg = make_error_msg(name, ap);
     send_error_(error_msg, module.c_str(), line_index);
     free(error_msg);
+    // 检查设置判断是否报错
     if (error_env::quit) {
+        // 报错，退出程序
         exit(EXIT_FAILURE);
     }
+    // 跳转到执行的地方
     longjmp(error_env::error_back_place, 1);
 }
 

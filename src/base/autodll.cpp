@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @file autodll.cpp
- * @brief 显式加载动态链接库的包装
+ * @brief 显式加载动态链接库的封装
  * @date 2022-03-13
  *
  * @copyright Copyright (c) 2022
@@ -17,7 +17,6 @@
 namespace fs = std::filesystem;
 
 namespace trc::autodll {
-// 定义加载出的动态链接库的储存类型
 #ifdef WINDOWS_PLAT
 dll_t dllopen(const char* dllname) {
     dll_t dll_ = LoadLibrary(dllname);

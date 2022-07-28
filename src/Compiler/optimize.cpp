@@ -42,12 +42,12 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
             // 当类型相等可以直接优化
             // 优化执行过程，释放b点，以a点作为新的节点，避免多余的分配和释放
             if (t1 == t2) {
+                token_ticks operator_
+                    = ((node_base_tick_without_sons*)(*i))->tick;
                 switch (t1) {
                 case grammar_type::NUMBER: {
                     auto anode = ((node_base_int_without_sons*)*a),
                          bnode = ((node_base_int_without_sons*)*b);
-                    token_ticks operator_
-                        = ((node_base_tick_without_sons*)(*i))->tick;
                     switch (operator_) {
                     case token_ticks::ADD: {
                         anode->value += bnode->value;
@@ -70,28 +70,50 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                             (int)(operator_));
                     }
                     }
-                    cal_struct.push(a);
-                    DELETE_NODE(expr, b);
                     break;
                 }
                 case grammar_type::STRING: {
-                    auto atmp = (node_base_string_without_sons*)*a,
-                         btmp = (node_base_string_without_sons*)*b;
-                    size_t astrlen = strlen(atmp->data);
-                    atmp->data = (char*)realloc(atmp->data,
-                        sizeof(char) * (astrlen + strlen(btmp->data) + 1));
-                    strcpy(atmp->data + astrlen, btmp->data);
-                    DELETE_NODE(expr, b);
+                    auto anode = (node_base_string_without_sons*)*a,
+                             bnode = (node_base_string_without_sons*)*b;
+                    switch(operator_) {
+                        case token_ticks::ADD:{
+                            size_t astrlen = strlen(anode->data);
+                            anode->data = (char*)realloc(anode->data,
+                                sizeof(char) * (astrlen + strlen(bnode->data) + 1));
+                            strcpy(anode->data + astrlen, bnode->data);
+                            break;
+                        }
+                        default:{
+                             compiler_data.error.send_error_module(
+                            OPERERROR_MSG(t1, t2, *i));
+                        }
+                    }
                     break;
                 }
                 case grammar_type::FLOAT: {
                     auto anode = ((node_base_float_without_sons*)*a),
                          bnode = ((node_base_float_without_sons*)*b);
-                    anode->value += bnode->value;
-                    DELETE_NODE(expr, b);
+                    switch (operator_)
+                    {
+                    case token_ticks::ADD:{
+                        anode->value += bnode->value;
+                        break;
+                    }
+                    case token_ticks::SUB:{
+                        anode->value -= bnode->value;
+                        break;
+                    }
+                    default:{
+                        NOREACH("Optimizer met an unexpected cal token %d",
+                            (int)(operator_));
+                    }
+                    }
+                    
                     break;
                 }
                 }
+                cal_struct.push(a);
+                DELETE_NODE(expr, b);
             } else {
                 // 否则考虑提升类型
                 // todo:列举出所有的提升方案,优化该方案的写法使其更加简洁可读

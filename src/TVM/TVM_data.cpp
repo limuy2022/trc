@@ -24,20 +24,19 @@ TVM_dyna_data::TVM_dyna_data(size_t global_symbol_table_size)
 }
 
 TVM_dyna_data::TVM_dyna_data()
-    :stack_top_ptr(stack_data - 1) {
+    : stack_top_ptr(stack_data - 1) {
 }
 
-TVM_dyna_data::~TVM_dyna_data() {}
+TVM_dyna_data::~TVM_dyna_data() = default;
 
 void TVM_static_data::ReleaseStringData() {
-    for (auto i = const_s.begin() + 1, end = const_s.end(); i != end; ++i) {
-        delete[] * i;
+    for (size_t i = 1, n = const_s.size(); i < n; ++i) {
+        delete[] const_s[i];
     }
     const_s.clear();
     const_s.push_back(nullptr);
-    for (auto i = const_long.begin() + 1, end = const_long.end(); i != end;
-         ++i) {
-        delete[] * i;
+    for (size_t i = 1, n = const_long.size(); i < n; ++i) {
+        delete[] const_long[i];
     }
     const_long.clear();
     const_long.push_back(nullptr);

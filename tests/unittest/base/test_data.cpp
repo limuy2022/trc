@@ -103,6 +103,7 @@ TEST(data, len) {
     EXPECT_EQ(trc::utils::len(1000000000), 10);
     EXPECT_EQ(trc::utils::len(-1), 1);
     EXPECT_EQ(trc::utils::len(-1000000), 7);
+    EXPECT_EQ(trc::utils::len(-1102030), 7);
     EXPECT_EQ(trc::utils::len((unsigned int)0), 1);
     EXPECT_EQ(trc::utils::len((unsigned int)100), 3);
 }

@@ -262,9 +262,9 @@ void detail_compiler::compile(treenode* head) {
 
 detail_compiler::detail_compiler(
     compiler_public_data& compiler_data, TVM_space::TVM* vm)
-    : compiler_data(compiler_data)
+    : infoenv(compiler_data)
     , vm(vm)
-    , infoenv(compiler_data) {
+    , compiler_data(compiler_data) {
 }
 
 void detail_compiler::retie(TVM_space::TVM* vm) {
@@ -283,7 +283,7 @@ void free_tree(treenode* head) {
 }
 
 void detail_compiler::free_detail_compiler() {
-    delete &this->compiler_data.error;
+    delete &(this->compiler_data.error);
 }
 
 /**

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <base/Error.h>
 #include <base/trcdef.h>
@@ -55,5 +55,5 @@ TRC_base_c_api int readcode_with_code(
 /**
  * @brief 将指定长度的字符串写入文件
  */
-TRC_base_c_api void write_to_file(FILE*file, const char* str, size_t len);
+TRC_base_c_api void write_to_file(FILE* file, const char* str, size_t len);
 }

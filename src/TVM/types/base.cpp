@@ -156,7 +156,4 @@ def::INTOBJ trcobj::operator||([[maybe_unused]] def::OBJ value_i) {
     // error_msg); delete[] error_msg;
     return nullptr;
 }
-
-void trcobj::delete_() {
-}
 }

@@ -1,12 +1,12 @@
 ﻿#pragma once
 
+#include <TVM/library.h>
 #include <TVM/types/base.h>
 #include <TVM/types/trc_float.h>
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_int.h>
 #include <TVM/types/trc_long.h>
 #include <TVM/types/trc_string.h>
-#include <base/library.h>
 #include <base/memory/objs_pool.hpp>
 #include <platform.h>
 
@@ -19,11 +19,11 @@
 
 namespace trc::TVM_space {
 class TVM_dyna_data;
+/**
+ * 对对象池的基本封装，对象池面向全体对象
+ * 而这个类面向TVM用于保存基础类型
+ */
 struct TRC_TVM_api objs_pool_TVM {
-    /**
-     * 对对象池的基本封装，对象池面向全体对象
-     * 而这个类面向TVM用于保存基础类型
-     */
     memory::objs_pool<types::trc_int> int_pool;
     memory::objs_pool<types::trc_float> float_pool;
     memory::objs_pool<types::trc_string> str_pool;
@@ -37,9 +37,9 @@ struct TRC_TVM_api objs_pool_TVM {
  */
 TRC_TVM_c_api void free_TVM(TVM* vm);
 
-TRC_TVM_c_api void quit_mem();
+TRC_TVM_c_api void TVM_quit_mem();
 
 TRC_TVM_c_api void init_mem();
 
-TRC_TVM_api extern objs_pool_TVM* global_objs_pool;
+TRC_TVM_c_api objs_pool_TVM* global_objs_pool;
 }

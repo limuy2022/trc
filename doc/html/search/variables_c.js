@@ -6,7 +6,7 @@ var searchData=
   ['name_5fmap_5ftoken_3',['name_map_token',['../namespacetrc_1_1compiler.html#a742c940e53cef48c27a3099253a5aaaf',1,'trc::compiler']]],
   ['nameerror_4',['nameerror',['../namespacelanguage_1_1error.html#a0513b18ce55c68b0e0d6526a98d3a6ec',1,'language::error']]],
   ['names_5',['names',['../namespacetrc_1_1_t_v_m__space_1_1cpp__libs.html#ae206d90f8bdcce960f6db6404af7fbbd',1,'trc::TVM_space::cpp_libs']]],
-  ['next_6',['next',['../uniontrc_1_1memory_1_1memclass_1_1node__mem.html#ad8c83e4d023425d1bb34f70ae5a7a3c3',1,'trc::memory::memclass::node_mem::next()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html#ad7dfe9c1112c20d776c1a106530a4951',1,'trc::TVM_space::types::map_space::data_info::next()']]],
+  ['next_6',['next',['../classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html#ad7dfe9c1112c20d776c1a106530a4951',1,'trc::TVM_space::types::map_space::data_info']]],
   ['nooptimize_5foption_7',['nooptimize_option',['../namespacetrc_1_1compiler.html#a3a44cc77be0d58ef43a351bf2c3d088f',1,'trc::compiler']]],
   ['noreach_8',['noreach',['../namespacelanguage_1_1error.html#a5fd6fe5a554df3234c639b8737d13738',1,'language::error']]],
   ['not_5fdefined_9',['not_defined',['../namespacelanguage_1_1tdb.html#a93c13a9cf7416c7eed915e9583388475',1,'language::tdb']]],

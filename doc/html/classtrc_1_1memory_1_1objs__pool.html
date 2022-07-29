@@ -85,7 +85,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a126352e9f95685e0b8701328c3d11d3e"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtrc_1_1memory_1_1objs__pool.html#a126352e9f95685e0b8701328c3d11d3e">trcmalloc</a> (const P &amp;... data_argv)</td></tr>
 <tr class="separator:a126352e9f95685e0b8701328c3d11d3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
+class trc::memory::objs_pool&lt; T &gt;</div><p >对象池，每次默认分配OBJS_POOL_SIZE个对象 使用双向链表进行管理 另外，对于该内存池，注重的是分配速度，而不是释放速度，释放会由gc统一管理 </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8007895da904ba2ebfe819c34b599ad8" name="a8007895da904ba2ebfe819c34b599ad8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8007895da904ba2ebfe819c34b599ad8">&#9670;&nbsp;</a></span>objs_pool()</h2>
 
@@ -99,7 +102,6 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >对象池，每次默认分配OBJS_POOL_SIZE个对象 使用双向链表进行管理 另外，对于该内存池，注重的是分配速度，而不是释放速度，释放会由gc统一管理 </p>
 
 </div>
 </div>

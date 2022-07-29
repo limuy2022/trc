@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">trc::TVM_space::types Namespace Reference</div></div>
 </div><!--header-->
@@ -99,19 +100,57 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">所有数据类型的基类(包括用户自定义类，这些函数可以不实现) 包含析构函数，比较函数，运算函数， 逻辑运算符 注意：类不可实例化 类型系统中的所有类都不是给项目本身使用的， 仅仅服务于虚拟机，所以千万不要滥用对象和指针！  <a href="classtrc_1_1_t_v_m__space_1_1types_1_1trcobj.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a7a4b7c45828b2602d2e12a0b8571ef4e"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a7a4b7c45828b2602d2e12a0b8571ef4e">bit_type</a></td></tr>
+<tr class="separator:a7a4b7c45828b2602d2e12a0b8571ef4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a49f16e3512120b754bbaf924641e3722"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a7a4b7c45828b2602d2e12a0b8571ef4e">bit_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a49f16e3512120b754bbaf924641e3722">opt</a> = 1000000000</td></tr>
+<tr class="separator:a49f16e3512120b754bbaf924641e3722"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a035bf2046a88b2a7ea7c6815bfe23a9c"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a035bf2046a88b2a7ea7c6815bfe23a9c">bitopt</a> = <a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">utils::len</a>(<a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a49f16e3512120b754bbaf924641e3722">opt</a>)</td></tr>
+<tr class="separator:a035bf2046a88b2a7ea7c6815bfe23a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b54701f6328e8d8c95693030e29c96a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc_1_1def.html#a859ff40afa4bafd531a2c578a0cdc2f4">def::OBJ</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a9b54701f6328e8d8c95693030e29c96a">error_tick</a> = nullptr</td></tr>
 <tr class="separator:a9b54701f6328e8d8c95693030e29c96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >TVM虚拟机对象和数据对象的基类 对于需要报出异常的函数，如果报出异常，则返回nullptr，需要在字节码处判断</p>
 <p >高精度浮点数运算</p>
-<p >大整数运算</p>
+<p >大整数运算 在此详细描述一下使用的技术，在高精度的基础上使用了位压的技术， 将多位存在一个数位里，可以简单理解为1000进制，10000进制等 这样可以减少非常多的运算</p>
 <p >基础数据结构map 采用哈希表加红黑树实现 注意：如果你仔细阅读了这里的代码，你会发现这个哈希表其实实现的并不复杂， 效率也只能算是一般，不过有时间再改吧</p>
 <p >TVM中的字符串类型 注：自己实现的原因： 1.本次实现的string不需要有太多的功能，而标准库中string内容太多，功能太繁杂 2.作为一个类型，需要被gc统一管理，所以自己实现</p>
 <p >本次实现的string用法和标准库的差别很大，本次string只为TVM实现 另外，trc_string类并不提供对char和char*进行操作的函数，基本仅支持trc_string本身 </p>
-</div><h2 class="groupheader">Variable Documentation</h2>
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="a7a4b7c45828b2602d2e12a0b8571ef4e" name="a7a4b7c45828b2602d2e12a0b8571ef4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a4b7c45828b2602d2e12a0b8571ef4e">&#9670;&nbsp;</a></span>bit_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint64_t <a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a7a4b7c45828b2602d2e12a0b8571ef4e">trc::TVM_space::types::bit_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a035bf2046a88b2a7ea7c6815bfe23a9c" name="a035bf2046a88b2a7ea7c6815bfe23a9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a035bf2046a88b2a7ea7c6815bfe23a9c">&#9670;&nbsp;</a></span>bitopt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int trc::TVM_space::types::bitopt = <a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">utils::len</a>(<a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a49f16e3512120b754bbaf924641e3722">opt</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a9b54701f6328e8d8c95693030e29c96a" name="a9b54701f6328e8d8c95693030e29c96a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9b54701f6328e8d8c95693030e29c96a">&#9670;&nbsp;</a></span>error_tick</h2>
 
@@ -122,6 +161,28 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="namespacetrc_1_1def.html#a859ff40afa4bafd531a2c578a0cdc2f4">def::OBJ</a> trc::TVM_space::types::error_tick = nullptr</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a49f16e3512120b754bbaf924641e3722" name="a49f16e3512120b754bbaf924641e3722"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49f16e3512120b754bbaf924641e3722">&#9670;&nbsp;</a></span>opt</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr <a class="el" href="namespacetrc_1_1_t_v_m__space_1_1types.html#a7a4b7c45828b2602d2e12a0b8571ef4e">bit_type</a> trc::TVM_space::types::opt = 1000000000</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

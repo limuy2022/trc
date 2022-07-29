@@ -1,6 +1,5 @@
 ﻿#include <TVM/TRE.h>
 #include <TVM/TVM.h>
-#include <TVM/TVM_data.h>
 #include <TVM/memory.h>
 #include <base/memory/memory.hpp>
 #include <map>
@@ -21,7 +20,7 @@ void free_TVM(TVM* vm) {
     vm->dyna_data.reset_global_symbol_table(1);
 }
 
-void quit_mem() {
+void TVM_quit_mem() {
     delete TVM_share::true_;
     delete TVM_share::false_;
     delete global_objs_pool;

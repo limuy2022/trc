@@ -67,8 +67,6 @@ public:
 
     RUN_TYPE_TICK gettype() override;
 
-    void delete_() override;
-
 private:
     /**
      * @brief 重新申请字符数

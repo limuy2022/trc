@@ -31,9 +31,6 @@ trc_string::trc_string(const trc_string& init)
 }
 
 trc_string& trc_string::operator=(const std::string& init) {
-    /**
-     * 由于常量池，所以兼容string
-     */
     char_num = init.length();
     set_realloc(char_num);
     strcpy(value, init.c_str());
@@ -43,7 +40,6 @@ trc_string& trc_string::operator=(const std::string& init) {
 trc_string::trc_string(const std::string& init)
     : char_num(init.length())
     , value((char*)(malloc(sizeof(char) * (char_num + 1)))) {
-    // 由于常量池，所以兼容string
     strcpy(value, init.c_str());
 }
 
@@ -161,9 +157,5 @@ def::OBJ trc_string::operator*(def::OBJ value_i) {
         strcat(res->value, value);
     }
     return res;
-}
-
-void trc_string::delete_() {
-    set_realloc(0);
 }
 }

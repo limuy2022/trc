@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 进度条
  */
 #include <base/trcdef.h>

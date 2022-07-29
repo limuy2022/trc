@@ -10,24 +10,6 @@
 
 using namespace trc;
 
-// 内存池测试
-TEST(memory, memory_pool) {
-    // 申请小的
-    int* a = (int*)MALLOC(sizeof(int));
-    *a = 10;
-    FREE(a, sizeof(int));
-    // 申请可变的长字符串
-    char* str = (char*)MALLOC(sizeof(char) * 20);
-    strcpy(str, "pppp");
-    // 往短的方向申请
-    str = (char*)REALLOC(str, sizeof(char) * 20, sizeof(char) * 5);
-    EXPECT_STREQ(str, "pppp");
-    // 往长的方向申请
-    str = (char*)REALLOC(str, sizeof(char) * 5, sizeof(char) * 50);
-    EXPECT_STREQ(str, "pppp");
-    FREE(str, sizeof(char) * 50);
-}
-
 // 对象池构造函数和析构函数测试
 TEST(memory, objs_pool_new_delete) {
     count_new_del::reset();

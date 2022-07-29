@@ -46,6 +46,8 @@ public:
      */
     void retie(TVM_space::TVM* vm);
 
+    TVM_space::TVM* vm;
+
     // 编译期间需要用到的数据
     compiler_public_data& compiler_data;
 
@@ -117,8 +119,6 @@ private:
 
     // 行号转化为字节码每行的第一个字节码的索引
     std::vector<int> line_to_bycodeindex_table;
-
-    TVM_space::TVM* vm;
 };
 
 /**

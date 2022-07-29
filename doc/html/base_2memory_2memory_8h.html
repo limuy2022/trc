@@ -68,13 +68,11 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">memory.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="base_2library_8h_source.html">base/library.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="memory__pool_8h_source.html">base/memory/memory_pool.h</a>&gt;</code><br />
 </div>
 <p><a href="base_2memory_2memory_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -85,68 +83,12 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacetrc_1_1memory"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html">trc::memory</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a3e218828af7ddd3f4cd0d3772562b520"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2memory_2memory_8h.html#a3e218828af7ddd3f4cd0d3772562b520">MALLOC</a>&#160;&#160;&#160;trc::memory::global_memory_pool.mem_malloc</td></tr>
-<tr class="separator:a3e218828af7ddd3f4cd0d3772562b520"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e501a3b49991d5e526b5c52c1522df4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2memory_2memory_8h.html#a2e501a3b49991d5e526b5c52c1522df4">REALLOC</a>&#160;&#160;&#160;trc::memory::global_memory_pool.mem_realloc</td></tr>
-<tr class="separator:a2e501a3b49991d5e526b5c52c1522df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a8e700d56e7d858108b755ad3edb52e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2memory_2memory_8h.html#a9a8e700d56e7d858108b755ad3edb52e">FREE</a>&#160;&#160;&#160;trc::memory::global_memory_pool.mem_free</td></tr>
-<tr class="separator:a9a8e700d56e7d858108b755ad3edb52e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a3b4c2049a327c96e65e2ace23638fd61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#a3b4c2049a327c96e65e2ace23638fd61">trc::memory::init_mem</a> ()</td></tr>
 <tr class="memdesc:a3b4c2049a327c96e65e2ace23638fd61"><td class="mdescLeft">&#160;</td><td class="mdescRight">内存申请初始化，程序启动时执行  <a href="namespacetrc_1_1memory.html#a3b4c2049a327c96e65e2ace23638fd61">More...</a><br /></td></tr>
 <tr class="separator:a3b4c2049a327c96e65e2ace23638fd61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06371e2ab0fece49d154f84b940f6254"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#a06371e2ab0fece49d154f84b940f6254">trc::memory::quit_mem</a> ()</td></tr>
-<tr class="memdesc:a06371e2ab0fece49d154f84b940f6254"><td class="mdescLeft">&#160;</td><td class="mdescRight">释放内存，程序结束时使用  <a href="namespacetrc_1_1memory.html#a06371e2ab0fece49d154f84b940f6254">More...</a><br /></td></tr>
-<tr class="separator:a06371e2ab0fece49d154f84b940f6254"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a9a8e700d56e7d858108b755ad3edb52e" name="a9a8e700d56e7d858108b755ad3edb52e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a8e700d56e7d858108b755ad3edb52e">&#9670;&nbsp;</a></span>FREE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define FREE&#160;&#160;&#160;trc::memory::global_memory_pool.mem_free</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3e218828af7ddd3f4cd0d3772562b520" name="a3e218828af7ddd3f4cd0d3772562b520"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e218828af7ddd3f4cd0d3772562b520">&#9670;&nbsp;</a></span>MALLOC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MALLOC&#160;&#160;&#160;trc::memory::global_memory_pool.mem_malloc</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >管理trc的内存 当申请失败时报出MemoryError </p>
-
-</div>
-</div>
-<a id="a2e501a3b49991d5e526b5c52c1522df4" name="a2e501a3b49991d5e526b5c52c1522df4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e501a3b49991d5e526b5c52c1522df4">&#9670;&nbsp;</a></span>REALLOC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define REALLOC&#160;&#160;&#160;trc::memory::global_memory_pool.mem_realloc</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

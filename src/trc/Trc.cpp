@@ -1,10 +1,11 @@
-/**
+﻿/**
  * File    :   Trc.cpp
  * Time    :   2021/07/09 20:49:12
  * Author  :   李沐阳
  * @warning 此文件不能包含任何需要测试的程序
  */
 
+#include <TVM/memory.h>
 #include <base/color.h>
 #include <base/easter_eggs.h>
 #include <base/memory/memory.h>
@@ -62,6 +63,13 @@ static inline void find_mode_to_run(char* mode) {
     show_error(mode);
 }
 
+/**
+ * @brief 释放内存，程序结束时使用
+ */
+static void quit_mem() {
+    trc::TVM_space::TVM_quit_mem();
+}
+
 int main(int argc, char* argv[]) {
     // 初始化系统
     // 初始化地域化设置
@@ -86,6 +94,6 @@ int main(int argc, char* argv[]) {
     }
     // 卸载系统
     // 卸载内存，做收尾工作
-    trc::memory::quit_mem();
+    quit_mem();
     return 0;
 }

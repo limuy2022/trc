@@ -27,9 +27,6 @@ public:
 
     virtual ~trcobj();
 
-    // 为了内存池的需要，由于内存池并不真正删除对象，所以需要提供一个"伪析构函数"
-    virtual void delete_();
-
     virtual def::OBJ to_int();
 
     virtual def::OBJ to_string();

@@ -67,32 +67,19 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">trc::memory Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespacetrc_1_1memory_1_1memclass"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory_1_1memclass.html">memclass</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1memory_1_1memory__pool.html">memory_pool</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">内存池 对象存放在对象池中，由对象创建的特殊对象存放在公共对象池中 只有对象申请的内存才会被存放到内存池中 两者的区别在于：对象池大小固定，效率更高； 而内存池可以申请大小不固定的内存，效率稍低  <a href="classtrc_1_1memory_1_1memory__pool.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1memory_1_1objs__pool.html">objs_pool</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a06371e2ab0fece49d154f84b940f6254"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#a06371e2ab0fece49d154f84b940f6254">quit_mem</a> ()</td></tr>
-<tr class="memdesc:a06371e2ab0fece49d154f84b940f6254"><td class="mdescLeft">&#160;</td><td class="mdescRight">释放内存，程序结束时使用  <a href="namespacetrc_1_1memory.html#a06371e2ab0fece49d154f84b940f6254">More...</a><br /></td></tr>
-<tr class="separator:a06371e2ab0fece49d154f84b940f6254"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b4c2049a327c96e65e2ace23638fd61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#a3b4c2049a327c96e65e2ace23638fd61">init_mem</a> ()</td></tr>
 <tr class="memdesc:a3b4c2049a327c96e65e2ace23638fd61"><td class="mdescLeft">&#160;</td><td class="mdescRight">内存申请初始化，程序启动时执行  <a href="namespacetrc_1_1memory.html#a3b4c2049a327c96e65e2ace23638fd61">More...</a><br /></td></tr>
 <tr class="separator:a3b4c2049a327c96e65e2ace23638fd61"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,15 +95,10 @@ Functions</h2></td></tr>
 <tr class="memitem:aa28f1bd84f1cee975af45427e8c65c7f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">free_array_obj</a> (T &amp;f)</td></tr>
 <tr class="memdesc:aa28f1bd84f1cee975af45427e8c65c7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">释放整个容器中元素的内存  <a href="namespacetrc_1_1memory.html#aa28f1bd84f1cee975af45427e8c65c7f">More...</a><br /></td></tr>
 <tr class="separator:aa28f1bd84f1cee975af45427e8c65c7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:aeb76db46789c7ca12fe4f22bd962ac47"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1memory_1_1memory__pool.html">memory_pool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1memory.html#aeb76db46789c7ca12fe4f22bd962ac47">global_memory_pool</a></td></tr>
-<tr class="memdesc:aeb76db46789c7ca12fe4f22bd962ac47"><td class="mdescLeft">&#160;</td><td class="mdescRight">管理虚拟机对象分配内存的内存池  <a href="namespacetrc_1_1memory.html#aeb76db46789c7ca12fe4f22bd962ac47">More...</a><br /></td></tr>
-<tr class="separator:aeb76db46789c7ca12fe4f22bd962ac47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >管理内存申请 </p>
+<div class="textblock"><p >管理内存申请</p>
+<p >管理trc的内存 当申请失败时报出MemoryError </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="acf852b2c2e34d1828c27c5bbde0df7b5" name="acf852b2c2e34d1828c27c5bbde0df7b5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acf852b2c2e34d1828c27c5bbde0df7b5">&#9670;&nbsp;</a></span>free_array_array()</h2>
@@ -247,42 +229,6 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>内存申请初始化，程序启动时执行 </p>
-
-</div>
-</div>
-<a id="a06371e2ab0fece49d154f84b940f6254" name="a06371e2ab0fece49d154f84b940f6254"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06371e2ab0fece49d154f84b940f6254">&#9670;&nbsp;</a></span>quit_mem()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::memory::quit_mem </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>释放内存，程序结束时使用 </p>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="aeb76db46789c7ca12fe4f22bd962ac47" name="aeb76db46789c7ca12fe4f22bd962ac47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb76db46789c7ca12fe4f22bd962ac47">&#9670;&nbsp;</a></span>global_memory_pool</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> <a class="el" href="classtrc_1_1memory_1_1memory__pool.html">memory_pool</a> trc::memory::global_memory_pool</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>管理虚拟机对象分配内存的内存池 </p>
 
 </div>
 </div>

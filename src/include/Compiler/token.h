@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Compiler/Compiler.h>
 #include <Compiler/pri_compiler.hpp>

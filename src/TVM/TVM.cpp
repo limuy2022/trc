@@ -62,7 +62,6 @@ void free_module(TVM* vm) {
 
 TVM::~TVM() {
     // 释放字节码和变量的值
-    free_TVM(this);
     free_module(this);
     for (const auto& i : static_data.funcs) {
         delete i.second;

@@ -4,7 +4,6 @@
  */
 
 #include <Compiler/Compiler.h>
-#include <Compiler/compiler_def.h>
 #include <TVM/TVM.h>
 #include <TVM/memory.h>
 #include <base/Error.h>
@@ -50,7 +49,7 @@ static void get_block(std::string& res) {
         else if (is_end(temp)) {
             --break_num;
             if (!break_num)
-                return;
+                break;
         }
     }
     free(temp);
@@ -90,11 +89,11 @@ namespace tools::tools_out {
         }
         // 释放代码
         free(code);
+        // 删除虚拟机
+        delete vm;
         // 删除编译器设置
         info_saver->free_detail_compiler();
         delete info_saver;
-        // 删除虚拟机
-        delete vm;
         // 还原设置
         error::error_env::quit = true;
     }

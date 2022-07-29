@@ -34,7 +34,7 @@ void listfiles(const std::string& path, std::vector<fs::path>& fileList,
 
 bool file_exists(const std::string& path) {
     // 如果存在且不为目录，返回true
-    return fs::exists(path)? !fs::is_directory(path):false;
+    return fs::exists(path) ? !fs::is_directory(path) : false;
 }
 
 void import_to_path(std::string& import_name) {
@@ -81,8 +81,8 @@ int readcode_with_code(std::string& file_data, const std::string& path) {
     return 0;
 }
 
-void write_to_file(FILE*file, const char* str, size_t len){
-    for(size_t i = 0; i < len; ++i) {
+void write_to_file(FILE* file, const char* str, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
         fputc(str[i], file);
     }
 }

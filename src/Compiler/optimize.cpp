@@ -74,41 +74,40 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                 }
                 case grammar_type::STRING: {
                     auto anode = (node_base_string_without_sons*)*a,
-                             bnode = (node_base_string_without_sons*)*b;
-                    switch(operator_) {
-                        case token_ticks::ADD:{
-                            size_t astrlen = strlen(anode->data);
-                            anode->data = (char*)realloc(anode->data,
-                                sizeof(char) * (astrlen + strlen(bnode->data) + 1));
-                            strcpy(anode->data + astrlen, bnode->data);
-                            break;
-                        }
-                        default:{
-                             compiler_data.error.send_error_module(
+                         bnode = (node_base_string_without_sons*)*b;
+                    switch (operator_) {
+                    case token_ticks::ADD: {
+                        size_t astrlen = strlen(anode->data);
+                        anode->data = (char*)realloc(anode->data,
+                            sizeof(char) * (astrlen + strlen(bnode->data) + 1));
+                        strcpy(anode->data + astrlen, bnode->data);
+                        break;
+                    }
+                    default: {
+                        compiler_data.error.send_error_module(
                             OPERERROR_MSG(t1, t2, *i));
-                        }
+                    }
                     }
                     break;
                 }
                 case grammar_type::FLOAT: {
                     auto anode = ((node_base_float_without_sons*)*a),
                          bnode = ((node_base_float_without_sons*)*b);
-                    switch (operator_)
-                    {
-                    case token_ticks::ADD:{
+                    switch (operator_) {
+                    case token_ticks::ADD: {
                         anode->value += bnode->value;
                         break;
                     }
-                    case token_ticks::SUB:{
+                    case token_ticks::SUB: {
                         anode->value -= bnode->value;
                         break;
                     }
-                    default:{
+                    default: {
                         NOREACH("Optimizer met an unexpected cal token %d",
                             (int)(operator_));
                     }
                     }
-                    
+
                     break;
                 }
                 }

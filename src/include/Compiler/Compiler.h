@@ -56,19 +56,19 @@ private:
      * @brief 将整形数据添加进const_i常量池
      * @return 数据在常量池中的索引
      */
-    TVM_space::bytecode_index_t add_int(int value);
+    TVM_space::bytecode_index_t add_int(int value) const;
 
     /**
      * @brief 将浮点型数据添加进const_f常量池
      * @return 数据在常量池中的索引
      */
-    TVM_space::bytecode_index_t add_float(float value);
+    TVM_space::bytecode_index_t add_float(float value) const;
 
     /**
      * @brief 将字符串型数据添加进const_s常量池
      * @return 数据在常量池中的索引
      */
-    TVM_space::bytecode_index_t add_string(const char* value);
+    TVM_space::bytecode_index_t add_string(const char* value) const;
 
     /**
      * @brief 将变量添加进符号表中
@@ -88,7 +88,7 @@ private:
      * @brief 将长整型添加进符号表中
      * @return 变量在符号表中的索引
      */
-    TVM_space::bytecode_index_t add_long(const char* value);
+    TVM_space::bytecode_index_t add_long(const char* value) const;
 
     /**
      * @brief

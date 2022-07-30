@@ -8,12 +8,21 @@ namespace trc::utils {
  * @brief 改变字节序：大端改成小端，小端改成大端
  * @param bytes 需要转换的起点
  * @param size 需要转换的字节数
- * 注：之所以使用unsigned char，是因为unsigned
- * char正好是一个字节，而且比较好操作，使用之前需要把指针转为（char*）
  */
 TRC_base_c_api void bytes_order_change(def::byte_t* const& bytes_, size_t size);
 
-uint32_t utf_8_decode();
+/**
+ * @brief 返回解码utf8的字节数
+ */
+TRC_base_c_api int utf_8_decode(const uint8_t* bytePtr, uint32_t length);
 
-uint32_t utf_8_encode();
+/**
+ * @brief 把value编码为utf8后写入缓冲区buf,返回写入的字节数
+ */
+TRC_base_c_api uint32_t utf_8_encode(uint8_t* buf, int value);
+
+/**
+ * @brief 返回value按照utf8编码后的字节数
+ */
+TRC_base_c_api uint32_t getByteNumOfEncodeUtf8(int value);
 }

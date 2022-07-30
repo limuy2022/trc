@@ -5,14 +5,11 @@
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
-#include <TVM/TVM_data.h>
 #include <TVM/TVMdef.h>
 #include <TVM/func.h>
 #include <base/Error.h>
 #include <base/code_loader.h>
 #include <base/utils/data.hpp>
-#include <climits>
-#include <cstring>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -64,7 +61,7 @@ void detail_compiler::add_opcode(
 void detail_compiler::func_lexer(treenode* head) {
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_int(int value) {
+TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
     size_t size = vm->static_data.const_i.size();
     int index = utils::check_in_i(value, vm->static_data.const_i.begin() + 1,
         vm->static_data.const_i.end());
@@ -76,7 +73,7 @@ TVM_space::bytecode_index_t detail_compiler::add_int(int value) {
     }
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_float(float value) {
+TVM_space::bytecode_index_t detail_compiler::add_float(float value) const {
     size_t size = vm->static_data.const_f.size();
     int index = utils::check_in_i(value, vm->static_data.const_f.begin() + 1,
         vm->static_data.const_f.end());
@@ -88,7 +85,7 @@ TVM_space::bytecode_index_t detail_compiler::add_float(float value) {
     }
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_string(const char* value) {
+TVM_space::bytecode_index_t detail_compiler::add_string(const char* value) const {
     int index = utils::str_check_in_i(value,
         vm->static_data.const_s.begin() + 1, vm->static_data.const_s.end());
     size_t size = vm->static_data.const_s.size();
@@ -112,7 +109,7 @@ TVM_space::bytecode_index_t detail_compiler::add_var_must_in(
     return infoenv.get_index_of_globalvar(value, false);
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_long(const char* value) {
+TVM_space::bytecode_index_t detail_compiler::add_long(const char* value) const {
     size_t size = vm->static_data.const_long.size();
     int index
         = utils::str_check_in_i(value, vm->static_data.const_long.begin() + 1,

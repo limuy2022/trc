@@ -4,11 +4,13 @@
 #include <TVM/library.h>
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
+#include <cstdint>
 
 namespace trc::TVM_space::types {
+typedef int32_t trc_int_t;
 class TRC_TVM_api trc_int : public trcobj {
 public:
-    int value = 0;
+    trc_int_t value = 0;
 
     void putline(FILE* out);
 

@@ -17,7 +17,7 @@ void LENGTH(int argc, TVM* vm) {
         vm->error_report(
             error::ArgumentError, language::error::argumenterror, "len", "1");
     }
-    firsts = (def::STRINGOBJ)vm->pop();
+    auto firsts = (def::STRINGOBJ)vm->pop();
     vm->push(new types::trc_int(firsts->len()));
 }
 
@@ -29,15 +29,13 @@ void HELP([[maybe_unused]] int argc, [[maybe_unused]] TVM* vm) {
 
 void PRINT(int argc, TVM* vm) {
     for (int i = 0; i < argc; ++i) {
-        firstv = vm->pop();
-        firstv->putline(stdout);
+        vm->pop()->putline(stdout);
     }
 }
 
 void PRINTLN(int argc, TVM* vm) {
     for (int i = 0; i < argc; ++i) {
-        firstv = vm->pop();
-        firstv->putline(stdout);
+        vm->pop()->putline(stdout);
     }
     putchar('\n');
 }
@@ -46,9 +44,9 @@ void INPUT(int argc, TVM* vm) {
     for (int i = 0; i < argc; ++i) {
         ((def::STRINGOBJ)vm->pop())->putline(stdout);
     }
-    firsts = MALLOCSTRING();
-    firsts->in(stdin);
-    vm->push(firsts);
+    def::STRINGOBJ strtmp = MALLOCSTRING();
+    strtmp->in(stdin);
+    vm->push(strtmp);
 }
 
 void EXIT(int argc, TVM* vm) {
@@ -56,29 +54,24 @@ void EXIT(int argc, TVM* vm) {
 }
 
 void INT_(int argc, TVM* vm) {
-    firstv = vm->pop();
-    vm->push(firstv->to_int());
+    vm->top() = vm->top()->to_int();
 }
 
 void STRING_(int argc, TVM* vm) {
     // 利用了写好的底层转化函数，将不是string型的转化为string
-    firstv = vm->pop();
-    vm->push(firstv->to_string());
+    vm->top() = vm->top()->to_string();
 }
 
 void FLOAT_(int argc, TVM* vm) {
     // 利用了写好的底层转化函数，将不是double型的转化为double
-    firstv = vm->pop();
-    vm->push(firstv->to_float());
+    vm->top() = vm->top()->to_float();
 }
 
 void BOOL_(int argc, TVM* vm) {
-    firstv = vm->pop();
-    vm->push(firstv->to_bool());
+    vm->top() = vm->top()->to_bool();
 }
 
 void TYPE(int argc, TVM* vm) {
-    firstv = vm->pop();
-    vm->push(MALLOCSTRING(type_int::int_name_s[(int)firstv->gettype()]));
+    vm->top() = MALLOCSTRING(type_int::int_name_s[(int)vm->top()->gettype()]);
 }
 }

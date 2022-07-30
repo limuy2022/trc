@@ -2,10 +2,8 @@
 #include <TVM/TVM.h>
 #include <TVM/func.h>
 #include <TVM/types/trc_string.h>
-#include <base/Error.h>
 #include <base/utils/data.hpp>
 #include <language/error.h>
-#include <string>
 
 namespace trc::TVM_space {
 void TVM::CHANGE_VALUE(bytecode_index_t index) {

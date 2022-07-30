@@ -16,13 +16,6 @@
 #define INT_CACHE_LEN 262
 
 namespace trc::TVM_space {
-// 中间变量，便于使用
-extern def::OBJ firstv, secondv;
-extern def::INTOBJ firsti, secondi;
-extern def::FLOATOBJ firstf, secondf;
-extern def::STRINGOBJ firsts, seconds;
-extern def::LONGOBJ firstl, secondl;
-
 namespace TVM_share {
     /**
      * TVM类型数据缓存

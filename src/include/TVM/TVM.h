@@ -69,7 +69,9 @@ public:
     /**
      * @brief 弹出栈顶值并返回
      */
-    def::OBJ pop();
+    inline def::OBJ pop() {
+        return *(dyna_data.stack_top_ptr--);
+    }
 
     /**
      * @brief 重新加载数据(编译完之后需要执行)
@@ -87,7 +89,13 @@ public:
     /**
      * @brief 将对象入栈
      */
-    void push(def::OBJ a);
+    inline void push(def::OBJ a)  {
+        *(++dyna_data.stack_top_ptr) = a;
+    }
+
+    inline def::OBJ& top() {
+        return *(dyna_data.stack_top_ptr);
+    }
 
     /**
      * @brief 从头开始，执行所有字节码

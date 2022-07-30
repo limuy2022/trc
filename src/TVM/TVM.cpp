@@ -68,16 +68,8 @@ TVM::~TVM() {
     }
 }
 
-void TVM::push(def::OBJ a) {
-    *(++dyna_data.stack_top_ptr) = a;
-}
-
 void TVM::pop_value() {
     --dyna_data.stack_top_ptr;
-}
-
-def::OBJ TVM::pop() {
-    return *(dyna_data.stack_top_ptr--);
 }
 
 void TVM::run_all() {

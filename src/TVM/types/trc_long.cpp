@@ -77,7 +77,7 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    NOREACH("big num can't cal the used size.");
+    NOREACH("big num can't cal the used size.used:%d\nsize:%d", used, size);
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {

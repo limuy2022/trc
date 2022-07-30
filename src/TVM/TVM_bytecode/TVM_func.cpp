@@ -11,7 +11,7 @@ TVM_BUILTINS_FUNC builtin_funcs[] { nullptr, &builtin::EXIT, &builtin::PRINT,
     &builtin::TYPE };
 
 void TVM::CALL_BUILTIN(bytecode_index_t name) {
-    firsti = (def::INTOBJ)pop();
+    auto firsti = (def::INTOBJ)pop();
     builtin_funcs[name](firsti->value, this);
 }
 

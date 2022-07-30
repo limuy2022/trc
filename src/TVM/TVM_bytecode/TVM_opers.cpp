@@ -3,44 +3,37 @@
 
 namespace trc::TVM_space {
 void TVM::ADD() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->operator+(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->operator+(secondv);
 }
 
 void TVM::SUB() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->operator-(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->operator-(secondv);
 }
 
 void TVM::MUL() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->operator*(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->operator*(secondv);
 }
 
 void TVM::DIV() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->operator/(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->operator/(secondv);
 }
 
 void TVM::ZDIV() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->zdiv(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->zdiv(secondv);
 }
 
 void TVM::POW() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->pow_(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->pow_(secondv);
 }
 
 void TVM::MOD() {
-    secondv = pop();
-    firstv = pop();
-    push(firstv->operator%(secondv));
+    def::OBJ secondv = pop();
+    top() = top()->operator%(secondv);
 }
 }

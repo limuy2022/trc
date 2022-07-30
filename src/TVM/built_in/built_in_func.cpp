@@ -50,7 +50,7 @@ void INPUT(int argc, TVM* vm) {
 }
 
 void EXIT(int argc, TVM* vm) {
-    exit(0);
+    exit(((def::INTOBJ)vm->pop())->value);
 }
 
 void INT_(int argc, TVM* vm) {

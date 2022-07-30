@@ -74,8 +74,6 @@ namespace tools::tools_out {
             free(code);
             io::readstr(code, stdin);
             std::string code_str(code);
-            if (!strcmp(code, "exit()"))
-                break;
             if (is_block(code)) {
                 get_block(code_str);
             }
@@ -87,15 +85,7 @@ namespace tools::tools_out {
                 vm->run_all();
             }
         }
-        // 释放代码
-        free(code);
-        // 删除虚拟机
-        delete vm;
-        // 删除编译器设置
-        info_saver->free_detail_compiler();
-        delete info_saver;
-        // 还原设置
-        error::error_env::quit = true;
+        // 该地不需要释放内存的原因是退出只可能是ctrl+c或者exit函数，而退出后会由操作系统回收内存
     }
 }
 }

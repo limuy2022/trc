@@ -10,19 +10,4 @@ namespace trc::utils {
  * @param size 需要转换的字节数
  */
 TRC_base_c_api void bytes_order_change(def::byte_t* const& bytes_, size_t size);
-
-/**
- * @brief 返回解码utf8的字节数
- */
-TRC_base_c_api int utf_8_decode(const uint8_t* bytePtr, uint32_t length);
-
-/**
- * @brief 把value编码为utf8后写入缓冲区buf,返回写入的字节数
- */
-TRC_base_c_api uint32_t utf_8_encode(uint8_t* buf, int value);
-
-/**
- * @brief 返回value按照utf8编码后的字节数
- */
-TRC_base_c_api uint32_t getByteNumOfEncodeUtf8(int value);
 }

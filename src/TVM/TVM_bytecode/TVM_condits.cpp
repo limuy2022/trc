@@ -59,7 +59,7 @@ void TVM::ASSERT() {
                 firsts->c_str());
             break;
         }
-        default:{
+        default: {
             error_report(error::ArgumentError, language::error::argumenterror,
                 "assert", "one or two");
         }

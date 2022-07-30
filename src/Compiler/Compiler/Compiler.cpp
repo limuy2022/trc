@@ -85,7 +85,8 @@ TVM_space::bytecode_index_t detail_compiler::add_float(float value) const {
     }
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_string(const char* value) const {
+TVM_space::bytecode_index_t detail_compiler::add_string(
+    const char* value) const {
     int index = utils::str_check_in_i(value,
         vm->static_data.const_s.begin() + 1, vm->static_data.const_s.end());
     size_t size = vm->static_data.const_s.size();

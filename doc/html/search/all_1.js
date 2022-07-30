@@ -4,7 +4,7 @@ var searchData=
   ['add_5f_1',['ADD_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca3c65a7718764d41d630a0d1566d27e56',1,'TVM.h']]],
   ['and_2',['AND',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a558ffc8f5770d8e4f95f51d822685532',1,'trc::compiler']]],
   ['and_5f_3',['AND_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca93087727a6dfe32d794485a216dcf962',1,'TVM.h']]],
-  ['append_4',['append',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__array.html#ab7a015eff226bf83b8cafeb660a53c71',1,'trc::TVM_space::types::trc_array']]],
+  ['append_4',['append',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__list.html#af32fde93d248360b4d9a9432ca96c194',1,'trc::TVM_space::types::trc_list']]],
   ['argc_5',['argc',['../namespacetrc_1_1tools.html#a6429fe983bfa999b2c301767dd073443',1,'trc::tools']]],
   ['argumenterror_6',['argumenterror',['../namespacelanguage_1_1error.html#ab6346e3ecb9128b6c44290eb70dfde16',1,'language::error']]],
   ['argumenterror_7',['ArgumentError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1adb25c9434b13b4d88c450144dfc9ce75',1,'trc::error']]],

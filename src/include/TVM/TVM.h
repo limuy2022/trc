@@ -89,7 +89,7 @@ public:
     /**
      * @brief 将对象入栈
      */
-    inline void push(def::OBJ a)  {
+    inline void push(def::OBJ a) {
         *(++dyna_data.stack_top_ptr) = a;
     }
 

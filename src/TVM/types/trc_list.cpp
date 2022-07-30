@@ -1,26 +1,26 @@
 ﻿#include <TVM/TRE.h>
-#include <TVM/types/trc_array.h>
+#include <TVM/types/trc_list.h>
 #include <base/trcdef.h>
 #include <cstdio>
 
 namespace trc::TVM_space::types {
-const RUN_TYPE_TICK trc_array::type = RUN_TYPE_TICK::array_T;
+const RUN_TYPE_TICK trc_list::type = RUN_TYPE_TICK::array_T;
 
-trc_array::trc_array() {
+trc_list::trc_list() {
     head = new listnode;
     head->next = nullptr;
 }
 
-trc_array::~trc_array() {
+trc_list::~trc_list() {
     clear();
     delete head;
 }
 
-RUN_TYPE_TICK trc_array::gettype() {
+RUN_TYPE_TICK trc_list::gettype() {
     return type;
 }
 
-void trc_array::del(int index) {
+void trc_list::del(int index) {
     listnode* p = head;
     for (int i = 0; i < index - 1; ++i)
         p = p->next;
@@ -28,14 +28,14 @@ void trc_array::del(int index) {
     delete p->next;
 }
 
-def::OBJ trc_array::operator[](int index) {
+def::OBJ trc_list::operator[](int index) {
     listnode* p = head->next;
     for (int i = 0; i < index; ++i)
         p = p->next;
     return p->data;
 }
 
-void trc_array::insert(int index, def::OBJ data) {
+void trc_list::insert(int index, def::OBJ data) {
     listnode *p = head, *s = new listnode, *temp;
     for (int i = 0; i < index; ++i)
         p = p->next;
@@ -45,7 +45,7 @@ void trc_array::insert(int index, def::OBJ data) {
     s->next = temp;
 }
 
-void trc_array::append(def::OBJ data) {
+void trc_list::append(def::OBJ data) {
     listnode *p = head, *s = new listnode;
     while (p->next != nullptr)
         p = p->next;
@@ -54,7 +54,7 @@ void trc_array::append(def::OBJ data) {
     s->next = nullptr;
 }
 
-int trc_array::len() {
+int trc_list::len() {
     listnode* t = head->next;
     if (head->next == nullptr)
         return 0; // 为空
@@ -67,7 +67,7 @@ int trc_array::len() {
     return length;
 }
 
-void trc_array::clear() {
+void trc_list::clear() {
     listnode *t = head->next, *s;
     while (t != nullptr) {
         s = t;
@@ -77,7 +77,7 @@ void trc_array::clear() {
     head->next = nullptr;
 }
 
-void trc_array::putline(FILE* out) {
+void trc_list::putline(FILE* out) {
     listnode* t = head->next;
     fputc('[', out);
     while (t->next != nullptr) {
@@ -89,7 +89,7 @@ void trc_array::putline(FILE* out) {
     fputc(']', out);
 }
 
-bool trc_array::check_in_(def::OBJ data) {
+bool trc_list::check_in_(def::OBJ data) {
     listnode* t = head->next;
     while (t != nullptr) {
         if (TVM_share::obj_to_bool(data->operator==(t->data)))

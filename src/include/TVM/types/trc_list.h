@@ -9,7 +9,7 @@ namespace trc::TVM_space::types {
 /**
  * trc中的链表结构
  */
-class TRC_TVM_api trc_array : public trcobj {
+class TRC_TVM_api trc_list : public trcobj {
     struct listnode {
         def::OBJ data;
         listnode* next;
@@ -19,9 +19,9 @@ public:
     // 头尾结点，头结点不存数据
     listnode *head, *tail = nullptr;
 
-    trc_array();
+    trc_list();
 
-    ~trc_array();
+    ~trc_list();
 
     /**
      * @brief 删除链表中index的元素

@@ -49,12 +49,10 @@ class TRC_TVM_api TVM_static_data {
 public:
     // 各种常量数据
     std::vector<int> const_i;
-    std::vector<char*> const_s, const_long;
+    std::vector<const char*> const_s, const_long;
     std::vector<double> const_f;
     // 注意：此处装载func的静态信息，并不是保存执行信息的场所
     std::map<std::string, func_*> funcs;
-    // 版本号
-    float ver_;
     // 字节码
     struct_codes byte_codes;
     // 类信息
@@ -62,7 +60,7 @@ public:
     // 行号表，字节码对应到相应行号的表(可以选择不生成)
     std::vector<size_t> line_number_table;
     // 全局符号表大小
-    size_t global_symbol_table_size;
+    size_t global_symbol_table_size {};
     /**
      * @brief 用于释放字符串内存的函数
      */

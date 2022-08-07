@@ -37,17 +37,17 @@ public:
      * @param maybe_not_in
      * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_globalvar(const char* name, bool maybe_not_in);
+    size_t get_index_of_globalvar(char* name, bool maybe_not_in);
 
     /**
      * @brief 获取某个变量在局部变量表中的位置，没有该符号则添加进符号表
      * @param localspace_name 局部空间名，如函数名
-     * @param localvar_name 变量名
+     * @param name 变量名
      * @param maybe_not_in
      * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_localvar(const std::string& localspace_name,
-        const char* localvar_name, bool maybe_not_in);
+    size_t get_index_of_localvar(
+        const std::string& localspace_name, char* name, bool maybe_not_in);
 
 private:
     typedef std::vector<const char*> name_list_t;
@@ -60,8 +60,9 @@ private:
 
     /**
      * @brief 从某列表中查找索引和添加数据
+     * @warning 如果未添加进列表中，会直接释放内存
      */
     size_t get_index_from_list(
-        const char* name, name_list_t& list, bool maybe_not_in);
+        char* name, name_list_t& list, bool maybe_not_in);
 };
 }

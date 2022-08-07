@@ -13,7 +13,7 @@ endif()
 include_directories(src/include)
 include_directories(third_party)
 
-#去除那些烦人的警告
+#去除msvc编译器的不安全警告
 add_definitions(-D _CRT_SECURE_NO_WARNINGS)
 
 project(Trc CXX)
@@ -34,12 +34,9 @@ message("${TRC_BUILD_TYPE}")
 # 添加单元测试
 if("${TRC_BUILD_TYPE}" STREQUAL "Test")
 	add_subdirectory(tests/unittest)
-	find_library(gtest_path gtest)
-	if(NOT gtest_path)
-		message(FATAL_ERROR "can't find gtest.Maybe you can install googletest and add it to env path")
-	endif()
+	add_subdirectory(third_party/googletest)
 	message("using gtest")
-	target_link_libraries(unittest Trc ${gtest_path})
+	target_link_libraries(unittest Trc gtest)
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		target_link_libraries(unittest pthread)
 	endif()

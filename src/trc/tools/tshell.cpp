@@ -57,7 +57,7 @@ static void get_block(std::string& res) {
 
 namespace tools::tools_out {
     void tshell() {
-        printf("Trc %.1f\n\n", def::version);
+        printf("Trc %s\n\n", def::version);
 
         char* code = nullptr;
 

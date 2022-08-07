@@ -18,7 +18,7 @@
 #include <string>
 
 namespace trc::compiler {
-// token的标识，避免重复解析
+// token的标识
 enum class token_ticks {
     FOR, // for
     WHILE, // while
@@ -91,7 +91,7 @@ public:
 
     token(token_ticks, const char* data, size_t len);
 
-    token(token_ticks);
+    explicit token(token_ticks);
 
     token() = default;
 
@@ -104,9 +104,6 @@ public:
     ~token();
 };
 
-extern std::array<std::string, 7> opti_opers;
-extern std::array<std::string, 8> opti_condits;
-extern std::array<std::string, 3> const_values;
 extern std::map<std::string, int> change_const;
 
 // 语法生成树中的标识
@@ -142,55 +139,49 @@ enum class grammar_type {
 };
 
 /**
- * 树节点的基类，生成语法分析树时用到
+ * @brief 树节点的基类，生成语法分析树时用到
  * 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除
  */
 class TRC_Compiler_api treenode {
 public:
     virtual ~treenode() = 0;
 
-    virtual bool has_son() = 0;
+    bool has_son;
 
     grammar_type type = grammar_type::TREE;
 };
 
 /**
  * @brief
- * 描述不是终结节点的类(不储存数据的非叶子节点)
+ * 描述非叶子节点的类
  */
 class TRC_Compiler_api is_not_end_node : public treenode {
 public:
-    is_not_end_node(grammar_type type);
+    explicit is_not_end_node(grammar_type type);
 
-    is_not_end_node() = default;
+    is_not_end_node();
 
     std::list<treenode*> son;
 
     void connect(treenode* son_node);
-
-    bool has_son() override;
 };
 
 /**
- * @brief 描述终结节点
+ * @brief 描述叶子节点的类
  */
 class TRC_Compiler_api is_end_node : public treenode {
 public:
-    bool has_son() override;
+    is_end_node();
 };
 
 /**
- * @brief 数据节点
+ * @brief 储存字符串类型的数据节点
  */
 class TRC_Compiler_api data_node {
 public:
     char* data = nullptr;
 
-    data_node(const std::string& data);
-
-    data_node(const char* data);
-
-    void set(const std::string&);
+    explicit data_node(const char* data);
 
     void set(const char*);
 
@@ -203,7 +194,13 @@ public:
      * char*给此节点，只进行对象所有权的转移而消除了多次申请，释放和拷贝内存
      * @param token_value
      */
-    void swap_string_data(token* token_value);
+    void swap_token_data(token* token_value);
+
+    /**
+     * @brief 将自己的字符串所有权转移给其它对象，消除多次申请拷贝和释放内存
+     * @return 字符串
+     */
+    char* swap_string_data();
 
 private:
     /**
@@ -236,14 +233,10 @@ class TRC_Compiler_api node_base_data : public is_not_end_node,
                                         public data_node {
 public:
     node_base_data(grammar_type type_argv, const char* data);
-
-    explicit node_base_data(grammar_type type, token* data);
-
-    explicit node_base_data(grammar_type type = grammar_type::TREE);
 };
 
 /**
- * @brief 基于标签的没有子节点的类型
+ * @brief 基于标签的叶子节点
  */
 class TRC_Compiler_api node_base_tick_without_sons : public is_end_node,
                                                      public tick_node {
@@ -252,33 +245,18 @@ public:
 };
 
 /**
- * @brief 基于字符串的没有子节点的节点
+ * @brief 基于字符串的叶子节点
  */
 class TRC_Compiler_api node_base_data_without_sons : public data_node,
                                                      public is_end_node {
 public:
-    node_base_data_without_sons(grammar_type type, const char* name);
-
-    explicit node_base_data_without_sons(grammar_type type);
-
     explicit node_base_data_without_sons(grammar_type type, token* data);
 
     node_base_data_without_sons();
 };
 
 /**
- * @brief 基于字符串的没有子节点的节点
- */
-class TRC_Compiler_api node_base_string_without_sons : public is_end_node,
-                                                       public data_node {
-public:
-    node_base_string_without_sons(const char* data);
-
-    explicit node_base_string_without_sons(token* data);
-};
-
-/**
- * @brief 基于整型的没有子节点的类型
+ * @brief 基于整型的叶子节点
  */
 class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
 public:
@@ -289,7 +267,7 @@ public:
 };
 
 /**
- * @brief 基于整形的有子节点的类型
+ * @brief 基于整形的非叶子节点
  */
 class TRC_Compiler_api node_base_int : public is_not_end_node {
 public:
@@ -299,7 +277,7 @@ public:
 };
 
 /**
- * @brief 基于浮点型的没有子节点的类型
+ * @brief 基于浮点型的叶子节点
  */
 class TRC_Compiler_api node_base_float_without_sons : public is_end_node {
 public:
@@ -386,7 +364,7 @@ inline bool is_condit_token(token_ticks tick) {
 
 /**
  * @brief 判断是不是运算符token
- * @warning 不包含常量运算符token
+ * @warning 不包含条件运算符token
  */
 inline bool is_cal_token(token_ticks tick) {
     return utils::inrange(token_ticks::ADD, token_ticks::POW, tick);

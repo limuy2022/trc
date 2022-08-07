@@ -13,7 +13,7 @@
  */
 #define DELETE_NODE(l, n)                                                      \
     do {                                                                       \
-        delete (*n);                                                           \
+        delete (*(n));                                                         \
         (l)->son.erase((n)++);                                                 \
     } while (0)
 
@@ -26,10 +26,8 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
     for (auto i = expr->son.begin(), n = expr->son.end(); i != n;) {
         if ((*i)->type == grammar_type::OPCODE) {
             // 运算符
-            auto a = cal_struct.top();
-            cal_struct.pop();
-            auto b = cal_struct.top();
-            cal_struct.pop();
+            auto a = pop_oper_stack(cal_struct);
+            auto b = pop_oper_stack(cal_struct);
             auto t1 = (*a)->type, t2 = (*b)->type;
             if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
                 // 有一个是变量就无法优化，todo:通过上文进行值推测进行变量优化
@@ -71,8 +69,8 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                     break;
                 }
                 case grammar_type::STRING: {
-                    auto anode = (node_base_string_without_sons*)*a,
-                         bnode = (node_base_string_without_sons*)*b;
+                    auto anode = (node_base_data_without_sons*)*a,
+                         bnode = (node_base_data_without_sons*)*b;
                     switch (operator_) {
                     case token_ticks::ADD: {
                         size_t astrlen = strlen(anode->data);

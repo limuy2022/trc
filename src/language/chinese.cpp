@@ -1,5 +1,5 @@
 ﻿/**
- * 中文，gbk编码,作为dll插件提供不同语言
+ * 中文，作为dll插件提供不同语言
  */
 
 #include <language/error.h>
@@ -74,6 +74,12 @@ namespace tdb {
 }
 
 void locale_init() {
-    std::locale::global(std::locale("zh_CN.UTF-8"));
+    try {
+        std::locale::global(std::locale("zh_CN.UTF-8"));
+    } catch (std::runtime_error& e) {
+        fprintf(stderr,
+            "Can't load Chinese language.Because there isn't Chinese package "
+            "installed on your computer\n");
+    }
 }
 }

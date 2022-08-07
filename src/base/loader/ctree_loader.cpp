@@ -10,6 +10,7 @@
 #include <base/ctree_loader.h>
 #include <base/utils/bytes.h>
 #include <cstdio>
+#include <cstring>
 #include <language/error.h>
 #include <platform.h>
 #include <string>
@@ -82,11 +83,11 @@ static char* load_string_one(FILE* file) {
 /**
  * @brief 写入单个字符串
  */
-static void write_string_one(FILE* file, const std::string& data) {
-    int n = (int)data.length();
+static void write_string_one(FILE* file, const char* data) {
+    int n = (int)strlen(data);
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
-    fwrite(data.c_str(), n, sizeof(char), file);
+    fwrite(data, n, sizeof(char), file);
 }
 
 /**
@@ -127,7 +128,8 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
  * @param file 文件
  * @param const_pool 字符串型常量池
  */
-static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
+static void write_string_pool(
+    FILE* file, std::vector<const char*>& const_pool) {
     // 减去开头占位的数据
     int size = (int)const_pool.size() - 1;
     // 数据长度
@@ -144,7 +146,7 @@ static void write_string_pool(FILE* file, std::vector<char*>& const_pool) {
  * @param file 文件
  * @param const_pool 字符串型常量池
  */
-static void load_string_pool(FILE* file, std::vector<char*>& const_pool) {
+static void load_string_pool(FILE* file, std::vector<const char*>& const_pool) {
     const_pool.clear();
     int size;
     // 数据长度
@@ -264,6 +266,23 @@ static void write_functions(
     // }
 }
 
+static int getbigversion(const char* version) {
+    int res = 0;
+    for (int i = 0; version[i] != '.'; ++i) {
+        res *= 10;
+        res += version[i] - '0';
+    }
+    return res;
+}
+
+/**
+ * @brief 比较传入版本号是否合法
+ * @details 合法的标准是程序大版本号大于传入的版本号，小版本号可以不相同
+ */
+static bool compare_version(const char* version) {
+    return getbigversion(trc::def::version) >= getbigversion(version);
+}
+
 namespace trc::loader {
 bool is_magic(const std::string& path) {
     FILE* file = fopen(path.c_str(), "rb");
@@ -290,14 +309,17 @@ void loader_ctree(TVM_space::TVM* vm, const std::string& path) {
         exit(1);
     }
 
+    // 读取版本号长度
+    int version_size;
+    fread(&version_size, sizeof(int), 1, file);
     // 读取版本号
-    float ver_;
-    fread(&ver_, sizeof(ver_), 1, file);
-    if (ver_ > def::version) {
+    char* ver_ = (char*)malloc(sizeof(char) * (version_size + 1));
+    fread(ver_, sizeof(version_size), sizeof(char), file);
+    ver_[version_size] = '\0';
+    if (compare_version(def::version)) {
         error::send_error(error::VersionError, language::error::versionerror,
-            std::to_string(ver_).c_str(), std::to_string(def::version).c_str());
+            ver_, def::version);
     }
-    vm->static_data.ver_ = ver_;
     // 开始正式读写
     LOAD_WRITE(file, vm, load);
     fclose(file);
@@ -312,8 +334,11 @@ void save_ctree(TVM_space::TVM* vm, const std::string& path) {
     // 写入魔数
     // ACFD
     fwrite(&MAGIC_VALUE, sizeof(MAGIC_VALUE), 1, file);
+    // 写入版本号的长度
+    int size_tmp = strlen(def::version);
+    fwrite(&size_tmp, sizeof(int), 1, file);
     // 写入版本号
-    fwrite(&def::version, sizeof(def::version), 1, file);
+    fwrite(def::version, strlen(def::version), sizeof(char), file);
     LOAD_WRITE(file, vm, write);
     fclose(file);
 }

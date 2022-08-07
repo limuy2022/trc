@@ -28,7 +28,9 @@ TRC_base_c_api void console_init();
 
 class TRC_base_api color_st {
 public:
-    color_st(color_type color);
+    explicit color_st(color_type color)
+        : color(color) {
+    }
 
     /**
      * @brief 输出

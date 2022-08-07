@@ -190,7 +190,8 @@ treenode* make_data_node(token* data_token) {
     } else if (tmp == token_ticks::FLOAT_VALUE) {
         return new node_base_float_without_sons(atof(data_token->data));
     } else if (tmp == token_ticks::STRING_VALUE) {
-        return new node_base_string_without_sons(data_token);
+        return new node_base_data_without_sons(
+            grammar_type::STRING, data_token);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
         return new node_base_int_without_sons(change_const[data_token->data]);
@@ -265,7 +266,7 @@ reget:
             delete now;
             return res;
         } else if (is_blocked_token(now->tick)) {
-            treenode* res;
+            treenode* res = nullptr;
             switch (now->tick) {
             case token_ticks::WHILE: {
                 res = while_loop_tree();
@@ -347,10 +348,8 @@ void grammar_lex::check_expr(is_not_end_node* root) {
     for (auto i = root->son.begin(), n = root->son.end(); i != n; ++i) {
         if ((*i)->type == grammar_type::OPCODE) {
             // 运算符
-            treenode* a = check_struct.top();
-            check_struct.pop();
-            treenode* b = check_struct.top();
-            check_struct.pop();
+            treenode* a = pop_oper_stack(check_struct);
+            treenode* b = pop_oper_stack(check_struct);
             auto t1 = a->type, t2 = b->type;
             if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
                 // 变量类型不确定，没有检查的意义
@@ -420,7 +419,6 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
             new node_base_tick_without_sons(grammar_type::OPCODE, tmp));
         oper_stack.pop();
     }
-
     // 此处已经成功且正确生成后缀表达式，在此检查参数判断是否进行常量折叠
     if (compiler_data.option->optimize) {
         // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型

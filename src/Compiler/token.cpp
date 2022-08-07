@@ -4,8 +4,6 @@
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_long.h>
 #include <base/Error.h>
-#include <base/utils/data.hpp>
-#include <cassert>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -18,7 +16,7 @@ token* token_lex::lex_string() {
     ++char_ptr;
     const char* start = char_ptr;
     while (*char_ptr != string_begin) {
-        // 读入下一符号
+        // 读入下一个符号
         if (*char_ptr == '\\') {
             char_ptr++;
         }
@@ -31,9 +29,9 @@ token* token_lex::lex_string() {
     }
     ptrdiff_t str_len = char_ptr - start;
     ptrdiff_t backup = str_len;
-    token* str = new token(token_ticks::STRING_VALUE);
+    auto* str = new token(token_ticks::STRING_VALUE);
     str->set_size(str_len);
-    // 为了性能，不使用标准库的拷贝函数，使用自定义的函数方便处理换行符，消除字符的移动
+    // 使用自定义的函数方便处理换行符，消除字符的移动
     for (char *i = const_cast<char*>(start), *dataptr = str->data;
          i != char_ptr; ++i, ++dataptr) {
         if (*i == '\\') {
@@ -119,7 +117,7 @@ token* token_lex::lex_int_float() {
         }
         ++char_ptr;
     } while (!end_of_lex());
-    token* result = new token();
+    auto* result = new token();
     ptrdiff_t res_len = char_ptr - start, backup = res_len;
     result->set_size(res_len);
     for (char *i = const_cast<char*>(start), *dataptr = result->data;
@@ -192,11 +190,11 @@ token* token_lex::lex_english() {
     do {
         ++char_ptr;
     } while ((is_english(*char_ptr) || isdigit(*char_ptr)) && !end_of_lex());
-    ptrdiff_t len = char_ptr - start;
-    for (size_t i = 0; i < utils::sizeof_static_array(keywords_); ++i) {
-        if (keywords_[i].len == len && !strncmp(start, keywords_[i].str, len)) {
+    size_t len = char_ptr - start;
+    for (auto& keyword : keywords_) {
+        if (keyword.len == len && !strncmp(start, keyword.str, len)) {
             // 注：传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
-            return new token(keywords_[i].tick);
+            return new token(keyword.tick);
         }
     }
     // 啥关键字都不是，只能是名称了
@@ -329,7 +327,7 @@ token* token_lex::lex_others() {
     }
     case ')': {
         result = new token(token_ticks::RIGHT_SMALL_BRACE);
-        if (check_brace.empty()||check_brace.top() != '(') {
+        if (check_brace.empty() || check_brace.top() != '(') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, ")");
         }
@@ -343,7 +341,7 @@ token* token_lex::lex_others() {
     }
     case ']': {
         result = new token(token_ticks::RIGHT_MID_BRACE);
-        if (check_brace.empty()||check_brace.top() != '[') {
+        if (check_brace.empty() || check_brace.top() != '[') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "]");
         }
@@ -357,7 +355,7 @@ token* token_lex::lex_others() {
     }
     case '}': {
         result = new token(token_ticks::RIGHT_BIG_BRACE);
-        if (check_brace.empty()||check_brace.top() != '{') {
+        if (check_brace.empty() || check_brace.top() != '{') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "}");
         }
@@ -386,7 +384,7 @@ token* token_lex::lex_others() {
 
 void token_lex::unget_token(token* token_data) {
     // 必须没有储存token，否则就是出现了bug
-    assert(back_token == nullptr);
+    //    assert(back_token == nullptr);
     back_token = token_data;
 }
 
@@ -469,7 +467,7 @@ token::token(token_ticks tick)
 }
 
 void token::set_size(size_t len) {
-    // 第一次申请内存也可以使用，因为当data为零是等价于malloc
+    // 第一次申请内存也可以使用，因为当data为nullptr是等价于malloc
     data = (char*)realloc(data, sizeof(char) * (1 + len));
     if (data == nullptr) {
         error::send_error(error::MemoryError, language::error::memoryerror);

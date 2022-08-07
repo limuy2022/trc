@@ -62,33 +62,34 @@ private:
      * @brief 将浮点型数据添加进const_f常量池
      * @return 数据在常量池中的索引
      */
-    TVM_space::bytecode_index_t add_float(float value) const;
+    TVM_space::bytecode_index_t add_float(double value) const;
 
     /**
      * @brief 将字符串型数据添加进const_s常量池
      * @return 数据在常量池中的索引
      */
-    TVM_space::bytecode_index_t add_string(const char* value) const;
+    TVM_space::bytecode_index_t add_string(char*) const;
 
     /**
      * @brief 将变量添加进符号表中
      * @return 变量在符号表中的索引
      * @warning 不允许变量不存在于符号表中
      */
-    TVM_space::bytecode_index_t add_var_allow_not_in(const char* value);
+    TVM_space::bytecode_index_t add_var_allow_not_in(char*);
 
     /**
      * @brief 将变量添加进符号表中
      * @return 变量在符号表中的索引
      * @warning 允许变量不存在于符号表中
      */
-    TVM_space::bytecode_index_t add_var_must_in(const char* value);
+    TVM_space::bytecode_index_t add_var_must_in(char*);
 
     /**
      * @brief 将长整型添加进符号表中
      * @return 变量在符号表中的索引
+     * @warning 如果不被加进常量池，将会被直接释放
      */
-    TVM_space::bytecode_index_t add_long(const char* value) const;
+    TVM_space::bytecode_index_t add_long(char*) const;
 
     /**
      * @brief

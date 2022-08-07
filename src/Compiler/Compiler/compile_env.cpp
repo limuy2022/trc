@@ -25,10 +25,11 @@ size_t CompileEnvironment::get_local_name_size(const std::string& name) {
 }
 
 size_t CompileEnvironment::get_index_from_list(
-    const char* name, name_list_t& list, bool maybe_not_in) {
+    char* name, name_list_t& list, bool maybe_not_in) {
     size_t n = list.size();
     for (size_t i = 1; i < n; ++i) {
         if (!strcmp(list[i], name)) {
+            free(name);
             return i;
         }
     }
@@ -36,9 +37,8 @@ size_t CompileEnvironment::get_index_from_list(
     if (maybe_not_in) {
         // 允许不在符号表
         // 添加进符号表
-        char* copy = new char[strlen(name) + 1];
-        strcpy(copy, name);
-        list.push_back(copy);
+        // 直接转移字符串所有权
+        list.push_back(name);
         return n;
     } else {
         // 报错
@@ -49,14 +49,13 @@ size_t CompileEnvironment::get_index_from_list(
 }
 
 size_t CompileEnvironment::get_index_of_globalvar(
-    const char* name, bool maybe_not_in) {
-    return get_index_from_list(name, var_names_list_global, maybe_not_in);
+    char* node, bool maybe_not_in) {
+    return get_index_from_list(node, var_names_list_global, maybe_not_in);
 }
 
 size_t CompileEnvironment::get_index_of_localvar(
-    const std::string& localspace_name, const char* localvar_name,
-    bool maybe_not_in) {
-    return get_index_from_list(localspace_name.c_str(),
-        var_names_list_local[localspace_name], maybe_not_in);
+    const std::string& localspace_name, char* node, bool maybe_not_in) {
+    return get_index_from_list(
+        node, var_names_list_local[localspace_name], maybe_not_in);
 }
 }

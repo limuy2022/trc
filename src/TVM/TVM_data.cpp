@@ -31,12 +31,12 @@ TVM_dyna_data::~TVM_dyna_data() = default;
 
 void TVM_static_data::ReleaseStringData() {
     for (size_t i = 1, n = const_s.size(); i < n; ++i) {
-        delete[] const_s[i];
+        free(const_cast<char*>(const_s[i]));
     }
     const_s.clear();
     const_s.push_back(nullptr);
     for (size_t i = 1, n = const_long.size(); i < n; ++i) {
-        delete[] const_long[i];
+        free(const_cast<char*>(const_long[i]));
     }
     const_long.clear();
     const_long.push_back(nullptr);

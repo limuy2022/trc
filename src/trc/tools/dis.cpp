@@ -18,8 +18,6 @@ namespace tools_in {
      */
     static void out(const TVM_space::TVM& static_data, const char* file_name) {
         printf("From file %s:\n", file_name);
-        // 输出版本号
-        printf("Version:%f\n", static_data.static_data.ver_);
         // 输出字节码
         puts("\nCode:");
         for (const auto& bycode : static_data.static_data.byte_codes) {

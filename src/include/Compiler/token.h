@@ -90,7 +90,7 @@ private:
      */
     void check_expected_char(char expected_char);
 
-    // 用于检查代码是否正确
+    // 用于检查括号是否正确匹配
     std::stack<char> check_brace;
 };
 }

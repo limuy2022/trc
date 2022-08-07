@@ -74,6 +74,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>树节点的基类，生成语法分析树时用到 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除  
+ <a href="classtrc_1_1compiler_1_1treenode.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">pri_compiler.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for trc::compiler::treenode:</div>
@@ -81,16 +84,15 @@ Inheritance diagram for trc::compiler::treenode:</div>
  <div class="center">
   <img src="classtrc_1_1compiler_1_1treenode.png" usemap="#trc::compiler::treenode_map" alt=""/>
   <map id="trc::compiler::treenode_map" name="trc::compiler::treenode_map">
-<area href="classtrc_1_1compiler_1_1is__end__node.html" title="描述终结节点" alt="trc::compiler::is_end_node" shape="rect" coords="0,56,266,80"/>
-<area href="classtrc_1_1compiler_1_1is__not__end__node.html" title="描述不是终结节点的类(不储存数据的非叶子节点)" alt="trc::compiler::is_not_end_node" shape="rect" coords="552,56,818,80"/>
-<area href="classtrc_1_1compiler_1_1node__base__data__without__sons.html" title="基于字符串的没有子节点的节点" alt="trc::compiler::node_base_data_without_sons" shape="rect" coords="276,112,542,136"/>
-<area href="classtrc_1_1compiler_1_1node__base__float__without__sons.html" title="基于浮点型的没有子节点的类型" alt="trc::compiler::node_base_float_without_sons" shape="rect" coords="276,168,542,192"/>
-<area href="classtrc_1_1compiler_1_1node__base__int__without__sons.html" title="基于整型的没有子节点的类型" alt="trc::compiler::node_base_int_without_sons" shape="rect" coords="276,224,542,248"/>
-<area href="classtrc_1_1compiler_1_1node__base__string__without__sons.html" title="基于字符串的没有子节点的节点" alt="trc::compiler::node_base_string_without_sons" shape="rect" coords="276,280,542,304"/>
-<area href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html" title="基于标签的没有子节点的类型" alt="trc::compiler::node_base_tick_without_sons" shape="rect" coords="276,336,542,360"/>
-<area href="classtrc_1_1compiler_1_1node__base__data.html" title="基于数据的节点" alt="trc::compiler::node_base_data" shape="rect" coords="828,112,1094,136"/>
-<area href="classtrc_1_1compiler_1_1node__base__int.html" title="基于整形的有子节点的类型" alt="trc::compiler::node_base_int" shape="rect" coords="828,168,1094,192"/>
-<area href="classtrc_1_1compiler_1_1node__base__tick.html" title="基于token符号的节点" alt="trc::compiler::node_base_tick" shape="rect" coords="828,224,1094,248"/>
+<area href="classtrc_1_1compiler_1_1is__end__node.html" title="描述叶子节点的类" alt="trc::compiler::is_end_node" shape="rect" coords="403,56,662,80"/>
+<area href="classtrc_1_1compiler_1_1is__not__end__node.html" title="描述非叶子节点的类" alt="trc::compiler::is_not_end_node" shape="rect" coords="1345,56,1604,80"/>
+<area href="classtrc_1_1compiler_1_1node__base__data__without__sons.html" title="基于字符串的叶子节点" alt="trc::compiler::node_base_data_without_sons" shape="rect" coords="0,112,259,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__float__without__sons.html" title="基于浮点型的叶子节点" alt="trc::compiler::node_base_float_without_sons" shape="rect" coords="269,112,528,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__int__without__sons.html" title="基于整型的叶子节点" alt="trc::compiler::node_base_int_without_sons" shape="rect" coords="538,112,797,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html" title="基于标签的叶子节点" alt="trc::compiler::node_base_tick_without_sons" shape="rect" coords="807,112,1066,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__data.html" title="基于数据的节点" alt="trc::compiler::node_base_data" shape="rect" coords="1076,112,1335,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__int.html" title="基于整形的非叶子节点" alt="trc::compiler::node_base_int" shape="rect" coords="1345,112,1604,136"/>
+<area href="classtrc_1_1compiler_1_1node__base__tick.html" title="基于token符号的节点" alt="trc::compiler::node_base_tick" shape="rect" coords="1614,112,1873,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -98,11 +100,11 @@ Inheritance diagram for trc::compiler::treenode:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a550288a2e3a3183d8ecc57319728c38d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a550288a2e3a3183d8ecc57319728c38d">~treenode</a> ()=0</td></tr>
 <tr class="separator:a550288a2e3a3183d8ecc57319728c38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25f67e5b535bb40fb1dfa92c20f77af6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a25f67e5b535bb40fb1dfa92c20f77af6">has_son</a> ()=0</td></tr>
-<tr class="separator:a25f67e5b535bb40fb1dfa92c20f77af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a8c6144d49e84bc3b6edefeeac52aeb29"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a8c6144d49e84bc3b6edefeeac52aeb29">has_son</a></td></tr>
+<tr class="separator:a8c6144d49e84bc3b6edefeeac52aeb29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43cca7779e9cf2f29a9c142fccc7fb8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">grammar_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html#a43cca7779e9cf2f29a9c142fccc7fb8a">type</a> = <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efac0f8e24cf041639c4fc457ebec9490eb">grammar_type::TREE</a></td></tr>
 <tr class="separator:a43cca7779e9cf2f29a9c142fccc7fb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -134,35 +136,21 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a25f67e5b535bb40fb1dfa92c20f77af6" name="a25f67e5b535bb40fb1dfa92c20f77af6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25f67e5b535bb40fb1dfa92c20f77af6">&#9670;&nbsp;</a></span>has_son()</h2>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a8c6144d49e84bc3b6edefeeac52aeb29" name="a8c6144d49e84bc3b6edefeeac52aeb29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c6144d49e84bc3b6edefeeac52aeb29">&#9670;&nbsp;</a></span>has_son</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual bool trc::compiler::treenode::has_son </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td class="memname">bool trc::compiler::treenode::has_son</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classtrc_1_1compiler_1_1is__not__end__node.html#a3cd857e55757e76b8e2075ecb015e2f1">trc::compiler::is_not_end_node</a>, and <a class="el" href="classtrc_1_1compiler_1_1is__end__node.html#a5bebe040cf7694de01e1b06ae7552a71">trc::compiler::is_end_node</a>.</p>
-
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
 <a id="a43cca7779e9cf2f29a9c142fccc7fb8a" name="a43cca7779e9cf2f29a9c142fccc7fb8a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a43cca7779e9cf2f29a9c142fccc7fb8a">&#9670;&nbsp;</a></span>type</h2>
 

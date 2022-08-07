@@ -47,7 +47,7 @@ namespace tools_in {
         }
         }
         putchar(',');
-        if (data->has_son()) {
+        if (data->has_son) {
             auto* tmp = (compiler::is_not_end_node*)data;
             for (auto& i : tmp->son)
                 out(i);

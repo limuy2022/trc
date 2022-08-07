@@ -1,10 +1,11 @@
 ﻿/**
- * 编译时期共享的数据
+ * 编译各个阶段的公用函数和变量
  */
 
 #include <Compiler/pri_compiler.hpp>
 #include <array>
 #include <base/Error.h>
+#include <cassert>
 #include <cstring>
 #include <language/error.h>
 #include <map>
@@ -17,25 +18,21 @@ void is_not_end_node::connect(treenode* son_node) {
     son.push_back(son_node);
 }
 
-bool is_not_end_node::has_son() {
-    return true;
+is_not_end_node::is_not_end_node() {
+    this->has_son = true;
 }
 
 is_not_end_node::is_not_end_node(grammar_type type) {
+    new (this) is_not_end_node;
     this->type = type;
 }
 
-bool is_end_node::has_son() {
-    return false;
+is_end_node::is_end_node() {
+    this->has_son = false;
 }
 
 tick_node::tick_node(token_ticks tick)
     : tick(tick) {
-}
-
-data_node::data_node(const std::string& data)
-    : data((char*)malloc(sizeof(char) * (data.length() + 1))) {
-    strcpy(this->data, data.c_str());
 }
 
 data_node::data_node(const char* data)
@@ -43,17 +40,12 @@ data_node::data_node(const char* data)
     strcpy(this->data, data);
 }
 
-void data_node::set(const std::string& new_data) {
-    set_alloc(new_data.length());
-    strcpy(this->data, new_data.c_str());
-}
-
 void data_node::set(const char* new_data) {
     set_alloc(strlen(new_data));
     strcpy(this->data, new_data);
 }
 
-void data_node::swap_string_data(token* token_value) {
+void data_node::swap_token_data(token* token_value) {
     this->data = token_value->data;
     token_value->data = nullptr;
 }
@@ -72,18 +64,18 @@ void data_node::set_alloc(size_t sizes) {
     data[sizes] = '\0';
 }
 
+char* data_node::swap_string_data() {
+    // 防止被多次调用
+    assert(data != nullptr);
+    char* str_data_ptr = data;
+    // 置空是使释放时不会释放掉内存
+    data = nullptr;
+    return str_data_ptr;
+}
+
 node_base_data::node_base_data(grammar_type type_argv, const char* data)
     : data_node(data) {
     this->type = type_argv;
-}
-
-node_base_data::node_base_data(grammar_type type) {
-    this->type = type;
-}
-
-node_base_data::node_base_data(grammar_type type, token* data) {
-    this->type = type;
-    this->swap_string_data(data);
 }
 
 node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
@@ -91,20 +83,10 @@ node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
     this->type = type;
 }
 
-node_base_data_without_sons::node_base_data_without_sons(grammar_type type) {
-    this->type = type;
-}
-
-node_base_data_without_sons::node_base_data_without_sons(
-    grammar_type type, const char* data)
-    : data_node(data) {
-    this->type = type;
-}
-
 node_base_data_without_sons::node_base_data_without_sons(
     grammar_type type, token* data) {
     this->type = type;
-    this->swap_string_data(data);
+    this->swap_token_data(data);
 }
 
 node_base_data_without_sons::node_base_data_without_sons() = default;
@@ -113,16 +95,6 @@ node_base_tick_without_sons::node_base_tick_without_sons(
     grammar_type type, token_ticks tick)
     : tick_node(tick) {
     this->type = type;
-}
-
-node_base_string_without_sons::node_base_string_without_sons(const char* data)
-    : data_node(data) {
-    this->type = grammar_type::STRING;
-}
-
-node_base_string_without_sons::node_base_string_without_sons(token* data) {
-    this->type = grammar_type::STRING;
-    this->swap_string_data(data);
 }
 
 node_base_int_without_sons::node_base_int_without_sons(
@@ -141,13 +113,6 @@ node_base_float_without_sons::node_base_float_without_sons(double value)
     this->type = grammar_type::FLOAT;
 }
 
-// 可以优化的运算符
-std::array<std::string, 7> opti_opers = { "+", "-", "**", "*", "//", "%", "/" };
-// 可以优化的条件运算符
-std::array<std::string, 8> opti_condits
-    = { "<", ">", "<=", ">=", "!=", "==", "and", "or" };
-// 常量值
-std::array<std::string, 3> const_values = { "true", "false", "null" };
 // 常量值到数字的转换
 std::map<std::string, int> change_const = {
     { "true", 1 },

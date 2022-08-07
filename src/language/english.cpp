@@ -83,6 +83,12 @@ namespace tdb {
 }
 
 void locale_init() {
-    std::locale::global(std::locale("en_US.UTF-8"));
+    try {
+        std::locale::global(std::locale("en_US.UTF-8"));
+    } catch (std::runtime_error& e) {
+        fprintf(stderr,
+            "Can't load English language.Because there isn't Chinese package "
+            "installed on your computer\n");
+    }
 }
 }

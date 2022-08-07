@@ -1,4 +1,4 @@
-#include "../testdata/autodll/create_dll.h"
+﻿#include "../testdata/autodll/create_dll.h"
 #include <base/autodll.h>
 #include <filesys_tools.h>
 #include <gtest/gtest.h>

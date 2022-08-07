@@ -67,62 +67,53 @@ TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
         vm->static_data.const_i.end());
     if (index != -1) {
         return index + 1;
-    } else {
-        vm->static_data.const_i.push_back(value);
-        return size;
     }
+    vm->static_data.const_i.push_back(value);
+    return size;
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_float(float value) const {
+TVM_space::bytecode_index_t detail_compiler::add_float(double value) const {
     size_t size = vm->static_data.const_f.size();
     int index = utils::check_in_i(value, vm->static_data.const_f.begin() + 1,
         vm->static_data.const_f.end());
     if (index != -1) {
         return index + 1;
-    } else {
-        vm->static_data.const_f.push_back(value);
-        return size;
     }
+    vm->static_data.const_f.push_back(value);
+    return size;
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_string(
-    const char* value) const {
+TVM_space::bytecode_index_t detail_compiler::add_string(char* value) const {
     int index = utils::str_check_in_i(value,
         vm->static_data.const_s.begin() + 1, vm->static_data.const_s.end());
     size_t size = vm->static_data.const_s.size();
     if (index != -1) {
+        free(value);
         return index + 1;
-    } else {
-        char* copy = new char[strlen(value) + 1];
-        strcpy(copy, value);
-        vm->static_data.const_s.push_back(copy);
-        return size;
     }
+    vm->static_data.const_s.push_back(value);
+    return size;
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_var_allow_not_in(
-    const char* value) {
+TVM_space::bytecode_index_t detail_compiler::add_var_allow_not_in(char* value) {
     return infoenv.get_index_of_globalvar(value, true);
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_var_must_in(
-    const char* value) {
+TVM_space::bytecode_index_t detail_compiler::add_var_must_in(char* value) {
     return infoenv.get_index_of_globalvar(value, false);
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_long(const char* value) const {
+TVM_space::bytecode_index_t detail_compiler::add_long(char* value) const {
     size_t size = vm->static_data.const_long.size();
     int index
         = utils::str_check_in_i(value, vm->static_data.const_long.begin() + 1,
             vm->static_data.const_long.end());
     if (index != -1) {
+        free(value);
         return index + 1;
-    } else {
-        char* copy = new char[strlen(value) + 1];
-        strcpy(copy, value);
-        vm->static_data.const_long.push_back(copy);
-        return size;
     }
+    vm->static_data.const_long.push_back(value);
+    return size;
 }
 
 bytecode_t detail_compiler::build_opcode(token_ticks symbol) {
@@ -137,7 +128,7 @@ bytecode_t detail_compiler::build_var(token_ticks data) {
 
 void detail_compiler::compile(treenode* head) {
     grammar_type type = head->type;
-    if (head->has_son()) {
+    if (head->has_son) {
         auto* root = (is_not_end_node*)head;
         switch (type) {
         case grammar_type::EXPR:
@@ -187,8 +178,9 @@ void detail_compiler::compile(treenode* head) {
             // 处理等式右边的数据
             compile(*(++root->son.begin()));
             // 处理等式左边的数据
-            auto* argv_ = (node_base_data_without_sons*)*root->son.begin();
-            short index_argv = add_var_allow_not_in(argv_->data);
+            char* argv_ = ((node_base_data_without_sons*)*root->son.begin())
+                              ->swap_string_data();
+            auto index_argv = add_var_allow_not_in(argv_);
             add_opcode(build_var(((node_base_tick*)root)->tick), index_argv);
             break;
         }
@@ -212,8 +204,8 @@ void detail_compiler::compile(treenode* head) {
         switch (type) {
         case grammar_type::VAR_NAME: {
             // 变量名节点，生成读取变量的节点
-            char* nodedata = ((node_base_data_without_sons*)head)->data;
-            auto index_argv = add_var_must_in(nodedata);
+            auto index_argv = add_var_must_in(
+                ((node_base_data_without_sons*)head)->swap_string_data());
             add_opcode((bytecode_t)byteCodeNumber::LOAD_NAME_, index_argv);
             break;
         }
@@ -226,8 +218,8 @@ void detail_compiler::compile(treenode* head) {
         }
         case grammar_type::STRING: {
             // 字符串节点
-            auto value = ((node_base_string_without_sons*)head)->data;
-            auto index_argv = add_string(value);
+            auto index_argv = add_string(
+                ((node_base_data_without_sons*)head)->swap_string_data());
             add_opcode((bytecode_t)byteCodeNumber::LOAD_STRING_, index_argv);
             break;
         }
@@ -240,8 +232,8 @@ void detail_compiler::compile(treenode* head) {
         }
         case grammar_type::LONG_INT: {
             // 长整型节点
-            auto value = ((node_base_data_without_sons*)head)->data;
-            auto index_argv = add_long(value);
+            auto index_argv = add_long(
+                ((node_base_data_without_sons*)head)->swap_string_data());
             add_opcode((bytecode_t)byteCodeNumber::LOAD_LONG_, index_argv);
             break;
         }
@@ -272,7 +264,7 @@ void detail_compiler::retie(TVM_space::TVM* vm) {
 
 namespace trc::compiler {
 void free_tree(treenode* head) {
-    if (head->has_son()) {
+    if (head->has_son) {
         for (const auto i : ((is_not_end_node*)head)->son) {
             free_tree(i);
         }
@@ -310,9 +302,8 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
     const compiler_option* option, detail_compiler* compiler_ptr,
     bool return_compiler_ptr) {
     /* 正式进入虚拟机字节码生成环节*/
-    vm->static_data.ver_ = def::version;
 
-    if (compiler_ptr == nullptr && return_compiler_ptr == false) [[likely]] {
+    if (compiler_ptr == nullptr && !return_compiler_ptr) [[likely]] {
         // 如果不需要返回变量信息或者没有提供指定编译器
         // 不需要保存变量信息
         compiler_public_data compiler_data
@@ -322,12 +313,12 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
         detail_compiler lex_d(compiler_data, vm);
         compile_node(grammar_lexer, lex_d, vm);
         return nullptr;
-    } else if (return_compiler_ptr == true) {
+    } else if (return_compiler_ptr) {
         // 需要返回保存变量信息(tshell和tdb需要使用)
         auto* compiler_data
             = new compiler_public_data { std::string("__main__"), option };
         grammar_lex grammar_lexer(codes, *compiler_data);
-        detail_compiler* lex_d = new detail_compiler(*compiler_data, vm);
+        auto* lex_d = new detail_compiler(*compiler_data, vm);
         compile_node(grammar_lexer, *lex_d, vm);
         return lex_d;
     } else if (compiler_ptr != nullptr) {

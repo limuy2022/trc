@@ -88,7 +88,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">储存编译期间要用到的公共数据和成员  <a href="structtrc_1_1compiler_1_1compiler__public__data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html">data_node</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">数据节点  <a href="classtrc_1_1compiler_1_1data__node.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">储存字符串类型的数据节点  <a href="classtrc_1_1compiler_1_1data__node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html">detail_compiler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">编译器的细节  <a href="classtrc_1_1compiler_1_1detail__compiler.html#details">More...</a><br /></td></tr>
@@ -100,10 +100,10 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成语法树的解析器  <a href="classtrc_1_1compiler_1_1grammar__lex.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1is__end__node.html">is_end_node</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述终结节点  <a href="classtrc_1_1compiler_1_1is__end__node.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述叶子节点的类  <a href="classtrc_1_1compiler_1_1is__end__node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述不是终结节点的类(不储存数据的非叶子节点)  <a href="classtrc_1_1compiler_1_1is__not__end__node.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述非叶子节点的类  <a href="classtrc_1_1compiler_1_1is__not__end__node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1next__order__map.html">next_order_map</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">适用于相邻的多个元素访问，使用方法同map  <a href="classtrc_1_1compiler_1_1next__order__map.html#details">More...</a><br /></td></tr>
@@ -112,25 +112,22 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于数据的节点  <a href="classtrc_1_1compiler_1_1node__base__data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__data__without__sons.html">node_base_data_without_sons</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于字符串的没有子节点的节点  <a href="classtrc_1_1compiler_1_1node__base__data__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于字符串的叶子节点  <a href="classtrc_1_1compiler_1_1node__base__data__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__float__without__sons.html">node_base_float_without_sons</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于浮点型的叶子节点  <a href="classtrc_1_1compiler_1_1node__base__float__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int.html">node_base_int</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整形的有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整形的非叶子节点  <a href="classtrc_1_1compiler_1_1node__base__int.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__int__without__sons.html">node_base_int_without_sons</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整型的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__int__without__sons.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__string__without__sons.html">node_base_string_without_sons</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于字符串的没有子节点的节点  <a href="classtrc_1_1compiler_1_1node__base__string__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于整型的叶子节点  <a href="classtrc_1_1compiler_1_1node__base__int__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__tick.html">node_base_tick</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于token符号的节点  <a href="classtrc_1_1compiler_1_1node__base__tick.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html">node_base_tick_without_sons</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于标签的没有子节点的类型  <a href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于标签的叶子节点  <a href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1tick__node.html">tick_node</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,6 +138,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">这是一个将字符串转换成token流按行输出的类  <a href="classtrc_1_1compiler_1_1token__lex.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">树节点的基类，生成语法分析树时用到 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除  <a href="classtrc_1_1compiler_1_1treenode.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -312,12 +310,6 @@ Variables</h2></td></tr>
 <tr class="separator:a6e8c03e81cf0287d40170afceecdd6b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a44cc77be0d58ef43a351bf2c3d088f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a3a44cc77be0d58ef43a351bf2c3d088f">nooptimize_option</a> { true, false }</td></tr>
 <tr class="separator:a3a44cc77be0d58ef43a351bf2c3d088f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7212915c9c18eaf8ec38216160264f8"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 7 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ae7212915c9c18eaf8ec38216160264f8">opti_opers</a> = { &quot;+&quot;, &quot;-&quot;, &quot;**&quot;, &quot;*&quot;, &quot;//&quot;, &quot;%&quot;, &quot;/&quot; }</td></tr>
-<tr class="separator:ae7212915c9c18eaf8ec38216160264f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35f7516051f08dd3edd6471f3477b753"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a35f7516051f08dd3edd6471f3477b753">opti_condits</a> = { &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;&lt;=&quot;, &quot;&gt;=&quot;, &quot;!=&quot;, &quot;==&quot;, &quot;and&quot;, &quot;or&quot; }</td></tr>
-<tr class="separator:a35f7516051f08dd3edd6471f3477b753"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3538137419d8f843ad5d29da2957cddd"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::string, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a3538137419d8f843ad5d29da2957cddd">const_values</a> = { &quot;true&quot;, &quot;false&quot;, &quot;null&quot; }</td></tr>
-<tr class="separator:a3538137419d8f843ad5d29da2957cddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1585c35a0079e8001f12f788884d282d"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a1585c35a0079e8001f12f788884d282d">change_const</a></td></tr>
 <tr class="separator:a1585c35a0079e8001f12f788884d282d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a647bab001ab83bfd92a03e8fda99c886"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a647bab001ab83bfd92a03e8fda99c886">map_</a> []</td></tr>
@@ -344,7 +336,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >字节码最终在此生成，是编译器的另一个核心</p>
-<p >编译时期共享的数据</p>
+<p >编译各个阶段的公用函数和变量</p>
 <p >该头文件是私有头文件，不是公有头文件</p>
 <p >声明编译中的优化函数 </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
@@ -656,7 +648,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>判断是不是运算符token </p>
-<dl class="section warning"><dt>Warning</dt><dd>不包含常量运算符token </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>不包含条件运算符token </dd></dl>
 
 </div>
 </div>
@@ -1100,20 +1092,6 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a3538137419d8f843ad5d29da2957cddd" name="a3538137419d8f843ad5d29da2957cddd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3538137419d8f843ad5d29da2957cddd">&#9670;&nbsp;</a></span>const_values</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt; std::string, 3 &gt; trc::compiler::const_values = { &quot;true&quot;, &quot;false&quot;, &quot;null&quot; }</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a8e2753859f702ea35cde9b6bfdff55f0" name="a8e2753859f702ea35cde9b6bfdff55f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8e2753859f702ea35cde9b6bfdff55f0">&#9670;&nbsp;</a></span></h2>
 
@@ -1140,7 +1118,7 @@ Variables</h2></td></tr>
 <div class="line">    <a class="code hl_define" href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a>(<span class="stringliteral">&quot;null&quot;</span>, token_ticks::NULL_),</div>
 <div class="line">    <a class="code hl_define" href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a>(<span class="stringliteral">&quot;true&quot;</span>, token_ticks::TRUE),</div>
 <div class="line">    <a class="code hl_define" href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a>(<span class="stringliteral">&quot;false&quot;</span>, token_ticks::FALSE) }</div>
-<div class="ttc" id="a_compiler_2token_8cpp_html_a9b50aadf6559a42b5362dc148267e35e"><div class="ttname"><a href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a></div><div class="ttdeci">#define CREATE_KEYWORD(str, tick)</div><div class="ttdef"><b>Definition:</b> token.cpp:165</div></div>
+<div class="ttc" id="a_compiler_2token_8cpp_html_a9b50aadf6559a42b5362dc148267e35e"><div class="ttname"><a href="_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e">CREATE_KEYWORD</a></div><div class="ttdeci">#define CREATE_KEYWORD(str, tick)</div><div class="ttdef"><b>Definition:</b> token.cpp:163</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1251,34 +1229,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_compiler_2library_8h.html#a1eccab6427f53a76ce9d25c379b5a90d">TRC_Compiler_c_api</a> <a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> trc::compiler::nooptimize_option { true, false }</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a35f7516051f08dd3edd6471f3477b753" name="a35f7516051f08dd3edd6471f3477b753"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35f7516051f08dd3edd6471f3477b753">&#9670;&nbsp;</a></span>opti_condits</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt; std::string, 8 &gt; trc::compiler::opti_condits = { &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;&lt;=&quot;, &quot;&gt;=&quot;, &quot;!=&quot;, &quot;==&quot;, &quot;and&quot;, &quot;or&quot; }</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae7212915c9c18eaf8ec38216160264f8" name="ae7212915c9c18eaf8ec38216160264f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7212915c9c18eaf8ec38216160264f8">&#9670;&nbsp;</a></span>opti_opers</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt; std::string, 7 &gt; trc::compiler::opti_opers = { &quot;+&quot;, &quot;-&quot;, &quot;**&quot;, &quot;*&quot;, &quot;//&quot;, &quot;%&quot;, &quot;/&quot; }</td>
         </tr>
       </table>
 </div><div class="memdoc">

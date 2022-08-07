@@ -90,12 +90,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8bb961a0e05e0f330897cd119935a6d4"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a8bb961a0e05e0f330897cd119935a6d4">get_local_name_size</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a8bb961a0e05e0f330897cd119935a6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取局部的符号表的大小  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a8bb961a0e05e0f330897cd119935a6d4">More...</a><br /></td></tr>
 <tr class="separator:a8bb961a0e05e0f330897cd119935a6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0153aa50d087f5f0d867feb8cae1083"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#aa0153aa50d087f5f0d867feb8cae1083">get_index_of_globalvar</a> (const char *name, bool maybe_not_in)</td></tr>
-<tr class="memdesc:aa0153aa50d087f5f0d867feb8cae1083"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在全局符号表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#aa0153aa50d087f5f0d867feb8cae1083">More...</a><br /></td></tr>
-<tr class="separator:aa0153aa50d087f5f0d867feb8cae1083"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a998883645be4d92bb583651817c69236"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a998883645be4d92bb583651817c69236">get_index_of_localvar</a> (const std::string &amp;localspace_name, const char *localvar_name, bool maybe_not_in)</td></tr>
-<tr class="memdesc:a998883645be4d92bb583651817c69236"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a998883645be4d92bb583651817c69236">More...</a><br /></td></tr>
-<tr class="separator:a998883645be4d92bb583651817c69236"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b69ab4da9f68fb3a2082fde1ea2bd07"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a8b69ab4da9f68fb3a2082fde1ea2bd07">get_index_of_globalvar</a> (char *name, bool maybe_not_in)</td></tr>
+<tr class="memdesc:a8b69ab4da9f68fb3a2082fde1ea2bd07"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在全局符号表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a8b69ab4da9f68fb3a2082fde1ea2bd07">More...</a><br /></td></tr>
+<tr class="separator:a8b69ab4da9f68fb3a2082fde1ea2bd07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c08b8c853b474ce847fd704acc7f667"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">get_index_of_localvar</a> (const std::string &amp;localspace_name, char *name, bool maybe_not_in)</td></tr>
+<tr class="memdesc:a7c08b8c853b474ce847fd704acc7f667"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">More...</a><br /></td></tr>
+<tr class="separator:a7c08b8c853b474ce847fd704acc7f667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表 </p>
@@ -155,8 +155,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0153aa50d087f5f0d867feb8cae1083" name="aa0153aa50d087f5f0d867feb8cae1083"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0153aa50d087f5f0d867feb8cae1083">&#9670;&nbsp;</a></span>get_index_of_globalvar()</h2>
+<a id="a8b69ab4da9f68fb3a2082fde1ea2bd07" name="a8b69ab4da9f68fb3a2082fde1ea2bd07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b69ab4da9f68fb3a2082fde1ea2bd07">&#9670;&nbsp;</a></span>get_index_of_globalvar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,7 +164,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">size_t trc::compiler::CompileEnvironment::get_index_of_globalvar </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">char *&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
@@ -192,8 +192,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a998883645be4d92bb583651817c69236" name="a998883645be4d92bb583651817c69236"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a998883645be4d92bb583651817c69236">&#9670;&nbsp;</a></span>get_index_of_localvar()</h2>
+<a id="a7c08b8c853b474ce847fd704acc7f667" name="a7c08b8c853b474ce847fd704acc7f667"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c08b8c853b474ce847fd704acc7f667">&#9670;&nbsp;</a></span>get_index_of_localvar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,8 +207,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>localvar_name</em>, </td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -228,7 +228,7 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">localspace_name</td><td>局部空间名，如函数名 </td></tr>
-    <tr><td class="paramname">localvar_name</td><td>变量名 </td></tr>
+    <tr><td class="paramname">name</td><td>变量名 </td></tr>
     <tr><td class="paramname">maybe_not_in</td><td>允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错 </td></tr>
   </table>
   </dd>

@@ -1,4 +1,4 @@
-#include <base/utils/type.hpp>
+﻿#include <base/utils/type.hpp>
 #include <gtest/gtest.h>
 
 using namespace trc;

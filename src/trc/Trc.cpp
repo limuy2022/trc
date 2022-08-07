@@ -28,7 +28,7 @@ static inline void show_error(const char* mode) {
  * @brief 输出版本号，version命令行参数对应的函数
  */
 static void showversion() {
-    trc::color::green("Version %.1f\n", trc::def::version);
+    trc::color::green("Version %s\n", trc::def::version);
     // 调用小彩蛋模块
     trc::eggs::canvas_data data = { { 0, 1, 0 }, { 1, 2, 1 }, { 0, 1, 0 } };
     trc::eggs::draw_pictures(data);
@@ -65,7 +65,7 @@ static inline void find_mode_to_run(char* mode) {
 /**
  * @brief 释放内存，程序结束时使用
  */
-static void quit_mem() {
+inline static void quit_mem() {
     trc::TVM_space::TVM_quit_mem();
 }
 

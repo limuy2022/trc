@@ -8,9 +8,8 @@ var searchData=
   ['var_5fname_5',['VAR_NAME',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa04278d9c3e8692412e2d9cb9f7e0af30',1,'trc::compiler']]],
   ['vars_6',['vars',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#af3eb957a58fac8cd24f0c3f5ab1c9aca',1,'trc::TVM_space::cpp_libs::cpp_lib::vars()'],['../classtrc_1_1_t_v_m__space_1_1symbol__form.html#ada0e4e65f7946c8e29c9265072d72ef6',1,'trc::TVM_space::symbol_form::vars()']]],
   ['vecs_7',['vecs',['../trcdef_8h.html#a2b3a665a72a3ec38ec342e0722c043df',1,'trcdef.h']]],
-  ['ver_5f_8',['ver_',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a1cda05a88482adc882d7e6c9cdb0bf57',1,'trc::TVM_space::TVM_static_data']]],
-  ['version_9',['version',['../namespacetrc_1_1def.html#a9917689e8be235a2b03110401ca4023d',1,'trc::def']]],
+  ['version_8',['version',['../namespacetrc_1_1def.html#a4459ab9e2be776c34d74988ae605f018',1,'trc::def']]],
+  ['versionerror_9',['versionerror',['../namespacelanguage_1_1error.html#a21cbc0a738bc3faba2aa14b597675e95',1,'language::error']]],
   ['versionerror_10',['VersionError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ab2519913d7052119947f1d4e4200f626',1,'trc::error']]],
-  ['versionerror_11',['versionerror',['../namespacelanguage_1_1error.html#a21cbc0a738bc3faba2aa14b597675e95',1,'language::error']]],
-  ['vm_12',['vm',['../classtrc_1_1compiler_1_1detail__compiler.html#a9b248666ad51c3537dc61fe697b3edb9',1,'trc::compiler::detail_compiler']]]
+  ['vm_11',['vm',['../classtrc_1_1compiler_1_1detail__compiler.html#a9b248666ad51c3537dc61fe697b3edb9',1,'trc::compiler::detail_compiler']]]
 ];

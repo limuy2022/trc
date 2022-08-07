@@ -12,7 +12,7 @@ namespace trc::utils {
  * @warning 该函数效率并不算太高，请优先求助标准库例如atoi等
  * @tparam outtype 输出类型(需要自己指定)
  * @tparam intype 输入类型(无需自己指定)
- * @example to_type<int>("10") -> 10
+ * @code to_type<int>("10") -> 10 @endcode
  */
 template <typename outtype, typename intype>
 outtype to_type(const intype& value) {

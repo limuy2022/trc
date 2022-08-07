@@ -1,19 +1,15 @@
 ﻿#include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
 #include <Compiler/grammar_env.h>
-#include <Compiler/optimize.h>
 #include <Compiler/pri_compiler.hpp>
-#include <Compiler/token.h>
 #include <array>
 #include <base/Error.h>
 #include <base/func_loader.h>
-#include <base/memory/memory.hpp>
 #include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <language/error.h>
 #include <stack>
 #include <string>
-#include <vector>
 
 namespace trc::compiler {
 grammar_lex::~grammar_lex() {

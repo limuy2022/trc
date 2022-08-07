@@ -11,7 +11,6 @@
 #include <base/memory/memory.h>
 #include <base/trcdef.h>
 #include <base/utils/data.hpp>
-#include <cstdio>
 #include <cstring>
 #include <gflags/gflags.h>
 #include <language/language.h>

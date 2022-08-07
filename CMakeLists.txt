@@ -18,7 +18,6 @@ add_definitions(-D _CRT_SECURE_NO_WARNINGS)
 
 project(Trc CXX)
 
-#调试专区
 message("${CMAKE_BUILD_TYPE}")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

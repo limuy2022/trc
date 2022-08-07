@@ -10,13 +10,11 @@
 #include <TVM/memory.h>
 #include <algorithm>
 #include <base/io.hpp>
-#include <base/utils/data.hpp>
 #include <base/utils/filesys.h>
 #include <cstdio>
 #include <cstring>
 #include <generated_params.h>
 #include <language/language.h>
-#include <stack>
 #include <string>
 
 namespace trc {

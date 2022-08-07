@@ -2,7 +2,6 @@
 #include <TVM/func.h>
 #include <TVM/memory.h>
 #include <base/Error.h>
-#include <base/memory/memory.h>
 #include <base/trcdef.h>
 #include <cstdarg>
 #include <utility>

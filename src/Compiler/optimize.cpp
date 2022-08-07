@@ -1,8 +1,6 @@
 ﻿#include <Compiler/grammar.h>
-#include <Compiler/optimize.h>
 #include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
-#include <base/utils/data.hpp>
 #include <cmath>
 #include <cstring>
 #include <language/error.h>

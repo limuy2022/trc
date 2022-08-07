@@ -13,9 +13,7 @@
 #include <TVM/memory.h>
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_string.h>
-#include <base/Error.h>
 #include <base/io.hpp>
-#include <base/memory/memory.h>
 #include <base/trcdef.h>
 #include <cstdio>
 #include <cstring>

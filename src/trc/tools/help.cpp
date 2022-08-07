@@ -1,5 +1,4 @@
 ﻿#include <base/color.h>
-#include <base/easter_eggs.h>
 #include <base/trcdef.h>
 #include <cstdio>
 #include <language/language.h>

@@ -329,7 +329,7 @@ token* token_lex::lex_others() {
     }
     case ')': {
         result = new token(token_ticks::RIGHT_SMALL_BRACE);
-        if (check_brace.top() != '(') {
+        if (check_brace.empty()||check_brace.top() != '(') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, ")");
         }
@@ -343,7 +343,7 @@ token* token_lex::lex_others() {
     }
     case ']': {
         result = new token(token_ticks::RIGHT_MID_BRACE);
-        if (check_brace.top() != '[') {
+        if (check_brace.empty()||check_brace.top() != '[') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "]");
         }
@@ -357,7 +357,7 @@ token* token_lex::lex_others() {
     }
     case '}': {
         result = new token(token_ticks::RIGHT_BIG_BRACE);
-        if (check_brace.top() != '{') {
+        if (check_brace.empty()||check_brace.top() != '{') {
             compiler_data.error.send_error_module(error::SyntaxError,
                 language::error::syntaxerror_no_expect, "}");
         }

@@ -62,7 +62,7 @@ char* make_error_msg(int error_name, va_list& ap) {
         }
         case '#': {
             // 插入字符
-            char addchar = va_arg(ap, char);
+            char addchar = va_arg(ap, int);
             used_size++;
             CHECK_AND_REALLOC_ERROR_MSG_STR(1);
             finally_out[res_string_index] = addchar;

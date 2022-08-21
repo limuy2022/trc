@@ -31,7 +31,7 @@ static const int MAGIC_VALUE = 0xACFD;
         str##_string_pool((file), (vm)->static_data.const_s);                  \
         /* 长整型常量池 */                                               \
         str##_string_pool((file), (vm)->static_data.const_long);               \
-        /* 变量名常量池 */                                               \
+        /* 符号表 */                                                        \
         str##_var_form((file), (vm)->static_data.global_symbol_table_size);    \
         /* 字节码常量池 */                                               \
         str##_bytecode((file), (vm)->static_data);                             \
@@ -72,7 +72,7 @@ static void fwrite_all(const void* a, size_t b, size_t c, FILE* d) {
  * @brief 加载单个字符串
  */
 static char* load_string_one(FILE* file) {
-    int n;
+    uint32_t n;
     fread(&n, sizeof(n), 1, file);
     char* res = new char[n + 1];
     fread(res, n, 1, file);
@@ -84,7 +84,7 @@ static char* load_string_one(FILE* file) {
  * @brief 写入单个字符串
  */
 static void write_string_one(FILE* file, const char* data) {
-    int n = (int)strlen(data);
+    auto n = static_cast<uint32_t>(strlen(data));
     // 写入数据长度
     fwrite(&n, sizeof(n), 1, file);
     fwrite(data, n, sizeof(char), file);
@@ -99,10 +99,10 @@ static void write_string_one(FILE* file, const char* data) {
  */
 template <typename T>
 static void write_pool(FILE* file, std::vector<T>& const_pool) {
-    int size = const_pool.size() - 1;
+    uint32_t size = const_pool.size();
     fwrite(&size, sizeof(size), 1, file);
-    if (size > 0) {
-        fwrite(const_pool.data() + 1, sizeof(T), size, file);
+    if (size != 0) {
+        fwrite(const_pool.data(), sizeof(T), size, file);
     }
 }
 
@@ -114,11 +114,10 @@ static void write_pool(FILE* file, std::vector<T>& const_pool) {
  */
 template <typename T>
 static void load_pool(FILE* file, std::vector<T>& const_pool) {
-    int size;
+    uint32_t size;
     fread(&size, sizeof(size), 1, file);
-    // 留出占位的位置
-    const_pool.resize(size + 1);
-    fread(const_pool.data() + 1, sizeof(T), size, file);
+    const_pool.resize(size);
+    fread(const_pool.data(), sizeof(T), size, file);
 }
 
 /**
@@ -130,12 +129,11 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
  */
 static void write_string_pool(
     FILE* file, std::vector<const char*>& const_pool) {
-    // 减去开头占位的数据
-    int size = (int)const_pool.size() - 1;
     // 数据长度
+    auto size = static_cast<uint32_t>(const_pool.size());
     fwrite(&size, sizeof(size), 1, file);
-    for (size_t i = 1, n = const_pool.size(); i < n; ++i)
-        write_string_one(file, const_pool[i]);
+    for (auto i : const_pool)
+        write_string_one(file, i);
 }
 
 /**
@@ -148,12 +146,11 @@ static void write_string_pool(
  */
 static void load_string_pool(FILE* file, std::vector<const char*>& const_pool) {
     const_pool.clear();
-    int size;
+    uint32_t size;
     // 数据长度
     fread(&size, sizeof(size), 1, file);
     const_pool.reserve(size);
-    const_pool.push_back(nullptr);
-    for (; size != 0; --size) {
+    while (size--) {
         const_pool.push_back(load_string_one(file));
     }
 }
@@ -182,7 +179,7 @@ static void write_var_form(FILE* file, size_t table_size) {
 static void write_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
-    int size = (int)static_data.byte_codes.size();
+    auto size = (uint32_t)static_data.byte_codes.size();
     fwrite(&size, sizeof(size), 1, file);
     // 是否带有行号表
     size_t line_numeber_size = static_data.line_number_table.size();
@@ -208,7 +205,7 @@ static void write_bytecode(
 static void load_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
-    int size;
+    uint32_t size;
     trc::TVM_space::bytecode_t name;
     trc::TVM_space::bytecode_index_t argv;
     fread(&size, sizeof(size), 1, file);
@@ -223,7 +220,7 @@ static void load_bytecode(
     }
     // 读取具体字节码
     static_data.byte_codes.reserve(size);
-    for (int i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         fread(&name, sizeof(name), 1, file);
         fread(&argv, sizeof(argv), 1, file);
         static_data.byte_codes.emplace_back(name, argv);
@@ -335,8 +332,8 @@ void save_ctree(TVM_space::TVM* vm, const std::string& path) {
     // ACFD
     fwrite(&MAGIC_VALUE, sizeof(MAGIC_VALUE), 1, file);
     // 写入版本号的长度
-    int size_tmp = strlen(def::version);
-    fwrite(&size_tmp, sizeof(int), 1, file);
+    int size_tmp = static_cast<int>(strlen(def::version));
+    fwrite(&size_tmp, sizeof(size_tmp), 1, file);
     // 写入版本号
     fwrite(def::version, strlen(def::version), sizeof(char), file);
     LOAD_WRITE(file, vm, write);

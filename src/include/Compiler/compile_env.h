@@ -18,7 +18,7 @@ namespace trc::compiler {
  */
 class TRC_Compiler_api CompileEnvironment {
 public:
-    CompileEnvironment(compiler_public_data& compiler_data);
+    explicit CompileEnvironment(compiler_public_data& compiler_data);
 
     ~CompileEnvironment();
     /**

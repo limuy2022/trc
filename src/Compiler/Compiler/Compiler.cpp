@@ -63,10 +63,10 @@ void detail_compiler::func_lexer(treenode* head) {
 
 TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
     size_t size = vm->static_data.const_i.size();
-    int index = utils::check_in_i(value, vm->static_data.const_i.begin() + 1,
-        vm->static_data.const_i.end());
+    int index = utils::check_in_i(
+        value, vm->static_data.const_i.begin(), vm->static_data.const_i.end());
     if (index != -1) {
-        return index + 1;
+        return index;
     }
     vm->static_data.const_i.push_back(value);
     return size;
@@ -74,22 +74,22 @@ TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
 
 TVM_space::bytecode_index_t detail_compiler::add_float(double value) const {
     size_t size = vm->static_data.const_f.size();
-    int index = utils::check_in_i(value, vm->static_data.const_f.begin() + 1,
-        vm->static_data.const_f.end());
+    int index = utils::check_in_i(
+        value, vm->static_data.const_f.begin(), vm->static_data.const_f.end());
     if (index != -1) {
-        return index + 1;
+        return index;
     }
     vm->static_data.const_f.push_back(value);
     return size;
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_string(char* value) const {
-    int index = utils::str_check_in_i(value,
-        vm->static_data.const_s.begin() + 1, vm->static_data.const_s.end());
+    int index = utils::str_check_in_i(
+        value, vm->static_data.const_s.begin(), vm->static_data.const_s.end());
     size_t size = vm->static_data.const_s.size();
     if (index != -1) {
         free(value);
-        return index + 1;
+        return index;
     }
     vm->static_data.const_s.push_back(value);
     return size;
@@ -105,12 +105,11 @@ TVM_space::bytecode_index_t detail_compiler::add_var_must_in(char* value) {
 
 TVM_space::bytecode_index_t detail_compiler::add_long(char* value) const {
     size_t size = vm->static_data.const_long.size();
-    int index
-        = utils::str_check_in_i(value, vm->static_data.const_long.begin() + 1,
-            vm->static_data.const_long.end());
+    int index = utils::str_check_in_i(value, vm->static_data.const_long.begin(),
+        vm->static_data.const_long.end());
     if (index != -1) {
         free(value);
-        return index + 1;
+        return index;
     }
     vm->static_data.const_long.push_back(value);
     return size;

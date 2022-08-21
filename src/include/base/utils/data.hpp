@@ -44,18 +44,6 @@ template <typename T, typename V> int index_vector(const T& v1, const V& data) {
 }
 
 /**
- * @brief 获取字符串data在v1中的索引值(第一个)
- */
-template <typename T> int index_strstl(const T& v1, const char* data) {
-    for (int i = 0, n = v1.size(); i < n; i++) {
-        if (!strcmp(v1[i], data)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-/**
  * @brief 检查data是否在容器T每一项值的里面
  * @tparam T 容器类型
  * @tparam O 数据类型

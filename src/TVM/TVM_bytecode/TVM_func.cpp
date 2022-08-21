@@ -4,7 +4,7 @@
 #include <base/trcdef.h>
 
 namespace trc::TVM_space {
-TVM_BUILTINS_FUNC builtin_funcs[] { nullptr, &builtin::EXIT, &builtin::PRINT,
+TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT, &builtin::PRINT,
     &builtin::PRINTLN, &builtin::INPUT, &builtin::LENGTH, &builtin::HELP,
     &builtin::STRING_, &builtin::INT_, &builtin::BOOL_, &builtin::FLOAT_,
     &builtin::TYPE };

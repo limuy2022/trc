@@ -5,14 +5,13 @@
 
 namespace trc::compiler {
 CompileEnvironment::CompileEnvironment(compiler_public_data& compiler_data)
-    : var_names_list_global(1)
-    , compiler_data(compiler_data) {
+    : compiler_data(compiler_data) {
 }
 
 CompileEnvironment::~CompileEnvironment() {
     // 释放掉变量名内存
-    for (size_t i = 1, n = var_names_list_global.size(); i < n; ++i) {
-        delete[] var_names_list_global[i];
+    for (auto i : var_names_list_global) {
+        delete[] i;
     }
 }
 
@@ -27,7 +26,7 @@ size_t CompileEnvironment::get_local_name_size(const std::string& name) {
 size_t CompileEnvironment::get_index_from_list(
     char* name, name_list_t& list, bool maybe_not_in) {
     size_t n = list.size();
-    for (size_t i = 1; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         if (!strcmp(list[i], name)) {
             free(name);
             return i;

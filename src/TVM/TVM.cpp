@@ -9,7 +9,6 @@
 namespace trc::TVM_space {
 
 // 利用索引存放函数指针，实现O(1)复杂度的调用算法
-// 不符合的地方用nullptr代替，算是以小部分空间换大部分时间
 const NOARGV_TVM_METHOD TVM::TVM_RUN_CODE_NOARG_FUNC[]
     = { nullptr, &trc::TVM_space::TVM::ADD, &trc::TVM_space::TVM::NOP,
           &trc::TVM_space::TVM::SUB, &trc::TVM_space::TVM::MUL,
@@ -40,6 +39,12 @@ const ARGV_TVM_METHOD TVM::TVM_RUN_CODE_ARG_FUNC[]
           &trc::TVM_space::TVM::LOAD_LONG, &trc::TVM_space::TVM::LOAD_ARRAY,
           &trc::TVM_space::TVM::CALL_METHOD, &trc::TVM_space::TVM::LOAD_MAP };
 
+// 判断字节码是否含有参数
+bool has_argv[] = { true, false, false, false, false, false, true, true, true,
+    false, true, true, true, false, false, false, false, true, true, false,
+    false, false, false, false, false, false, false, false, false, true, true,
+    true, false, true, false, true, true, true, true };
+
 TVM::TVM(std::string name)
     : name(std::move(name)) {
     // 初始化TVM
@@ -48,6 +53,14 @@ TVM::TVM(std::string name)
 
 void TVM::reload_data() {
     dyna_data.reset_global_symbol_table(static_data.global_symbol_table_size);
+}
+
+void TVM::run_bycode(TVM_bytecode* bycode) {
+    if (has_argv[bycode->bycode]) {
+        (this->*TVM_RUN_CODE_ARG_FUNC[bycode->bycode])(bycode->index);
+    } else {
+        (this->*TVM_RUN_CODE_NOARG_FUNC[bycode->bycode])();
+    }
 }
 
 void free_module(TVM* vm) {

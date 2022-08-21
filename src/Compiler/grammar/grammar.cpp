@@ -51,8 +51,8 @@ treenode* grammar_lex::callfunction(token* funcname) {
     std::reverse(argv_node->son.begin(), argv_node->son.end());
 
     // 函数名问题：判断内置函数和自定义函数
-    if (trc::utils::check_in(funcname->data, loader::num_func.begin() + 1,
-            loader::num_func.end())) {
+    if (trc::utils::str_check_in(
+            funcname->data, loader::num_func.begin(), loader::num_func.end())) {
         // 内置函数
         auto builtin = new node_base_int(
             loader::func_num[funcname->data], grammar_type::BUILTIN_FUNC);

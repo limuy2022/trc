@@ -66,7 +66,7 @@ public:
      */
     void ReleaseStringData();
     ~TVM_static_data();
-    TVM_static_data();
+    TVM_static_data() = default;
 };
 
 #define TVM_STACK_SIZE 1024

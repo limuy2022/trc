@@ -43,10 +43,9 @@ class drawer {
 public:
     /**
      * @brief 计算出画布大小并初始化画布
-     * @param canvas 关于画布的描述
      * @param background 用于填充背景的字符
      */
-    drawer(const canvas_data& canvas, char background);
+    explicit drawer(char background);
 
     /**
      * @brief 打印出方块
@@ -78,15 +77,10 @@ private:
     char background;
 };
 
-drawer::drawer(const canvas_data& canvas, char background)
+drawer::drawer(char background)
     : background(background) {
-
     // 初始化数据
-    for (auto& canva : canvas_) {
-        for (char& j : canva) {
-            j = background;
-        }
-    }
+    memset(canvas_, background, sizeof(canvas_));
 }
 
 bool drawer::check_x(int x) {
@@ -139,13 +133,9 @@ void drawer::draw() {
     }
 }
 
-pos::pos(int count)
-    : count_(count) {
-}
-
 void draw_pictures(canvas_data& pos_, char background) {
     // 构建一个绘画者(因为画布数据可能会栈溢出，所以在堆上分配)
-    auto* painter = new drawer(pos_, background);
+    auto* painter = new drawer(background);
     // 开始设置方块
     bool flag = false;
     size_t m = pos_.size(), n = pos_[0].size();

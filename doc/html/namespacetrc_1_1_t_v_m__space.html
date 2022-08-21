@@ -163,6 +163,8 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a40e59fb284e8d5d97e432890cf0e4416"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_t_v_m_2library_8h.html#aae14e094fa3529923749c0ad9bb758e4">TRC_TVM_c_api</a> <a class="el" href="structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html">objs_pool_TVM</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a40e59fb284e8d5d97e432890cf0e4416">global_objs_pool</a></td></tr>
 <tr class="separator:a40e59fb284e8d5d97e432890cf0e4416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5d751140f8a776e4ed04864ef235947"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#ad5d751140f8a776e4ed04864ef235947">has_argv</a> []</td></tr>
+<tr class="separator:ad5d751140f8a776e4ed04864ef235947"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b1066cb4d55bd96c344d94689ae5e0a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a85cef7438d5d252b20026c3ed514b7e5">TVM_BUILTINS_FUNC</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a1b1066cb4d55bd96c344d94689ae5e0a">builtin_funcs</a> []</td></tr>
 <tr class="separator:a1b1066cb4d55bd96c344d94689ae5e0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -391,7 +393,7 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{ <span class="keyword">nullptr</span>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a52beb179148221cbdb6165f8f253fe0e">builtin::EXIT</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a6c43849f16a275d88f936e0956966262">builtin::PRINT</a>,</div>
+<b>Initial value:</b><div class="fragment"><div class="line">{ &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a52beb179148221cbdb6165f8f253fe0e">builtin::EXIT</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a6c43849f16a275d88f936e0956966262">builtin::PRINT</a>,</div>
 <div class="line">    &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a8a1c30eefb92985bebd4599fdaa873f8">builtin::PRINTLN</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#acb9c3fcc42f473199d3bf19230054760">builtin::INPUT</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a2ad12a2b85f97b508e2c3a19a456f469">builtin::LENGTH</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#aea3664ac2bf120e00d3f70f14723d0c7">builtin::HELP</a>,</div>
 <div class="line">    &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae047552a515e8a364a219e1493e09500">builtin::STRING_</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a6e32bbb4255fac74ae7090b8bdd57b54">builtin::INT_</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae206eec981a0b4c4f53e0280607ee23d">builtin::BOOL_</a>, &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#a0515ffac25483920d7ff0bf69dae1aa2">builtin::FLOAT_</a>,</div>
 <div class="line">    &amp;<a class="code hl_function" href="namespacetrc_1_1_t_v_m__space_1_1builtin.html#ab9899fb0acbc7d0c1a5398616db1dc77">builtin::TYPE</a> }</div>
@@ -421,6 +423,24 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="ad5d751140f8a776e4ed04864ef235947" name="ad5d751140f8a776e4ed04864ef235947"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5d751140f8a776e4ed04864ef235947">&#9670;&nbsp;</a></span>has_argv</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trc::TVM_space::has_argv[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= { <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">true</span>,</div>
+<div class="line">    <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">false</span>,</div>
+<div class="line">    <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>,</div>
+<div class="line">    <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">true</span> }</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

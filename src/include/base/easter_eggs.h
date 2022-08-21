@@ -17,7 +17,9 @@ class TRC_base_api pos {
 public:
     int count_;
     int high = 0;
-    pos(int count);
+    pos(int count)
+        : count_(count) {
+    }
 };
 
 typedef std::vector<std::vector<pos>> canvas_data;

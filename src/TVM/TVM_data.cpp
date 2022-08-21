@@ -30,27 +30,17 @@ TVM_dyna_data::TVM_dyna_data()
 TVM_dyna_data::~TVM_dyna_data() = default;
 
 void TVM_static_data::ReleaseStringData() {
-    for (size_t i = 1, n = const_s.size(); i < n; ++i) {
-        free(const_cast<char*>(const_s[i]));
+    for (auto& i : const_s) {
+        free(const_cast<char*>(i));
     }
     const_s.clear();
-    const_s.push_back(nullptr);
-    for (size_t i = 1, n = const_long.size(); i < n; ++i) {
-        free(const_cast<char*>(const_long[i]));
+    for (auto& i : const_long) {
+        free(const_cast<char*>(i));
     }
     const_long.clear();
-    const_long.push_back(nullptr);
 }
 
 TVM_static_data::~TVM_static_data() {
     ReleaseStringData();
-}
-
-// 初始化为1个是因为索引为uint16_t，所以0就表示无参数，0号位必须放一个数占位
-TVM_static_data::TVM_static_data()
-    : const_i(1)
-    , const_s(1)
-    , const_long(1)
-    , const_f(1) {
 }
 }

@@ -1,10 +1,11 @@
 #include <platform.h>
+#include <cstdint>
 
 namespace trc {
 namespace utils {
     bool get_byte_order() {
-        int tmp = 0;
-        return !(*(char*)(&tmp));
+        const int32_t tmp = 1;
+        return !(*(char8_t*)(&tmp));
     }
 }
 

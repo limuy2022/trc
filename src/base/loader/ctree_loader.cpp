@@ -17,10 +17,12 @@
 #include <vector>
 
 // 开头标识文件是否为ctree文件的标识，魔数
-static const int MAGIC_VALUE = 0xACFD;
+static uint16_t MAGIC_VALUE = 0xACFD;
 
-// 由于读入和写入是相对的，所以用宏定义来简化这一点
-// @param str load or write
+/**
+ * 由于读入和写入是相对的，所以用宏定义来简化这一点
+ * @param str load or write
+ */
 #define LOAD_WRITE(file, vm, str)                                              \
     do {                                                                       \
         /* 整型常量池 */                                                  \
@@ -39,12 +41,13 @@ static const int MAGIC_VALUE = 0xACFD;
         str##_functions((file), (vm)->static_data.funcs);                      \
     } while (0)
 
+namespace trc::loader {
 /**
  * @brief
- * 包装fread函数，使它能够自动统一为大端字节序
- * @warning 用法与fread相同
+ * 包装fread函数，使它能够自动统一为大端字节序，用法与fread相同
+ * @warning 字符串等数据无需通过此种方式写入
  */
-static void fread_all(void* a, size_t b, size_t c, FILE* d) {
+static void fread_cross_plat(void* a, size_t b, size_t c, FILE* d) {
     fread(a, b, c, d);
     /*为大端则转成小端*/
     if (!trc::def::byte_order) {
@@ -54,28 +57,28 @@ static void fread_all(void* a, size_t b, size_t c, FILE* d) {
 
 /**
  * @brief
- * 包装fwrite函数，使它能够自动统一为大端字节序
- * @warning 用法与fwrite相同
+ * 包装fwrite函数，使它能够自动统一为大端字节序，用法与fwrite相同
+ * @warning 字符串等数据无需通过此种方式读取
  */
-static void fwrite_all(const void* a, size_t b, size_t c, FILE* d) {
-    fwrite(a, b, c, d);
-    /*为小端则转成大端*/
-    if (!trc::def::byte_order) {
-        trc::utils::bytes_order_change((trc::def::byte_t*)a, b * c);
+static void fwrite_cross_plat(const void* a, size_t b, size_t c, FILE* d) {
+    if (!def::byte_order) {
+        /*为小端则转成大端*/
+        utils::bytes_order_change((def::byte_t*)a, b * c);
+        fwrite(a, b, c, d);
+        utils::bytes_order_change((def::byte_t*)a, b * c);
+    } else {
+        fwrite(a, b, c, d);
     }
 }
-
-#define fread fread_all
-#define fwrite fwrite_all
 
 /**
  * @brief 加载单个字符串
  */
 static char* load_string_one(FILE* file) {
     uint32_t n;
-    fread(&n, sizeof(n), 1, file);
+    fread_cross_plat(&n, sizeof(n), 1, file);
     char* res = new char[n + 1];
-    fread(res, n, 1, file);
+    fread(res, n, sizeof(char), file);
     res[n] = '\0';
     return res;
 }
@@ -86,7 +89,7 @@ static char* load_string_one(FILE* file) {
 static void write_string_one(FILE* file, const char* data) {
     auto n = static_cast<uint32_t>(strlen(data));
     // 写入数据长度
-    fwrite(&n, sizeof(n), 1, file);
+    fwrite_cross_plat(&n, sizeof(n), 1, file);
     fwrite(data, n, sizeof(char), file);
 }
 
@@ -100,9 +103,9 @@ static void write_string_one(FILE* file, const char* data) {
 template <typename T>
 static void write_pool(FILE* file, std::vector<T>& const_pool) {
     uint32_t size = const_pool.size();
-    fwrite(&size, sizeof(size), 1, file);
-    if (size != 0) {
-        fwrite(const_pool.data(), sizeof(T), size, file);
+    fwrite_cross_plat(&size, sizeof(size), 1, file);
+    for (const auto& i : const_pool) {
+        fwrite_cross_plat(&i, sizeof(T), 1, file);
     }
 }
 
@@ -115,9 +118,11 @@ static void write_pool(FILE* file, std::vector<T>& const_pool) {
 template <typename T>
 static void load_pool(FILE* file, std::vector<T>& const_pool) {
     uint32_t size;
-    fread(&size, sizeof(size), 1, file);
+    fread_cross_plat(&size, sizeof(size), 1, file);
     const_pool.resize(size);
-    fread(const_pool.data(), sizeof(T), size, file);
+    for(uint32_t i = 0;i < size;--i) {
+        fread_cross_plat(&const_pool[i], sizeof(T), 1, file);
+    }
 }
 
 /**
@@ -131,7 +136,7 @@ static void write_string_pool(
     FILE* file, std::vector<const char*>& const_pool) {
     // 数据长度
     auto size = static_cast<uint32_t>(const_pool.size());
-    fwrite(&size, sizeof(size), 1, file);
+    fwrite_cross_plat(&size, sizeof(size), 1, file);
     for (auto i : const_pool)
         write_string_one(file, i);
 }
@@ -148,7 +153,7 @@ static void load_string_pool(FILE* file, std::vector<const char*>& const_pool) {
     const_pool.clear();
     uint32_t size;
     // 数据长度
-    fread(&size, sizeof(size), 1, file);
+    fread_cross_plat(&size, sizeof(size), 1, file);
     const_pool.reserve(size);
     while (size--) {
         const_pool.push_back(load_string_one(file));
@@ -161,14 +166,14 @@ static void load_string_pool(FILE* file, std::vector<const char*>& const_pool) {
  * @param table_size 符号表大小
  */
 static void load_var_form(FILE* file, size_t& table_size) {
-    fread(&table_size, sizeof(table_size), 1, file);
+    fread_cross_plat(&table_size, sizeof(table_size), 1, file);
 }
 
 /**
  * @brief 写入符号表大小
  */
 static void write_var_form(FILE* file, size_t table_size) {
-    fwrite(&table_size, sizeof(table_size), 1, file);
+    fwrite_cross_plat(&table_size, sizeof(table_size), 1, file);
 }
 
 /**
@@ -180,20 +185,18 @@ static void write_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
     auto size = (uint32_t)static_data.byte_codes.size();
-    fwrite(&size, sizeof(size), 1, file);
-    // 是否带有行号表
+    fwrite_cross_plat(&size, sizeof(size), 1, file);
+    // 写入行号表
     size_t line_numeber_size = static_data.line_number_table.size();
-    fwrite(&line_numeber_size, sizeof(line_numeber_size), 1, file);
-    if (size != 0) {
-        // 为是，写入行号表
-        fwrite(static_data.line_number_table.data(),
-            sizeof(decltype(static_data.line_number_table)::value_type),
-            line_numeber_size, file);
+    fwrite_cross_plat(&line_numeber_size, sizeof(line_numeber_size), 1, file);
+    for(size_t i = 0; i < line_numeber_size; ++i) {
+        fwrite_cross_plat(&static_data.line_number_table[i],
+            sizeof(decltype(static_data.line_number_table)::value_type), 1, file);
     }
     // 具体字节码
     for (const auto& i : static_data.byte_codes) {
-        fwrite(&i.bycode, sizeof(i.bycode), 1, file);
-        fwrite(&i.index, sizeof(i.index), 1, file);
+        fwrite_cross_plat(&i.bycode, sizeof(i.bycode), 1, file);
+        fwrite_cross_plat(&i.index, sizeof(i.index), 1, file);
     }
 }
 
@@ -206,23 +209,25 @@ static void load_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
     // 字节码条数
     uint32_t size;
-    trc::TVM_space::bytecode_t name;
-    trc::TVM_space::bytecode_index_t argv;
-    fread(&size, sizeof(size), 1, file);
+    fread_cross_plat(&size, sizeof(size), 1, file);
     // 读取长度判断是否有行号表
     size_t line_number_size;
-    fread(&line_number_size, sizeof(line_number_size), 1, file);
+    fread_cross_plat(&line_number_size, sizeof(line_number_size), 1, file);
     if (size) {
-        static_data.line_number_table.resize(line_number_size);
-        fread(static_data.line_number_table.data(),
-            sizeof(decltype(static_data.line_number_table)::value_type),
-            line_number_size, file);
+        static_data.line_number_table.reserve(line_number_size);
+        decltype(static_data.line_number_table)::value_type tmp;
+        for(size_t i = 0; i < line_number_size; ++i) {
+            fread_cross_plat(&tmp, sizeof(decltype(static_data.line_number_table)::value_type), 1, file);
+            static_data.line_number_table.push_back(tmp);
+        }
     }
     // 读取具体字节码
+    trc::TVM_space::bytecode_t name;
+    trc::TVM_space::bytecode_index_t argv;
     static_data.byte_codes.reserve(size);
     for (uint32_t i = 0; i < size; ++i) {
-        fread(&name, sizeof(name), 1, file);
-        fread(&argv, sizeof(argv), 1, file);
+        fread_cross_plat(&name, sizeof(name), 1, file);
+        fread_cross_plat(&argv, sizeof(argv), 1, file);
         static_data.byte_codes.emplace_back(name, argv);
     }
 }
@@ -275,21 +280,32 @@ static int getbigversion(const char* version) {
 /**
  * @brief 比较传入版本号是否合法
  * @details 合法的标准是程序大版本号大于传入的版本号，小版本号可以不相同
+ * @return true 合法的版本号
+ * @return false 不合法的版本号
  */
 static bool compare_version(const char* version) {
     return getbigversion(trc::def::version) >= getbigversion(version);
 }
 
-namespace trc::loader {
+/**
+ * @brief 判断是不是ctree文件的内部实现
+ * @param file
+ * @return true 代表是真实的ctree文件
+ */
+static bool is_magic_interal(FILE* file) {
+    decltype(MAGIC_VALUE) magic;
+    fread_cross_plat(&magic, sizeof(magic), 1, file);
+    return magic == MAGIC_VALUE;
+}
+
 bool is_magic(const std::string& path) {
     FILE* file = fopen(path.c_str(), "rb");
     if (!file)
         error::send_error(
             error::OpenFileError, language::error::openfileerror, path.c_str());
-    int magic;
-    fread(&magic, sizeof(magic), 1, file);
+    bool res = is_magic_interal(file);
     fclose(file);
-    return magic == MAGIC_VALUE;
+    return res;
 }
 
 void loader_ctree(TVM_space::TVM* vm, const std::string& path) {
@@ -298,25 +314,22 @@ void loader_ctree(TVM_space::TVM* vm, const std::string& path) {
         error::send_error(
             error::OpenFileError, language::error::openfileerror, path.c_str());
     // 读取魔数
-    // ACFD
-    int magic;
-    fread(&magic, sizeof(magic), 1, file);
-    if (magic != MAGIC_VALUE) {
+    if (!is_magic_interal(file)) {
         fprintf(stderr, language::error::magic_value_error, path.c_str());
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-
     // 读取版本号长度
-    int version_size;
-    fread(&version_size, sizeof(int), 1, file);
+    uint32_t version_size;
+    fread_cross_plat(&version_size, sizeof(version_size), 1, file);
     // 读取版本号
-    char* ver_ = (char*)malloc(sizeof(char) * (version_size + 1));
+    char* ver_ = new char[version_size + 1];
     fread(ver_, sizeof(version_size), sizeof(char), file);
     ver_[version_size] = '\0';
-    if (compare_version(def::version)) {
+    if (!compare_version(def::version)) {
         error::send_error(error::VersionError, language::error::versionerror,
             ver_, def::version);
     }
+    delete[] ver_;
     // 开始正式读写
     LOAD_WRITE(file, vm, load);
     fclose(file);
@@ -330,10 +343,10 @@ void save_ctree(TVM_space::TVM* vm, const std::string& path) {
     }
     // 写入魔数
     // ACFD
-    fwrite(&MAGIC_VALUE, sizeof(MAGIC_VALUE), 1, file);
+    fwrite_cross_plat(&MAGIC_VALUE, sizeof(MAGIC_VALUE), 1, file);
     // 写入版本号的长度
-    int size_tmp = static_cast<int>(strlen(def::version));
-    fwrite(&size_tmp, sizeof(size_tmp), 1, file);
+    auto size_tmp = uint32_t(strlen(def::version));
+    fwrite_cross_plat(&size_tmp, sizeof(size_tmp), 1, file);
     // 写入版本号
     fwrite(def::version, strlen(def::version), sizeof(char), file);
     LOAD_WRITE(file, vm, write);

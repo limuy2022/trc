@@ -8,22 +8,23 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-// 用来过滤文件的函数类型
-typedef bool (*filefilter)(const std::filesystem::path&);
-
 /**
  * @brief 遍历目录
- * @param path 遍历的目录
- * @param func
- * 判断文件是否应当存入文件列表的判别函数
- * 默认全部加入
- * @param fileList 遍历出文件的存储地
- * @param dirList 遍历出文件夹的存储地
  */
-TRC_base_c_api void listfiles(
-    const std::string& path, std::vector<fs::path>& fileList,
-    std::vector<fs::path>& dirList,
-    filefilter = [](const fs::path&) -> bool { return true; });
+class TRC_base_api listfiles{
+public:
+    /**
+     * @param path 遍历的目录
+     */
+    listfiles(const std::string& path);
+
+    /**
+     * @return 获取下一项，为空字符串说明到头了
+     */
+    fs::path nextitem();
+private:
+    fs::recursive_directory_iterator iter, now;
+};
 
 /**
  * @brief 检查文件是否存在

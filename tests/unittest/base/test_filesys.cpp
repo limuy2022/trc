@@ -13,38 +13,28 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
-#include <vector>
 
 using namespace trc;
 
-static void check_items(const std::vector<fs::path>& raw_items,
-    const std::vector<fs::path>& expect_result) {
-    for (const auto& raw_item : raw_items) {
-        bool flag = false;
-        fs::path filename = raw_item.filename();
-        for (const auto& j : expect_result) {
-            if (j == filename) {
-                flag = true;
-                break;
-            }
-        }
-        EXPECT_TRUE(flag);
-    }
-    EXPECT_EQ(raw_items.size(), expect_result.size());
-}
-
 // 测试遍历文件夹的函数
 TEST(filesys, listfiles) {
-    std::vector<fs::path> filelist, dirlist;
-    utils::listfiles(redefine_path("filesys/listdirs"), filelist, dirlist,
-        [](const std::filesystem::path& path) -> bool {
-            if (path.stem().string().find('t') != std::string::npos) {
-                return true;
-            } else {
-                return false;
+    utils::listfiles listfiles(redefine_path("filesys/listdirs"));
+    std::list<std::string> res = {"indir1.txt", "indir2.txt", "t1.txt", "t2.txt", "other.txt" };
+    while(true) {
+        std::filesystem::path str = listfiles.nextitem();
+        if(str.empty()) {
+            break;
+        }
+        for(auto i = res.begin() ; i != res.end(); ++i) {
+            if(*i == str.filename().string()) {
+                res.erase(i);
+                goto success;
             }
-        });
-    check_items(filelist, { "t1.txt", "t2.txt", "other.txt" });
+        }
+        ASSERT_TRUE(false) << str;
+        success:
+        continue;
+    }
 }
 
 // 检查文件是否存在函数

@@ -19,17 +19,14 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-void listfiles(const std::string& path, std::vector<fs::path>& fileList,
-    std::vector<fs::path>& dirList, filefilter func) {
-    fs::path tmp;
-    for (const auto& path_i : fs::recursive_directory_iterator(path)) {
-        tmp = path_i.path();
-        if (is_directory(path_i)) {
-            dirList.push_back(tmp);
-        } else if (func(tmp.filename())) {
-            fileList.push_back(tmp);
-        }
+listfiles::listfiles(const std::string& path):iter(path), now(begin(iter)) {}
+
+fs::path listfiles::nextitem() {
+    now++;
+    if(now == end(iter)) {
+        return "";
     }
+    return now->path();
 }
 
 bool file_exists(const std::string& path) {

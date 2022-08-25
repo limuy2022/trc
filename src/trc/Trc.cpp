@@ -74,6 +74,21 @@ inline static void quit_mem() {
     trc::TVM_space::TVM_quit_mem();
 }
 
+/**
+ * @brief 设置日志
+ */
+static void ConfigureLogger() {
+    el::Configurations defaultConf;
+    defaultConf.setToDefault();
+    defaultConf.setGlobally(el::ConfigurationType::Enabled, "true");
+    defaultConf.setGlobally(el::ConfigurationType::ToFile, "false");
+    defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
+    defaultConf.setGlobally(el::ConfigurationType::SubsecondPrecision, "6");
+    defaultConf.setGlobally(el::ConfigurationType::PerformanceTracking, "true");
+    defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1");
+    el::Loggers::reconfigureAllLoggers(defaultConf);
+}
+
 int main(int argc, char* argv[]) {
     // 初始化系统
     // 初始化地域化设置
@@ -82,6 +97,8 @@ int main(int argc, char* argv[]) {
 #ifdef WINDOWS_PLAT
     trc::color::console_init();
 #endif
+    // 日志器初始化
+    ConfigureLogger();
 #ifndef UNITTEST
     /* 内存初始化*/
     trc::memory::init_mem();

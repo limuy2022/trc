@@ -68,7 +68,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">trc::utils Namespace Reference</div></div>
 </div><!--header-->
@@ -79,41 +78,36 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1cfg.html">cfg</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">管理配置文件的类  <a href="classtrc_1_1utils_1_1cfg.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1listfiles.html">listfiles</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="classtrc_1_1utils_1_1listfiles.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1utils_1_1progress__bar.html">progress_bar</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">用于显示进度条 绘制风格:  <a href="classtrc_1_1utils_1_1progress__bar.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a96636eb1ea2c7b3a7d437fbf096e9390"><td class="memItemLeft" align="right" valign="top">typedef bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>) (const std::filesystem::path &amp;)</td></tr>
-<tr class="separator:a96636eb1ea2c7b3a7d437fbf096e9390"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8c3565bdfa768f4e145e91285a55c74c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a8c3565bdfa768f4e145e91285a55c74c">bytes_order_change</a> (<a class="el" href="namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b">def::byte_t</a> *const  &amp;bytes_, size_t size)</td></tr>
-<tr class="memdesc:a8c3565bdfa768f4e145e91285a55c74c"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变字节序：大端改成小端，小端改成大端  <a href="namespacetrc_1_1utils.html#a8c3565bdfa768f4e145e91285a55c74c">More...</a><br /></td></tr>
-<tr class="separator:a8c3565bdfa768f4e145e91285a55c74c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a032a50e4cd0474e50206ab4aa8fe5f5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a032a50e4cd0474e50206ab4aa8fe5f5b">listfiles</a> (const std::string &amp;path, std::vector&lt; fs::path &gt; &amp;fileList, std::vector&lt; fs::path &gt; &amp;dirList, <a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>=[](const fs::path &amp;) -&gt; bool { return true;})</td></tr>
-<tr class="memdesc:a032a50e4cd0474e50206ab4aa8fe5f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">遍历目录  <a href="namespacetrc_1_1utils.html#a032a50e4cd0474e50206ab4aa8fe5f5b">More...</a><br /></td></tr>
-<tr class="separator:a032a50e4cd0474e50206ab4aa8fe5f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68802a4192c4839cc11d62afa8a980f6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a68802a4192c4839cc11d62afa8a980f6">file_exists</a> (const std::string &amp;path)</td></tr>
-<tr class="memdesc:a68802a4192c4839cc11d62afa8a980f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查文件是否存在  <a href="namespacetrc_1_1utils.html#a68802a4192c4839cc11d62afa8a980f6">More...</a><br /></td></tr>
-<tr class="separator:a68802a4192c4839cc11d62afa8a980f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a08de04ef526105de0c79a30d8a00c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a0a08de04ef526105de0c79a30d8a00c8">import_to_path</a> (std::string &amp;import_name)</td></tr>
-<tr class="memdesc:a0a08de04ef526105de0c79a30d8a00c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">在虚拟机执行过程中，动态加载字节码时路径转换  <a href="namespacetrc_1_1utils.html#a0a08de04ef526105de0c79a30d8a00c8">More...</a><br /></td></tr>
-<tr class="separator:a0a08de04ef526105de0c79a30d8a00c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af844e77a0a2e70c68428028f253579c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#af844e77a0a2e70c68428028f253579c0">bytes_order_change</a> (<a class="el" href="namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b">def::byte_t</a> *const  &amp;bytes_, size_t size)</td></tr>
+<tr class="memdesc:af844e77a0a2e70c68428028f253579c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变字节序：大端改成小端，小端改成大端  <a href="namespacetrc_1_1utils.html#af844e77a0a2e70c68428028f253579c0">More...</a><br /></td></tr>
+<tr class="separator:af844e77a0a2e70c68428028f253579c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad154f37b8287195984d716092845a25"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#aad154f37b8287195984d716092845a25">file_exists</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:aad154f37b8287195984d716092845a25"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查文件是否存在  <a href="namespacetrc_1_1utils.html#aad154f37b8287195984d716092845a25">More...</a><br /></td></tr>
+<tr class="separator:aad154f37b8287195984d716092845a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada910c8d462801d15878fb3571253e22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ada910c8d462801d15878fb3571253e22">import_to_path</a> (std::string &amp;import_name)</td></tr>
+<tr class="memdesc:ada910c8d462801d15878fb3571253e22"><td class="mdescLeft">&#160;</td><td class="mdescRight">在虚拟机执行过程中，动态加载字节码时路径转换  <a href="namespacetrc_1_1utils.html#ada910c8d462801d15878fb3571253e22">More...</a><br /></td></tr>
+<tr class="separator:ada910c8d462801d15878fb3571253e22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">read_file_detail</a> (const std::string &amp;path, std::string &amp;file_data, FILE *file)</td></tr>
 <tr class="memdesc:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">具体的读取文件的细节  <a href="namespacetrc_1_1utils.html#a7a0dd10fac9cf560ee5ff75e2bfda3b1">More...</a><br /></td></tr>
 <tr class="separator:a7a0dd10fac9cf560ee5ff75e2bfda3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4b04da6108d54a9602beb2119b8c21f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ab4b04da6108d54a9602beb2119b8c21f">readcode</a> (std::string &amp;file_data, const std::string &amp;path)</td></tr>
-<tr class="memdesc:ab4b04da6108d54a9602beb2119b8c21f"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件并将字符存入file_data  <a href="namespacetrc_1_1utils.html#ab4b04da6108d54a9602beb2119b8c21f">More...</a><br /></td></tr>
-<tr class="separator:ab4b04da6108d54a9602beb2119b8c21f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f0397ff14b0679c6e31760a722df0bd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a8f0397ff14b0679c6e31760a722df0bd">readcode_with_code</a> (std::string &amp;file_data, const std::string &amp;path)</td></tr>
-<tr class="memdesc:a8f0397ff14b0679c6e31760a722df0bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件并将字符存入file_data  <a href="namespacetrc_1_1utils.html#a8f0397ff14b0679c6e31760a722df0bd">More...</a><br /></td></tr>
-<tr class="separator:a8f0397ff14b0679c6e31760a722df0bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89059bd1a652652447ce9e7ad3c068cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a89059bd1a652652447ce9e7ad3c068cf">write_to_file</a> (FILE *file, const char *str, size_t <a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">len</a>)</td></tr>
-<tr class="memdesc:a89059bd1a652652447ce9e7ad3c068cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">将指定长度的字符串写入文件  <a href="namespacetrc_1_1utils.html#a89059bd1a652652447ce9e7ad3c068cf">More...</a><br /></td></tr>
-<tr class="separator:a89059bd1a652652447ce9e7ad3c068cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adba645eb273545f44e785d97623270b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#adba645eb273545f44e785d97623270b4">readcode</a> (std::string &amp;file_data, const std::string &amp;path)</td></tr>
+<tr class="memdesc:adba645eb273545f44e785d97623270b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件并将字符存入file_data  <a href="namespacetrc_1_1utils.html#adba645eb273545f44e785d97623270b4">More...</a><br /></td></tr>
+<tr class="separator:adba645eb273545f44e785d97623270b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7cd8a677ff3c2fc4a53351db904c07b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#aa7cd8a677ff3c2fc4a53351db904c07b">readcode_with_code</a> (std::string &amp;file_data, const std::string &amp;path)</td></tr>
+<tr class="memdesc:aa7cd8a677ff3c2fc4a53351db904c07b"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件并将字符存入file_data  <a href="namespacetrc_1_1utils.html#aa7cd8a677ff3c2fc4a53351db904c07b">More...</a><br /></td></tr>
+<tr class="separator:aa7cd8a677ff3c2fc4a53351db904c07b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ec777aa35c89e2cd8a69529100c62be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a2ec777aa35c89e2cd8a69529100c62be">write_to_file</a> (FILE *file, const char *str, size_t <a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">len</a>)</td></tr>
+<tr class="memdesc:a2ec777aa35c89e2cd8a69529100c62be"><td class="mdescLeft">&#160;</td><td class="mdescRight">将指定长度的字符串写入文件  <a href="namespacetrc_1_1utils.html#a2ec777aa35c89e2cd8a69529100c62be">More...</a><br /></td></tr>
+<tr class="separator:a2ec777aa35c89e2cd8a69529100c62be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">get_byte_order</a> ()</td></tr>
 <tr class="memdesc:a60e0b7d72054ff094840174a0d5d9fd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取字节序  <a href="namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0">More...</a><br /></td></tr>
 <tr class="separator:a60e0b7d72054ff094840174a0d5d9fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,10 +159,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memTemplItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">len</a> (T in)</td></tr>
 <tr class="memdesc:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="mdescLeft">&#160;</td><td class="mdescRight">求整型长度  <a href="namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d">More...</a><br /></td></tr>
 <tr class="separator:a7f4800bbbf0ebf0d3ca60412ded4074d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a058ffcf31536578278ebf06c24fcc5a5"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a058ffcf31536578278ebf06c24fcc5a5"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">match_data</a> (const T &amp;a, const T &amp;b, const T &amp;c, const T &amp;d)</td></tr>
-<tr class="memdesc:a058ffcf31536578278ebf06c24fcc5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">求a,b是否满足与数据相匹配  <a href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">More...</a><br /></td></tr>
-<tr class="separator:a058ffcf31536578278ebf06c24fcc5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplParams" colspan="2">template&lt;typename outtype , typename intype &gt; </td></tr>
 <tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplItemLeft" align="right" valign="top">outtype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">to_type</a> (const intype &amp;value)</td></tr>
 <tr class="memdesc:a10fddf0485656e34179e2d7892bdd1cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">任意转化类型  <a href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">More...</a><br /></td></tr>
@@ -176,30 +166,15 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >进度条 </p>
-</div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a96636eb1ea2c7b3a7d437fbf096e9390" name="a96636eb1ea2c7b3a7d437fbf096e9390"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96636eb1ea2c7b3a7d437fbf096e9390">&#9670;&nbsp;</a></span>filefilter</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="af844e77a0a2e70c68428028f253579c0" name="af844e77a0a2e70c68428028f253579c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af844e77a0a2e70c68428028f253579c0">&#9670;&nbsp;</a></span>bytes_order_change()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef bool(* trc::utils::filefilter) (const std::filesystem::path &amp;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a8c3565bdfa768f4e145e91285a55c74c" name="a8c3565bdfa768f4e145e91285a55c74c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c3565bdfa768f4e145e91285a55c74c">&#9670;&nbsp;</a></span>bytes_order_change()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::utils::bytes_order_change </td>
+          <td class="memname">void trc::utils::bytes_order_change </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacetrc_1_1def.html#ab977636df0b50bac4324013ea0f4523b">def::byte_t</a> *const &amp;&#160;</td>
           <td class="paramname"><em>bytes_</em>, </td>
@@ -333,14 +308,14 @@ template&lt;typename T , typename O &gt; </div>
 
 </div>
 </div>
-<a id="a68802a4192c4839cc11d62afa8a980f6" name="a68802a4192c4839cc11d62afa8a980f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68802a4192c4839cc11d62afa8a980f6">&#9670;&nbsp;</a></span>file_exists()</h2>
+<a id="aad154f37b8287195984d716092845a25" name="aad154f37b8287195984d716092845a25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad154f37b8287195984d716092845a25">&#9670;&nbsp;</a></span>file_exists()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> bool trc::utils::file_exists </td>
+          <td class="memname">bool trc::utils::file_exists </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>path</em></td><td>)</td>
@@ -373,14 +348,14 @@ template&lt;typename T , typename O &gt; </div>
 
 </div>
 </div>
-<a id="a0a08de04ef526105de0c79a30d8a00c8" name="a0a08de04ef526105de0c79a30d8a00c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a08de04ef526105de0c79a30d8a00c8">&#9670;&nbsp;</a></span>import_to_path()</h2>
+<a id="ada910c8d462801d15878fb3571253e22" name="ada910c8d462801d15878fb3571253e22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada910c8d462801d15878fb3571253e22">&#9670;&nbsp;</a></span>import_to_path()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::utils::import_to_path </td>
+          <td class="memname">void trc::utils::import_to_path </td>
           <td>(</td>
           <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>import_name</em></td><td>)</td>
@@ -564,57 +539,6 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a032a50e4cd0474e50206ab4aa8fe5f5b" name="a032a50e4cd0474e50206ab4aa8fe5f5b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a032a50e4cd0474e50206ab4aa8fe5f5b">&#9670;&nbsp;</a></span>listfiles()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::utils::listfiles </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; fs::path &gt; &amp;&#160;</td>
-          <td class="paramname"><em>fileList</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; fs::path &gt; &amp;&#160;</td>
-          <td class="paramname"><em>dirList</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="namespacetrc_1_1utils.html#a96636eb1ea2c7b3a7d437fbf096e9390">filefilter</a>&#160;</td>
-          <td class="paramname"> = <code>[](const&#160;fs::path&#160;&amp;)&#160;-&gt;&#160;bool&#160;{&#160;return&#160;true;}</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>遍历目录 </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">path</td><td>遍历的目录 </td></tr>
-    <tr><td class="paramname">func</td><td>判断文件是否应当存入文件列表的判别函数 默认全部加入 </td></tr>
-    <tr><td class="paramname">fileList</td><td>遍历出文件的存储地 </td></tr>
-    <tr><td class="paramname">dirList</td><td>遍历出文件夹的存储地 </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="ae2e4b714d93db63d57506bf713ce69af" name="ae2e4b714d93db63d57506bf713ce69af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae2e4b714d93db63d57506bf713ce69af">&#9670;&nbsp;</a></span>map_check_in_first()</h2>
 
@@ -707,62 +631,6 @@ template&lt;typename T , typename O &gt; </div>
 
 </div>
 </div>
-<a id="a058ffcf31536578278ebf06c24fcc5a5" name="a058ffcf31536578278ebf06c24fcc5a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a058ffcf31536578278ebf06c24fcc5a5">&#9670;&nbsp;</a></span>match_data()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool trc::utils::match_data </td>
-          <td>(</td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>c</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>d</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>求a,b是否满足与数据相匹配 </p>
-<div class="fragment"><div class="line">a=1</div>
-<div class="line">b=2</div>
-<div class="line"><a class="code hl_function" href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">match_data</a>(a, b, 1, 2)和mathch_data(a,b,2,1)同样返回true</div>
-<div class="ttc" id="anamespacetrc_1_1utils_html_a058ffcf31536578278ebf06c24fcc5a5"><div class="ttname"><a href="namespacetrc_1_1utils.html#a058ffcf31536578278ebf06c24fcc5a5">trc::utils::match_data</a></div><div class="ttdeci">bool match_data(const T &amp;a, const T &amp;b, const T &amp;c, const T &amp;d)</div><div class="ttdoc">求a,b是否满足与数据相匹配</div><div class="ttdef"><b>Definition:</b> data.hpp:198</div></div>
-</div><!-- fragment --> 
-</div>
-</div>
 <a id="a7a0dd10fac9cf560ee5ff75e2bfda3b1" name="a7a0dd10fac9cf560ee5ff75e2bfda3b1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a0dd10fac9cf560ee5ff75e2bfda3b1">&#9670;&nbsp;</a></span>read_file_detail()</h2>
 
@@ -815,14 +683,14 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="ab4b04da6108d54a9602beb2119b8c21f" name="ab4b04da6108d54a9602beb2119b8c21f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4b04da6108d54a9602beb2119b8c21f">&#9670;&nbsp;</a></span>readcode()</h2>
+<a id="adba645eb273545f44e785d97623270b4" name="adba645eb273545f44e785d97623270b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adba645eb273545f44e785d97623270b4">&#9670;&nbsp;</a></span>readcode()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::utils::readcode </td>
+          <td class="memname">void trc::utils::readcode </td>
           <td>(</td>
           <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>file_data</em>, </td>
@@ -846,14 +714,14 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a8f0397ff14b0679c6e31760a722df0bd" name="a8f0397ff14b0679c6e31760a722df0bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f0397ff14b0679c6e31760a722df0bd">&#9670;&nbsp;</a></span>readcode_with_code()</h2>
+<a id="aa7cd8a677ff3c2fc4a53351db904c07b" name="aa7cd8a677ff3c2fc4a53351db904c07b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7cd8a677ff3c2fc4a53351db904c07b">&#9670;&nbsp;</a></span>readcode_with_code()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> int trc::utils::readcode_with_code </td>
+          <td class="memname">int trc::utils::readcode_with_code </td>
           <td>(</td>
           <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>file_data</em>, </td>
@@ -1106,14 +974,14 @@ template&lt;typename outtype , typename intype &gt; </div>
 
 </div>
 </div>
-<a id="a89059bd1a652652447ce9e7ad3c068cf" name="a89059bd1a652652447ce9e7ad3c068cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89059bd1a652652447ce9e7ad3c068cf">&#9670;&nbsp;</a></span>write_to_file()</h2>
+<a id="a2ec777aa35c89e2cd8a69529100c62be" name="a2ec777aa35c89e2cd8a69529100c62be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ec777aa35c89e2cd8a69529100c62be">&#9670;&nbsp;</a></span>write_to_file()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> void trc::utils::write_to_file </td>
+          <td class="memname">void trc::utils::write_to_file </td>
           <td>(</td>
           <td class="paramtype">FILE *&#160;</td>
           <td class="paramname"><em>file</em>, </td>

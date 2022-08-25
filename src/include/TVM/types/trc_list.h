@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 
@@ -9,7 +9,7 @@ namespace trc::TVM_space::types {
 /**
  * trc中的链表结构
  */
-class TRC_TVM_api trc_list : public trcobj {
+class trc_list : public trcobj {
     struct listnode {
         def::OBJ data;
         listnode* next;

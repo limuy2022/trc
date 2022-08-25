@@ -1,12 +1,12 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 
 namespace trc::TVM_space::types {
-class TRC_TVM_api trc_float : public trcobj {
+class trc_float : public trcobj {
 public:
     double value;
 

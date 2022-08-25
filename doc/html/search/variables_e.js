@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['purple_0',['purple',['../namespacetrc_1_1color.html#acc2be2aa3bbca55e1c2feaaae0d075e2',1,'trc::color']]]
+  ['purple_0',['purple',['../namespacetrc_1_1color.html#ac6917fd95cd67b5a0e38833da689c970',1,'trc::color']]]
 ];

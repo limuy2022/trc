@@ -5,7 +5,7 @@
 #pragma once
 
 #include <Compiler/compiler_def.h>
-#include <Compiler/library.h>
+
 #include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
 #include <map>
@@ -16,7 +16,7 @@ namespace trc::compiler {
 /**
  * @brief 编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表
  */
-class TRC_Compiler_api CompileEnvironment {
+class CompileEnvironment {
 public:
     explicit CompileEnvironment(compiler_public_data& compiler_data);
 

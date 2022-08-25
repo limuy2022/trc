@@ -176,22 +176,21 @@ TEST(token, english) {
     // 特殊常量的解析
     test_tokens("null:=true+false",
         { { token_ticks::NULL_, nullptr }, { token_ticks::STORE, nullptr },
-            { token_ticks::TRUE, nullptr }, { token_ticks::ADD, nullptr },
-            { token_ticks::FALSE, nullptr } });
+            { token_ticks::TRUE_, nullptr }, { token_ticks::ADD, nullptr },
+            { token_ticks::FALSE_, nullptr } });
 }
 
 // 测试if,while等语句
 TEST(token, block_expr_lex) {
-    test_tokens("if 1==1{print(1)}", {{token_ticks::IF, nullptr},
-                                         {token_ticks::INT_VALUE, "1"},
-                                         {token_ticks::EQUAL, nullptr},
-                                         {token_ticks::INT_VALUE, "1"},
-                                         {token_ticks::LEFT_BIG_BRACE, nullptr},
-                                         {token_ticks::NAME, "print"},
-                                         {token_ticks::LEFT_SMALL_BRACE, nullptr},
-                                         {token_ticks::INT_VALUE, "1"},
-                                         {token_ticks::RIGHT_SMALL_BRACE, nullptr},
-                                         {token_ticks::RIGHT_BIG_BRACE, nullptr}});
+    test_tokens("if 1==1{print(1)}",
+        { { token_ticks::IF, nullptr }, { token_ticks::INT_VALUE, "1" },
+            { token_ticks::EQUAL, nullptr }, { token_ticks::INT_VALUE, "1" },
+            { token_ticks::LEFT_BIG_BRACE, nullptr },
+            { token_ticks::NAME, "print" },
+            { token_ticks::LEFT_SMALL_BRACE, nullptr },
+            { token_ticks::INT_VALUE, "1" },
+            { token_ticks::RIGHT_SMALL_BRACE, nullptr },
+            { token_ticks::RIGHT_BIG_BRACE, nullptr } });
 }
 
 // 退回token的期望结果

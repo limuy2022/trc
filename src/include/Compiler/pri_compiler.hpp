@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <Compiler/library.h>
 #include <array>
 #include <base/Error.h>
 #include <base/trcdef.h>
@@ -58,8 +57,8 @@ enum class token_ticks {
     STORE, // :=
     NAME, // 名称
     NULL_, // null
-    TRUE, // true
-    FALSE, // false
+    TRUE_, // true
+    FALSE_, // false
     STRING_VALUE, // 字符串值
     LONG_FLOAT_VALUE, //长浮点型值
     FLOAT_VALUE, // 浮点数值
@@ -82,7 +81,7 @@ enum class token_ticks {
  * @brief token
  * @details 一个完整的token包括标识和值两部分,是解析器的基本单元
  */
-class TRC_Compiler_api token {
+class token {
 public:
     // 标识
     token_ticks tick;
@@ -142,7 +141,7 @@ enum class grammar_type {
  * @brief 树节点的基类，生成语法分析树时用到
  * 从中派生出两个不同的子类，一个用于存放数据，另一个仅仅存放token_ticks，通过基类进行类型擦除
  */
-class TRC_Compiler_api treenode {
+class treenode {
 public:
     virtual ~treenode() = 0;
 
@@ -155,7 +154,7 @@ public:
  * @brief
  * 描述非叶子节点的类
  */
-class TRC_Compiler_api is_not_end_node : public treenode {
+class is_not_end_node : public treenode {
 public:
     explicit is_not_end_node(grammar_type type);
 
@@ -169,7 +168,7 @@ public:
 /**
  * @brief 描述叶子节点的类
  */
-class TRC_Compiler_api is_end_node : public treenode {
+class is_end_node : public treenode {
 public:
     is_end_node();
 };
@@ -177,7 +176,7 @@ public:
 /**
  * @brief 储存字符串类型的数据节点
  */
-class TRC_Compiler_api data_node {
+class data_node {
 public:
     char* data = nullptr;
 
@@ -210,7 +209,7 @@ private:
     void set_alloc(size_t sizes);
 };
 
-class TRC_Compiler_api tick_node {
+class tick_node {
 public:
     token_ticks tick;
 
@@ -220,8 +219,7 @@ public:
 /**
  * @brief 基于token符号的节点
  */
-class TRC_Compiler_api node_base_tick : public is_not_end_node,
-                                        public tick_node {
+class node_base_tick : public is_not_end_node, public tick_node {
 public:
     node_base_tick(grammar_type type, token_ticks tick);
 };
@@ -229,8 +227,7 @@ public:
 /**
  * @brief 基于数据的节点
  */
-class TRC_Compiler_api node_base_data : public is_not_end_node,
-                                        public data_node {
+class node_base_data : public is_not_end_node, public data_node {
 public:
     node_base_data(grammar_type type_argv, const char* data);
 };
@@ -238,8 +235,7 @@ public:
 /**
  * @brief 基于标签的叶子节点
  */
-class TRC_Compiler_api node_base_tick_without_sons : public is_end_node,
-                                                     public tick_node {
+class node_base_tick_without_sons : public is_end_node, public tick_node {
 public:
     node_base_tick_without_sons(grammar_type type, token_ticks);
 };
@@ -247,8 +243,7 @@ public:
 /**
  * @brief 基于字符串的叶子节点
  */
-class TRC_Compiler_api node_base_data_without_sons : public data_node,
-                                                     public is_end_node {
+class node_base_data_without_sons : public data_node, public is_end_node {
 public:
     explicit node_base_data_without_sons(grammar_type type, token* data);
 
@@ -258,7 +253,7 @@ public:
 /**
  * @brief 基于整型的叶子节点
  */
-class TRC_Compiler_api node_base_int_without_sons : public is_end_node {
+class node_base_int_without_sons : public is_end_node {
 public:
     int value;
 
@@ -269,7 +264,7 @@ public:
 /**
  * @brief 基于整形的非叶子节点
  */
-class TRC_Compiler_api node_base_int : public is_not_end_node {
+class node_base_int : public is_not_end_node {
 public:
     int value;
 
@@ -279,7 +274,7 @@ public:
 /**
  * @brief 基于浮点型的叶子节点
  */
-class TRC_Compiler_api node_base_float_without_sons : public is_end_node {
+class node_base_float_without_sons : public is_end_node {
 public:
     double value;
 
@@ -388,7 +383,7 @@ inline bool is_sentence_with_one_argv(token_ticks tick) {
  * @brief 判断是不是常量token
  */
 inline bool is_const_value(token_ticks tick) {
-    return utils::inrange(token_ticks::NULL_, token_ticks::FALSE, tick);
+    return utils::inrange(token_ticks::NULL_, token_ticks::FALSE_, tick);
 }
 
 /**

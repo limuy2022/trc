@@ -6,7 +6,7 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <base/trcdef.h>
 #include <cstdio>
 
@@ -19,7 +19,7 @@ namespace trc::TVM_space::types {
  * 类型系统中的所有类都不是给项目本身使用的，
  * 仅仅服务于虚拟机，所以千万不要滥用对象和指针！
  */
-class TRC_TVM_api trcobj {
+class trcobj {
 public:
     int refs = 0;
     // 第几代对象

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <base/library.h>
 #include <cstdio>
 #include <platform.h>
 
@@ -23,10 +22,10 @@ namespace trc::color {
 /**
  * @brief 初始化控制台，设置控制台为ANSI模式
  */
-TRC_base_c_api void console_init();
+void console_init();
 #endif
 
-class TRC_base_api color_st {
+class color_st {
 public:
     explicit color_st(color_type color)
         : color(color) {
@@ -50,5 +49,5 @@ void color_st::operator()(const char* fmt, const argvs&... data) const {
     printf("%s", CLOSE_COLOR);
 }
 
-TRC_base_c_api color_st yellow, blue, red, green, white, purple;
+extern color_st yellow, blue, red, green, white, purple;
 }

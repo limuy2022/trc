@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.4"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trc: src/include/sharelib.h File Reference</title>
+<title>Trc: src/include/language/library.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,50 +62,33 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_dd64cee09ee63bc2d42589eaa926d767.html">language</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a>  </div>
-  <div class="headertitle"><div class="title">sharelib.h File Reference</div></div>
+  <div class="headertitle"><div class="title">library.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="platform_8h_source.html">platform.h</a>&gt;</code><br />
 </div>
-<p><a href="sharelib_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="library_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:aaa0c4a4dabaa8f7d9528440d5b8238c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sharelib_8h.html#aaa0c4a4dabaa8f7d9528440d5b8238c7">TRC_xxx_api</a></td></tr>
-<tr class="separator:aaa0c4a4dabaa8f7d9528440d5b8238c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46a5f242d0ebdc54da59f0c3a91e85aa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sharelib_8h.html#a46a5f242d0ebdc54da59f0c3a91e85aa">TRC_xxx_c_api</a></td></tr>
-<tr class="separator:a46a5f242d0ebdc54da59f0c3a91e85aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c680b5e31e3ec5d3f3fe97c78137613"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="library_8h.html#a7c680b5e31e3ec5d3f3fe97c78137613">TRC_language_c_api</a>&#160;&#160;&#160;extern &quot;C&quot; __attribute__((visibility(&quot;default&quot;)))</td></tr>
+<tr class="separator:a7c680b5e31e3ec5d3f3fe97c78137613"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="aaa0c4a4dabaa8f7d9528440d5b8238c7" name="aaa0c4a4dabaa8f7d9528440d5b8238c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa0c4a4dabaa8f7d9528440d5b8238c7">&#9670;&nbsp;</a></span>TRC_xxx_api</h2>
+<a id="a7c680b5e31e3ec5d3f3fe97c78137613" name="a7c680b5e31e3ec5d3f3fe97c78137613"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c680b5e31e3ec5d3f3fe97c78137613">&#9670;&nbsp;</a></span>TRC_language_c_api</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define TRC_xxx_api</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >关于动态链接库的使用 使用方法： 该文件不是直接用来include的，而是一个模板 为每个模块新建一个相应的dll.h 将xxx替换成一个自定义的宏，然后在 它的声明前加上TRC_xxx_api，并且在定义文件 最上方加上“::define BUILD_xxx_DLL”或者在 cmake中添加target_compile_definitions（推荐） </p>
-
-</div>
-</div>
-<a id="a46a5f242d0ebdc54da59f0c3a91e85aa" name="a46a5f242d0ebdc54da59f0c3a91e85aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46a5f242d0ebdc54da59f0c3a91e85aa">&#9670;&nbsp;</a></span>TRC_xxx_c_api</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TRC_xxx_c_api</td>
+          <td class="memname">#define TRC_language_c_api&#160;&#160;&#160;extern &quot;C&quot; __attribute__((visibility(&quot;default&quot;)))</td>
         </tr>
       </table>
 </div><div class="memdoc">

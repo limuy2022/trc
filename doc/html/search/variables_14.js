@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['white_0',['white',['../namespacetrc_1_1color.html#a230f24c1e7bd9fc60bdaebdbcc470801',1,'trc::color']]]
+  ['white_0',['white',['../namespacetrc_1_1color.html#a7a4b4cd0ed3d094560f6c89795ebea60',1,'trc::color']]]
 ];

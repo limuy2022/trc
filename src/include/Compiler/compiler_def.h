@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <Compiler/library.h>
 #include <base/Error.h>
 
 namespace trc::compiler {
@@ -24,6 +23,6 @@ struct compiler_public_data {
 };
 
 // 实例化几个常用的编译参数
-TRC_Compiler_c_api compiler_option optimize_option;
-TRC_Compiler_c_api compiler_option nooptimize_option;
+extern compiler_option optimize_option;
+extern compiler_option nooptimize_option;
 }

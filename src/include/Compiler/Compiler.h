@@ -10,7 +10,7 @@
 
 #include <Compiler/compile_env.h>
 #include <Compiler/compiler_def.h>
-#include <Compiler/library.h>
+
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVM.h>
 #include <base/Error.h>
@@ -22,7 +22,7 @@ class grammar_data_control;
 /**
  * @brief 编译器的细节
  */
-class TRC_Compiler_api detail_compiler {
+class detail_compiler {
 public:
     detail_compiler(compiler_public_data&, TVM_space::TVM* vm);
 
@@ -134,12 +134,12 @@ private:
  * 是否返回当前编译函数生成的编译器对象，可用于保存编译信息
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
-TRC_Compiler_c_api detail_compiler* Compiler(TVM_space::TVM* vm,
-    const std::string& codes, const compiler_option* option,
-    detail_compiler* compiler_ptr = nullptr, bool return_compiler_ptr = false);
+detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
+    const compiler_option* option, detail_compiler* compiler_ptr = nullptr,
+    bool return_compiler_ptr = false);
 
 /**
  * @brief 释放整棵树的内存
  */
-TRC_Compiler_c_api void free_tree(compiler::treenode* head);
+void free_tree(compiler::treenode* head);
 }

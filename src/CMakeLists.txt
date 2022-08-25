@@ -1,5 +1,5 @@
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(compile_flag " -Wextra -Wall -fno-rtti -fdata-sections -ffunction-sections")
+set(compile_flag " -Wextra -Wall -fdata-sections -ffunction-sections")
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${compile_flag}")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${compile_flag}")
@@ -11,17 +11,21 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MAT
 	endif()
 endif()
 
-add_subdirectory(language)
-add_subdirectory(base)
-add_subdirectory(TVM)
-add_subdirectory(Compiler)
-add_subdirectory(trc)
+file(GLOB_RECURSE SRCS "*.cpp")
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	target_link_libraries(base dl)
+if("${TRC_BUILD_TYPE}" STREQUAL "Test")
+	add_library(Trc STATIC
+			${SRCS}
+			)
+else()
+	add_executable(Trc
+			${SRCS}
+			trc/Trc_logo.rc
+			)
 endif()
 
-target_link_libraries(base language easyloggingpp)
-target_link_libraries(Compiler language base)
-target_link_libraries(TVM language base Compiler)
-target_link_libraries(Trc language base TVM Compiler gflags::gflags)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	target_link_libraries(Trc dl)
+endif()
+
+target_link_libraries(Trc language gflags::gflags easyloggingpp)

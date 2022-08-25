@@ -6,14 +6,13 @@
  * @copyright Copyright (c) 2022
  */
 
-#include <base/library.h>
 #include <vector>
 
 namespace trc::eggs {
 /**
  * @brief 表示一个物体的坐标
  */
-class TRC_base_api pos {
+class pos {
 public:
     int count_;
     int high = 0;
@@ -41,5 +40,5 @@ typedef std::vector<std::vector<pos>> canvas_data;
  * @warning
  * 这个函数将会修改pos_参数中的值，理想状态下，最后pos_应该全部被清零
  */
-TRC_base_c_api void draw_pictures(canvas_data& pos_, char background = '.');
+void draw_pictures(canvas_data& pos_, char background = '.');
 }

@@ -19,20 +19,21 @@ using namespace trc;
 // 测试遍历文件夹的函数
 TEST(filesys, listfiles) {
     utils::listfiles listfiles(redefine_path("filesys/listdirs"));
-    std::list<std::string> res = {"indir1.txt", "indir2.txt", "t1.txt", "t2.txt", "other.txt" };
-    while(true) {
+    std::list<std::string> res
+        = { "indir1.txt", "indir2.txt", "t1.txt", "t2.txt", "other.txt" };
+    while (true) {
         std::filesystem::path str = listfiles.nextitem();
-        if(str.empty()) {
+        if (str.empty()) {
             break;
         }
-        for(auto i = res.begin() ; i != res.end(); ++i) {
-            if(*i == str.filename().string()) {
+        for (auto i = res.begin(); i != res.end(); ++i) {
+            if (*i == str.filename().string()) {
                 res.erase(i);
                 goto success;
             }
         }
         ASSERT_TRUE(false) << str;
-        success:
+    success:
         continue;
     }
 }

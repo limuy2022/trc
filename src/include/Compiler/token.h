@@ -9,7 +9,7 @@ namespace trc::compiler {
  * @brief
  * 这是一个将字符串转换成token流按行输出的类
  */
-class TRC_Compiler_api token_lex {
+class token_lex {
 public:
     token_lex(const std::string& code, compiler_public_data& compiler_data);
 

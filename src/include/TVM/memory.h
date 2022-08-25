@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <TVM/library.h>
 #include <TVM/types/base.h>
 #include <TVM/types/trc_float.h>
 #include <TVM/types/trc_flong.h>
@@ -23,7 +22,7 @@ class TVM_dyna_data;
  * 对对象池的基本封装，对象池面向全体对象
  * 而这个类面向TVM用于保存基础类型
  */
-struct TRC_TVM_api objs_pool_TVM {
+struct objs_pool_TVM {
     memory::objs_pool<types::trc_int> int_pool;
     memory::objs_pool<types::trc_float> float_pool;
     memory::objs_pool<types::trc_string> str_pool;
@@ -35,11 +34,11 @@ struct TRC_TVM_api objs_pool_TVM {
  * @brief 删除TVM中的栈信息，常量池，字节码
  * @warning 会保留变量信息（tshell）
  */
-TRC_TVM_c_api void free_TVM(TVM* vm);
+void free_TVM(TVM* vm);
 
-TRC_TVM_c_api void TVM_quit_mem();
+void TVM_quit_mem();
 
-TRC_TVM_c_api void init_mem();
+void init_mem();
 
-TRC_TVM_c_api objs_pool_TVM* global_objs_pool;
+extern objs_pool_TVM* global_objs_pool;
 }

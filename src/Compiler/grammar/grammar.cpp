@@ -7,6 +7,7 @@
 #include <base/func_loader.h>
 #include <base/trcdef.h>
 #include <base/utils/data.hpp>
+#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <stack>
 #include <string>
@@ -203,7 +204,7 @@ treenode* make_data_node(token* data_token) {
             grammar_type::LONG_FLOAT, data_token);
     } else {
         // 不可能执行到别的代码，执行到就是出bug了
-        NOREACH("Unexpected data token type %d", (int)tmp);
+        LOG(FATAL) << "Unexpected data token type " << (int)tmp;
     }
 }
 
@@ -281,7 +282,8 @@ reget:
                 break;
             }
             default: {
-                NOREACH("Unexpected grammar block token %d", (int)(now->tick));
+                LOG(FATAL) << "Unexpected grammar block token "
+                           << (int)(now->tick);
             }
             }
             delete now;

@@ -1,5 +1,5 @@
-#include <platform.h>
 #include <cstdint>
+#include <platform.h>
 
 namespace trc {
 namespace utils {

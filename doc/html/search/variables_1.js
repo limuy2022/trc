@@ -1,7 +1,7 @@
 var searchData=
 [
   ['bitopt_0',['bitopt',['../namespacetrc_1_1_t_v_m__space_1_1types.html#a035bf2046a88b2a7ea7c6815bfe23a9c',1,'trc::TVM_space::types']]],
-  ['blue_1',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
+  ['blue_1',['blue',['../namespacetrc_1_1color.html#afe3513598f8aec33a11eecff33144348',1,'trc::color']]],
   ['builtin_5ffuncs_2',['builtin_funcs',['../namespacetrc_1_1_t_v_m__space.html#a1b1066cb4d55bd96c344d94689ae5e0a',1,'trc::TVM_space']]],
   ['bycode_3',['bycode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a6235781272a07fa3566bc6b04522da2b',1,'trc::TVM_space::TVM_bytecode']]],
   ['byte_5fcodes_4',['byte_codes',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a29e1665b491b2395fce108a0c72d848b',1,'trc::TVM_space::TVM_static_data']]],

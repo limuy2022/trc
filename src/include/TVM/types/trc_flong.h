@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <string>
 
 #define FLOAT_LONGFLOAT_LINE 15
 
 namespace trc::TVM_space::types {
-class TRC_TVM_api trc_flong : public trcobj {
+class trc_flong : public trcobj {
 public:
     trc_flong(const std::string&);
 

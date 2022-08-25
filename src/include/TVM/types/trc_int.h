@@ -1,14 +1,14 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 #include <cstdint>
 
 namespace trc::TVM_space::types {
 typedef int32_t trc_int_t;
-class TRC_TVM_api trc_int : public trcobj {
+class trc_int : public trcobj {
 public:
     trc_int_t value = 0;
 

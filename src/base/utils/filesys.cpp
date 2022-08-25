@@ -19,11 +19,14 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-listfiles::listfiles(const std::string& path):iter(path), now(begin(iter)) {}
+listfiles::listfiles(const std::string& path)
+    : iter(path)
+    , now(begin(iter)) {
+}
 
 fs::path listfiles::nextitem() {
     now++;
-    if(now == end(iter)) {
+    if (now == end(iter)) {
         return "";
     }
     return now->path();

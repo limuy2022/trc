@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 #include <string>
 
 namespace trc::TVM_space::types {
-class TRC_TVM_api trc_string : public trcobj {
+class trc_string : public trcobj {
 public:
     // 字符数(不包括\0的长度)
     size_t char_num = 0;

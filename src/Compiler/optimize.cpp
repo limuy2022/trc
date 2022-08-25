@@ -3,6 +3,7 @@
 #include <base/Error.h>
 #include <cmath>
 #include <cstring>
+#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <stack>
 
@@ -62,8 +63,8 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                         break;
                     }
                     default: {
-                        NOREACH("Optimizer met an unexpected cal token %d",
-                            (int)(operator_));
+                        LOG(FATAL) << "Optimizer met an unexpected cal token "
+                                   << (int)(operator_);
                     }
                     }
                     break;
@@ -99,8 +100,8 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                         break;
                     }
                     default: {
-                        NOREACH("Optimizer met an unexpected cal token %d",
-                            (int)(operator_));
+                        LOG(FATAL) << "Optimizer met an unexpected cal token "
+                                   << (int)(operator_);
                     }
                     }
 

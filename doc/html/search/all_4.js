@@ -16,12 +16,12 @@ var searchData=
   ['dis_2ecpp_13',['dis.cpp',['../dis_8cpp.html',1,'']]],
   ['div_14',['DIV',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a29bbf66f7f8529ec47e394fb5a36c646',1,'trc::compiler']]],
   ['div_5f_15',['DIV_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcab2d5936daf075afa1f882652f4038907',1,'TVM.h']]],
-  ['dll_5fopen_5ferr_16',['dll_open_err',['../namespacelanguage_1_1error.html#ab8130072224d8a1733a65e73e27661c4',1,'language::error']]],
-  ['dllfree_17',['dllfree',['../namespacetrc_1_1autodll.html#a3f74ff31f3a5a1ae8f497bc7e97978d2',1,'trc::autodll']]],
-  ['dllfuncload_18',['dllfuncload',['../namespacetrc_1_1autodll.html#ad260290e4d5d6c9ae6f6ac08ae823f86',1,'trc::autodll']]],
-  ['dllopen_19',['dllopen',['../namespacetrc_1_1autodll.html#aa30a352c86e5863780c219f75f2cf3d7',1,'trc::autodll']]],
+  ['dll_5fopen_5ferr_16',['dll_open_err',['../namespacelanguage_1_1error.html#a00be129cc17f88e7fec8e85ec74c5d28',1,'language::error']]],
+  ['dllfree_17',['dllfree',['../namespacetrc_1_1autodll.html#a9aaa07d183109a4133d70c406b9c6329',1,'trc::autodll']]],
+  ['dllfuncload_18',['dllfuncload',['../namespacetrc_1_1autodll.html#a157b8b595887f19ab034af7f5e42f5aa',1,'trc::autodll']]],
+  ['dllopen_19',['dllopen',['../namespacetrc_1_1autodll.html#a74cb5e4028a8415621cf5a6a1f4a28ff',1,'trc::autodll']]],
   ['draw_20',['draw',['../classtrc_1_1eggs_1_1drawer.html#af16e4e29d00eae8f52699ca8c73bee55',1,'trc::eggs::drawer::draw()'],['../classtrc_1_1utils_1_1progress__bar.html#a2719be4c254cc688ce3b82e81d352d4e',1,'trc::utils::progress_bar::draw()']]],
-  ['draw_5fpictures_21',['draw_pictures',['../namespacetrc_1_1eggs.html#a3504e46adcc1a581ae0ddaf129319300',1,'trc::eggs']]],
+  ['draw_5fpictures_21',['draw_pictures',['../namespacetrc_1_1eggs.html#a3390aa00ef6559f77abf6954a482e0be',1,'trc::eggs']]],
   ['drawer_22',['drawer',['../classtrc_1_1eggs_1_1drawer.html#abbc66e1dc081f7624d5ddc3811f9ee22',1,'trc::eggs::drawer::drawer()'],['../classtrc_1_1eggs_1_1drawer.html',1,'trc::eggs::drawer']]],
   ['dyna_5fdata_23',['dyna_data',['../classtrc_1_1_t_v_m__space_1_1frame__.html#a8941457764ffbd5140a3f7f72f85d041',1,'trc::TVM_space::frame_::dyna_data()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a4a3eed3a76306909a223b52a2a21752e',1,'trc::TVM_space::TVM::dyna_data()']]]
 ];

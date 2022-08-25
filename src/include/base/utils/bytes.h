@@ -9,5 +9,5 @@ namespace trc::utils {
  * @param bytes 需要转换的起点
  * @param size 需要转换的字节数
  */
-TRC_base_c_api void bytes_order_change(def::byte_t* const& bytes_, size_t size);
+void bytes_order_change(def::byte_t* const& bytes_, size_t size);
 }

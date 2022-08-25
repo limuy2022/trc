@@ -10,7 +10,7 @@ typedef std::vector<token*> code_type;
 /**
  * @brief 生成语法树的解析器
  */
-class TRC_Compiler_api grammar_lex {
+class grammar_lex {
 public:
     /**
      * @brief 解析一段完整的代码成为语法树

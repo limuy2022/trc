@@ -1,14 +1,12 @@
 ﻿#pragma once
 
-#include <base/library.h>
-
 namespace trc::utils {
 /**
  * @brief 用于显示进度条
  * 绘制风格:
  * [xxx%]:------------======================
  */
-class TRC_base_api progress_bar {
+class progress_bar {
 public:
     progress_bar(unsigned int total_steps, char background, char bar_char);
 

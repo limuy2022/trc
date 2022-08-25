@@ -70,39 +70,36 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="autodll_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="base_2library_8h.html">base/library.h</a>&gt;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="platform_8h.html">platform.h</a>&gt;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#ifdef WINDOWS_PLAT</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;windows.h&gt;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#elif defined(LINUX_PLAT)</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;dlfcn.h&gt;</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1autodll.html">trc::autodll</a> {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// 定义加载出的动态链接库的储存类型</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#ifdef WINDOWS_PLAT</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">typedef</span> HINSTANCE dll_t;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#elif defined(LINUX_PLAT)</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">typedef</span> <span class="keywordtype">void</span>* dll_t;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#aa30a352c86e5863780c219f75f2cf3d7">   31</a></span><a class="code hl_define" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> dll_t <a class="code hl_function" href="namespacetrc_1_1autodll.html#aa30a352c86e5863780c219f75f2cf3d7">dllopen</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>*);</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#a3f74ff31f3a5a1ae8f497bc7e97978d2">   36</a></span><a class="code hl_define" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1autodll.html#a3f74ff31f3a5a1ae8f497bc7e97978d2">dllfree</a>(dll_t dll);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#ad260290e4d5d6c9ae6f6ac08ae823f86">   43</a></span><a class="code hl_define" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> <span class="keywordtype">void</span>* <a class="code hl_function" href="namespacetrc_1_1autodll.html#ad260290e4d5d6c9ae6f6ac08ae823f86">dllfuncload</a>(dll_t dll, <span class="keyword">const</span> <span class="keywordtype">char</span>* funcname);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#a4a76d276fe208449adadc8fcfa963b16">   50</a></span><a class="code hl_define" href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a> <span class="keywordtype">char</span>* <a class="code hl_function" href="namespacetrc_1_1autodll.html#a4a76d276fe208449adadc8fcfa963b16">redirect_to_platform</a>(<span class="keyword">const</span> std::string&amp; name);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>}</div>
-<div class="ttc" id="abase_2library_8h_html"><div class="ttname"><a href="base_2library_8h.html">library.h</a></div></div>
-<div class="ttc" id="abase_2library_8h_html_a0f26d3004ebad82481b3f045629d1a7f"><div class="ttname"><a href="base_2library_8h.html#a0f26d3004ebad82481b3f045629d1a7f">TRC_base_c_api</a></div><div class="ttdeci">#define TRC_base_c_api</div><div class="ttdef"><b>Definition:</b> library.h:20</div></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="platform_8h.html">platform.h</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#ifdef WINDOWS_PLAT</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;windows.h&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#elif defined(LINUX_PLAT)</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;dlfcn.h&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1autodll.html">trc::autodll</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// 定义加载出的动态链接库的储存类型</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#ifdef WINDOWS_PLAT</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">typedef</span> HINSTANCE dll_t;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#elif defined(LINUX_PLAT)</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">typedef</span> <span class="keywordtype">void</span>* dll_t;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#a74cb5e4028a8415621cf5a6a1f4a28ff">   30</a></span>dll_t <a class="code hl_function" href="namespacetrc_1_1autodll.html#a74cb5e4028a8415621cf5a6a1f4a28ff">dllopen</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>*);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#a9aaa07d183109a4133d70c406b9c6329">   35</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1autodll.html#a9aaa07d183109a4133d70c406b9c6329">dllfree</a>(dll_t dll);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#a157b8b595887f19ab034af7f5e42f5aa">   42</a></span><span class="keywordtype">void</span>* <a class="code hl_function" href="namespacetrc_1_1autodll.html#a157b8b595887f19ab034af7f5e42f5aa">dllfuncload</a>(dll_t dll, <span class="keyword">const</span> <span class="keywordtype">char</span>* funcname);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="namespacetrc_1_1autodll.html#aa0df49e0a9e1f33c24937564acb2a091">   49</a></span><span class="keywordtype">char</span>* <a class="code hl_function" href="namespacetrc_1_1autodll.html#aa0df49e0a9e1f33c24937564acb2a091">redirect_to_platform</a>(<span class="keyword">const</span> std::string&amp; name);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}</div>
 <div class="ttc" id="anamespacetrc_1_1autodll_html"><div class="ttname"><a href="namespacetrc_1_1autodll.html">trc::autodll</a></div><div class="ttdef"><b>Definition:</b> autodll.cpp:19</div></div>
-<div class="ttc" id="anamespacetrc_1_1autodll_html_a3f74ff31f3a5a1ae8f497bc7e97978d2"><div class="ttname"><a href="namespacetrc_1_1autodll.html#a3f74ff31f3a5a1ae8f497bc7e97978d2">trc::autodll::dllfree</a></div><div class="ttdeci">TRC_base_c_api void dllfree(dll_t dll)</div><div class="ttdoc">关闭释放一个动态链接库</div></div>
-<div class="ttc" id="anamespacetrc_1_1autodll_html_a4a76d276fe208449adadc8fcfa963b16"><div class="ttname"><a href="namespacetrc_1_1autodll.html#a4a76d276fe208449adadc8fcfa963b16">trc::autodll::redirect_to_platform</a></div><div class="ttdeci">TRC_base_c_api char * redirect_to_platform(const std::string &amp;name)</div><div class="ttdoc">将链接库名字改为当前系统中的名字</div></div>
-<div class="ttc" id="anamespacetrc_1_1autodll_html_aa30a352c86e5863780c219f75f2cf3d7"><div class="ttname"><a href="namespacetrc_1_1autodll.html#aa30a352c86e5863780c219f75f2cf3d7">trc::autodll::dllopen</a></div><div class="ttdeci">TRC_base_c_api dll_t dllopen(const char *)</div><div class="ttdoc">打开一个动态链接库</div></div>
-<div class="ttc" id="anamespacetrc_1_1autodll_html_ad260290e4d5d6c9ae6f6ac08ae823f86"><div class="ttname"><a href="namespacetrc_1_1autodll.html#ad260290e4d5d6c9ae6f6ac08ae823f86">trc::autodll::dllfuncload</a></div><div class="ttdeci">TRC_base_c_api void * dllfuncload(dll_t dll, const char *funcname)</div><div class="ttdoc">从动态链接库中加载出一个函数</div></div>
+<div class="ttc" id="anamespacetrc_1_1autodll_html_a157b8b595887f19ab034af7f5e42f5aa"><div class="ttname"><a href="namespacetrc_1_1autodll.html#a157b8b595887f19ab034af7f5e42f5aa">trc::autodll::dllfuncload</a></div><div class="ttdeci">void * dllfuncload(dll_t dll, const char *funcname)</div><div class="ttdoc">从动态链接库中加载出一个函数</div></div>
+<div class="ttc" id="anamespacetrc_1_1autodll_html_a74cb5e4028a8415621cf5a6a1f4a28ff"><div class="ttname"><a href="namespacetrc_1_1autodll.html#a74cb5e4028a8415621cf5a6a1f4a28ff">trc::autodll::dllopen</a></div><div class="ttdeci">dll_t dllopen(const char *)</div><div class="ttdoc">打开一个动态链接库</div></div>
+<div class="ttc" id="anamespacetrc_1_1autodll_html_a9aaa07d183109a4133d70c406b9c6329"><div class="ttname"><a href="namespacetrc_1_1autodll.html#a9aaa07d183109a4133d70c406b9c6329">trc::autodll::dllfree</a></div><div class="ttdeci">void dllfree(dll_t dll)</div><div class="ttdoc">关闭释放一个动态链接库</div></div>
+<div class="ttc" id="anamespacetrc_1_1autodll_html_aa0df49e0a9e1f33c24937564acb2a091"><div class="ttname"><a href="namespacetrc_1_1autodll.html#aa0df49e0a9e1f33c24937564acb2a091">trc::autodll::redirect_to_platform</a></div><div class="ttdeci">char * redirect_to_platform(const std::string &amp;name)</div><div class="ttdoc">将链接库名字改为当前系统中的名字</div></div>
 <div class="ttc" id="aplatform_8h_html"><div class="ttname"><a href="platform_8h.html">platform.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

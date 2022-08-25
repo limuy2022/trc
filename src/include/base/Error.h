@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <base/library.h>
 #include <csetjmp>
 #include <string>
 
@@ -23,9 +22,9 @@ namespace trc::error {
  */
 namespace error_env {
     // 是否终止程序
-    TRC_base_c_api bool quit;
+    extern bool quit;
     // 当quit被设置为false时，会跳转到该地址
-    TRC_base_c_api jmp_buf error_back_place;
+    extern jmp_buf error_back_place;
 }
 
 // 错误，增强可读性
@@ -51,7 +50,7 @@ enum error_type {
  * @brief 关于模块报错的异常封装
  * @details 包含模块名和当前行数
  */
-class TRC_base_api error_module {
+class error_module {
 public:
     // 模块的名字
     const std::string name;
@@ -78,7 +77,7 @@ public:
  * can't be %", "int", "string")
  * @endcode
  */
-TRC_base_c_api void send_error(int name, ...);
+void send_error(int name, ...);
 
 /**
  * @brief 报出有模块有行号的异常
@@ -89,7 +88,7 @@ TRC_base_c_api void send_error(int name, ...);
  * 0, "% can't be
  * %", "int", "string") @endcode
  */
-TRC_base_c_api void send_error_module_aplist(
+void send_error_module_aplist(
     int name, const std::string& module, size_t line_index, va_list& ap);
 
 /**
@@ -98,7 +97,7 @@ TRC_base_c_api void send_error_module_aplist(
  * @param ap 可变参数
  * @warning 使用完请释放，并且使用free释放！
  */
-TRC_base_c_api char* make_error_msg(int error_name, va_list& ap);
+char* make_error_msg(int error_name, va_list& ap);
 
 /**
  * @brief 输出报错信息
@@ -106,6 +105,6 @@ TRC_base_c_api char* make_error_msg(int error_name, va_list& ap);
  * 不接收可变参数，接受已经处理好的报错信息和数据
  * @details 格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
  */
-TRC_base_c_api void send_error_(
+void send_error_(
     const char* error_msg, const char* module, size_t line_index) noexcept;
 }

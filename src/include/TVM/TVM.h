@@ -7,7 +7,7 @@
 
 #include <TVM/TRE.h>
 #include <TVM/TVM_data.h>
-#include <TVM/library.h>
+
 #include <base/utils/bytes.h>
 #include <stack>
 #include <string>
@@ -61,7 +61,7 @@ namespace trc::TVM_space {
  * @brief trc的核心部分，负责执行字节码
  * @details 这是TVM的接口，实现在别的类
  */
-class TRC_TVM_api TVM {
+class TVM {
 public:
     TVM(std::string name);
 
@@ -378,5 +378,5 @@ private:
     // 指令集定义结束
 };
 
-TRC_TVM_c_api TVM* create_TVM(const std::string& name = "__main__");
+TVM* create_TVM(const std::string& name = "__main__");
 }

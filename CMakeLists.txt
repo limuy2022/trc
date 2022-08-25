@@ -25,14 +25,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 link_directories(${PROJECT_SOURCE_DIR}/bin)
 
-# 分自己编写的代码和第三方库两部分构建，避免编译参数互相干扰
-add_subdirectory(third_party)
-add_subdirectory(src)
-
 message("${TRC_BUILD_TYPE}")
 # 将主程序编译为静态链接库，单元测试链接它执行
 # 添加单元测试
 if("${TRC_BUILD_TYPE}" STREQUAL "Test")
+	add_definitions(-D UNITTEST)
 	add_subdirectory(tests/unittest)
 	add_subdirectory(third_party/googletest)
 	message("using gtest")
@@ -41,3 +38,7 @@ if("${TRC_BUILD_TYPE}" STREQUAL "Test")
 		target_link_libraries(unittest pthread)
 	endif()
 endif()
+# 分自己编写的代码和第三方库两部分构建，避免编译参数互相干扰
+add_subdirectory(third_party)
+add_subdirectory(src)
+add_subdirectory(language)

@@ -4,6 +4,7 @@
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_long.h>
 #include <base/Error.h>
+#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -149,7 +150,7 @@ token* token_lex::lex_int_float() {
         break;
     }
     default: {
-        NOREACH("Another token tick %d", (int)tick_for_res);
+        LOG(FATAL) << "Another token tick " << (int)tick_for_res;
     }
     }
     result->tick = tick_for_res;
@@ -180,8 +181,8 @@ struct {
     CREATE_KEYWORD("or", token_ticks::OR),
     CREATE_KEYWORD("not", token_ticks::NOT),
     CREATE_KEYWORD("null", token_ticks::NULL_),
-    CREATE_KEYWORD("true", token_ticks::TRUE),
-    CREATE_KEYWORD("false", token_ticks::FALSE) };
+    CREATE_KEYWORD("true", token_ticks::TRUE_),
+    CREATE_KEYWORD("false", token_ticks::FALSE_) };
 
 #undef CREATE_KEYWORD
 

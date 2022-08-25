@@ -30,5 +30,5 @@ var searchData=
   ['greater_5fequal_27',['GREATER_EQUAL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a87e6b203bf40967d37a33f9a4438561a',1,'trc::compiler']]],
   ['greater_5fequal_5f_28',['GREATER_EQUAL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca178d9bc6683d65b7d84588b10f9c87d7',1,'TVM.h']]],
   ['green_29',['GREEN',['../color_8h.html#acfbc006ea433ad708fdee3e82996e721',1,'color.h']]],
-  ['green_30',['green',['../namespacetrc_1_1color.html#ab5878987981b385e2e9a7bd6f3523adf',1,'trc::color']]]
+  ['green_30',['green',['../namespacetrc_1_1color.html#a22b8fbbdd4e4786488ac933c18258021',1,'trc::color']]]
 ];

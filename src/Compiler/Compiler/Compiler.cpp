@@ -10,6 +10,7 @@
 #include <base/Error.h>
 #include <base/code_loader.h>
 #include <base/utils/data.hpp>
+#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -196,7 +197,7 @@ void detail_compiler::compile(treenode* head) {
             break;
         }
         default: {
-            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
+            LOG(FATAL) << "Unexpeceted grammar treee node type " << (int)type;
         }
         }
     } else {
@@ -243,7 +244,8 @@ void detail_compiler::compile(treenode* head) {
             break;
         }
         default: {
-            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
+            LOG(FATAL) << "Unexpeceted grammar treee node type %d."
+                       << (int)type;
         }
         }
     }

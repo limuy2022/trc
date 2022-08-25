@@ -5,7 +5,7 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/object.h>
 #include <map>
 #include <stack>
@@ -45,7 +45,7 @@ public:
  * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
  * 并且降低TVM和Compiler之间的耦合度
  */
-class TRC_TVM_api TVM_static_data {
+class TVM_static_data {
 public:
     // 各种常量数据
     std::vector<int> const_i;

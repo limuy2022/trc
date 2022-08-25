@@ -2,7 +2,6 @@
  * File    :   Trc.cpp
  * Time    :   2021/07/09 20:49:12
  * Author  :   李沐阳
- * @warning 此文件不能包含任何需要测试的程序
  */
 
 #include <TVM/memory.h>
@@ -12,10 +11,16 @@
 #include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <cstring>
+#include <easyloggingpp/easylogging++.h>
 #include <gflags/gflags.h>
 #include <language/language.h>
 #include <platform.h>
 #include <tools.h>
+#ifdef UNITTEST
+#include <gtest/gtest.h>
+#endif
+
+INITIALIZE_EASYLOGGINGPP
 
 /**
  * @brief 报出找不到模式错误
@@ -77,6 +82,7 @@ int main(int argc, char* argv[]) {
 #ifdef WINDOWS_PLAT
     trc::color::console_init();
 #endif
+#ifndef UNITTEST
     /* 内存初始化*/
     trc::memory::init_mem();
     /* 初始化命令行解析器*/
@@ -91,6 +97,11 @@ int main(int argc, char* argv[]) {
         // 指定模式，匹配调用模式
         find_mode_to_run(argv[1]);
     }
+#else
+    // 启动单元测试
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+#endif
     // 卸载系统
     // 卸载内存，做收尾工作
     quit_mem();

@@ -1,7 +1,7 @@
 import os
 
 os.chdir("..")
-l = ["src", "tests"]
+l = ["src", "tests", "language"]
 for path_ in l:
 	for root, dirs, files in os.walk(path_):
 		for i in files:

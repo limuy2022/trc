@@ -5,6 +5,7 @@
 #include <base/utils/data.hpp>
 #include <base/utils/progress_bar.h>
 #include <cstdio>
+#include <easyloggingpp/easylogging++.h>
 
 namespace trc::utils {
 progress_bar::progress_bar(
@@ -21,8 +22,8 @@ progress_bar::progress_bar(
 void progress_bar::next() {
     if (now_progress > total_steps) {
         // 到达此处说明代码出现错误
-        NOREACH("The progress %d has exceeded the total progress %d",
-            now_progress, total_steps);
+        LOG(FATAL) << "The progress " << now_progress
+                   << " has exceeded the total progress " << total_steps;
     }
     now_progress++;
 }

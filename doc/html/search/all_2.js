@@ -4,7 +4,7 @@ var searchData=
   ['base_2eh_1',['base.h',['../base_8h.html',1,'']]],
   ['bit_5ftype_2',['bit_type',['../namespacetrc_1_1_t_v_m__space_1_1types.html#a7a4b7c45828b2602d2e12a0b8571ef4e',1,'trc::TVM_space::types']]],
   ['bitopt_3',['bitopt',['../namespacetrc_1_1_t_v_m__space_1_1types.html#a035bf2046a88b2a7ea7c6815bfe23a9c',1,'trc::TVM_space::types']]],
-  ['blue_4',['blue',['../namespacetrc_1_1color.html#a093d904df59140854c915b7fc121712e',1,'trc::color']]],
+  ['blue_4',['blue',['../namespacetrc_1_1color.html#afe3513598f8aec33a11eecff33144348',1,'trc::color']]],
   ['blue_5',['BLUE',['../color_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'color.h']]],
   ['bool_5f_6',['BOOL_',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ae206eec981a0b4c4f53e0280607ee23d',1,'trc::TVM_space::builtin']]],
   ['break_7',['BREAK',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a14d6a3e0201f58bfe7c01e775973e80e',1,'trc::compiler']]],
@@ -26,5 +26,5 @@ var searchData=
   ['bytecodes_23',['bytecodes',['../classtrc_1_1_t_v_m__space_1_1func__.html#ab4e97b48a1ddba3c2825960c2eebe20a',1,'trc::TVM_space::func_']]],
   ['bytes_2ecpp_24',['bytes.cpp',['../bytes_8cpp.html',1,'']]],
   ['bytes_2eh_25',['bytes.h',['../bytes_8h.html',1,'']]],
-  ['bytes_5forder_5fchange_26',['bytes_order_change',['../namespacetrc_1_1utils.html#a8c3565bdfa768f4e145e91285a55c74c',1,'trc::utils']]]
+  ['bytes_5forder_5fchange_26',['bytes_order_change',['../namespacetrc_1_1utils.html#af844e77a0a2e70c68428028f253579c0',1,'trc::utils']]]
 ];

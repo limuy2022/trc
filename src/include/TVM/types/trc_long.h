@@ -8,7 +8,7 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 #include <cstdint>
@@ -22,7 +22,7 @@ namespace trc::TVM_space::types {
 // 高精度数每一位的类型
 typedef uint64_t bit_type;
 
-class TRC_TVM_api trc_long : public trcobj {
+class trc_long : public trcobj {
 public:
     trc_long(const std::string& a);
 

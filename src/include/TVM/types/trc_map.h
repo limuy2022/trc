@@ -5,7 +5,7 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-#include <TVM/library.h>
+
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 
@@ -17,7 +17,7 @@ namespace map_space {
     class data_info;
 }
 
-class TRC_TVM_api trc_map : public trcobj {
+class trc_map : public trcobj {
     /**
      * 用作两个OBJ对象的关联
      * 具体实现：哈希表加红黑树

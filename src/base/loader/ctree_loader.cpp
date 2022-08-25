@@ -120,7 +120,7 @@ static void load_pool(FILE* file, std::vector<T>& const_pool) {
     uint32_t size;
     fread_cross_plat(&size, sizeof(size), 1, file);
     const_pool.resize(size);
-    for(uint32_t i = 0;i < size;--i) {
+    for (uint32_t i = 0; i < size; --i) {
         fread_cross_plat(&const_pool[i], sizeof(T), 1, file);
     }
 }
@@ -189,9 +189,10 @@ static void write_bytecode(
     // 写入行号表
     size_t line_numeber_size = static_data.line_number_table.size();
     fwrite_cross_plat(&line_numeber_size, sizeof(line_numeber_size), 1, file);
-    for(size_t i = 0; i < line_numeber_size; ++i) {
+    for (size_t i = 0; i < line_numeber_size; ++i) {
         fwrite_cross_plat(&static_data.line_number_table[i],
-            sizeof(decltype(static_data.line_number_table)::value_type), 1, file);
+            sizeof(decltype(static_data.line_number_table)::value_type), 1,
+            file);
     }
     // 具体字节码
     for (const auto& i : static_data.byte_codes) {
@@ -216,8 +217,10 @@ static void load_bytecode(
     if (size) {
         static_data.line_number_table.reserve(line_number_size);
         decltype(static_data.line_number_table)::value_type tmp;
-        for(size_t i = 0; i < line_number_size; ++i) {
-            fread_cross_plat(&tmp, sizeof(decltype(static_data.line_number_table)::value_type), 1, file);
+        for (size_t i = 0; i < line_number_size; ++i) {
+            fread_cross_plat(&tmp,
+                sizeof(decltype(static_data.line_number_table)::value_type), 1,
+                file);
             static_data.line_number_table.push_back(tmp);
         }
     }

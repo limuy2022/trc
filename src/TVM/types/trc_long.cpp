@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <easyloggingpp/easylogging++.h>
 #include <string>
 
 namespace trc::TVM_space::types {
@@ -77,7 +78,8 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    NOREACH("big num can't cal the used size.used:%d\nsize:%d", used, size);
+    LOG(FATAL) << "big num can't cal the used size.used:" << used
+               << "\nsize:" << size;
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {
@@ -92,7 +94,7 @@ trc_long& trc_long::operator=(def::OBJ a) {
 def::OBJ trc_long::operator+(def::OBJ b) {
     auto a = (def::LONGOBJ)(b);
     // +1不是因为符号位，而是因为可能会进位
-    auto* res = MALLOCLONG(std::max(a->used, used) + 1);
+    auto* res = MALLOCLONG((std::max)(a->used, used) + 1);
     memcpy(res->value, value, used * sizeof(bit_type));
     for (size_t i = 1; i <= a->used; ++i) {
         res->value[i] += a->value[i];
@@ -114,7 +116,7 @@ def::OBJ trc_long::operator+(def::OBJ b) {
 
 def::OBJ trc_long::operator-(def::OBJ b) {
     auto a = (def::LONGOBJ)(b);
-    auto* res = MALLOCLONG(std::max(a->used, used));
+    auto* res = MALLOCLONG((std::max)(a->used, used));
     memcpy(res->value, value, used * sizeof(bit_type));
     for (size_t i = 0; i < a->used; ++i) {
         res->value[i] -= a->value[i];

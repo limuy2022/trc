@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['objs_5fpool_0',['objs_pool',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_3c_20trc_3a_3atvm_5fspace_3a_3atypes_3a_3atrc_5ffloat_20_3e_1',['objs_pool&lt; trc::TVM_space::types::trc_float &gt;',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_3c_20trc_3a_3atvm_5fspace_3a_3atypes_3a_3atrc_5fflong_20_3e_2',['objs_pool&lt; trc::TVM_space::types::trc_flong &gt;',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_3c_20trc_3a_3atvm_5fspace_3a_3atypes_3a_3atrc_5fint_20_3e_3',['objs_pool&lt; trc::TVM_space::types::trc_int &gt;',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_3c_20trc_3a_3atvm_5fspace_3a_3atypes_3a_3atrc_5flong_20_3e_4',['objs_pool&lt; trc::TVM_space::types::trc_long &gt;',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_3c_20trc_3a_3atvm_5fspace_3a_3atypes_3a_3atrc_5fstring_20_3e_5',['objs_pool&lt; trc::TVM_space::types::trc_string &gt;',['../classtrc_1_1memory_1_1objs__pool.html',1,'trc::memory']]],
-  ['objs_5fpool_5ftvm_6',['objs_pool_TVM',['../structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html',1,'trc::TVM_space']]]
+  ['next_5forder_5fmap_0',['next_order_map',['../classtrc_1_1compiler_1_1next__order__map.html',1,'trc::compiler']]],
+  ['node_5fbase_5fdata_1',['node_base_data',['../classtrc_1_1compiler_1_1node__base__data.html',1,'trc::compiler']]],
+  ['node_5fbase_5fdata_5fwithout_5fsons_2',['node_base_data_without_sons',['../classtrc_1_1compiler_1_1node__base__data__without__sons.html',1,'trc::compiler']]],
+  ['node_5fbase_5ffloat_5fwithout_5fsons_3',['node_base_float_without_sons',['../classtrc_1_1compiler_1_1node__base__float__without__sons.html',1,'trc::compiler']]],
+  ['node_5fbase_5fint_4',['node_base_int',['../classtrc_1_1compiler_1_1node__base__int.html',1,'trc::compiler']]],
+  ['node_5fbase_5fint_5fwithout_5fsons_5',['node_base_int_without_sons',['../classtrc_1_1compiler_1_1node__base__int__without__sons.html',1,'trc::compiler']]],
+  ['node_5fbase_5ftick_6',['node_base_tick',['../classtrc_1_1compiler_1_1node__base__tick.html',1,'trc::compiler']]],
+  ['node_5fbase_5ftick_5fwithout_5fsons_7',['node_base_tick_without_sons',['../classtrc_1_1compiler_1_1node__base__tick__without__sons.html',1,'trc::compiler']]]
 ];

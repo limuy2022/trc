@@ -41,7 +41,6 @@ static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::GREATER_EQUAL_,
     byteCodeNumber::IMPORT_,
     byteCodeNumber::GOTO_,
-    byteCodeNumber::DEL_,
     byteCodeNumber::ASSERT_,
 };
 

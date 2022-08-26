@@ -8,43 +8,6 @@
 
 namespace trc::TVM_space {
 
-// 利用索引存放函数指针，实现O(1)复杂度的调用算法
-const NOARGV_TVM_METHOD TVM::TVM_RUN_CODE_NOARG_FUNC[]
-    = { nullptr, &trc::TVM_space::TVM::ADD, &trc::TVM_space::TVM::NOP,
-          &trc::TVM_space::TVM::SUB, &trc::TVM_space::TVM::MUL,
-          &trc::TVM_space::TVM::DIV, nullptr, nullptr, nullptr,
-          &trc::TVM_space::TVM::DEL, nullptr, nullptr, nullptr,
-          &trc::TVM_space::TVM::IMPORT, &trc::TVM_space::TVM::POW,
-          &trc::TVM_space::TVM::ZDIV, &trc::TVM_space::TVM::MOD, nullptr,
-          nullptr, &trc::TVM_space::TVM::EQUAL, &trc::TVM_space::TVM::UNEQUAL,
-          &trc::TVM_space::TVM::GREATER_EQUAL, &trc::TVM_space::TVM::LESS_EQUAL,
-          &trc::TVM_space::TVM::LESS, &trc::TVM_space::TVM::GREATER,
-          &trc::TVM_space::TVM::ASSERT, &trc::TVM_space::TVM::NOT,
-          &trc::TVM_space::TVM::AND, &trc::TVM_space::TVM::OR, nullptr, nullptr,
-          nullptr, &trc::TVM_space::TVM::FREE_FUNCTION, nullptr,
-          &trc::TVM_space::TVM::DEL_LOCAL, nullptr, nullptr, nullptr, nullptr };
-
-const ARGV_TVM_METHOD TVM::TVM_RUN_CODE_ARG_FUNC[]
-    = { &trc::TVM_space::TVM::LOAD_INT, nullptr, nullptr, nullptr, nullptr,
-          nullptr, &trc::TVM_space::TVM::GOTO, &trc::TVM_space::TVM::STORE_NAME,
-          &trc::TVM_space::TVM::LOAD_NAME, nullptr,
-          &trc::TVM_space::TVM::LOAD_FLOAT, &trc::TVM_space::TVM::LOAD_STRING,
-          &trc::TVM_space::TVM::CALL_BUILTIN, nullptr, nullptr, nullptr,
-          nullptr, &trc::TVM_space::TVM::IF_FALSE_GOTO,
-          &trc::TVM_space::TVM::CHANGE_VALUE, nullptr, nullptr, nullptr,
-          nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-          &trc::TVM_space::TVM::STORE_LOCAL, &trc::TVM_space::TVM::LOAD_LOCAL,
-          &trc::TVM_space::TVM::CALL_FUNCTION, nullptr,
-          &trc::TVM_space::TVM::CHANGE_LOCAL, nullptr,
-          &trc::TVM_space::TVM::LOAD_LONG, &trc::TVM_space::TVM::LOAD_ARRAY,
-          &trc::TVM_space::TVM::CALL_METHOD, &trc::TVM_space::TVM::LOAD_MAP };
-
-// 判断字节码是否含有参数
-bool has_argv[] = { true, false, false, false, false, false, true, true, true,
-    false, true, true, true, false, false, false, false, true, true, false,
-    false, false, false, false, false, false, false, false, false, true, true,
-    true, false, true, false, true, true, true, true };
-
 TVM::TVM(std::string name)
     : name(std::move(name)) {
     // 初始化TVM
@@ -56,10 +19,155 @@ void TVM::reload_data() {
 }
 
 void TVM::run_bycode(TVM_bytecode* bycode) {
-    if (has_argv[bycode->bycode]) {
-        (this->*TVM_RUN_CODE_ARG_FUNC[bycode->bycode])(bycode->index);
-    } else {
-        (this->*TVM_RUN_CODE_NOARG_FUNC[bycode->bycode])();
+    switch (bycode->bycode) {
+    case 0: {
+        LOAD_INT(bycode->index);
+        break;
+    }
+    case 1: {
+        ADD();
+        break;
+    }
+    case 2: {
+        NOP();
+        break;
+    }
+    case 3: {
+        SUB();
+        break;
+    }
+    case 4: {
+        MUL();
+        break;
+    }
+    case 5: {
+        DIV();
+        break;
+    }
+    case 6: {
+        GOTO(bycode->index);
+        break;
+    }
+    case 7: {
+        STORE_NAME(bycode->index);
+        break;
+    }
+    case 8: {
+        LOAD_NAME(bycode->index);
+        break;
+    }
+    case 9: {
+        LOAD_FLOAT(bycode->index);
+        break;
+    }
+    case 10: {
+        LOAD_STRING(bycode->index);
+        break;
+    }
+    case 11: {
+        CALL_BUILTIN(bycode->index);
+        break;
+    }
+    case 12: {
+        IMPORT();
+        break;
+    }
+    case 13: {
+        POW();
+        break;
+    }
+    case 14: {
+        ZDIV();
+        break;
+    }
+    case 15: {
+        MOD();
+        break;
+    }
+    case 16: {
+        IF_FALSE_GOTO(bycode->index);
+        break;
+    }
+    case 17: {
+        CHANGE_VALUE(bycode->index);
+        break;
+    }
+    case 18: {
+        EQUAL();
+        break;
+    }
+    case 19: {
+        UNEQUAL();
+        break;
+    }
+    case 20: {
+        GREATER_EQUAL();
+        break;
+    }
+    case 21: {
+        LESS_EQUAL();
+        break;
+    }
+    case 22: {
+        LESS();
+        break;
+    }
+    case 23: {
+        GREATER();
+        break;
+    }
+    case 24: {
+        ASSERT();
+        break;
+    }
+    case 25: {
+        NOT();
+        break;
+    }
+    case 26: {
+        AND();
+        break;
+    }
+    case 27: {
+        OR();
+        break;
+    }
+    case 28: {
+        STORE_LOCAL(bycode->index);
+        break;
+    }
+    case 29: {
+        LOAD_LOCAL(bycode->index);
+        break;
+    }
+    case 30: {
+        CALL_FUNCTION(bycode->index);
+        break;
+    }
+    case 31: {
+        FREE_FUNCTION();
+        break;
+    }
+    case 32: {
+        CHANGE_LOCAL(bycode->index);
+        break;
+    }
+    case 33: {
+        LOAD_LONG(bycode->index);
+        break;
+    }
+    case 34: {
+        LOAD_ARRAY(bycode->index);
+        break;
+    }
+    case 35: {
+        CALL_METHOD(bycode->index);
+        break;
+    }
+    case 36: {
+        LOAD_MAP(bycode->index);
+        break;
+    }
     }
 }
 
@@ -107,7 +215,7 @@ void TVM::run_line_bycode() {
     } while (now_index != static_data.line_number_table.size() - 1
         && now_index
             == static_data.line_number_table
-                   [run_index]); //如果没有执行到底或者到下一行
+                   [run_index]); // 如果没有执行到底或者到下一行
 }
 
 TVM* create_TVM(const std::string& name) {

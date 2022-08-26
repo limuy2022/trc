@@ -43,9 +43,9 @@ enum class token_ticks {
     IMPORT, // import
     GOTO, // goto
     DEL, // del
+    ASSERT, // assert
     BREAK, // break
     CONTINUE, // continue
-    ASSERT, // assert
     SELFADD, // +=
     SELFSUB, // -=
     SELFMUL, // *=

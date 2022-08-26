@@ -8,9 +8,6 @@ void TVM::CHANGE_VALUE(bytecode_index_t index) {
     dyna_data.global_symbol_table.vars[index] = pop();
 }
 
-void TVM::DEL() {
-}
-
 void TVM::LOAD_NAME(bytecode_index_t index) {
     push(dyna_data.global_symbol_table.vars[index]);
 }
@@ -36,8 +33,5 @@ void TVM::CHANGE_LOCAL(bytecode_index_t index) {
     // NAMEERROR(name_v.c_str());
     // firstv = pop();
     // dyna_data.frames.top()->dyna_data.var_names[name_v] = firstv;
-}
-
-void TVM::DEL_LOCAL() {
 }
 }

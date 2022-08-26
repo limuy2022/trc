@@ -7,7 +7,6 @@
 
 #include <TVM/TRE.h>
 #include <TVM/TVM_data.h>
-
 #include <base/utils/bytes.h>
 #include <stack>
 #include <string>
@@ -23,7 +22,6 @@ enum class byteCodeNumber {
     GOTO_,
     STORE_NAME_,
     LOAD_NAME_,
-    DEL_,
     LOAD_FLOAT_,
     LOAD_STRING_,
     CALL_BUILTIN_,
@@ -48,7 +46,6 @@ enum class byteCodeNumber {
     FREE_FUNCTION_,
     LOAD_LOCAL_,
     CHANGE_LOCAL_,
-    DEL_LOCAL_,
     LOAD_LONG_,
     LOAD_ARRAY_,
     CALL_METHOD_,
@@ -239,11 +236,6 @@ private:
     void LOAD_NAME(bytecode_index_t index);
 
     /**
-     * @brief 删除变量
-     */
-    void DEL();
-
-    /**
      * @brief 执行内置函数
      */
     void CALL_BUILTIN(bytecode_index_t name);
@@ -350,11 +342,6 @@ private:
      * @brief 改变局部变量的值
      */
     void CHANGE_LOCAL(bytecode_index_t index);
-
-    /**
-     * @brief 删除局部变量
-     */
-    void DEL_LOCAL();
 
     /**
      * @brief 加载大整数变量到栈

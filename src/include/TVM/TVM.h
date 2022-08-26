@@ -118,7 +118,7 @@ public:
      * @brief 执行一条字节码
      * @param bycode 字节码
      */
-    inline void run_bycode(TVM_bytecode* bycode);
+    void run_bycode(TVM_bytecode* bycode);
 
     /**
      * @brief 执行当前字节码并指向下一条

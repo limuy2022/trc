@@ -86,9 +86,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8338270f30f42706c318d480b3305587"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#a8338270f30f42706c318d480b3305587">compile</a> (<a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> *head)</td></tr>
 <tr class="memdesc:a8338270f30f42706c318d480b3305587"><td class="mdescLeft">&#160;</td><td class="mdescRight">将一个节点解析成字节码  <a href="classtrc_1_1compiler_1_1detail__compiler.html#a8338270f30f42706c318d480b3305587">More...</a><br /></td></tr>
 <tr class="separator:a8338270f30f42706c318d480b3305587"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa42f699fe907a7c21939afa74dbca145"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#aa42f699fe907a7c21939afa74dbca145">free_detail_compiler</a> ()</td></tr>
-<tr class="memdesc:aa42f699fe907a7c21939afa74dbca145"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除多余的信息  <a href="classtrc_1_1compiler_1_1detail__compiler.html#aa42f699fe907a7c21939afa74dbca145">More...</a><br /></td></tr>
-<tr class="separator:aa42f699fe907a7c21939afa74dbca145"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda5494d1b64d5d810f16d2d932ff18f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#acda5494d1b64d5d810f16d2d932ff18f">retie</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM_space::TVM</a> *<a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#a9b248666ad51c3537dc61fe697b3edb9">vm</a>)</td></tr>
 <tr class="memdesc:acda5494d1b64d5d810f16d2d932ff18f"><td class="mdescLeft">&#160;</td><td class="mdescRight">重新绑定数据  <a href="classtrc_1_1compiler_1_1detail__compiler.html#acda5494d1b64d5d810f16d2d932ff18f">More...</a><br /></td></tr>
 <tr class="separator:acda5494d1b64d5d810f16d2d932ff18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,26 +154,6 @@ Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="aa42f699fe907a7c21939afa74dbca145" name="aa42f699fe907a7c21939afa74dbca145"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa42f699fe907a7c21939afa74dbca145">&#9670;&nbsp;</a></span>free_detail_compiler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void trc::compiler::detail_compiler::free_detail_compiler </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>删除多余的信息 </p>
-<p >为何不在析构函数中解决该问题？因为当该类作为外传的信息类时，就要承担起释放多余内存的责任 </p>
 
 </div>
 </div>

@@ -16,8 +16,6 @@
 #include <vector>
 
 namespace trc::compiler {
-using TVM_space::bytecode_t;
-
 // 将对应字符转化为字节码的过程，此过程会直接通过映射的方式编译出字节码
 static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::UNKNOWN, // for
@@ -50,6 +48,7 @@ static byteCodeNumber opcodesym_int[] = {
 void detail_compiler::add_opcode(
     bytecode_t opcode, TVM_space::bytecode_index_t index) {
     vm->static_data.byte_codes.emplace_back(opcode, index);
+    // 以下都是在处理行号表
     vm->static_data.line_number_table.push_back(compiler_data.error.line);
     if (compiler_data.error.line != prev_value) {
         line_to_bycodeindex_table.resize(compiler_data.error.line + 1);
@@ -131,10 +130,10 @@ void detail_compiler::compile(treenode* head) {
     if (head->has_son) {
         auto* root = (is_not_end_node*)head;
         switch (type) {
+            // 运算符表达式或条件表达式
         case grammar_type::EXPR:
-        // 运算符表达式或条件表达式
+        // 树
         case grammar_type::TREE: {
-            // 不是数据和传参节点，确认为树
             for (auto i : root->son) {
                 compile(i);
             }
@@ -194,6 +193,15 @@ void detail_compiler::compile(treenode* head) {
             auto* code = (node_base_tick_without_sons*)*root->son.begin();
             auto* index_ = (node_base_int_without_sons*)*root->son.end();
             add_opcode(build_opcode(code->tick), index_->value);
+            break;
+        }
+            // 需要跳转的语句块
+        case grammar_type::IF_BLOCK: {
+            add_block<false>(root);
+            break;
+        }
+        case grammar_type::WHILE_BLOCK: {
+            add_block<true>(root);
             break;
         }
         default: {
@@ -271,10 +279,6 @@ void free_tree(treenode* head) {
         }
     }
     delete head;
-}
-
-void detail_compiler::free_detail_compiler() {
-    delete &(this->compiler_data.error);
 }
 
 /**

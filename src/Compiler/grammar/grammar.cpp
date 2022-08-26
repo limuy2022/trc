@@ -1,11 +1,9 @@
 ﻿#include <Compiler/Compiler.h>
 #include <Compiler/grammar.h>
-#include <Compiler/grammar_env.h>
 #include <Compiler/pri_compiler.hpp>
 #include <array>
 #include <base/Error.h>
 #include <base/func_loader.h>
-#include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
@@ -13,10 +11,6 @@
 #include <string>
 
 namespace trc::compiler {
-grammar_lex::~grammar_lex() {
-    delete env;
-}
-
 treenode* grammar_lex::assign(
     trc::compiler::token_ticks oper, treenode* left_value) {
     // 申请新的树节点
@@ -50,7 +44,6 @@ treenode* grammar_lex::callfunction(token* funcname) {
     special_tick_for_end = token_ticks::UNKNOWN;
     // 由于栈先进后出的特征，在此处将参数进行反转
     std::reverse(argv_node->son.begin(), argv_node->son.end());
-
     // 函数名问题：判断内置函数和自定义函数
     if (trc::utils::str_check_in(
             funcname->data, loader::num_func.begin(), loader::num_func.end())) {
@@ -113,58 +106,25 @@ treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     return head;
 }
 
-treenode* grammar_lex::while_loop_tree() {
-    auto head = new is_not_end_node;
-    auto while_argv
-        = new node_base_tick(grammar_type::OPCODE_ARGV, token_ticks::WHILE);
+treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
+    auto head = new is_not_end_node(compile_type);
     // 条件表达式
+    // 设置遇到左大括号停止
+    special_tick_for_end = token_ticks::LEFT_BIG_BRACE;
     head->connect(get_node());
-    head->connect(while_argv);
+    special_tick_for_end = token_ticks::UNKNOWN;
     token* token_data;
-    size_t while_start_line = compiler_data.error.line;
+    // 读掉大括号
+    delete check_excepted(token_ticks::LEFT_BIG_BRACE);
     for (;;) {
-        token_data = token_.get_token();
-        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
+        token_data = clear_enter();
+        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) {
             delete token_data;
             break;
-        } else {
-            token_.unget_token(token_data);
-            head->connect(get_node());
         }
+        token_.unget_token(token_data);
+        head->connect(get_node());
     }
-    // 如果条件不满足，调到goto语句之后出循环
-    auto data_node
-        = new node_base_int_without_sons(compiler_data.error.line + 1);
-    while_argv->connect(data_node);
-
-    auto* goto_while_line
-        = new node_base_tick(grammar_type::OPCODE_ARGV, token_ticks::GOTO);
-    auto line_node = new node_base_int_without_sons(while_start_line);
-    goto_while_line->connect(line_node);
-    head->connect(goto_while_line);
-    return head;
-}
-
-treenode* grammar_lex::if_tree() {
-    auto head = new is_not_end_node;
-    auto* if_with_argv
-        = new node_base_tick(grammar_type::OPCODE_ARGV, token_ticks::IF);
-    // 条件表达式
-    head->connect(get_node());
-    head->connect(if_with_argv);
-    token* token_data;
-    for (;;) {
-        token_data = token_.get_token();
-        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) [[unlikely]] {
-            delete token_data;
-            break;
-        } else {
-            token_.unget_token(token_data);
-            head->connect(get_node());
-        }
-    }
-    auto* data_node = new node_base_int_without_sons(compiler_data.error.line);
-    if_with_argv->connect(data_node);
     return head;
 }
 
@@ -208,14 +168,20 @@ treenode* make_data_node(token* data_token) {
     }
 }
 
+token* grammar_lex::clear_enter() {
+    token* now;
+    do {
+        now = token_.get_token();
+        if (now->tick == token_ticks::END_OF_LINE) {
+            delete now;
+            continue;
+        }
+        return now;
+    } while (true);
+}
+
 treenode* grammar_lex::get_node(bool end_with_oper) {
-    trc::compiler::token* now;
-reget:
-    now = token_.get_token();
-    if (now->tick == token_ticks::END_OF_LINE) {
-        delete now;
-        goto reget;
-    }
+    token* now = clear_enter();
     if (now->tick == trc::compiler::token_ticks::END_OF_TOKENS) {
         delete now;
         return nullptr;
@@ -267,27 +233,24 @@ reget:
             delete now;
             return res;
         } else if (is_blocked_token(now->tick)) {
-            treenode* res = nullptr;
-            switch (now->tick) {
+            token_ticks block_type = now->tick;
+            delete now;
+            switch (block_type) {
             case token_ticks::WHILE: {
-                res = while_loop_tree();
-                break;
+                return while_if_tree(grammar_type::WHILE_BLOCK);
             }
             case token_ticks::IF: {
-                res = if_tree();
-                break;
+                return while_if_tree(grammar_type::IF_BLOCK);
             }
             case token_ticks::FUNC: {
-                res = func_define();
-                break;
+                return func_define();
             }
             default: {
                 LOG(FATAL) << "Unexpected grammar block token "
-                           << (int)(now->tick);
+                           << (int)(block_type);
+                return nullptr;
             }
             }
-            delete now;
-            return res;
         } else {
             compiler_data.error.send_error_module(
                 error::SyntaxError, language::error::syntaxerror);
@@ -301,7 +264,6 @@ reget:
 grammar_lex::grammar_lex(
     const std::string& codes_str, compiler_public_data& compiler_data)
     : compiler_data(compiler_data)
-    , env(new trc::compiler::grammar_data_control)
     , token_(codes_str, compiler_data) {
 }
 
@@ -317,8 +279,7 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
     }
     token_ticks quicktmp;
     if (tick == token_ticks::RIGHT_SMALL_BRACE) {
-        // 此处先假设括号是对的
-        if (correct_braces <= 0) {
+        if (correct_braces == 0) {
             // 代表解析结束，因为遇到了不属于自己的括号
             correct_braces = -1;
             return;
@@ -403,11 +364,14 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
         if (is_end_token(raw_lex->tick)) {
             delete raw_lex;
             break;
+        } else if (raw_lex->tick == special_tick_for_end) {
+            token_.unget_token(raw_lex);
+            break;
         }
         ConvertDataToExpressions(
             raw_lex, head->son, oper_stack, correct_braces);
         if (correct_braces == -1) {
-            // -1作为特殊含义表达，意思是解析到了尽头，所以将token退还同时清零correct_braces确保代码正常
+            // -1作为特殊含义表达，意思是解析到了尽头，所以将token退还确保代码正常
             token_.unget_token(raw_lex);
             break;
         }
@@ -433,14 +397,13 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
 token* grammar_lex::check_excepted(token_ticks tick) {
     token* res = token_.get_token();
     if (res->tick != tick) {
-        auto out_error_msg = res->data;
         delete res;
-        compiler_data.error.send_error_module(error::SyntaxError,
-            language::error::syntaxerror_no_expect, out_error_msg);
+        compiler_data.error.send_error_module(
+            error::SyntaxError, language::error::syntaxerror);
+        // 用于消除warning
         return nullptr;
-    } else {
-        return res;
     }
+    return res;
 }
 
 token_ticks grammar_lex::get_next_token_tick() {

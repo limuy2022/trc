@@ -129,12 +129,16 @@ enum class grammar_type {
     LONG_INT,
     // 长浮点型节点
     LONG_FLOAT,
-    //字符串型节点
+    // 字符串型节点
     STRING,
     // 变量名节点
     VAR_NAME,
-    // 描述一件表达式或者运算符表达式
-    EXPR
+    // 描述表达式
+    EXPR,
+    // if语句块
+    IF_BLOCK,
+    // while语句块
+    WHILE_BLOCK
 };
 
 /**

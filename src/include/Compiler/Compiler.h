@@ -10,14 +10,16 @@
 
 #include <Compiler/compile_env.h>
 #include <Compiler/compiler_def.h>
-
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVM.h>
+#include <TVM/TVMdef.h>
 #include <base/Error.h>
 #include <base/trcdef.h>
 
 namespace trc::compiler {
 class grammar_data_control;
+
+using TVM_space::bytecode_t;
 
 /**
  * @brief 编译器的细节
@@ -33,13 +35,6 @@ public:
     void compile(treenode* head);
     // 编译时信息记录
     CompileEnvironment infoenv;
-
-    /**
-     * @brief 删除多余的信息
-     * @details
-     * 为何不在析构函数中解决该问题？因为当该类作为外传的信息类时，就要承担起释放多余内存的责任
-     */
-    void free_detail_compiler();
 
     /**
      * @brief 重新绑定数据
@@ -112,6 +107,11 @@ private:
     void add_opcode(TVM_space::bytecode_t, TVM_space::bytecode_index_t index);
 
     /**
+     * @brief 添加带有语句块的特殊代码
+     */
+    template <bool compiletype> void add_block(is_not_end_node* root);
+
+    /**
      * @brief 解析函数字节码
      */
     void func_lexer(treenode* head);
@@ -142,4 +142,34 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
  * @brief 释放整棵树的内存
  */
 void free_tree(compiler::treenode* head);
+
+template <bool compiletype>
+void detail_compiler::add_block(is_not_end_node* root) {
+    // 开头表达式
+
+    // 记录语句块一开始的位置
+    size_t goto_addr;
+    if constexpr (compiletype) {
+        goto_addr = vm->static_data.byte_codes.size();
+    }
+    auto iter = root->son.begin();
+    compile(*iter);
+    iter++;
+    // 单独处理跳转语句，否则无法处理常量表
+    // 0只是用来占位的
+    add_opcode((bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 0);
+    // 获取跳转表达式的字节码位置
+    size_t fix_bytecode = vm->static_data.byte_codes.size() - 1;
+    // 然后编译其它所有的节点
+    for (; iter != root->son.end(); ++iter) {
+        compile(*iter);
+    }
+    if constexpr (compiletype) {
+        // while循环比if多一句goto
+        add_opcode((bytecode_t)byteCodeNumber::GOTO_, goto_addr);
+    }
+    // 然后重新修改跳转地址
+    vm->static_data.byte_codes[fix_bytecode].index
+        = vm->static_data.byte_codes.size();
+}
 }

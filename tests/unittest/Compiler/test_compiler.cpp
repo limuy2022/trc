@@ -215,21 +215,34 @@ TEST_F(compiler_env_set, optimize_with_different_types) {
 
 // 测试条件判断的解析
 TEST_F(compiler_env_set, if_lex) {
-    //     compiler::Compiler(
-    //         vm, "if 1==1{\nprint(1)\n}", &compiler::nooptimize_option);
-    //     ASSERT_EQ(vm->static_data.const_i.size(), 1);
-    //     EXPECT_EQ(vm->static_data.const_i[0], 1);
-    //     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-    //                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-    //                        { (bytecode_t)byteCodeNumber::EQUAL_, 0},
-    //                        { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 7 },
-    //                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-    //                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-    //                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 }
-    //                        },
-    //         vm);
+    compiler::Compiler(
+        vm, "if 1==1{\nprint(1)\n}", &compiler::nooptimize_option);
+    // 一个是跳转行号，一个是1
+    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    EXPECT_EQ(vm->static_data.const_i[0], 1);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::EQUAL_, 0 },
+                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 7 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 } },
+        vm);
 }
 
-// 测试while循环的解析
+// 测试while循环
 TEST_F(compiler_env_set, while_lex) {
+    compiler::Compiler(
+        vm, "while 1==1{\nprint(1)\n}", &compiler::nooptimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    EXPECT_EQ(vm->static_data.const_i[0], 1);
+    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::EQUAL_, 0 },
+                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 8 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 },
+                       { (bytecode_t)byteCodeNumber::GOTO_, 0 } },
+        vm);
 }

@@ -182,14 +182,16 @@ TEST(token, english) {
 
 // 测试if,while等语句
 TEST(token, block_expr_lex) {
-    test_tokens("if 1==1{print(1)}",
+    test_tokens("if 1==1 {\n    print(1)\n}",
         { { token_ticks::IF, nullptr }, { token_ticks::INT_VALUE, "1" },
             { token_ticks::EQUAL, nullptr }, { token_ticks::INT_VALUE, "1" },
             { token_ticks::LEFT_BIG_BRACE, nullptr },
+            { token_ticks::END_OF_LINE, nullptr },
             { token_ticks::NAME, "print" },
             { token_ticks::LEFT_SMALL_BRACE, nullptr },
             { token_ticks::INT_VALUE, "1" },
             { token_ticks::RIGHT_SMALL_BRACE, nullptr },
+            { token_ticks::END_OF_LINE, nullptr },
             { token_ticks::RIGHT_BIG_BRACE, nullptr } });
 }
 

@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) {
         find_mode_to_run(argv[1]);
     }
 #else
+    ::testing::GTEST_FLAG(output) = "xml:unittest.xml";
     // 启动单元测试
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

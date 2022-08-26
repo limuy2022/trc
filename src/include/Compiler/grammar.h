@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "grammar_env.h"
 #include <Compiler/Compiler.h>
 #include <Compiler/token.h>
 #include <language/error.h>
@@ -26,7 +27,7 @@ public:
     grammar_lex(
         const std::string& codes_str, compiler_public_data& compiler_data);
 
-    ~grammar_lex();
+    ~grammar_lex() = default;
 
 private:
     /**
@@ -67,6 +68,12 @@ private:
     treenode* assign(trc::compiler::token_ticks oper, treenode* left_value);
 
     /**
+     * @brief 清理换行符
+     * @return 换行符后的下一个token
+     */
+    token* clear_enter();
+
+    /**
      * @brief 生成函数调用节点
      * @param code 整条语句
      */
@@ -79,18 +86,11 @@ private:
     treenode* sentence_tree(token_ticks sentence_name);
 
     /**
-     * @brief 生成条件循环字节码
-     * @details 仅对当前行进行解析
+     * @brief 生成条件循环或条件判断语法树
+     * @param compile_type 指定编译的类型，IF_BLOCK或WHILE_BLOCK
      * @details 循环通过跳转实现
      */
-    treenode* while_loop_tree();
-
-    /**
-     * @brief 生成条件判断节点
-     * @details 仅对当前行进行解析
-     * @details 判断通过跳转实现
-     */
-    treenode* if_tree();
+    treenode* while_if_tree(grammar_type compile_type);
 
     /**
      * @brief 生成定义函数节点
@@ -117,7 +117,7 @@ private:
     trc::compiler::compiler_public_data& compiler_data;
 
     // 数据环境
-    trc::compiler::grammar_data_control* env;
+    trc::compiler::grammar_data_control env;
 
     // token解析器
     trc::compiler::token_lex token_;

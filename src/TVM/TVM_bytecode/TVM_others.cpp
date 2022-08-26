@@ -45,7 +45,8 @@ void TVM::NOP() {
 }
 
 void TVM::GOTO(bytecode_index_t index) {
-    run_index = static_data.const_i[index] - 1;
+    // 减一是因为结束一次循环run_index会加一，为了使索引正确需要提前减一
+    run_index = index - 1;
 }
 
 /**

@@ -320,7 +320,7 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
         // 此处先假设括号是对的
         if (correct_braces <= 0) {
             // 代表解析结束，因为遇到了不属于自己的括号
-            correct_braces = INT_MAX;
+            correct_braces = -1;
             return;
         }
         while ((quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE) {
@@ -406,10 +406,8 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
         }
         ConvertDataToExpressions(
             raw_lex, head->son, oper_stack, correct_braces);
-        // todo:改掉此部分，该部分为一个潜在的bug
-        if (correct_braces == INT_MAX) {
-            // INT_MAX作为一个几乎不可能的括号数，作为特殊含义表达，意思是解析到了尽头，所以将token退还同时清零correct_braces确保代码正常
-            correct_braces = 0;
+        if (correct_braces == -1) {
+            // -1作为特殊含义表达，意思是解析到了尽头，所以将token退还同时清零correct_braces确保代码正常
             token_.unget_token(raw_lex);
             break;
         }

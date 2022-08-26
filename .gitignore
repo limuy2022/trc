@@ -18,6 +18,7 @@ testlog.txt
 *.dll
 *.lib
 *.so
+*.a
 *.exp
 *.pdb
 

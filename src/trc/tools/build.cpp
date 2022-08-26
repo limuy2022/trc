@@ -11,8 +11,6 @@
 #include <string>
 #include <tools.h>
 
-namespace fs = std::filesystem;
-
 namespace trc::tools {
 namespace tools_in {
     void __build(TVM_space::TVM* vm, const std::string& path) {

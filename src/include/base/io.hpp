@@ -7,6 +7,7 @@
  *
  */
 
+#pragma once
 #include <cstdio>
 
 namespace trc::io {

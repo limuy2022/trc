@@ -17,31 +17,24 @@
 但操作系统不满足就会直接报错，无法编译
 
 ## cmake操作
-
-### 编译debug版本
-
+注:由于该项目的linux和windows操作差不多，故没有加以区分
+### 编译并安装发行版
 ```
--DCMAKE_BUILD_TYPE=Debug
-```
-
-### 编译release版本
-
-```
--DCMAKE_BUILD_TYPE=Release
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+make install
 ```
 
 ### 启动单元测试
 
 ```
--DTRC_BUILD_TYPE=Test
+mkdir unittest
+cd unittest
+cmake .. -DTRC_BUILD_TYPE=Test -DCMAKE_BUILD_TYPE=Release
+make
+../bin/unittest
 ```
-
-### 编译为单个可执行文件(当不需要通过动态链接库调用trc的api时，建议选择该选项)
-
-```
--DTRC_BUILD_TYPE=One
-```
-
-## xmake操作
 
 ## 注：要求编译器必须支持c++20标准

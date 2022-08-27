@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
+#include <list>
 
 using namespace trc;
 

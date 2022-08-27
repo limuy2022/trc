@@ -1,7 +1,7 @@
 # 测试双引号
 
 a := 10
-while a >= 10{
-	println('\"')
+while a >= 0{
+	print('\"')
 	a = a - 1
 }

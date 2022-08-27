@@ -12,8 +12,8 @@
 #include <filesys_tools.h>
 #include <filesystem>
 #include <gtest/gtest.h>
-#include <string>
 #include <list>
+#include <string>
 
 using namespace trc;
 

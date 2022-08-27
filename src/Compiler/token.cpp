@@ -395,6 +395,13 @@ token* token_lex::get_token() {
         back_token = nullptr;
         return return_temp;
     }
+    if (*char_ptr == '#') {
+        /*忽略注释*/
+        while (!end_of_lex()) {
+            // 只要不读完文件或本行，就往下读
+            ++char_ptr;
+        }
+    }
     if (*char_ptr == '\n') {
         // 加一行
         compiler_data.error.line++;
@@ -408,13 +415,6 @@ token* token_lex::get_token() {
     while (*char_ptr == ' ' || *char_ptr == '\t') {
         /*略过空白符和制表符*/
         ++char_ptr;
-    }
-    while (*char_ptr == '#') {
-        /*忽略注释*/
-        while (!end_of_lex()) {
-            // 只要不读完文件或本行，就往下读
-            ++char_ptr;
-        }
     }
     if (*char_ptr == '\'' || *char_ptr == '"') {
         /*解析字符串*/

@@ -14,7 +14,7 @@ bin/
 *.vcxproj
 Trc.sln
 CMakeSettings.json
-testlog.txt
+testlog.log
 *.dll
 *.lib
 *.so

@@ -1,8 +1,8 @@
 # 测试制表符
 
 a := 2
-while a >= 2{
-	println("op\top")
+while a >= 1{
+	println("\nop\top")
 	print("\ttree")
 	a = a - 1
 }

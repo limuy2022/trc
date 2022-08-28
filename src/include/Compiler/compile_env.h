@@ -5,7 +5,6 @@
 #pragma once
 
 #include <Compiler/compiler_def.h>
-
 #include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
 #include <map>
@@ -15,6 +14,7 @@
 namespace trc::compiler {
 /**
  * @brief 编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表
+ * @details 该类是每个模块都配备一个
  */
 class CompileEnvironment {
 public:
@@ -48,6 +48,14 @@ public:
      */
     size_t get_index_of_localvar(
         const std::string& localspace_name, char* name, bool maybe_not_in);
+
+    /**
+     * @brief 获取某个函数在全局符号表中的位置，没有该函数则添加进符号表
+     * @param name 变量名
+     * @param maybe_not_in
+     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
+     */
+    size_t get_index_of_function(char* name, bool maybe_not_in);
 
 private:
     typedef std::vector<const char*> name_list_t;

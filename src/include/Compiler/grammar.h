@@ -98,6 +98,12 @@ private:
     treenode* func_define();
 
     /**
+     * @brief 读取一个语句块
+     * @param root 提供的根节点
+     */
+    void read_block(is_not_end_node* root);
+
+    /**
      * @brief 优化表达式(常量折叠)和修正表达式节点
      * @param expr 表达式
      */

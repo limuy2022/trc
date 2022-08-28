@@ -112,9 +112,14 @@ private:
     template <bool compiletype> void add_block(is_not_end_node* root);
 
     /**
+     * @brief 生成一条字节码的对应行号表记录
+     */
+    void generate_line_table();
+
+    /**
      * @brief 解析函数字节码
      */
-    void func_lexer(treenode* head);
+    void func_definer(treenode* head);
 
     long long prev_value = LLONG_MAX;
 

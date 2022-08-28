@@ -25,7 +25,7 @@ namespace tools_in {
 
 namespace tools_out {
     void build() {
-        TVM_space::TVM* vm = TVM_space::create_TVM();
+        auto vm = new TVM_space::TVM;
         // 解析到命令行参数停止
         for (int i = 2; i < argc; ++i) {
             tools_in::__build(vm, argv[i]);

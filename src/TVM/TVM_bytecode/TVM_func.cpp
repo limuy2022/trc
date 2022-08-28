@@ -15,17 +15,16 @@ void TVM::CALL_BUILTIN(bytecode_index_t name) {
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {
-    // func_* fast = static_data.funcs[static_data.const_name[index]];
-    // run_func_str = fast->name;
-    // frame_* frame_var = new frame_(fast);
-    // dyna_data.frames.push(frame_var);
+    const func_& fast = static_data.funcs[index];
+    // 启动函数环境
+    (++dyna_data.frames_top_str)->set_func(fast);
     // 调用函数
-    // this->run_func(fast->bytecodes, LINE_NOW);
+    this->run_func(fast);
 }
 
 void TVM::FREE_FUNCTION() {
-    delete dyna_data.frames.top();
-    dyna_data.frames.pop();
+    dyna_data.frames_top_str->free_func();
+    dyna_data.frames_top_str--;
 }
 
 void TVM::CALL_METHOD(bytecode_index_t index) {

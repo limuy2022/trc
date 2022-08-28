@@ -61,7 +61,7 @@ namespace tools::tools_out {
 
         char* code = nullptr;
 
-        TVM_space::TVM* vm = TVM_space::create_TVM();
+        auto vm = new TVM_space::TVM;
         // tshell报错但不终止程序
         error::error_env::quit = false;
         // 解析命令行参数

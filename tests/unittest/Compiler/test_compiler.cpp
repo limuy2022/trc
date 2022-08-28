@@ -28,7 +28,7 @@ void compiler_env_set::TearDown() {
 }
 
 void compiler_env_set::SetUp() {
-    vm = create_TVM();
+    vm = new TVM;
 }
 
 /**

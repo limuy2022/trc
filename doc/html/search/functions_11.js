@@ -19,9 +19,9 @@ var searchData=
   ['trc_5fstring_16',['trc_string',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#ad30c252ce055b240012da66d38433250',1,'trc::TVM_space::types::trc_string::trc_string(const trc_string &amp;init)'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#a567ac5921587615a69dda6147b725556',1,'trc::TVM_space::types::trc_string::trc_string(const std::string &amp;init)'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#ab876cfe61a8d9cff834aead250f4b1a3',1,'trc::TVM_space::types::trc_string::trc_string()']]],
   ['trcmalloc_17',['trcmalloc',['../classtrc_1_1memory_1_1objs__pool.html#a126352e9f95685e0b8701328c3d11d3e',1,'trc::memory::objs_pool']]],
   ['tshell_18',['tshell',['../namespacetrc_1_1tools_1_1tools__out.html#acd76734624d565e31132c49077a797b5',1,'trc::tools::tools_out']]],
-  ['tvm_19',['TVM',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a0794de0d75ac10ca50b28955ea6ee236',1,'trc::TVM_space::TVM']]],
+  ['tvm_19',['TVM',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#ac6585d19edae90baf63d470f0c9a7dcc',1,'trc::TVM_space::TVM']]],
   ['tvm_5fbytecode_20',['TVM_bytecode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a85ea11b687d0f87aef99b3f55e6c252c',1,'trc::TVM_space::TVM_bytecode']]],
-  ['tvm_5fdyna_5fdata_21',['TVM_dyna_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html#a8541ac3a7eaece7c85ab3dd1255319e3',1,'trc::TVM_space::TVM_dyna_data::TVM_dyna_data(size_t global_symbol_table_size)'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html#a31c56d3cd3beacbd33805908593c77d4',1,'trc::TVM_space::TVM_dyna_data::TVM_dyna_data()']]],
+  ['tvm_5fdyna_5fdata_21',['TVM_dyna_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html#a31c56d3cd3beacbd33805908593c77d4',1,'trc::TVM_space::TVM_dyna_data']]],
   ['tvm_5fquit_5fmem_22',['TVM_quit_mem',['../namespacetrc_1_1_t_v_m__space.html#ac02f5e8af7a378027b6f4d12f4947e39',1,'trc::TVM_space']]],
   ['tvm_5fstatic_5fdata_23',['TVM_static_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a477a2bcaee29b40f909b691871e4cb1b',1,'trc::TVM_space::TVM_static_data']]],
   ['type_24',['TYPE',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ab9899fb0acbc7d0c1a5398616db1dc77',1,'trc::TVM_space::builtin']]]

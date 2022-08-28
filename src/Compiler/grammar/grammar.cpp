@@ -106,6 +106,20 @@ treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     return head;
 }
 
+void grammar_lex::read_block(is_not_end_node* root) {
+    // 检查并删除下一个大括号
+    delete check_excepted(token_ticks::LEFT_BIG_BRACE);
+    for (;;) {
+        token* token_data = clear_enter();
+        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) {
+            delete token_data;
+            break;
+        }
+        token_.unget_token(token_data);
+        root->connect(get_node());
+    }
+}
+
 treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
     auto head = new is_not_end_node(compile_type);
     // 条件表达式
@@ -113,31 +127,16 @@ treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
     special_tick_for_end = token_ticks::LEFT_BIG_BRACE;
     head->connect(get_node());
     special_tick_for_end = token_ticks::UNKNOWN;
-    token* token_data;
-    // 读掉大括号
-    delete check_excepted(token_ticks::LEFT_BIG_BRACE);
-    for (;;) {
-        token_data = clear_enter();
-        if (token_data->tick == token_ticks::RIGHT_BIG_BRACE) {
-            delete token_data;
-            break;
-        }
-        token_.unget_token(token_data);
-        head->connect(get_node());
-    }
+    read_block(head);
     return head;
 }
 
 treenode* grammar_lex::func_define() {
-    auto head = new is_not_end_node;
-    // auto name = check_excepted(token_ticks::NAME);
-    // auto* func_node = new node_base_data(grammar_type::FUNC_DEFINE,
-    // name->data); delete name; auto* line_node = new
-    // node_base_data_without_sons(grammar_type::DATA, "");
-
-    // func_node->connect(line_node);
-    // head->connect(func_node);
-    return head;
+    auto name = check_excepted(token_ticks::NAME);
+    auto func_node = new node_base_data(grammar_type::FUNC_DEFINE, name->data);
+    delete name;
+    read_block(func_node);
+    return func_node;
 }
 
 /**

@@ -57,4 +57,8 @@ size_t CompileEnvironment::get_index_of_localvar(
     return get_index_from_list(
         node, var_names_list_local[localspace_name], maybe_not_in);
 }
+
+size_t CompileEnvironment::get_index_of_function(
+    char* name, bool maybe_not_in) {
+}
 }

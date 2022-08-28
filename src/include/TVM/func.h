@@ -1,19 +1,11 @@
 ﻿#pragma once
 
-#include <TVM/TVM_data.h>
 #include <TVM/TVMdef.h>
 #include <base/trcdef.h>
 #include <map>
 #include <string>
 
 namespace trc::TVM_space {
-class frame_ {
-public:
-    TVM_dyna_data dyna_data;
-
-    frame_(func_* func);
-};
-
 class func_ {
 public:
     char* name;
@@ -24,12 +16,14 @@ public:
     struct_codes bytecodes;
     // 符号表长度
     size_t symbol_form_size;
+};
 
-    /**
-     * @brief 执行函数
-     * @param frame 函数帧
-     * @return def::OBJ 返回值
-     */
-    def::OBJ run(frame_& frame);
+class frame_ {
+public:
+    void set_func(const func_& func);
+    void free_func();
+    // 保存函数的名字
+    const char* funcname;
+    // 符号表
 };
 }

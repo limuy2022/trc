@@ -154,8 +154,6 @@ Functions</h2></td></tr>
 <tr class="separator:ac02f5e8af7a378027b6f4d12f4947e39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77884e238dfcc7be5cfea40714d7d5be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a77884e238dfcc7be5cfea40714d7d5be">init_mem</a> ()</td></tr>
 <tr class="separator:a77884e238dfcc7be5cfea40714d7d5be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf18cdac96c35c382b0eab1111f856d0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#aaf18cdac96c35c382b0eab1111f856d0">create_TVM</a> (const std::string &amp;name=&quot;__main__&quot;)</td></tr>
-<tr class="separator:aaf18cdac96c35c382b0eab1111f856d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b34ab9d30dfa0cd0b1a5b371f7dc4b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a1b34ab9d30dfa0cd0b1a5b371f7dc4b1">free_module</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> *vm)</td></tr>
 <tr class="separator:a1b34ab9d30dfa0cd0b1a5b371f7dc4b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -163,6 +161,10 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a40e59fb284e8d5d97e432890cf0e4416"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html">objs_pool_TVM</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a40e59fb284e8d5d97e432890cf0e4416">global_objs_pool</a></td></tr>
 <tr class="separator:a40e59fb284e8d5d97e432890cf0e4416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa50f9e77d4a3c29b7193425293c950b4"><td class="memItemLeft" align="right" valign="top">constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#aa50f9e77d4a3c29b7193425293c950b4">TVM_STACK_SIZE</a> = 8192</td></tr>
+<tr class="separator:aa50f9e77d4a3c29b7193425293c950b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbc445226f4b98c8d04eb01e8a962bd3"><td class="memItemLeft" align="right" valign="top">constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#adbc445226f4b98c8d04eb01e8a962bd3">TVM_FRAME_SIZE</a> = 1024</td></tr>
+<tr class="separator:adbc445226f4b98c8d04eb01e8a962bd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b1066cb4d55bd96c344d94689ae5e0a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a85cef7438d5d252b20026c3ed514b7e5">TVM_BUILTINS_FUNC</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1_t_v_m__space.html#a1b1066cb4d55bd96c344d94689ae5e0a">builtin_funcs</a> []</td></tr>
 <tr class="separator:a1b1066cb4d55bd96c344d94689ae5e0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -288,24 +290,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aaf18cdac96c35c382b0eab1111f856d0" name="aaf18cdac96c35c382b0eab1111f856d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf18cdac96c35c382b0eab1111f856d0">&#9670;&nbsp;</a></span>create_TVM()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m.html">TVM</a> * trc::TVM_space::create_TVM </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>name</em> = <code>&quot;__main__&quot;</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a1b34ab9d30dfa0cd0b1a5b371f7dc4b1" name="a1b34ab9d30dfa0cd0b1a5b371f7dc4b1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b34ab9d30dfa0cd0b1a5b371f7dc4b1">&#9670;&nbsp;</a></span>free_module()</h2>
 
@@ -419,6 +403,50 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html">objs_pool_TVM</a> * trc::TVM_space::global_objs_pool</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adbc445226f4b98c8d04eb01e8a962bd3" name="adbc445226f4b98c8d04eb01e8a962bd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbc445226f4b98c8d04eb01e8a962bd3">&#9670;&nbsp;</a></span>TVM_FRAME_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr size_t trc::TVM_space::TVM_FRAME_SIZE = 1024</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa50f9e77d4a3c29b7193425293c950b4" name="aa50f9e77d4a3c29b7193425293c950b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa50f9e77d4a3c29b7193425293c950b4">&#9670;&nbsp;</a></span>TVM_STACK_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr size_t trc::TVM_space::TVM_STACK_SIZE = 8192</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

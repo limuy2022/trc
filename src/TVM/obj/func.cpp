@@ -1,8 +1,10 @@
 #include <TVM/func.h>
 
 namespace trc::TVM_space {
-frame_::frame_(func_* func)
-    : dyna_data(func->symbol_form_size) {
+void frame_::set_func(const trc::TVM_space::func_& func) {
+}
+
+void frame_::free_func() {
 }
 
 func_::~func_() {

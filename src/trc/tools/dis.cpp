@@ -56,11 +56,9 @@ namespace tools_in {
             printf("    %zu:%s\n", i, static_data.static_data.const_long[i]);
         }
         // 输出函数
-        n = static_data.static_data.funcs.size();
         puts("\nfunctions:");
-        auto itor = static_data.static_data.funcs.begin();
-        for (size_t i = 0; i < n; ++i, ++itor) {
-            printf("    %zu:%s\n", i, itor->first.c_str());
+        for (size_t i = 0; i < static_data.static_data.funcs_num; ++i) {
+            printf("    %zu:%s\n", i, static_data.static_data.funcs[i].name);
         }
         putchar('\n');
     }
@@ -80,7 +78,7 @@ namespace tools_in {
 
 namespace tools_out {
     void dis() {
-        TVM_space::TVM* vm = TVM_space::create_TVM();
+        auto vm = new TVM_space::TVM;
         for (int i = 2; i < argc; ++i)
             tools_in::__dis(vm, argv[i]);
         delete vm;

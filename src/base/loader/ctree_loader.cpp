@@ -245,8 +245,7 @@ static void load_bytecode(
  * @brief 从文件中读取函数
  * @param file 文件
  */
-static void load_functions(
-    FILE* file, std::map<std::string, trc::TVM_space::func_*>& const_funcl) {
+static void load_functions(FILE* file, trc::TVM_space::func_*& const_funcl) {
     // int len;
     // trc::TVM_space::func_ *tmp;
     // fread(&len, sizeof(len), 1, file);
@@ -262,8 +261,7 @@ static void load_functions(
  * @brief 写入函数
  * @param file 文件
  */
-static void write_functions(
-    FILE* file, std::map<std::string, trc::TVM_space::func_*>& const_funcl) {
+static void write_functions(FILE* file, trc::TVM_space::func_* const_funcl) {
     // for (const auto &i: const_funcl) {
     //     write_string_one(file, i.first);
     //     write_bytecode(file,

@@ -15,7 +15,10 @@ void free_TVM(TVM* vm) {
     vm->static_data.const_f.push_back(0);
 
     vm->static_data.ReleaseStringData();
-    memory::free_stl(vm->dyna_data.frames);
+    while (vm->dyna_data.frames_top_str != vm->dyna_data.frames - 1) {
+        vm->dyna_data.frames_top_str->free_func();
+        vm->dyna_data.frames_top_str--;
+    }
     vm->static_data.global_symbol_table_size = 1;
     vm->dyna_data.reset_global_symbol_table(1);
 }

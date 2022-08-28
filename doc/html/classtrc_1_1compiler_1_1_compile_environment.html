@@ -96,9 +96,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7c08b8c853b474ce847fd704acc7f667"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">get_index_of_localvar</a> (const std::string &amp;localspace_name, char *name, bool maybe_not_in)</td></tr>
 <tr class="memdesc:a7c08b8c853b474ce847fd704acc7f667"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">More...</a><br /></td></tr>
 <tr class="separator:a7c08b8c853b474ce847fd704acc7f667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73637670bd00e07bec3b5d68f01e9d5e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a73637670bd00e07bec3b5d68f01e9d5e">get_index_of_function</a> (char *name, bool maybe_not_in)</td></tr>
+<tr class="memdesc:a73637670bd00e07bec3b5d68f01e9d5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个函数在全局符号表中的位置，没有该函数则添加进符号表  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a73637670bd00e07bec3b5d68f01e9d5e">More...</a><br /></td></tr>
+<tr class="separator:a73637670bd00e07bec3b5d68f01e9d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表 </p>
+<p >该类是每个模块都配备一个 </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a728af5828eb035f449fc12f6220608fc" name="a728af5828eb035f449fc12f6220608fc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a728af5828eb035f449fc12f6220608fc">&#9670;&nbsp;</a></span>CompileEnvironment()</h2>
@@ -160,6 +164,43 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>获取全局的符号表的大小 </p>
+
+</div>
+</div>
+<a id="a73637670bd00e07bec3b5d68f01e9d5e" name="a73637670bd00e07bec3b5d68f01e9d5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73637670bd00e07bec3b5d68f01e9d5e">&#9670;&nbsp;</a></span>get_index_of_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t trc::compiler::CompileEnvironment::get_index_of_function </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>maybe_not_in</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取某个函数在全局符号表中的位置，没有该函数则添加进符号表 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>变量名 </td></tr>
+    <tr><td class="paramname">maybe_not_in</td><td>允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

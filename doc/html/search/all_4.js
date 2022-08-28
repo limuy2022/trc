@@ -21,5 +21,5 @@ var searchData=
   ['draw_18',['draw',['../classtrc_1_1eggs_1_1drawer.html#af16e4e29d00eae8f52699ca8c73bee55',1,'trc::eggs::drawer::draw()'],['../classtrc_1_1utils_1_1progress__bar.html#a2719be4c254cc688ce3b82e81d352d4e',1,'trc::utils::progress_bar::draw()']]],
   ['draw_5fpictures_19',['draw_pictures',['../namespacetrc_1_1eggs.html#a3390aa00ef6559f77abf6954a482e0be',1,'trc::eggs']]],
   ['drawer_20',['drawer',['../classtrc_1_1eggs_1_1drawer.html#abbc66e1dc081f7624d5ddc3811f9ee22',1,'trc::eggs::drawer::drawer()'],['../classtrc_1_1eggs_1_1drawer.html',1,'trc::eggs::drawer']]],
-  ['dyna_5fdata_21',['dyna_data',['../classtrc_1_1_t_v_m__space_1_1frame__.html#a8941457764ffbd5140a3f7f72f85d041',1,'trc::TVM_space::frame_::dyna_data()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a4a3eed3a76306909a223b52a2a21752e',1,'trc::TVM_space::TVM::dyna_data()']]]
+  ['dyna_5fdata_21',['dyna_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a4a3eed3a76306909a223b52a2a21752e',1,'trc::TVM_space::TVM']]]
 ];

@@ -29,7 +29,7 @@ namespace tools_in {
 
 namespace tools_out {
     void run() {
-        TVM_space::TVM* vm = TVM_space::create_TVM();
+        auto vm = new TVM_space::TVM;
         for (int i = 2; i < argc; ++i) {
             tools_in::__run(vm, argv[i]);
         }

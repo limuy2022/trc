@@ -14,6 +14,5 @@ var searchData=
   ['compileenvironment_11',['CompileEnvironment',['../classtrc_1_1compiler_1_1_compile_environment.html#a728af5828eb035f449fc12f6220608fc',1,'trc::compiler::CompileEnvironment']]],
   ['compiler_12',['Compiler',['../namespacetrc_1_1compiler.html#a27b2d1020e9e16318363a2b99f54c86f',1,'trc::compiler']]],
   ['connect_13',['connect',['../classtrc_1_1compiler_1_1is__not__end__node.html#a8f17d1dadfcbc30145ac12cba41a893f',1,'trc::compiler::is_not_end_node']]],
-  ['cpp_5flib_14',['cpp_lib',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#a9c8d238cec9408879b500a32e929b243',1,'trc::TVM_space::cpp_libs::cpp_lib']]],
-  ['create_5ftvm_15',['create_TVM',['../namespacetrc_1_1_t_v_m__space.html#aaf18cdac96c35c382b0eab1111f856d0',1,'trc::TVM_space']]]
+  ['cpp_5flib_14',['cpp_lib',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#a9c8d238cec9408879b500a32e929b243',1,'trc::TVM_space::cpp_libs::cpp_lib']]]
 ];

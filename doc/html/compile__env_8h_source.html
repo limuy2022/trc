@@ -73,14 +73,13 @@ $(function() {
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="compiler__def_8h.html">Compiler/compiler_def.h</a>&gt;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="pri__compiler_8hpp.html">Compiler/pri_compiler.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="base_2_error_8h.html">base/Error.h</a>&gt;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1compiler.html">trc::compiler</a> {</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="pri__compiler_8hpp.html">Compiler/pri_compiler.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="base_2_error_8h.html">base/Error.h</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1compiler.html">trc::compiler</a> {</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classtrc_1_1compiler_1_1_compile_environment.html">   19</a></span><span class="keyword">class </span><a class="code hl_class" href="classtrc_1_1compiler_1_1_compile_environment.html">CompileEnvironment</a> {</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classtrc_1_1compiler_1_1_compile_environment.html#a728af5828eb035f449fc12f6220608fc">CompileEnvironment</a>(<a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a>&amp; compiler_data);</div>
@@ -95,22 +94,25 @@ $(function() {
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">get_index_of_localvar</a>(</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keyword">const</span> std::string&amp; localspace_name, <span class="keywordtype">char</span>* name, <span class="keywordtype">bool</span> maybe_not_in);</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keyword">typedef</span> std::vector&lt;const char*&gt; name_list_t;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="comment">// 记录全局的变量名</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    name_list_t var_names_list_global;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// 记录局部的变量名</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    std::map&lt;std::string, name_list_t&gt; var_names_list_local;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="comment">// 编译期间要用到的公共数据</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a>&amp; compiler_data;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">size_t</span> get_index_from_list(</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="keywordtype">char</span>* name, name_list_t&amp; list, <span class="keywordtype">bool</span> maybe_not_in);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>};</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>}</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classtrc_1_1compiler_1_1_compile_environment.html#a73637670bd00e07bec3b5d68f01e9d5e">get_index_of_function</a>(<span class="keywordtype">char</span>* name, <span class="keywordtype">bool</span> maybe_not_in);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keyword">typedef</span> std::vector&lt;const char*&gt; name_list_t;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="comment">// 记录全局的变量名</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    name_list_t var_names_list_global;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="comment">// 记录局部的变量名</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    std::map&lt;std::string, name_list_t&gt; var_names_list_local;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// 编译期间要用到的公共数据</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a>&amp; compiler_data;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">size_t</span> get_index_from_list(</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keywordtype">char</span>* name, name_list_t&amp; list, <span class="keywordtype">bool</span> maybe_not_in);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>};</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}</div>
 <div class="ttc" id="abase_2_error_8h_html"><div class="ttname"><a href="base_2_error_8h.html">Error.h</a></div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html">trc::compiler::CompileEnvironment</a></div><div class="ttdoc">编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表</div><div class="ttdef"><b>Definition:</b> compile_env.h:19</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html_a728af5828eb035f449fc12f6220608fc"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html#a728af5828eb035f449fc12f6220608fc">trc::compiler::CompileEnvironment::CompileEnvironment</a></div><div class="ttdeci">CompileEnvironment(compiler_public_data &amp;compiler_data)</div><div class="ttdef"><b>Definition:</b> compile_env.cpp:7</div></div>
+<div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html_a73637670bd00e07bec3b5d68f01e9d5e"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html#a73637670bd00e07bec3b5d68f01e9d5e">trc::compiler::CompileEnvironment::get_index_of_function</a></div><div class="ttdeci">size_t get_index_of_function(char *name, bool maybe_not_in)</div><div class="ttdoc">获取某个函数在全局符号表中的位置，没有该函数则添加进符号表</div><div class="ttdef"><b>Definition:</b> compile_env.cpp:61</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html_a7c08b8c853b474ce847fd704acc7f667"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html#a7c08b8c853b474ce847fd704acc7f667">trc::compiler::CompileEnvironment::get_index_of_localvar</a></div><div class="ttdeci">size_t get_index_of_localvar(const std::string &amp;localspace_name, char *name, bool maybe_not_in)</div><div class="ttdoc">获取某个变量在局部变量表中的位置，没有该符号则添加进符号表</div><div class="ttdef"><b>Definition:</b> compile_env.cpp:55</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html_a81f5853cd8418dd083ab6164f2626048"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html#a81f5853cd8418dd083ab6164f2626048">trc::compiler::CompileEnvironment::~CompileEnvironment</a></div><div class="ttdeci">~CompileEnvironment()</div><div class="ttdef"><b>Definition:</b> compile_env.cpp:11</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1_compile_environment_html_a8b69ab4da9f68fb3a2082fde1ea2bd07"><div class="ttname"><a href="classtrc_1_1compiler_1_1_compile_environment.html#a8b69ab4da9f68fb3a2082fde1ea2bd07">trc::compiler::CompileEnvironment::get_index_of_globalvar</a></div><div class="ttdeci">size_t get_index_of_globalvar(char *name, bool maybe_not_in)</div><div class="ttdoc">获取某个变量在全局符号表中的位置，没有该符号则添加进符号表</div><div class="ttdef"><b>Definition:</b> compile_env.cpp:50</div></div>

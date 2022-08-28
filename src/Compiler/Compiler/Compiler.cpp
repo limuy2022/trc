@@ -44,10 +44,7 @@ static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::ASSERT_,
 };
 
-void detail_compiler::add_opcode(
-    bytecode_t opcode, TVM_space::bytecode_index_t index) {
-    vm->static_data.byte_codes.emplace_back(opcode, index);
-    // 以下都是在处理行号表
+void detail_compiler::generate_line_table() {
     vm->static_data.line_number_table.push_back(compiler_data.error.line);
     if (compiler_data.error.line != prev_value) {
         line_to_bycodeindex_table.resize(compiler_data.error.line + 1);
@@ -57,7 +54,14 @@ void detail_compiler::add_opcode(
     }
 }
 
-void detail_compiler::func_lexer(treenode* head) {
+void detail_compiler::add_opcode(
+    bytecode_t opcode, TVM_space::bytecode_index_t index) {
+    vm->static_data.byte_codes.emplace_back(opcode, index);
+    generate_line_table();
+}
+
+void detail_compiler::func_definer(treenode* head) {
+    // 首先添加到数据中，生成关于函数的符号表
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
@@ -168,7 +172,7 @@ void detail_compiler::compile(treenode* head) {
         }
         case grammar_type::FUNC_DEFINE: {
             // 函数定义
-            func_lexer(head);
+            func_definer(head);
             break;
         }
         case grammar_type::VAR_DEFINE: {
@@ -184,14 +188,9 @@ void detail_compiler::compile(treenode* head) {
         }
         case grammar_type::CALL_FUNC: {
             // 调用自定义函数
-            // 判断函数是否存在
             char* nodedata = ((node_base_data*)root)->data;
-            if (!utils::map_check_in_first(vm->static_data.funcs, nodedata))
-                compiler_data.error.send_error_module(
-                    error::NameError, language::error::nameerror, nodedata);
-            auto* code = (node_base_tick_without_sons*)*root->son.begin();
-            auto* index_ = (node_base_int_without_sons*)*root->son.end();
-            add_opcode(build_opcode(code->tick), index_->value);
+            size_t index = infoenv.get_index_of_function(nodedata, false);
+            add_opcode(bytecode_t(byteCodeNumber::CALL_FUNCTION_), index);
             break;
         }
             // 需要跳转的语句块

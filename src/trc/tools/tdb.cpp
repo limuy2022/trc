@@ -132,7 +132,7 @@ namespace tools::tools_out {
         puts(language::tdb::start_tip);
         char* file_path = nullptr;
         std::string tmp;
-        vm = TVM_space::create_TVM();
+        vm = new TVM_space::TVM;
         for (;;) {
             // 读取需要debug的文件
             printf("%s", "file>");

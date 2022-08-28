@@ -183,9 +183,6 @@ void free_module(TVM* vm) {
 TVM::~TVM() {
     // 释放字节码和变量的值
     free_module(this);
-    for (const auto& i : static_data.funcs) {
-        delete i.second;
-    }
 }
 
 void TVM::pop_value() {
@@ -198,6 +195,9 @@ void TVM::run_all() {
          ++run_index) {
         this->run_bycode(&static_data.byte_codes[run_index]);
     }
+}
+
+void TVM::run_func(const trc::TVM_space::func_& function) {
 }
 
 void TVM::error_report(int error, ...) {
@@ -216,9 +216,5 @@ void TVM::run_line_bycode() {
         && now_index
             == static_data.line_number_table
                    [run_index]); // 如果没有执行到底或者到下一行
-}
-
-TVM* create_TVM(const std::string& name) {
-    return new TVM(name);
 }
 }

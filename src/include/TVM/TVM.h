@@ -60,7 +60,7 @@ namespace trc::TVM_space {
  */
 class TVM {
 public:
-    TVM(std::string name);
+    TVM(std::string name = "__main__");
 
     ~TVM();
     /**
@@ -126,6 +126,8 @@ public:
         run_index++;
     }
 
+    void run_func(const func_& function);
+
     TVM_dyna_data dyna_data;
 
     // 储存模块
@@ -144,16 +146,6 @@ public:
     size_t run_index = 0;
 
 private:
-    // 运行函数名
-    std::string run_func_str;
-
-    // 调用函数的字节码所在的行
-    int call_func_index;
-
-    const static NOARGV_TVM_METHOD TVM_RUN_CODE_NOARG_FUNC[];
-
-    const static ARGV_TVM_METHOD TVM_RUN_CODE_ARG_FUNC[];
-
     // 指令集定义开始
 
     /**
@@ -364,6 +356,4 @@ private:
 
     // 指令集定义结束
 };
-
-TVM* create_TVM(const std::string& name = "__main__");
 }

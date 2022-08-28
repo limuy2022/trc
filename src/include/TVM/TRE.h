@@ -30,7 +30,7 @@ namespace TVM_share {
      * @brief
      * 将一个代表布尔值的INTOBJ对象转换成布尔值
      */
-    inline bool obj_to_bool(def::OBJ a) {
+    inline bool obj_to_bool(def::INTOBJ a) {
         return a == true_ ? true : false;
     }
 }

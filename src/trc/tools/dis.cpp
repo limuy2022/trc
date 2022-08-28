@@ -70,7 +70,7 @@ namespace tools_in {
             std::string codes;
             utils::readcode(codes, file_path);
             auto option = generate_compiler_params();
-            compiler::Compiler(vm, codes, &option);
+            compiler::Compiler(vm->static_data, codes, &option);
         }
         out(*vm, file_path);
     }

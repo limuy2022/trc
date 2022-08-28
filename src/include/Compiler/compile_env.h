@@ -7,14 +7,17 @@
 #include <Compiler/compiler_def.h>
 #include <Compiler/pri_compiler.hpp>
 #include <base/Error.h>
+#include <language/error.h>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace trc::compiler {
+inline size_t size_tmax = -1;
+
 /**
  * @brief 编译时的环境，主要记录各种变量的信息和作用域，可用于优化和计算行号表
- * @details 该类是每个模块都配备一个
+ * @details 该类每个模块都配备一个
  */
 class CompileEnvironment {
 public:
@@ -24,53 +27,38 @@ public:
     /**
      * @brief 获取全局的符号表的大小
      */
-    size_t get_global_name_size();
+    size_t get_name_size();
 
     /**
-     * @brief 获取局部的符号表的大小
+     * @brief 将变量添加进符号表，存在该符号则报出重定义错误
+     * @param name
      */
-    size_t get_local_name_size(const std::string& name);
+    size_t add_var(char* name);
 
     /**
-     * @brief 获取某个变量在全局符号表中的位置，没有该符号则添加进符号表
+     * @brief 获取某个变量在符号表中的位置，有该符号则报错
      * @param name 变量名
-     * @param maybe_not_in
-     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_globalvar(char* name, bool maybe_not_in);
+    size_t get_index_of_var(char* name);
 
     /**
-     * @brief 获取某个变量在局部变量表中的位置，没有该符号则添加进符号表
-     * @param localspace_name 局部空间名，如函数名
+     * @brief 获取某个函数在符号表中的位置
      * @param name 变量名
-     * @param maybe_not_in
-     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
      */
-    size_t get_index_of_localvar(
-        const std::string& localspace_name, char* name, bool maybe_not_in);
+    size_t get_index_of_function(const char* name);
 
     /**
-     * @brief 获取某个函数在全局符号表中的位置，没有该函数则添加进符号表
-     * @param name 变量名
-     * @param maybe_not_in
-     * 允许该变量不在符号表中吗，允许则会添加进符号表，不允许则会报错
+     * @brief 将函数添加进符号表，负责报出重定义错误
      */
-    size_t get_index_of_function(char* name, bool maybe_not_in);
+    void add_function(const char* name);
 
 private:
     typedef std::vector<const char*> name_list_t;
     // 记录全局的变量名
-    name_list_t var_names_list_global;
-    // 记录局部的变量名
-    std::map<std::string, name_list_t> var_names_list_local;
+    name_list_t var_names_list;
     // 编译期间要用到的公共数据
     compiler_public_data& compiler_data;
-
-    /**
-     * @brief 从某列表中查找索引和添加数据
-     * @warning 如果未添加进列表中，会直接释放内存
-     */
-    size_t get_index_from_list(
-        char* name, name_list_t& list, bool maybe_not_in);
+    // 函数名
+    name_list_t functions;
 };
 }

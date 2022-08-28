@@ -20,7 +20,7 @@ namespace tools_in {
             std::string scodes;
             utils::readcode(scodes, path);
             auto option = generate_compiler_params();
-            compiler::Compiler(vm, scodes, &option);
+            compiler::Compiler(vm->static_data, scodes, &option);
         }
         vm->reload_data();
         vm->run_all();

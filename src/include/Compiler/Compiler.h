@@ -12,13 +12,10 @@
 #include <Compiler/compiler_def.h>
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVM.h>
-#include <TVM/TVMdef.h>
+#include <TVM/TVM_data.h>
 #include <base/Error.h>
-#include <base/trcdef.h>
 
 namespace trc::compiler {
-class grammar_data_control;
-
 using TVM_space::bytecode_t;
 
 /**
@@ -26,22 +23,24 @@ using TVM_space::bytecode_t;
  */
 class detail_compiler {
 public:
-    detail_compiler(compiler_public_data&, TVM_space::TVM* vm);
+    detail_compiler(compiler_public_data&, TVM_space::TVM_static_data* vm);
 
-    /**
-     * @brief 将一个节点解析成字节码
-     * @param head 根节点
-     */
-    void compile(treenode* head);
     // 编译时信息记录
     CompileEnvironment infoenv;
 
     /**
+     * @brief 将一个节点解析成字节码
+     * @param head 根节点
+     * @param localinfo 指向局部信息，默认与全局信息相同
+     */
+    void compile(treenode* head, CompileEnvironment& localinfo);
+
+    /**
      * @brief 重新绑定数据
      */
-    void retie(TVM_space::TVM* vm);
+    void retie(TVM_space::TVM_static_data* vm);
 
-    TVM_space::TVM* vm;
+    TVM_space::TVM_static_data* vm;
 
     // 编译期间需要用到的数据
     compiler_public_data& compiler_data;
@@ -64,20 +63,6 @@ private:
      * @return 数据在常量池中的索引
      */
     TVM_space::bytecode_index_t add_string(char*) const;
-
-    /**
-     * @brief 将变量添加进符号表中
-     * @return 变量在符号表中的索引
-     * @warning 不允许变量不存在于符号表中
-     */
-    TVM_space::bytecode_index_t add_var_allow_not_in(char*);
-
-    /**
-     * @brief 将变量添加进符号表中
-     * @return 变量在符号表中的索引
-     * @warning 允许变量不存在于符号表中
-     */
-    TVM_space::bytecode_index_t add_var_must_in(char*);
 
     /**
      * @brief 将长整型添加进符号表中
@@ -109,22 +94,18 @@ private:
     /**
      * @brief 添加带有语句块的特殊代码
      */
-    template <bool compiletype> void add_block(is_not_end_node* root);
+    template <bool compiletype>
+    void add_block(is_not_end_node* root, CompileEnvironment& localinfo);
 
     /**
      * @brief 生成一条字节码的对应行号表记录
      */
     void generate_line_table();
 
-    /**
-     * @brief 解析函数字节码
-     */
-    void func_definer(treenode* head);
-
-    long long prev_value = LLONG_MAX;
+    size_t prev_value = ULLONG_MAX;
 
     // 行号转化为字节码每行的第一个字节码的索引
-    std::vector<int> line_to_bycodeindex_table;
+    std::vector<size_t> line_to_bycodeindex_table;
 };
 
 /**
@@ -139,9 +120,9 @@ private:
  * 是否返回当前编译函数生成的编译器对象，可用于保存编译信息
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
-detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
-    const compiler_option* option, detail_compiler* compiler_ptr = nullptr,
-    bool return_compiler_ptr = false);
+detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
+    const std::string& codes, const compiler_option* option,
+    detail_compiler* compiler_ptr = nullptr, bool return_compiler_ptr = false);
 
 /**
  * @brief 释放整棵树的内存
@@ -149,32 +130,32 @@ detail_compiler* Compiler(TVM_space::TVM* vm, const std::string& codes,
 void free_tree(compiler::treenode* head);
 
 template <bool compiletype>
-void detail_compiler::add_block(is_not_end_node* root) {
+void detail_compiler::add_block(
+    is_not_end_node* root, CompileEnvironment& localinfo) {
     // 开头表达式
 
     // 记录语句块一开始的位置
     size_t goto_addr;
     if constexpr (compiletype) {
-        goto_addr = vm->static_data.byte_codes.size();
+        goto_addr = vm->byte_codes.size();
     }
     auto iter = root->son.begin();
-    compile(*iter);
+    compile(*iter, localinfo);
     iter++;
     // 单独处理跳转语句，否则无法处理常量表
     // 0只是用来占位的
     add_opcode((bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 0);
     // 获取跳转表达式的字节码位置
-    size_t fix_bytecode = vm->static_data.byte_codes.size() - 1;
+    size_t fix_bytecode = vm->byte_codes.size() - 1;
     // 然后编译其它所有的节点
     for (; iter != root->son.end(); ++iter) {
-        compile(*iter);
+        compile(*iter, localinfo);
     }
     if constexpr (compiletype) {
         // while循环比if多一句goto
         add_opcode((bytecode_t)byteCodeNumber::GOTO_, goto_addr);
     }
     // 然后重新修改跳转地址
-    vm->static_data.byte_codes[fix_bytecode].index
-        = vm->static_data.byte_codes.size();
+    vm->byte_codes[fix_bytecode].index = vm->byte_codes.size();
 }
 }

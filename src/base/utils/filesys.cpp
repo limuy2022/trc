@@ -8,7 +8,6 @@
  */
 
 #include <base/Error.h>
-#include <base/trcdef.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
 #include <filesystem>

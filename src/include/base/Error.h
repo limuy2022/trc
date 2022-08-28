@@ -43,7 +43,8 @@ enum error_type {
     MemoryError,
     KeyError,
     SystemError,
-    OperatorError
+    OperatorError,
+    RedefinedError
 };
 
 /**

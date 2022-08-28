@@ -9,11 +9,11 @@
 namespace language {
 namespace error {
     // 错误的信息具体定义，$标识待补充
-    const char* error_map[]
-        = { "NameError:", "ValueError:", "SyntaxError:", "VersionError:",
-              "OpenFileError:", "ModuleNotFoundError:", "ArgumentError:",
-              "ZeroDivError:", "RunError:", "AssertError:", "IndexError:",
-              "MemoryError:", "KeyError:", "SystemError:", "OperatorError:" };
+    const char* error_map[] = { "NameError:", "ValueError:", "SyntaxError:",
+        "VersionError:", "OpenFileError:", "ModuleNotFoundError:",
+        "ArgumentError:", "ZeroDivError:", "RunError:", "AssertError:",
+        "IndexError:", "MemoryError:", "KeyError:", "SystemError:",
+        "OperatorError:", "RedefinedError:" };
 
     const char* error_from = "Error from ";
     const char* error_in_line = "Error in line ";
@@ -29,6 +29,8 @@ namespace error {
     const char* indexerror = R"(% is out of %)";
     const char* valueerror = R"("%" could not be "%")";
     const char* operatorerror = R"(Couldn't use % for types:% and %)";
+    const char* funcredefinederror = "func % is redefined";
+    const char* varredefinederror = "var % is redefined.";
 
     const char* argumenterror = R"(% need % arguments.)";
 

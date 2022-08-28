@@ -11,7 +11,7 @@ namespace error {
     const char* error_map[] = { "名字错误:", "值错误:", "语法错误:",
         "版本错误:", "文件打开错误:", "模块找不到错误:", "参数错误:",
         "除零错误:", "运行错误:", "断言错误:", "索引错误:", "内存错误:",
-        "键错误:", "系统错误:", "运算符错误:" };
+        "键错误:", "系统错误:", "运算符错误:", "重定义错误:" };
     const char* error_from = "错误来自";
     const char* error_in_line = "错误发生在行";
 
@@ -26,6 +26,8 @@ namespace error {
     const char* indexerror = R"(%超出了%的范围)";
     const char* valueerror = R"("%"不能被转换为"%")";
     const char* operatorerror = R"(不能使用运算符"%"对于类型:% and %)";
+    const char* funcredefinederror = "函数%被重定义";
+    const char* varredefinederror = "变量%被重定义";
 
     const char* argumenterror = R"(%需要%个参数.)";
 

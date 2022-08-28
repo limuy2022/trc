@@ -80,9 +80,8 @@ $(function() {
 <code>#include &lt;<a class="el" href="compiler__def_8h_source.html">Compiler/compiler_def.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">Compiler/pri_compiler.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="_t_v_m_8h_source.html">TVM/TVM.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="_t_v_mdef_8h_source.html">TVM/TVMdef.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="_t_v_m__data_8h_source.html">TVM/TVM_data.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="base_2_error_8h_source.html">base/Error.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="trcdef_8h_source.html">base/trcdef.h</a>&gt;</code><br />
 </div>
 <p><a href="_compiler_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -101,9 +100,9 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a27b2d1020e9e16318363a2b99f54c86f"><td class="memItemLeft" align="right" valign="top">detail_compiler *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a27b2d1020e9e16318363a2b99f54c86f">trc::compiler::Compiler</a> (TVM_space::TVM *vm, const std::string &amp;codes, const compiler_option *option, detail_compiler *compiler_ptr=nullptr, bool return_compiler_ptr=false)</td></tr>
-<tr class="memdesc:a27b2d1020e9e16318363a2b99f54c86f"><td class="mdescLeft">&#160;</td><td class="mdescRight">传入一台虚拟机和未编译的代码，将代码编译后填充进vm中  <a href="namespacetrc_1_1compiler.html#a27b2d1020e9e16318363a2b99f54c86f">More...</a><br /></td></tr>
-<tr class="separator:a27b2d1020e9e16318363a2b99f54c86f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa579535a614e7626fec5669349db7aef"><td class="memItemLeft" align="right" valign="top">detail_compiler *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa579535a614e7626fec5669349db7aef">trc::compiler::Compiler</a> (TVM_space::TVM_static_data &amp;vm, const std::string &amp;codes, const compiler_option *option, detail_compiler *compiler_ptr=nullptr, bool return_compiler_ptr=false)</td></tr>
+<tr class="memdesc:aa579535a614e7626fec5669349db7aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">传入一台虚拟机和未编译的代码，将代码编译后填充进vm中  <a href="namespacetrc_1_1compiler.html#aa579535a614e7626fec5669349db7aef">More...</a><br /></td></tr>
+<tr class="separator:aa579535a614e7626fec5669349db7aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8e2fabe582e3d503faa2f476a5204d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#af8e2fabe582e3d503faa2f476a5204d5">trc::compiler::free_tree</a> (compiler::treenode *head)</td></tr>
 <tr class="memdesc:af8e2fabe582e3d503faa2f476a5204d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">释放整棵树的内存  <a href="namespacetrc_1_1compiler.html#af8e2fabe582e3d503faa2f476a5204d5">More...</a><br /></td></tr>
 <tr class="separator:af8e2fabe582e3d503faa2f476a5204d5"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -130,13 +130,13 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
         case grammar_type::BUILTIN_FUNC: {
             // 内置函数
             // 先递归编译参数
-            auto argv_nodes = (is_not_end_node*)*root->son.begin();
+            auto argv_nodes = (is_not_end_node*)root->son.front();
             for (auto i : argv_nodes->son) {
                 compile(i, localinfo);
             }
             // 然后编译参数个数
             int num_of_nodes
-                = ((is_not_end_node*)*root->son.begin())->son.size();
+                = ((is_not_end_node*)root->son.front())->son.size();
             add_opcode(
                 (bytecode_t)byteCodeNumber::LOAD_INT_, add_int(num_of_nodes));
             // 最后加上调用函数
@@ -150,7 +150,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 带参数字节码
             // 参数
             auto argv_
-                = ((node_base_int_without_sons*)*root->son.begin())->value;
+                = ((node_base_int_without_sons*)root->son.front())->value;
             add_opcode(
                 build_opcode(((node_base_tick*)root)->tick), add_int(argv_));
             break;
@@ -159,6 +159,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 首先添加函数定义
             infoenv.add_function(((node_base_data*)root)->data);
             // 然后为函数新建一个新的局部环境，进行编译
+
             break;
         }
         case grammar_type::VAR_DEFINE: {
@@ -166,7 +167,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 处理等式右边的数据
             compile(*(++root->son.begin()), localinfo);
             // 处理等式左边的数据
-            char* argv_ = ((node_base_data_without_sons*)*root->son.begin())
+            char* argv_ = ((node_base_data_without_sons*)root->son.front())
                               ->swap_string_data();
             auto index_argv = localinfo.add_var(argv_);
             add_opcode(build_var(((node_base_tick*)root)->tick), index_argv);

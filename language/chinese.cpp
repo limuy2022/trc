@@ -2,9 +2,10 @@
  * 中文，作为dll插件提供不同语言
  */
 
-#include <language/error.h>
 #include <language/language.h>
-#include <locale>
+#include <language/error.h>
+#include <clocale>
+#include <cstdio>
 
 namespace language {
 namespace error {
@@ -76,12 +77,10 @@ namespace tdb {
 }
 
 void locale_init() {
-    try {
-        std::locale::global(std::locale("zh_CN.UTF-8"));
-    } catch (std::runtime_error& e) {
+    if(setlocale(LC_ALL, "zh_CN.UTF-8") == nullptr) {
         fprintf(stderr,
-            "Can't load Chinese language.Because there isn't Chinese package "
-            "installed on your computer\n");
+                    "Can't load Chinese language.Because there isn't Chinese package "
+                    "installed on your computer\n");
     }
 }
 }

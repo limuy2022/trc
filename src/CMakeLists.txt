@@ -1,5 +1,9 @@
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(compile_flag " -Wextra -Wall -fdata-sections -ffunction-sections")
+set(compile_flag " -Wextra -Wall -fdata-sections -ffunction-sections -fno-exceptions")
+if(NOT "${TRC_BUILD_TYPE}" STREQUAL "Test")
+	set(compile_flag " ${compile_flag} -fno-rtti")
+endif()
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${compile_flag}")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${compile_flag}")

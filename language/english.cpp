@@ -4,7 +4,8 @@
 
 #include <language/error.h>
 #include <language/language.h>
-#include <locale>
+#include <clocale>
+#include <cstdio>
 
 namespace language {
 namespace error {
@@ -85,11 +86,9 @@ namespace tdb {
 }
 
 void locale_init() {
-    try {
-        std::locale::global(std::locale("en_US.UTF-8"));
-    } catch (std::runtime_error& e) {
+    if(setlocale(LC_ALL, "en_US.UTF-8") == nullptr) {
         fprintf(stderr,
-            "Can't load English language.Because there isn't Chinese package "
+            "Can't load English language.Because there isn't English package "
             "installed on your computer\n");
     }
 }

@@ -12,8 +12,10 @@
 #include <language/error.h>
 #include <platform.h>
 #include <string>
-
+#ifdef LINUX_PLAT
+#include <filesystem>
 namespace fs = std::filesystem;
+#endif
 
 namespace trc::autodll {
 #ifdef WINDOWS_PLAT

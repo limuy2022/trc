@@ -40,52 +40,52 @@ public:
      */
     trc_long& operator=(def::OBJ a);
 
-    def::OBJ operator+(def::OBJ a);
+    def::OBJ operator+(def::OBJ a) override;
 
-    def::OBJ operator-(def::OBJ a);
+    def::OBJ operator-(def::OBJ a) override;
 
-    def::OBJ operator*(def::OBJ v);
+    def::OBJ operator*(def::OBJ v) override;
 
-    def::OBJ operator/(def::OBJ);
+    def::OBJ operator/(def::OBJ) override;
 
-    def::OBJ operator%(def::OBJ);
+    def::OBJ operator%(def::OBJ) override;
 
     def::OBJ pow(def::OBJ);
 
-    def::OBJ zdiv(def::OBJ);
+    def::OBJ zdiv(def::OBJ) override;
 
-    def::INTOBJ operator!=(def::OBJ a);
+    def::INTOBJ operator!=(def::OBJ a) override;
 
-    def::INTOBJ operator==(def::OBJ);
+    def::INTOBJ operator==(def::OBJ) override;
 
-    def::INTOBJ operator<(def::OBJ);
+    def::INTOBJ operator<(def::OBJ) override;
 
-    def::INTOBJ operator>(def::OBJ);
+    def::INTOBJ operator>(def::OBJ) override;
 
-    def::INTOBJ operator<=(def::OBJ);
+    def::INTOBJ operator<=(def::OBJ) override;
 
-    def::INTOBJ operator>=(def::OBJ);
+    def::INTOBJ operator>=(def::OBJ) override;
 
-    void putline(FILE* out);
+    void putline(FILE* out) override;
 
-    RUN_TYPE_TICK gettype();
+    RUN_TYPE_TICK gettype() override;
 
-    def::INTOBJ operator!();
+    def::INTOBJ operator!() override;
 
-    def::INTOBJ operator&&(def::OBJ value_i);
+    def::INTOBJ operator&&(def::OBJ value_i) override;
 
-    def::INTOBJ operator||(def::OBJ value_i);
+    def::INTOBJ operator||(def::OBJ value_i) override;
 
-    ~trc_long();
+    ~trc_long() override;
 
-    def::OBJ to_string();
+    def::OBJ to_string() override;
 
     /**
      * @warning 这里是转成高精度小数
      */
-    def::OBJ to_float();
+    def::OBJ to_float() override;
 
-    def::OBJ to_bool();
+    def::OBJ to_bool() override;
 
     /**
      * @brief 将长度修复到正确的

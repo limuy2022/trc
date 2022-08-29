@@ -21,12 +21,6 @@ typedef std::vector<TVM_bytecode> struct_codes;
 // 指向内置函数的指针
 typedef void (*TVM_BUILTINS_FUNC)(int argc, TVM* vm);
 
-// 有参数字节码调用
-typedef void (TVM::*ARGV_TVM_METHOD)(bytecode_index_t);
-
-// 与参数字节码调用
-typedef void (TVM::*NOARGV_TVM_METHOD)();
-
 // 运行时类型标识
 enum class RUN_TYPE_TICK {
     int_T,

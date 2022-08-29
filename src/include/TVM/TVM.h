@@ -15,7 +15,6 @@
 enum class byteCodeNumber {
     LOAD_INT_,
     ADD_,
-    NOP_,
     SUB_,
     MUL_,
     DIV_,
@@ -205,11 +204,6 @@ private:
      * @details 支持对象：int， float
      */
     void MOD();
-
-    /**
-     * @brief 什么都不做
-     */
-    void NOP();
 
     /**
      * @brief 跳转到行

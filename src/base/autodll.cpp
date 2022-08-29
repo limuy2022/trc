@@ -9,7 +9,6 @@
 #include <base/Error.h>
 #include <base/autodll.h>
 #include <cstring>
-#include <filesystem>
 #include <language/error.h>
 #include <platform.h>
 #include <string>

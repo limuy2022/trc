@@ -6,8 +6,6 @@
 #include <language/error.h>
 
 namespace trc::compiler {
-typedef std::vector<token*> code_type;
-
 /**
  * @brief 生成语法树的解析器
  */

@@ -21,7 +21,7 @@ public:
 
     trc_list();
 
-    ~trc_list();
+    ~trc_list() override;
 
     /**
      * @brief 删除链表中index的元素
@@ -57,7 +57,7 @@ public:
     /*
      * @brief 以[0,9,10]的方式打印整个链表
      */
-    void putline(FILE* out);
+    void putline(FILE* out) override;
 
     /**
      * @brief 检查元素是否在链表中
@@ -65,7 +65,7 @@ public:
      */
     bool check_in_(def::OBJ data);
 
-    RUN_TYPE_TICK gettype();
+    RUN_TYPE_TICK gettype() override;
 
 private:
     static const RUN_TYPE_TICK type;

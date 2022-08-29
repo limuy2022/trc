@@ -29,142 +29,138 @@ void TVM::run_bycode(TVM_bytecode* bycode) {
         break;
     }
     case 2: {
-        NOP();
-        break;
-    }
-    case 3: {
         SUB();
         break;
     }
-    case 4: {
+    case 3: {
         MUL();
         break;
     }
-    case 5: {
+    case 4: {
         DIV();
         break;
     }
-    case 6: {
+    case 5: {
         GOTO(bycode->index);
         break;
     }
-    case 7: {
+    case 6: {
         STORE_NAME(bycode->index);
         break;
     }
-    case 8: {
+    case 7: {
         LOAD_NAME(bycode->index);
         break;
     }
-    case 9: {
+    case 8: {
         LOAD_FLOAT(bycode->index);
         break;
     }
-    case 10: {
+    case 9: {
         LOAD_STRING(bycode->index);
         break;
     }
-    case 11: {
+    case 10: {
         CALL_BUILTIN(bycode->index);
         break;
     }
-    case 12: {
+    case 11: {
         IMPORT();
         break;
     }
-    case 13: {
+    case 12: {
         POW();
         break;
     }
-    case 14: {
+    case 13: {
         ZDIV();
         break;
     }
-    case 15: {
+    case 14: {
         MOD();
         break;
     }
-    case 16: {
+    case 15: {
         IF_FALSE_GOTO(bycode->index);
         break;
     }
-    case 17: {
+    case 16: {
         CHANGE_VALUE(bycode->index);
         break;
     }
-    case 18: {
+    case 17: {
         EQUAL();
         break;
     }
-    case 19: {
+    case 18: {
         UNEQUAL();
         break;
     }
-    case 20: {
+    case 19: {
         GREATER_EQUAL();
         break;
     }
-    case 21: {
+    case 20: {
         LESS_EQUAL();
         break;
     }
-    case 22: {
+    case 21: {
         LESS();
         break;
     }
-    case 23: {
+    case 22: {
         GREATER();
         break;
     }
-    case 24: {
+    case 23: {
         ASSERT();
         break;
     }
-    case 25: {
+    case 24: {
         NOT();
         break;
     }
-    case 26: {
+    case 25: {
         AND();
         break;
     }
-    case 27: {
+    case 26: {
         OR();
         break;
     }
-    case 28: {
+    case 27: {
         STORE_LOCAL(bycode->index);
         break;
     }
-    case 29: {
+    case 28: {
         LOAD_LOCAL(bycode->index);
         break;
     }
-    case 30: {
+    case 29: {
         CALL_FUNCTION(bycode->index);
         break;
     }
-    case 31: {
+    case 30: {
         FREE_FUNCTION();
         break;
     }
-    case 32: {
+    case 31: {
         CHANGE_LOCAL(bycode->index);
         break;
     }
-    case 33: {
+    case 32: {
         LOAD_LONG(bycode->index);
         break;
     }
-    case 34: {
+    case 33: {
         LOAD_ARRAY(bycode->index);
         break;
     }
-    case 35: {
+    case 34: {
         CALL_METHOD(bycode->index);
         break;
     }
-    case 36: {
+    case 35: {
         LOAD_MAP(bycode->index);
         break;
     }

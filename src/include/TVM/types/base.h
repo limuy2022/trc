@@ -25,7 +25,7 @@ public:
     // 第几代对象
     int gc_obj_ = 1;
 
-    virtual ~trcobj();
+    virtual ~trcobj() = default;
 
     virtual def::OBJ to_int();
 

@@ -25,7 +25,7 @@ class trc_map : public trcobj {
 public:
     trc_map();
 
-    ~trc_map();
+    ~trc_map() override;
 
     /**
      * @brief 根据键取值
@@ -47,7 +47,7 @@ public:
      */
     bool delete_value(const def::OBJ key);
 
-    RUN_TYPE_TICK gettype();
+    RUN_TYPE_TICK gettype() override;
 
 private:
     // 哈希表长度

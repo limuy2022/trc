@@ -77,74 +77,72 @@ $(function() {
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;<a class="code" href="language_2_error_8h.html">language/error.h</a>&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1compiler.html">trc::compiler</a> {</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">    9</a></span><span class="keyword">typedef</span> std::vector&lt;token*&gt; <a class="code hl_typedef" href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">code_type</a>;</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classtrc_1_1compiler_1_1grammar__lex.html">   14</a></span><span class="keyword">class </span><a class="code hl_class" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a> {</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#ae66bbfa71c66a0c7c6685342855e869a">get_node</a>(<span class="keywordtype">bool</span> end_with_oper = <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#a52099422ae87c8c43389b1c5ef489621">grammar_lex</a>(</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="keyword">const</span> std::string&amp; codes_str, <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a>&amp; compiler_data);</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classtrc_1_1compiler_1_1grammar__lex.html">   12</a></span><span class="keyword">class </span><a class="code hl_class" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#ae66bbfa71c66a0c7c6685342855e869a">get_node</a>(<span class="keywordtype">bool</span> end_with_oper = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#a52099422ae87c8c43389b1c5ef489621">grammar_lex</a>(</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        <span class="keyword">const</span> std::string&amp; codes_str, <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a>&amp; compiler_data);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classtrc_1_1compiler_1_1grammar__lex.html#aa02d396250d8945eb719f9c6b61abffb">   28</a></span>    <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#aa02d396250d8945eb719f9c6b61abffb">~grammar_lex</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classtrc_1_1compiler_1_1grammar__lex.html#aa02d396250d8945eb719f9c6b61abffb">   30</a></span>    <a class="code hl_function" href="classtrc_1_1compiler_1_1grammar__lex.html#aa02d396250d8945eb719f9c6b61abffb">~grammar_lex</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* check_excepted(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> <a class="code hl_variable" href="namespacetrc_1_1compiler.html#aef3ef9bea630fd4fe1ccb47a692351d4">tick</a>);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> get_next_token_tick();</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keywordtype">void</span> ConvertDataToExpressions(<a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* raw_lex,</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keyword">decltype</span>(<a class="code hl_variable" href="classtrc_1_1compiler_1_1is__not__end__node.html#aad783de31608cf8d655149b7337d97f0">is_not_end_node::son</a>)&amp; st, std::stack&lt;token_ticks&gt;&amp; oper_tmp,</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keywordtype">int</span>&amp; correct_braces);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* change_to_last_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* first_data_node);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* assign(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">trc::compiler::token_ticks</a> oper, <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* left_value);</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* clear_enter();</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* callfunction(<a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* funcname);</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* sentence_tree(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> sentence_name);</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* while_if_tree(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">grammar_type</a> compile_type);</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* func_define();</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">void</span> read_block(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* root);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">void</span> optimize_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* expr);</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; T pop_oper_stack(std::stack&lt;T&gt;&amp; s);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordtype">void</span> check_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* root);</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="comment">// 编译期间要用到的数据</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">trc::compiler::compiler_public_data</a>&amp; compiler_data;</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    <span class="comment">// 数据环境</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1grammar__data__control.html">trc::compiler::grammar_data_control</a> env;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <span class="comment">// token解析器</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token__lex.html">trc::compiler::token_lex</a> token_;</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <span class="comment">// 特殊的临时终结符，临时将某token_ticks提升到和\n一样的权限,记得撤销！</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> special_tick_for_end = <a class="code hl_enumvalue" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3">token_ticks::UNKNOWN</a>;</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>};</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; T grammar_lex::pop_oper_stack(std::stack&lt;T&gt;&amp; s) {</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="keywordflow">if</span> (s.empty()) {</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        compiler_data.<a class="code hl_variable" href="structtrc_1_1compiler_1_1compiler__public__data.html#a3fb9323851636373aec8c937d1c2cca4">error</a>.<a class="code hl_function" href="classtrc_1_1error_1_1error__module.html#a54f0ef9d1fbc29868d80c5b028c237ed">send_error_module</a>(</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>            <a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0">error::SyntaxError</a>, <a class="code hl_variable" href="namespacelanguage_1_1error.html#ac2ab4d2550db16fcf5c06277a2d86ad7">language::error::syntaxerror</a>);</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    }</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    T a = s.top();</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    s.pop();</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>}</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>}</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* check_excepted(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> <a class="code hl_variable" href="namespacetrc_1_1compiler.html#aef3ef9bea630fd4fe1ccb47a692351d4">tick</a>);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> get_next_token_tick();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">void</span> ConvertDataToExpressions(<a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* raw_lex,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keyword">decltype</span>(<a class="code hl_variable" href="classtrc_1_1compiler_1_1is__not__end__node.html#aad783de31608cf8d655149b7337d97f0">is_not_end_node::son</a>)&amp; st, std::stack&lt;token_ticks&gt;&amp; oper_tmp,</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="keywordtype">int</span>&amp; correct_braces);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* change_to_last_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* first_data_node);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* assign(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">trc::compiler::token_ticks</a> oper, <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* left_value);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* clear_enter();</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* callfunction(<a class="code hl_class" href="classtrc_1_1compiler_1_1token.html">token</a>* funcname);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* sentence_tree(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> sentence_name);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* while_if_tree(<a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">grammar_type</a> compile_type);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1treenode.html">treenode</a>* func_define();</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keywordtype">void</span> read_block(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* root);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordtype">void</span> optimize_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* expr);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; T pop_oper_stack(std::stack&lt;T&gt;&amp; s);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <span class="keywordtype">void</span> check_expr(<a class="code hl_class" href="classtrc_1_1compiler_1_1is__not__end__node.html">is_not_end_node</a>* root);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="comment">// 编译期间要用到的数据</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_struct" href="structtrc_1_1compiler_1_1compiler__public__data.html">trc::compiler::compiler_public_data</a>&amp; compiler_data;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="comment">// 数据环境</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1grammar__data__control.html">trc::compiler::grammar_data_control</a> env;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <span class="comment">// token解析器</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <a class="code hl_class" href="classtrc_1_1compiler_1_1token__lex.html">trc::compiler::token_lex</a> token_;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="comment">// 特殊的临时终结符，临时将某token_ticks提升到和\n一样的权限,记得撤销！</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <a class="code hl_enumeration" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> special_tick_for_end = <a class="code hl_enumvalue" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3">token_ticks::UNKNOWN</a>;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>};</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; T grammar_lex::pop_oper_stack(std::stack&lt;T&gt;&amp; s) {</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordflow">if</span> (s.empty()) {</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        compiler_data.<a class="code hl_variable" href="structtrc_1_1compiler_1_1compiler__public__data.html#a3fb9323851636373aec8c937d1c2cca4">error</a>.<a class="code hl_function" href="classtrc_1_1error_1_1error__module.html#a54f0ef9d1fbc29868d80c5b028c237ed">send_error_module</a>(</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>            <a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0">error::SyntaxError</a>, <a class="code hl_variable" href="namespacelanguage_1_1error.html#ac2ab4d2550db16fcf5c06277a2d86ad7">language::error::syntaxerror</a>);</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    }</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    T a = s.top();</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    s.pop();</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>}</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>}</div>
 <div class="ttc" id="a_compiler_8h_html"><div class="ttname"><a href="_compiler_8h.html">Compiler.h</a></div><div class="ttdoc">编译器开放的接口</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__data__control_html"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__data__control.html">trc::compiler::grammar_data_control</a></div><div class="ttdoc">关于对象的代码转换为节点以及对象信息保存和识别</div><div class="ttdef"><b>Definition:</b> grammar_env.h:12</div></div>
-<div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__lex_html"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__lex.html">trc::compiler::grammar_lex</a></div><div class="ttdoc">生成语法树的解析器</div><div class="ttdef"><b>Definition:</b> grammar.h:14</div></div>
+<div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__lex_html"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__lex.html">trc::compiler::grammar_lex</a></div><div class="ttdoc">生成语法树的解析器</div><div class="ttdef"><b>Definition:</b> grammar.h:12</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__lex_html_a52099422ae87c8c43389b1c5ef489621"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__lex.html#a52099422ae87c8c43389b1c5ef489621">trc::compiler::grammar_lex::grammar_lex</a></div><div class="ttdeci">grammar_lex(const std::string &amp;codes_str, compiler_public_data &amp;compiler_data)</div><div class="ttdef"><b>Definition:</b> grammar.cpp:263</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__lex_html_aa02d396250d8945eb719f9c6b61abffb"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__lex.html#aa02d396250d8945eb719f9c6b61abffb">trc::compiler::grammar_lex::~grammar_lex</a></div><div class="ttdeci">~grammar_lex()=default</div></div>
 <div class="ttc" id="aclasstrc_1_1compiler_1_1grammar__lex_html_ae66bbfa71c66a0c7c6685342855e869a"><div class="ttname"><a href="classtrc_1_1compiler_1_1grammar__lex.html#ae66bbfa71c66a0c7c6685342855e869a">trc::compiler::grammar_lex::get_node</a></div><div class="ttdeci">treenode * get_node(bool end_with_oper=false)</div><div class="ttdoc">解析一段完整的代码成为语法树</div><div class="ttdef"><b>Definition:</b> grammar.cpp:182</div></div>
@@ -161,7 +159,6 @@ $(function() {
 <div class="ttc" id="anamespacetrc_1_1compiler_html_a0845b90df8765369e37eadfd4b4ff452"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">trc::compiler::token_ticks</a></div><div class="ttdeci">token_ticks</div><div class="ttdef"><b>Definition:</b> pri_compiler.hpp:21</div></div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html_a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a696b031073e74bf2cb98e5ef201d4aa3">trc::compiler::token_ticks::UNKNOWN</a></div><div class="ttdeci">@ UNKNOWN</div></div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html_a4bcc8ae504de95341ebb688e6fcf56ef"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">trc::compiler::grammar_type</a></div><div class="ttdeci">grammar_type</div><div class="ttdef"><b>Definition:</b> pri_compiler.hpp:109</div></div>
-<div class="ttc" id="anamespacetrc_1_1compiler_html_aafd1809b0dea42c95d2419ef2cd0e832"><div class="ttname"><a href="namespacetrc_1_1compiler.html#aafd1809b0dea42c95d2419ef2cd0e832">trc::compiler::code_type</a></div><div class="ttdeci">std::vector&lt; token * &gt; code_type</div><div class="ttdef"><b>Definition:</b> grammar.h:9</div></div>
 <div class="ttc" id="anamespacetrc_1_1compiler_html_aef3ef9bea630fd4fe1ccb47a692351d4"><div class="ttname"><a href="namespacetrc_1_1compiler.html#aef3ef9bea630fd4fe1ccb47a692351d4">trc::compiler::tick</a></div><div class="ttdeci">token_ticks tick</div><div class="ttdef"><b>Definition:</b> token.cpp:169</div></div>
 <div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1a691088c7039c3a04617c75fefb388ad0">trc::error::SyntaxError</a></div><div class="ttdeci">@ SyntaxError</div><div class="ttdef"><b>Definition:</b> Error.h:34</div></div>
 <div class="ttc" id="astructtrc_1_1compiler_1_1compiler__public__data_html"><div class="ttname"><a href="structtrc_1_1compiler_1_1compiler__public__data.html">trc::compiler::compiler_public_data</a></div><div class="ttdoc">储存编译期间要用到的公共数据和成员</div><div class="ttdef"><b>Definition:</b> compiler_def.h:20</div></div>

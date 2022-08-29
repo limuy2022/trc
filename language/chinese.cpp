@@ -2,10 +2,10 @@
  * 中文，作为dll插件提供不同语言
  */
 
-#include <language/language.h>
-#include <language/error.h>
 #include <clocale>
 #include <cstdio>
+#include <language/error.h>
+#include <language/language.h>
 
 namespace language {
 namespace error {
@@ -77,10 +77,10 @@ namespace tdb {
 }
 
 void locale_init() {
-    if(setlocale(LC_ALL, "zh_CN.UTF-8") == nullptr) {
+    if (setlocale(LC_ALL, "zh_CN.UTF-8") == nullptr) {
         fprintf(stderr,
-                    "Can't load Chinese language.Because there isn't Chinese package "
-                    "installed on your computer\n");
+            "Can't load Chinese language.Because there isn't Chinese package "
+            "installed on your computer\n");
     }
 }
 }

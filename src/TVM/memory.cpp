@@ -1,7 +1,6 @@
 ﻿#include <TVM/TRE.h>
 #include <TVM/TVM.h>
 #include <TVM/memory.h>
-#include <base/memory/memory.hpp>
 #include <map>
 
 namespace trc::TVM_space {

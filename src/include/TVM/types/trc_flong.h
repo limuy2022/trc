@@ -16,15 +16,15 @@ public:
 
     trc_flong();
 
-    ~trc_flong();
+    ~trc_flong() override;
 
-    void putline(FILE* out);
+    void putline(FILE* out) override;
 
-    RUN_TYPE_TICK gettype();
+    RUN_TYPE_TICK gettype() override;
 
-    def::INTOBJ operator==(def::OBJ value_i);
+    def::INTOBJ operator==(def::OBJ value_i) override;
 
-    def::INTOBJ operator!=(def::OBJ value_i);
+    def::INTOBJ operator!=(def::OBJ value_i) override;
 
 private:
     void set_realloc(size_t num);

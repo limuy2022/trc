@@ -13,7 +13,6 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <easyloggingpp/easylogging++.h>
 #include <string>
 
 namespace trc::TVM_space::types {
@@ -78,8 +77,7 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    LOG(FATAL) << "big num can't cal the used size.used:" << used
-               << "\nsize:" << size;
+    NOREACH("big num can't cal the used size.used:%zu\nsize:%zu", used, size);
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {

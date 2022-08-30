@@ -5,7 +5,6 @@
 #include <base/Error.h>
 #include <base/func_loader.h>
 #include <base/utils/data.hpp>
-#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <stack>
 #include <string>
@@ -160,8 +159,7 @@ treenode* make_data_node(token* data_token) {
         return new node_base_data_without_sons(
             grammar_type::LONG_FLOAT, data_token);
     } else {
-        // 不可能执行到别的代码，执行到就是出bug了
-        LOG(FATAL) << "Unexpected data token type " << (int)tmp;
+        NOREACH("Unexpected data token type %d", (int)tmp);
     }
 }
 
@@ -248,8 +246,7 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
                 return func_define();
             }
             default: {
-                LOG(FATAL) << "Unexpected grammar block token "
-                           << (int)(block_type);
+                NOREACH("Unexpected grammar block token %d", (int)(block_type));
                 return nullptr;
             }
             }

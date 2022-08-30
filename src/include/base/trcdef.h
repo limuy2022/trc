@@ -6,14 +6,28 @@
 #pragma once
 
 #include <array>
-
 #include <cstdio>
 #include <string>
 #include <vector>
 
 typedef std::vector<std::string> vecs;
 
+/**
+ * @param str 报错的辅助输出信息
+ */
+#define NOREACH(str, ...)                                                      \
+    do {                                                                       \
+        printf(str "\n", __VA_ARGS__);                                         \
+        trc::noreach_internal(__LINE__, __FUNCTION__, __FILE__);               \
+    } while (0)
+
 namespace trc {
+/**
+ * @brief
+ * 在不能被执行到的地方放上这条语句，出现问题会强行停止程序
+ */
+void noreach_internal(size_t line, const char* funcname, const char* filename);
+
 namespace TVM_space::types {
     class trc_long;
 

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['purple_0',['PURPLE',['../color_8h.html#a0bb0b009e7a7390473ace4d98bd843c0',1,'color.h']]]
+  ['opererror_5fmsg_0',['OPERERROR_MSG',['../base_2_error_8h.html#a8f30fd859d96de41a948e0867b4f36a7',1,'Error.h']]]
 ];

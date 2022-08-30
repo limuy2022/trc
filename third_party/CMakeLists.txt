@@ -1,3 +1,1 @@
-add_subdirectory(easyloggingpp)
 add_subdirectory(gflags)
-target_compile_definitions(easyloggingpp PRIVATE ELPP_NO_DEFAULT_LOG_FILE)

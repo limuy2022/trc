@@ -32,4 +32,4 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	target_link_libraries(Trc dl)
 endif()
 
-target_link_libraries(Trc language gflags::gflags easyloggingpp)
+target_link_libraries(Trc language gflags::gflags)

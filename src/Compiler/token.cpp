@@ -4,7 +4,6 @@
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_long.h>
 #include <base/Error.h>
-#include <easyloggingpp/easylogging++.h>
 #include <language/error.h>
 #include <string>
 #include <vector>
@@ -150,7 +149,7 @@ token* token_lex::lex_int_float() {
         break;
     }
     default: {
-        LOG(FATAL) << "Another token tick " << (int)tick_for_res;
+        NOREACH("Another token tick %d", tick_for_res);
     }
     }
     result->tick = tick_for_res;

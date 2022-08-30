@@ -8,7 +8,6 @@
 #include <TVM/TVMdef.h>
 #include <base/code_loader.h>
 #include <base/utils/data.hpp>
-#include <easyloggingpp/easylogging++.h>
 #include <string>
 #include <vector>
 
@@ -212,7 +211,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             break;
         }
         default: {
-            LOG(FATAL) << "Unexpeceted grammar treee node type " << (int)type;
+            NOREACH("Unexpeceted grammar treee node type %d", (int)type);
         }
         }
     } else {
@@ -274,8 +273,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             break;
         }
         default: {
-            LOG(FATAL) << "Unexpeceted grammar treee node type %d."
-                       << (int)type;
+            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
         }
         }
     }

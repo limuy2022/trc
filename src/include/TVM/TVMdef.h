@@ -12,6 +12,19 @@ class TVM;
 
 class TVM_bytecode;
 
+/**
+ * @brief 符号表，保存变量信息
+ * 就是凭借这个结构优化变量访问速度为O(1)
+ */
+class symbol_form {
+public:
+    def::OBJ* vars = nullptr;
+    void reset(size_t size);
+    symbol_form(size_t size);
+    symbol_form() = default;
+    ~symbol_form();
+};
+
 // 字节码的类型
 typedef def::byte_t bytecode_t;
 // 字节码索引的类型

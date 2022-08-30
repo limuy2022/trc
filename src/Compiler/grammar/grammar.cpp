@@ -11,11 +11,9 @@
 #include <string>
 
 namespace trc::compiler {
-treenode* grammar_lex::assign(
-    trc::compiler::token_ticks oper, treenode* left_value) {
+treenode* grammar_lex::assign(grammar_type oper, treenode* left_value) {
     // 申请新的树节点
-    auto ass
-        = new trc::compiler::node_base_tick(grammar_type::VAR_DEFINE, oper);
+    auto ass = new trc::compiler::is_not_end_node(oper);
     // 保存变量名
     ass->connect(left_value);
     // 存放等号右边的值
@@ -221,9 +219,14 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
                 now_node = callfunction(now);
             }
             delete now;
-        } else if (is_as_token(now->tick)) {
-            /*赋值语句*/
-            treenode* res = assign(now->tick, now_node);
+        } else if (now->tick == token_ticks::STORE) {
+            // 定义语句
+            treenode* res = assign(grammar_type::VAR_DEFINE, now_node);
+            delete now;
+            return res;
+        } else if (now->tick == token_ticks::ASSIGN) {
+            // 赋值语句
+            treenode* res = assign(grammar_type::VAR_ASSIGN, now_node);
             delete now;
             return res;
         } else if (is_sentence_token(now->tick)) {

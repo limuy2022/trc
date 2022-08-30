@@ -57,7 +57,8 @@ namespace tools_in {
         }
         // 输出函数
         puts("\nfunctions:");
-        for (size_t i = 0; i < static_data.static_data.funcs_num; ++i) {
+        n = static_data.static_data.funcs.size();
+        for (size_t i = 0; i < n; ++i) {
             printf("    %zu:%s\n", i, static_data.static_data.funcs[i].name);
         }
         putchar('\n');

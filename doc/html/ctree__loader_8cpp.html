@@ -153,7 +153,7 @@ Functions</h2></td></tr>
 <div class="line">        <span class="comment">/* 符号表 */</span>                                                        \</div>
 <div class="line">        str##_var_form((file), (vm)-&gt;static_data.global_symbol_table_size);    \</div>
 <div class="line">        <span class="comment">/* 字节码常量池 */</span>                                               \</div>
-<div class="line">        str##_bytecode((file), (vm)-&gt;static_data);                             \</div>
+<div class="line">        str##_global_bytecode((file), (vm)-&gt;static_data);                      \</div>
 <div class="line">        <span class="comment">/* 函数字节码常量池 */</span>                                         \</div>
 <div class="line">        str##_functions((file), (vm)-&gt;static_data.funcs);                      \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>

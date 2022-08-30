@@ -15,21 +15,14 @@ void TVM::STORE_NAME(bytecode_index_t index) {
 }
 
 void TVM::STORE_LOCAL(bytecode_index_t name) {
-    // frame_* fast = dyna_data.frames.top();
-    // firstv = pop();
-    // fast->dyna_data.var_names[static_data.const_name[name]] = firstv;
+    dyna_data.frames_top_str->localvars.vars[name] = pop();
 }
 
 void TVM::LOAD_LOCAL(bytecode_index_t name) {
-    // const std::string& s_name = static_data.const_name[name];
-    // NAMEERROR(s_name.c_str());
-    // push(dyna_data.frames.top()->dyna_data.var_names[s_name]);
+    push(dyna_data.frames_top_str->localvars.vars[name]);
 }
 
 void TVM::CHANGE_LOCAL(bytecode_index_t index) {
-    // const std::string& name_v = static_data.const_name[index];
-    // NAMEERROR(name_v.c_str());
-    // firstv = pop();
-    // dyna_data.frames.top()->dyna_data.var_names[name_v] = firstv;
+    dyna_data.frames_top_str->localvars.vars[index] = pop();
 }
 }

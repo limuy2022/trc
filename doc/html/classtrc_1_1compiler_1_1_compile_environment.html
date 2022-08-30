@@ -90,9 +90,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a61cdd3b91159bea995578bf2ccb26f9b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a61cdd3b91159bea995578bf2ccb26f9b">add_var</a> (char *name)</td></tr>
 <tr class="memdesc:a61cdd3b91159bea995578bf2ccb26f9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">将变量添加进符号表，存在该符号则报出重定义错误  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a61cdd3b91159bea995578bf2ccb26f9b">More...</a><br /></td></tr>
 <tr class="separator:a61cdd3b91159bea995578bf2ccb26f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e53529baddf4164cbb3dc19899b8ccf"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a6e53529baddf4164cbb3dc19899b8ccf">get_index_of_var</a> (char *name)</td></tr>
-<tr class="memdesc:a6e53529baddf4164cbb3dc19899b8ccf"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在符号表中的位置，有该符号则报错  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a6e53529baddf4164cbb3dc19899b8ccf">More...</a><br /></td></tr>
-<tr class="separator:a6e53529baddf4164cbb3dc19899b8ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa349061f65800be5124d6bfb3bee8d1e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#aa349061f65800be5124d6bfb3bee8d1e">get_index_of_var</a> (char *name, bool report_error)</td></tr>
+<tr class="memdesc:aa349061f65800be5124d6bfb3bee8d1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个变量在符号表中的位置，有该符号则报错  <a href="classtrc_1_1compiler_1_1_compile_environment.html#aa349061f65800be5124d6bfb3bee8d1e">More...</a><br /></td></tr>
+<tr class="separator:aa349061f65800be5124d6bfb3bee8d1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a27ac4b7050cccd8c9300e0a40abb7a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html#a7a27ac4b7050cccd8c9300e0a40abb7a">get_index_of_function</a> (const char *name)</td></tr>
 <tr class="memdesc:a7a27ac4b7050cccd8c9300e0a40abb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取某个函数在符号表中的位置  <a href="classtrc_1_1compiler_1_1_compile_environment.html#a7a27ac4b7050cccd8c9300e0a40abb7a">More...</a><br /></td></tr>
 <tr class="separator:a7a27ac4b7050cccd8c9300e0a40abb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,8 +220,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a6e53529baddf4164cbb3dc19899b8ccf" name="a6e53529baddf4164cbb3dc19899b8ccf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e53529baddf4164cbb3dc19899b8ccf">&#9670;&nbsp;</a></span>get_index_of_var()</h2>
+<a id="aa349061f65800be5124d6bfb3bee8d1e" name="aa349061f65800be5124d6bfb3bee8d1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa349061f65800be5124d6bfb3bee8d1e">&#9670;&nbsp;</a></span>get_index_of_var()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -230,8 +230,18 @@ Public Member Functions</h2></td></tr>
           <td class="memname">size_t trc::compiler::CompileEnvironment::get_index_of_var </td>
           <td>(</td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>report_error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -240,6 +250,7 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>变量名 </td></tr>
+    <tr><td class="paramname">report_error</td><td>查找不到是否直接报错 </td></tr>
   </table>
   </dd>
 </dl>

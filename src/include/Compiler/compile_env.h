@@ -38,8 +38,9 @@ public:
     /**
      * @brief 获取某个变量在符号表中的位置，有该符号则报错
      * @param name 变量名
+     * @param report_error 查找不到是否直接报错
      */
-    size_t get_index_of_var(char* name);
+    size_t get_index_of_var(char* name, bool report_error);
 
     /**
      * @brief 获取某个函数在符号表中的位置

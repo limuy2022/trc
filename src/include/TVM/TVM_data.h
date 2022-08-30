@@ -24,19 +24,6 @@ public:
 };
 
 /**
- * @brief 符号表，保存变量信息
- * 就是凭借这个结构优化变量访问速度为O(1)
- */
-class symbol_form {
-public:
-    def::OBJ* vars = nullptr;
-    void reset(size_t size);
-    symbol_form(size_t size);
-    symbol_form() = default;
-    ~symbol_form();
-};
-
-/**
  * @brief 静态数据
  * 本类用于分离TVM的职责，装载编译时的数据，如常量池等
  * 并且降低TVM和Compiler之间的耦合度
@@ -48,9 +35,7 @@ public:
     std::vector<const char*> const_s, const_long;
     std::vector<double> const_f;
     // 注意：此处装载func的静态信息，并不是保存执行信息的场所
-    func_* funcs;
-    // 储存有多少个函数
-    size_t funcs_num;
+    std::vector<func_> funcs;
     // 字节码
     struct_codes byte_codes;
     // 类信息

@@ -115,9 +115,9 @@ enum class grammar_type {
     TREE,
     // 带有参数的字节码,分两种情况，参数为子节点或者参数为节点自带的数据
     OPCODE_ARGV,
-    // 函数定义，由于字节码十分特殊
+    // 函数定义
     FUNC_DEFINE,
-    // 变量定义，由于变量作用域特殊
+    // 变量定义
     VAR_DEFINE,
     // 调用自定义函数
     CALL_FUNC,
@@ -138,7 +138,9 @@ enum class grammar_type {
     // if语句块
     IF_BLOCK,
     // while语句块
-    WHILE_BLOCK
+    WHILE_BLOCK,
+    // 变量赋值
+    VAR_ASSIGN
 };
 
 /**

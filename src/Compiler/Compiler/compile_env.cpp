@@ -46,12 +46,17 @@ void CompileEnvironment::add_function(const char* name) {
     functions.push_back(name);
 }
 
-size_t CompileEnvironment::get_index_of_var(char* name) {
+size_t CompileEnvironment::get_index_of_var(char* name, bool report_error) {
     size_t n = var_names_list.size();
     for (size_t i = 0; i < n; ++i) {
         if (!strcmp(var_names_list[i], name)) {
             return i;
         }
+    }
+    if (report_error) {
+        // 并不在当前符号表,报错
+        compiler_data.error.send_error_module(
+            error::NameError, language::error::nameerror, name);
     }
     // -1转换到无符号整型中是最大值，代表不存在
     return size_tmax;

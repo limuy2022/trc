@@ -4,7 +4,7 @@ var searchData=
   ['get_5fbyte_5forder_1',['get_byte_order',['../namespacetrc_1_1utils.html#a60e0b7d72054ff094840174a0d5d9fd0',1,'trc::utils']]],
   ['get_5fcharptr_2',['get_charptr',['../classtrc_1_1compiler_1_1token__lex.html#aad906ea58b6d94efd8b482fb59c1b214',1,'trc::compiler::token_lex']]],
   ['get_5findex_5fof_5ffunction_3',['get_index_of_function',['../classtrc_1_1compiler_1_1_compile_environment.html#a7a27ac4b7050cccd8c9300e0a40abb7a',1,'trc::compiler::CompileEnvironment']]],
-  ['get_5findex_5fof_5fvar_4',['get_index_of_var',['../classtrc_1_1compiler_1_1_compile_environment.html#a6e53529baddf4164cbb3dc19899b8ccf',1,'trc::compiler::CompileEnvironment']]],
+  ['get_5findex_5fof_5fvar_4',['get_index_of_var',['../classtrc_1_1compiler_1_1_compile_environment.html#aa349061f65800be5124d6bfb3bee8d1e',1,'trc::compiler::CompileEnvironment']]],
   ['get_5fname_5fsize_5',['get_name_size',['../classtrc_1_1compiler_1_1_compile_environment.html#a042d933ba8708c3f5926ab9c8290a7aa',1,'trc::compiler::CompileEnvironment']]],
   ['get_5fnode_6',['get_node',['../classtrc_1_1compiler_1_1grammar__lex.html#ae66bbfa71c66a0c7c6685342855e869a',1,'trc::compiler::grammar_lex']]],
   ['get_5ftoken_7',['get_token',['../classtrc_1_1compiler_1_1token__lex.html#a0283bc2322315d224156191338a55da5',1,'trc::compiler::token_lex']]],

@@ -9,7 +9,6 @@ var searchData=
   ['func_5fnum_6',['func_num',['../namespacetrc_1_1loader.html#a34c7243299beabfd4b07525524ae558e',1,'trc::loader']]],
   ['funcname_7',['funcname',['../classtrc_1_1_t_v_m__space_1_1frame__.html#a3f3c12400f17ba1dbfa5d91982d6c7c7',1,'trc::TVM_space::frame_']]],
   ['funcredefinederror_8',['funcredefinederror',['../namespacelanguage_1_1error.html#a103e92a1395e95ff4fd84eedd2b9a562',1,'language::error']]],
-  ['funcs_9',['funcs',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#a815d87c2727a016cf80430605fd136b7',1,'trc::TVM_space::cpp_libs::cpp_lib::funcs()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#ad3d37f7ac3d700e8e476aeefdad7a0ec',1,'trc::TVM_space::TVM_static_data::funcs()']]],
-  ['funcs_5fnum_10',['funcs_num',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#ad25b6d2e47a2dd89dc42f80329765413',1,'trc::TVM_space::TVM_static_data']]],
-  ['funcs_5fnums_11',['funcs_nums',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#ad7fec72e1b1eec1b357d555e18567cc7',1,'trc::TVM_space::cpp_libs::cpp_lib']]]
+  ['funcs_9',['funcs',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#a815d87c2727a016cf80430605fd136b7',1,'trc::TVM_space::cpp_libs::cpp_lib::funcs()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a315f35e8425ff3532ffcecd4825fa77b',1,'trc::TVM_space::TVM_static_data::funcs()']]],
+  ['funcs_5fnums_10',['funcs_nums',['../classtrc_1_1_t_v_m__space_1_1cpp__libs_1_1cpp__lib.html#ad7fec72e1b1eec1b357d555e18567cc7',1,'trc::TVM_space::cpp_libs::cpp_lib']]]
 ];

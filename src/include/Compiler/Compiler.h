@@ -77,19 +77,19 @@ private:
      * @param data 符号
      * @param index 索引
      */
-    static TVM_space::bytecode_t build_opcode(token_ticks symbol);
+    static byteCodeNumber build_opcode(token_ticks symbol);
 
     /**
      * @brief 构建有关变量的字节码
-     * @param data 符号
-     * @param index 索引
+     * @param bycode 指定字节码，是定义还是赋值
      */
-    static TVM_space::bytecode_t build_var(token_ticks data);
+    void add_var(byteCodeNumber bycode, is_not_end_node* root,
+        CompileEnvironment& localinfo, size_t index);
 
     /**
      * @brief 添加字节码，并完善对应环境
      */
-    void add_opcode(TVM_space::bytecode_t, TVM_space::bytecode_index_t index);
+    void add_opcode(byteCodeNumber, TVM_space::bytecode_index_t index);
 
     /**
      * @brief 添加带有语句块的特殊代码
@@ -144,7 +144,7 @@ void detail_compiler::add_block(
     iter++;
     // 单独处理跳转语句，否则无法处理常量表
     // 0只是用来占位的
-    add_opcode((bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 0);
+    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0);
     // 获取跳转表达式的字节码位置
     size_t fix_bytecode = vm->byte_codes.size() - 1;
     // 然后编译其它所有的节点
@@ -153,7 +153,7 @@ void detail_compiler::add_block(
     }
     if constexpr (compiletype) {
         // while循环比if多一句goto
-        add_opcode((bytecode_t)byteCodeNumber::GOTO_, goto_addr);
+        add_opcode(byteCodeNumber::GOTO_, goto_addr);
     }
     // 然后重新修改跳转地址
     vm->byte_codes[fix_bytecode].index = vm->byte_codes.size();

@@ -36,7 +36,7 @@ static uint16_t MAGIC_VALUE = 0xACFD;
         /* 符号表 */                                                        \
         str##_var_form((file), (vm)->static_data.global_symbol_table_size);    \
         /* 字节码常量池 */                                               \
-        str##_bytecode((file), (vm)->static_data);                             \
+        str##_global_bytecode((file), (vm)->static_data);                      \
         /* 函数字节码常量池 */                                         \
         str##_functions((file), (vm)->static_data.funcs);                      \
     } while (0)
@@ -177,15 +177,47 @@ static void write_var_form(FILE* file, size_t table_size) {
 }
 
 /**
- * @brief 向文件写入字节码和行号表
+ * @brief 读取行号表
+ */
+static void load_bytecodes(FILE* file, TVM_space::struct_codes& bycodes) {
+
+    // 字节码条数
+    uint32_t size;
+    fread_cross_plat(&size, sizeof(size), 1, file);
+    // 读取具体字节码
+    TVM_space::bytecode_t name;
+    TVM_space::bytecode_index_t argv;
+    bycodes.reserve(size);
+    for (uint32_t i = 0; i < size; ++i) {
+        fread_cross_plat(&name, sizeof(name), 1, file);
+        fread_cross_plat(&argv, sizeof(argv), 1, file);
+        bycodes.emplace_back(name, argv);
+    }
+}
+
+/**
+ * @brief 写入行号表
+ */
+static void write_bytecodes(
+    FILE* file, const TVM_space::struct_codes& bycodes) {
+
+    // 字节码条数
+    auto size = (uint32_t)bycodes.size();
+    fwrite_cross_plat(&size, sizeof(size), 1, file);
+    // 具体字节码
+    for (const auto& i : bycodes) {
+        fwrite_cross_plat(&i.bycode, sizeof(i.bycode), 1, file);
+        fwrite_cross_plat(&i.index, sizeof(i.index), 1, file);
+    }
+}
+
+/**
+ * @brief 向文件写入全局字节码和行号表
  * @param file 文件
  * @param static_data 静态数据
  */
-static void write_bytecode(
+static void write_global_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
-    // 字节码条数
-    auto size = (uint32_t)static_data.byte_codes.size();
-    fwrite_cross_plat(&size, sizeof(size), 1, file);
     // 写入行号表
     size_t line_numeber_size = static_data.line_number_table.size();
     fwrite_cross_plat(&line_numeber_size, sizeof(line_numeber_size), 1, file);
@@ -194,79 +226,61 @@ static void write_bytecode(
             sizeof(decltype(static_data.line_number_table)::value_type), 1,
             file);
     }
-    // 具体字节码
-    for (const auto& i : static_data.byte_codes) {
-        fwrite_cross_plat(&i.bycode, sizeof(i.bycode), 1, file);
-        fwrite_cross_plat(&i.index, sizeof(i.index), 1, file);
-    }
+    write_bytecodes(file, static_data.byte_codes);
 }
 
 /**
- * @brief 从文件读取字节码和行号表
+ * @brief 从文件读取全局字节码和行号表
  * @param file 文件
  * @param static_data 静态数据存放变量
  */
-static void load_bytecode(
+static void load_global_bytecode(
     FILE* file, trc::TVM_space::TVM_static_data& static_data) {
-    // 字节码条数
-    uint32_t size;
-    fread_cross_plat(&size, sizeof(size), 1, file);
     // 读取长度判断是否有行号表
     size_t line_number_size;
     fread_cross_plat(&line_number_size, sizeof(line_number_size), 1, file);
-    if (size) {
-        static_data.line_number_table.reserve(line_number_size);
-        decltype(static_data.line_number_table)::value_type tmp;
-        for (size_t i = 0; i < line_number_size; ++i) {
-            fread_cross_plat(&tmp,
-                sizeof(decltype(static_data.line_number_table)::value_type), 1,
-                file);
-            static_data.line_number_table.push_back(tmp);
-        }
+    static_data.line_number_table.reserve(line_number_size);
+    decltype(static_data.line_number_table)::value_type tmp;
+    for (size_t i = 0; i < line_number_size; ++i) {
+        fread_cross_plat(&tmp,
+            sizeof(decltype(static_data.line_number_table)::value_type), 1,
+            file);
+        static_data.line_number_table.push_back(tmp);
     }
-    // 读取具体字节码
-    trc::TVM_space::bytecode_t name;
-    trc::TVM_space::bytecode_index_t argv;
-    static_data.byte_codes.reserve(size);
-    for (uint32_t i = 0; i < size; ++i) {
-        fread_cross_plat(&name, sizeof(name), 1, file);
-        fread_cross_plat(&argv, sizeof(argv), 1, file);
-        static_data.byte_codes.emplace_back(name, argv);
-    }
+    load_bytecodes(file, static_data.byte_codes);
 }
 
 /**
  * 函数写入字节码文件规定
  * 首先写入函数名长度，再写入函数名
- * 接着写入起始地址和终止地址
+ * 接着写入字节码长度，再写入字节码
  */
 
 /**
  * @brief 从文件中读取函数
  * @param file 文件
  */
-static void load_functions(FILE* file, trc::TVM_space::func_*& const_funcl) {
-    // int len;
-    // trc::TVM_space::func_ *tmp;
-    // fread(&len, sizeof(len), 1, file);
-    // for (int i = 0; i < len; ++i) {
-    //     char*t = load_string_one(file);
-    //     tmp = new trc::TVM_space::func_{t};
-    //     const_funcl[t] = tmp;
-    //     load_bytecode(file, tmp->bytecode);
-    // }
+static void load_functions(
+    FILE* file, std::vector<trc::TVM_space::func_>& const_funcl) {
+    uint32_t len;
+    fread(&len, sizeof(len), 1, file);
+    const_funcl.reserve(len);
+    for (uint32_t i = 0; i < len; ++i) {
+        load_bytecodes(
+            file, const_funcl.emplace_back(load_string_one(file)).bytecodes);
+    }
 }
 
 /**
  * @brief 写入函数
  * @param file 文件
  */
-static void write_functions(FILE* file, trc::TVM_space::func_* const_funcl) {
-    // for (const auto &i: const_funcl) {
-    //     write_string_one(file, i.first);
-    //     write_bytecode(file,
-    //     i.second->bytecodes);
-    // }
+static void write_functions(
+    FILE* file, const std::vector<trc::TVM_space::func_>& const_funcl) {
+    for (const auto& i : const_funcl) {
+        write_string_one(file, i.name);
+        write_bytecodes(file, i.bytecodes);
+    }
 }
 
 static int getbigversion(const char* version) {

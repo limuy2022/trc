@@ -10,5 +10,6 @@ var searchData=
   ['free_5fmodule_7',['free_module',['../namespacetrc_1_1_t_v_m__space.html#a1b34ab9d30dfa0cd0b1a5b371f7dc4b1',1,'trc::TVM_space']]],
   ['free_5fstl_8',['free_stl',['../namespacetrc_1_1memory.html#a4b1cf91dd790e263bac9ffbbd594a70a',1,'trc::memory']]],
   ['free_5ftree_9',['free_tree',['../namespacetrc_1_1compiler.html#af8e2fabe582e3d503faa2f476a5204d5',1,'trc::compiler']]],
-  ['free_5ftvm_10',['free_TVM',['../namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0',1,'trc::TVM_space']]]
+  ['free_5ftvm_10',['free_TVM',['../namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0',1,'trc::TVM_space']]],
+  ['func_5f_11',['func_',['../classtrc_1_1_t_v_m__space_1_1func__.html#ab6531b983f3b63ceb67fc86a5a41131c',1,'trc::TVM_space::func_']]]
 ];

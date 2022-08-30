@@ -63,7 +63,7 @@ private:
      * @brief 生成赋值语句节点
      * @param oper 等号的标记
      */
-    treenode* assign(trc::compiler::token_ticks oper, treenode* left_value);
+    treenode* assign(grammar_type oper, treenode* left_value);
 
     /**
      * @brief 清理换行符

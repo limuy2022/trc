@@ -35,16 +35,6 @@ tick_node::tick_node(token_ticks tick)
     : tick(tick) {
 }
 
-data_node::data_node(const char* data)
-    : data((char*)malloc(sizeof(char) * (strlen(data) + 1))) {
-    strcpy(this->data, data);
-}
-
-void data_node::set(const char* new_data) {
-    set_alloc(strlen(new_data));
-    strcpy(this->data, new_data);
-}
-
 void data_node::swap_token_data(token* token_value) {
     this->data = token_value->data;
     token_value->data = nullptr;
@@ -53,15 +43,6 @@ void data_node::swap_token_data(token* token_value) {
 data_node::~data_node() {
     // 直接释放是因为可以释放空指针
     free(data);
-}
-
-void data_node::set_alloc(size_t sizes) {
-    // 直接使用realloc是因为当传入的指针为空时相当于malloc
-    data = (char*)realloc(data, sizeof(char) * (sizes + 1));
-    if (data == nullptr) {
-        error::send_error(error::MemoryError, language::error::memoryerror);
-    }
-    data[sizes] = '\0';
 }
 
 char* data_node::swap_string_data() {
@@ -73,7 +54,11 @@ char* data_node::swap_string_data() {
     return str_data_ptr;
 }
 
-node_base_data::node_base_data(grammar_type type_argv, const char* data)
+data_node::data_node(token* data) {
+    swap_token_data(data);
+}
+
+node_base_data::node_base_data(grammar_type type_argv, token* data)
     : data_node(data) {
     this->type = type_argv;
 }
@@ -84,12 +69,10 @@ node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
 }
 
 node_base_data_without_sons::node_base_data_without_sons(
-    grammar_type type, token* data) {
+    grammar_type type, token* data)
+    : data_node(data) {
     this->type = type;
-    this->swap_token_data(data);
 }
-
-node_base_data_without_sons::node_base_data_without_sons() = default;
 
 node_base_tick_without_sons::node_base_tick_without_sons(
     grammar_type type, token_ticks tick)

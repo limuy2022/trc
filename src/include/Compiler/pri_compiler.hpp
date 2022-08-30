@@ -186,11 +186,7 @@ class data_node {
 public:
     char* data = nullptr;
 
-    explicit data_node(const char* data);
-
-    void set(const char*);
-
-    data_node() = default;
+    explicit data_node(token* data);
 
     virtual ~data_node();
 
@@ -206,13 +202,6 @@ public:
      * @return 字符串
      */
     char* swap_string_data();
-
-private:
-    /**
-     * @brief 重新设置大小
-     * @warning 包括\0在内，参数不需要把\0考虑进来
-     */
-    void set_alloc(size_t sizes);
 };
 
 class tick_node {
@@ -235,7 +224,7 @@ public:
  */
 class node_base_data : public is_not_end_node, public data_node {
 public:
-    node_base_data(grammar_type type_argv, const char* data);
+    node_base_data(grammar_type type_argv, token* data);
 };
 
 /**
@@ -252,8 +241,6 @@ public:
 class node_base_data_without_sons : public data_node, public is_end_node {
 public:
     explicit node_base_data_without_sons(grammar_type type, token* data);
-
-    node_base_data_without_sons();
 };
 
 /**
@@ -347,13 +334,6 @@ extern const next_order_map<const char*, token_ticks> str_token_ticks_cal_map;
  */
 inline bool is_cal_value(token_ticks tick) {
     return utils::inrange(token_ticks::NAME, token_ticks::INT_VALUE, tick);
-}
-
-/**
- * @brief 判断token是否是=或:=
- */
-inline bool is_as_token(token_ticks tick) {
-    return utils::inrange(token_ticks::ASSIGN, token_ticks::STORE, tick);
 }
 
 /**

@@ -103,21 +103,6 @@ template <typename T> int str_check_in_i(const char* data, T begin, T end) {
 }
 
 /**
- * @brief 检查s1里的元素是否都在s2中
- * @tparam T 容器1类型
- * @tparam O 容器2类型
- * @param s1 容器1
- * @param s2 容器2
- */
-template <typename T, typename O>
-bool s_check_in_s(T s1begin, T s1end, O s2begin, O s2end) {
-    for (auto i = s1begin; i != s1end; ++i)
-        if (!check_in(*i, s2begin, s2end))
-            return false;
-    return true;
-}
-
-/**
  * @brief 检查data是否是map的键
  * @tparam T map的类型(map,unordered_map)
  * @tparam O 数据的类型

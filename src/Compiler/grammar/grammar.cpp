@@ -40,7 +40,7 @@ treenode* grammar_lex::callfunction(token* funcname) {
     }
     special_tick_for_end = token_ticks::UNKNOWN;
     // 由于栈先进后出的特征，在此处将参数进行反转
-    std::reverse(argv_node->son.begin(), argv_node->son.end());
+    argv_node->son.reverse();
     // 函数名问题：判断内置函数和自定义函数
     if (trc::utils::str_check_in(
             funcname->data, loader::num_func.begin(), loader::num_func.end())) {
@@ -49,14 +49,11 @@ treenode* grammar_lex::callfunction(token* funcname) {
             loader::func_num[funcname->data], grammar_type::BUILTIN_FUNC);
         builtin->connect(argv_node);
         return builtin;
-    } else {
-        // 自定义函数
-        auto user_defined
-            = new node_base_data(grammar_type::CALL_FUNC, funcname->data);
-
-        user_defined->connect(argv_node);
-        return user_defined;
     }
+    // 自定义函数
+    auto user_defined = new node_base_data(grammar_type::CALL_FUNC, funcname);
+    user_defined->connect(argv_node);
+    return user_defined;
 }
 
 treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
@@ -130,7 +127,7 @@ treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
 
 treenode* grammar_lex::func_define() {
     auto name = check_excepted(token_ticks::NAME);
-    auto func_node = new node_base_data(grammar_type::FUNC_DEFINE, name->data);
+    auto func_node = new node_base_data(grammar_type::FUNC_DEFINE, name);
     delete name;
     read_block(func_node);
     return func_node;

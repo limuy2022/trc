@@ -18,7 +18,7 @@ void TVM::reload_data() {
     dyna_data.reset_global_symbol_table(static_data.global_symbol_table_size);
 }
 
-void TVM::run_bycode(TVM_bytecode* bycode) {
+void TVM::run_bycode(const TVM_bytecode* bycode) {
     switch (bycode->bycode) {
     case 0: {
         LOAD_INT(bycode->index);
@@ -189,11 +189,18 @@ void TVM::run_all() {
     size_t n;
     for (run_index = 0, n = static_data.byte_codes.size(); run_index < n;
          ++run_index) {
-        this->run_bycode(&static_data.byte_codes[run_index]);
+        run_bycode(&static_data.byte_codes[run_index]);
     }
 }
 
 void TVM::run_func(const trc::TVM_space::func_& function) {
+    // 暂存代码索引
+    size_t save_now = run_index, n;
+    for (run_index = 0, n = function.bytecodes.size(); run_index < n;
+         ++run_index) {
+        run_bycode(&function.bytecodes[run_index]);
+    }
+    run_index = save_now;
 }
 
 void TVM::error_report(int error, ...) {

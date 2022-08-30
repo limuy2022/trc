@@ -67,18 +67,6 @@ TEST(check_in, str_check_in_i) {
     EXPECT_EQ(utils::str_check_in_i("qbchj", a.begin(), a.end()), 0);
 }
 
-TEST(check_in, s_check_in_s) {
-    std::vector<int> a = { 9, 8, 7 };
-    std::deque<int> i = { 10 };
-    std::list<std::string> b = { "apple", "bananas", "pear" };
-    std::vector<std::string> c = { "apple", "pear" };
-
-    EXPECT_TRUE(
-        trc::utils::s_check_in_s(c.begin(), c.end(), b.begin(), b.end()));
-    EXPECT_FALSE(
-        trc::utils::s_check_in_s(i.begin(), i.end(), a.begin(), a.end()));
-}
-
 TEST(data, map_check_in) {
     std::map<int, std::string> a = { { 0, "pp" }, { 10, "op" }, { 90, "ui" } };
     EXPECT_TRUE(trc::utils::map_check_in_first(a, 0));

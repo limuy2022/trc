@@ -91,12 +91,8 @@ Inheritance diagram for trc::compiler::data_node:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aaade74f3a4c58504ef5361c145f78d08"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#aaade74f3a4c58504ef5361c145f78d08">data_node</a> (const char *<a class="el" href="classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10">data</a>)</td></tr>
-<tr class="separator:aaade74f3a4c58504ef5361c145f78d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a331908e4c5dbd333b89cb65a7bedf1b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a331908e4c5dbd333b89cb65a7bedf1b8">set</a> (const char *)</td></tr>
-<tr class="separator:a331908e4c5dbd333b89cb65a7bedf1b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d7a0c8fe7f362eafb0571e5f335b5c7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a3d7a0c8fe7f362eafb0571e5f335b5c7">data_node</a> ()=default</td></tr>
-<tr class="separator:a3d7a0c8fe7f362eafb0571e5f335b5c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47efd51f974611cbc33ebe47fe4a1e82"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a47efd51f974611cbc33ebe47fe4a1e82">data_node</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *<a class="el" href="classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10">data</a>)</td></tr>
+<tr class="separator:a47efd51f974611cbc33ebe47fe4a1e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a960ef87421c59bd487038f1dbde6743e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a960ef87421c59bd487038f1dbde6743e">~data_node</a> ()</td></tr>
 <tr class="separator:a960ef87421c59bd487038f1dbde6743e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a7aca10a9ea43dbc1c1dc8e696b0962"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a6a7aca10a9ea43dbc1c1dc8e696b0962">swap_token_data</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *token_value)</td></tr>
@@ -114,8 +110,8 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >储存字符串类型的数据节点 </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aaade74f3a4c58504ef5361c145f78d08" name="aaade74f3a4c58504ef5361c145f78d08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaade74f3a4c58504ef5361c145f78d08">&#9670;&nbsp;</a></span>data_node() <span class="overload">[1/2]</span></h2>
+<a id="a47efd51f974611cbc33ebe47fe4a1e82" name="a47efd51f974611cbc33ebe47fe4a1e82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47efd51f974611cbc33ebe47fe4a1e82">&#9670;&nbsp;</a></span>data_node()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -126,7 +122,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">trc::compiler::data_node::data_node </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *&#160;</td>
           <td class="paramname"><em>data</em></td><td>)</td>
           <td></td>
         </tr>
@@ -134,31 +130,6 @@ Public Attributes</h2></td></tr>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3d7a0c8fe7f362eafb0571e5f335b5c7" name="a3d7a0c8fe7f362eafb0571e5f335b5c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d7a0c8fe7f362eafb0571e5f335b5c7">&#9670;&nbsp;</a></span>data_node() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">trc::compiler::data_node::data_node </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -191,24 +162,6 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a331908e4c5dbd333b89cb65a7bedf1b8" name="a331908e4c5dbd333b89cb65a7bedf1b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a331908e4c5dbd333b89cb65a7bedf1b8">&#9670;&nbsp;</a></span>set()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void trc::compiler::data_node::set </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>new_data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a0345aca7a57d22f72c9bf30d61d7fdb2" name="a0345aca7a57d22f72c9bf30d61d7fdb2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0345aca7a57d22f72c9bf30d61d7fdb2">&#9670;&nbsp;</a></span>swap_string_data()</h2>
 

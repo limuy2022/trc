@@ -139,10 +139,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ac4601110209dd5cca75ab5c5e621524b"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ac4601110209dd5cca75ab5c5e621524b">str_check_in_i</a> (const char *data, T begin, T end)</td></tr>
 <tr class="memdesc:ac4601110209dd5cca75ab5c5e621524b"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查字符串数据是否在容器中，成功返回元素所在索引，否则返回-1  <a href="namespacetrc_1_1utils.html#ac4601110209dd5cca75ab5c5e621524b">More...</a><br /></td></tr>
 <tr class="separator:ac4601110209dd5cca75ab5c5e621524b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afba987f24e8827a6017d218a6297170d"><td class="memTemplParams" colspan="2">template&lt;typename T , typename O &gt; </td></tr>
-<tr class="memitem:afba987f24e8827a6017d218a6297170d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#afba987f24e8827a6017d218a6297170d">s_check_in_s</a> (T s1begin, T s1end, O s2begin, O s2end)</td></tr>
-<tr class="memdesc:afba987f24e8827a6017d218a6297170d"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查s1里的元素是否都在s2中  <a href="namespacetrc_1_1utils.html#afba987f24e8827a6017d218a6297170d">More...</a><br /></td></tr>
-<tr class="separator:afba987f24e8827a6017d218a6297170d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2e4b714d93db63d57506bf713ce69af"><td class="memTemplParams" colspan="2">template&lt;typename T , typename O &gt; </td></tr>
 <tr class="memitem:ae2e4b714d93db63d57506bf713ce69af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#ae2e4b714d93db63d57506bf713ce69af">map_check_in_first</a> (const T &amp;m1, const O &amp;data)</td></tr>
 <tr class="memdesc:ae2e4b714d93db63d57506bf713ce69af"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查data是否是map的键  <a href="namespacetrc_1_1utils.html#ae2e4b714d93db63d57506bf713ce69af">More...</a><br /></td></tr>
@@ -743,64 +739,6 @@ template&lt;typename T , typename O &gt; </div>
 <p>读取文件并将字符存入file_data </p>
 <dl class="section warning"><dt>Warning</dt><dd>失败后不会直接停止程序 </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>成功返回0，失败返回1 </dd></dl>
-
-</div>
-</div>
-<a id="afba987f24e8827a6017d218a6297170d" name="afba987f24e8827a6017d218a6297170d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afba987f24e8827a6017d218a6297170d">&#9670;&nbsp;</a></span>s_check_in_s()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T , typename O &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool trc::utils::s_check_in_s </td>
-          <td>(</td>
-          <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>s1begin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>s1end</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">O&#160;</td>
-          <td class="paramname"><em>s2begin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">O&#160;</td>
-          <td class="paramname"><em>s2end</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>检查s1里的元素是否都在s2中 </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">T</td><td>容器1类型 </td></tr>
-    <tr><td class="paramname">O</td><td>容器2类型 </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s1</td><td>容器1 </td></tr>
-    <tr><td class="paramname">s2</td><td>容器2 </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

@@ -52,7 +52,7 @@ static void bytecode_check(
 TEST_F(compiler_env_set, int) {
     compiler::Compiler(
         vm->static_data, "a:=80\nb:=900", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 80);
     EXPECT_EQ(vm->static_data.const_i[1], 900);
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 2);
@@ -67,7 +67,7 @@ TEST_F(compiler_env_set, int) {
 TEST_F(compiler_env_set, string) {
     compiler::Compiler(
         vm->static_data, "a:=\"ppp\"", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_s.size(), 1);
+    ASSERT_EQ(vm->static_data.const_s.size, 1);
     EXPECT_STREQ(vm->static_data.const_s[0], "ppp");
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_STRING_, 0 },
@@ -79,7 +79,7 @@ TEST_F(compiler_env_set, string) {
 TEST_F(compiler_env_set, float) {
     compiler::Compiler(
         vm->static_data, "a:=9.08", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_f.size(), 1);
+    ASSERT_EQ(vm->static_data.const_f.size, 1);
     EXPECT_TRUE(utils::isequal(vm->static_data.const_f[0], 9.08));
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_FLOAT_, 0 },
@@ -91,7 +91,7 @@ TEST_F(compiler_env_set, float) {
 TEST_F(compiler_env_set, long_int) {
     compiler::Compiler(vm->static_data, "a:=9999999999999999999",
         &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_long.size(), 1);
+    ASSERT_EQ(vm->static_data.const_long.size, 1);
     EXPECT_STREQ(vm->static_data.const_long[0], "9999999999999999999");
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_LONG_, 0 },
@@ -103,7 +103,7 @@ TEST_F(compiler_env_set, long_int) {
 TEST_F(compiler_env_set, assign_with_oper) {
     compiler::Compiler(
         vm->static_data, "a:=1+34\n", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     EXPECT_EQ(vm->static_data.const_i[1], 34);
     ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
@@ -119,7 +119,7 @@ TEST_F(compiler_env_set, assign_with_oper) {
 TEST_F(compiler_env_set, builtin_without_var) {
     compiler::Compiler(
         vm->static_data, "print(90)", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 90);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -131,7 +131,7 @@ TEST_F(compiler_env_set, builtin_without_var) {
 TEST_F(compiler_env_set, builtin_with_var) {
     compiler::Compiler(
         vm->static_data, "a:=856+1\nprint(a)", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 856);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -148,7 +148,7 @@ TEST_F(compiler_env_set, builtin_with_var) {
 TEST_F(compiler_env_set, func_in_func) {
     compiler::Compiler(
         vm->static_data, "a:=int(input())", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 0);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -163,7 +163,7 @@ TEST_F(compiler_env_set, func_in_func) {
 // 简单常量相加
 TEST_F(compiler_env_set, simple) {
     compiler::Compiler(vm->static_data, "1+4", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     EXPECT_EQ(vm->static_data.const_i[1], 4);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -176,7 +176,7 @@ TEST_F(compiler_env_set, simple) {
 TEST_F(compiler_env_set, expr_in_func) {
     compiler::Compiler(
         vm->static_data, "print(1+1)", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -190,7 +190,7 @@ TEST_F(compiler_env_set, expr_in_func) {
 TEST_F(compiler_env_set, expr_with_func) {
     compiler::Compiler(vm->static_data, "print(int(input())+int(input()))",
         &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 2);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
     EXPECT_EQ(vm->static_data.const_i[0], 0);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -210,14 +210,14 @@ TEST_F(compiler_env_set, expr_with_func) {
 // 优化类型相同的表达式代码
 TEST_F(compiler_env_set, optimize_same_types) {
     compiler::Compiler(vm->static_data, "1+2*3", &compiler::optimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 7);
 }
 
 // 优化类型不同的表达式代码
 TEST_F(compiler_env_set, optimize_with_different_types) {
     compiler::Compiler(vm->static_data, "1.2*4", &compiler::optimize_option);
-    ASSERT_EQ(vm->static_data.const_f.size(), 1);
+    ASSERT_EQ(vm->static_data.const_f.size, 1);
     EXPECT_EQ(vm->static_data.const_f[0], 4.8);
 }
 
@@ -226,7 +226,7 @@ TEST_F(compiler_env_set, if_lex) {
     compiler::Compiler(
         vm->static_data, "if 1==1{\nprint(1)\n}", &compiler::nooptimize_option);
     // 一个是跳转行号，一个是1
-    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
@@ -242,7 +242,7 @@ TEST_F(compiler_env_set, if_lex) {
 TEST_F(compiler_env_set, while_lex) {
     compiler::Compiler(vm->static_data, "while 1==1{\nprint(1)\n}",
         &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size(), 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },

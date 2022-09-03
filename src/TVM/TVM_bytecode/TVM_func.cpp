@@ -15,7 +15,7 @@ void TVM::CALL_BUILTIN(bytecode_index_t name) {
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {
-    const func_& fast = static_data.funcs[index];
+    const func_& fast = static_data.funcs.array[index];
     // 启动函数环境
     (++dyna_data.frames_top_str)->set_func(fast);
     // 调用函数

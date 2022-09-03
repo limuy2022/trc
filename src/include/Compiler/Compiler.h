@@ -18,6 +18,8 @@
 namespace trc::compiler {
 using TVM_space::bytecode_t;
 
+class grammar_lex;
+
 /**
  * @brief 编译器的细节
  */
@@ -34,6 +36,12 @@ public:
      * @param localinfo 指向局部信息，默认与全局信息相同
      */
     void compile(treenode* head, CompileEnvironment& localinfo);
+
+    /**
+     * @brief 负责把节点编译成代码
+     * @param grammar_lexer grammar解析器
+     */
+    void compile_node(grammar_lex& grammar_lexer);
 
     /**
      * @brief 重新绑定数据

@@ -57,48 +57,46 @@ void detail_compiler::add_opcode(
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
-    size_t size = vm->const_i.size();
-    int index
-        = utils::check_in_i(value, vm->const_i.begin(), vm->const_i.end());
+    size_t size = vm->const_i.size;
+    int index = utils::check_in_i(value, vm->const_i.array, vm->const_i.end());
     if (index != -1) {
         return index;
     }
-    vm->const_i.push_back(value);
+    vm->const_i.array[vm->const_i.size++] = value;
     return size;
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_float(double value) const {
-    size_t size = vm->const_f.size();
-    int index
-        = utils::check_in_i(value, vm->const_f.begin(), vm->const_f.end());
+    size_t size = vm->const_f.size;
+    int index = utils::check_in_i(value, vm->const_f.array, vm->const_f.end());
     if (index != -1) {
         return index;
     }
-    vm->const_f.push_back(value);
+    vm->const_f.array[vm->const_f.size++] = value;
     return size;
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_string(char* value) const {
     int index
-        = utils::str_check_in_i(value, vm->const_s.begin(), vm->const_s.end());
-    size_t size = vm->const_s.size();
+        = utils::str_check_in_i(value, vm->const_s.array, vm->const_s.end());
+    size_t size = vm->const_s.size;
     if (index != -1) {
         free(value);
         return index;
     }
-    vm->const_s.push_back(value);
+    vm->const_s.array[vm->const_s.size++] = value;
     return size;
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_long(char* value) const {
-    size_t size = vm->const_long.size();
+    size_t size = vm->const_long.size;
     int index = utils::str_check_in_i(
-        value, vm->const_long.begin(), vm->const_long.end());
+        value, vm->const_long.array, vm->const_long.end());
     if (index != -1) {
         free(value);
         return index;
     }
-    vm->const_long.push_back(value);
+    vm->const_long.array[vm->const_long.size++] = value;
     return size;
 }
 
@@ -277,6 +275,8 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
         }
         }
     }
+    // 释放自己的所有子节点
+    free_tree(head);
 }
 
 detail_compiler::detail_compiler(
@@ -292,33 +292,33 @@ void detail_compiler::retie(TVM_space::TVM_static_data* vm) {
 
 void free_tree(treenode* head) {
     if (head->has_son) {
-        for (auto i : ((is_not_end_node*)head)->son) {
+        auto node = ((is_not_end_node*)head);
+        for (auto i : node->son) {
             free_tree(i);
         }
+        node->son.clear();
     }
-    delete head;
 }
 
-/**
- * @brief 负责把节点编译成代码
- * @param grammar_lexer grammar解析器
- * @param lex_dcompiler 负责实现细节的编译器
- * @param vm 虚拟机
- */
-static void compile_node(grammar_lex& grammar_lexer,
-    detail_compiler& lex_dcompiler, TVM_space::TVM_static_data* vm) {
-    treenode* now_get;
-    for (;;) {
-        now_get = grammar_lexer.get_node();
-        if (now_get == nullptr) {
-            break;
-        }
-        // 对于全局对象，局部作用域等于全局作用域
-        lex_dcompiler.compile(now_get, lex_dcompiler.infoenv);
-        free_tree(now_get);
-    }
+void detail_compiler::compile_node(grammar_lex& grammar_lexer) {
+    treenode* root = grammar_lexer.compile_all();
+    // 申请虚拟机常量池的内存，统计元素个数时没有去重，可能会多申请，后面会压缩掉多余的储存空间
+    vm->const_i.array = (int*)malloc(sizeof(int) * compiler_data.int_size);
+    vm->const_f.array
+        = (double*)malloc(sizeof(double) * compiler_data.float_size);
+    vm->const_s.array
+        = (char**)malloc(sizeof(char*) * compiler_data.string_size);
+    vm->const_long.array
+        = (char**)malloc(sizeof(char*) * compiler_data.long_int_size);
+    vm->funcs.array = (TVM_space::func_*)malloc(
+        sizeof(TVM_space::func_) * compiler_data.func_size);
+    // 对于全局对象，局部作用域等于全局作用域
+    compile(root, infoenv);
+    delete root;
     // 设置全局符号表
-    vm->global_symbol_table_size = lex_dcompiler.infoenv.get_name_size();
+    vm->global_symbol_table_size = infoenv.get_name_size();
+    // 压缩内存
+    vm->compress_memory();
 }
 
 detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
@@ -331,7 +331,7 @@ detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
             = { std::string("__main__"), option };
         grammar_lex grammar_lexer(codes, compiler_data);
         detail_compiler lex_d(compiler_data, &vm);
-        compile_node(grammar_lexer, lex_d, &vm);
+        lex_d.compile_node(grammar_lexer);
         return nullptr;
     } else if (return_compiler_ptr) {
         // 需要返回保存变量信息(tshell和tdb需要使用)
@@ -339,13 +339,13 @@ detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
             = new compiler_public_data { std::string("__main__"), option };
         grammar_lex grammar_lexer(codes, *compiler_data);
         auto* lex_d = new detail_compiler(*compiler_data, &vm);
-        compile_node(grammar_lexer, *lex_d, &vm);
+        lex_d->compile_node(grammar_lexer);
         return lex_d;
     } else if (compiler_ptr != nullptr) {
         // 使用已经保存了的信息类进行编译
         compiler_ptr->retie(&vm);
         grammar_lex grammar_lexer(codes, compiler_ptr->compiler_data);
-        compile_node(grammar_lexer, *compiler_ptr, &vm);
+        compiler_ptr->compile_node(grammar_lexer);
         return nullptr;
     }
 }

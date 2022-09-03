@@ -20,6 +20,9 @@ struct compiler_option {
 struct compiler_public_data {
     compiler_error error;
     const compiler_option* option;
+    // 储存虚拟机常量池的大小
+    size_t int_size = 0, float_size = 0, string_size = 0, long_int_size = 0,
+           func_size = 0, long_float_size = 0;
 };
 
 // 实例化几个常用的编译参数

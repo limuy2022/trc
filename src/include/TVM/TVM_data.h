@@ -7,6 +7,7 @@
 #include <TVM/TVMdef.h>
 #include <TVM/func.h>
 #include <TVM/object.h>
+#include <base/dyna_array.hpp>
 #include <map>
 #include <stack>
 #include <string>
@@ -31,11 +32,10 @@ public:
 class TVM_static_data {
 public:
     // 各种常量数据
-    std::vector<int> const_i;
-    std::vector<const char*> const_s, const_long;
-    std::vector<double> const_f;
-    // 注意：此处装载func的静态信息，并不是保存执行信息的场所
-    std::vector<func_> funcs;
+    utils::dyna_array<int> const_i;
+    utils::dyna_array<char*> const_s, const_long;
+    utils::dyna_array<double> const_f;
+    utils::dyna_array<func_> funcs;
     // 字节码
     struct_codes byte_codes;
     // 类信息
@@ -49,7 +49,7 @@ public:
      */
     void ReleaseStringData();
     ~TVM_static_data();
-    TVM_static_data() = default;
+    void compress_memory();
 };
 
 constexpr size_t TVM_STACK_SIZE = 8192;

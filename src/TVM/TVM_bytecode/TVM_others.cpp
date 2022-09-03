@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 namespace trc::TVM_space {
 void TVM::LOAD_INT(bytecode_index_t index) {
-    int value = static_data.const_i[index];
+    int value = static_data.const_i.array[index];
     if (INT_CACHE_BEGIN <= value && value <= INT_CACHE_END) {
         // 处在缓存范围中
 
@@ -27,15 +27,15 @@ void TVM::LOAD_MAP(bytecode_index_t argc) {
 }
 
 void TVM::LOAD_FLOAT(bytecode_index_t index) {
-    push(MALLOCFLOAT(static_data.const_f[index]));
+    push(MALLOCFLOAT(static_data.const_f.array[index]));
 }
 
 void TVM::LOAD_STRING(bytecode_index_t index) {
-    push(MALLOCSTRING(static_data.const_s[index]));
+    push(MALLOCSTRING(static_data.const_s.array[index]));
 }
 
 void TVM::LOAD_LONG(bytecode_index_t index) {
-    push(MALLOCLONG(static_data.const_long[index]));
+    push(MALLOCLONG(static_data.const_long.array[index]));
 }
 
 void TVM::LOAD_ARRAY(bytecode_index_t index) {

@@ -86,6 +86,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0df19ea966655abedb4c50826606bee0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#a0df19ea966655abedb4c50826606bee0">compile</a> (<a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> *head, <a class="el" href="classtrc_1_1compiler_1_1_compile_environment.html">CompileEnvironment</a> &amp;localinfo)</td></tr>
 <tr class="memdesc:a0df19ea966655abedb4c50826606bee0"><td class="mdescLeft">&#160;</td><td class="mdescRight">将一个节点解析成字节码  <a href="classtrc_1_1compiler_1_1detail__compiler.html#a0df19ea966655abedb4c50826606bee0">More...</a><br /></td></tr>
 <tr class="separator:a0df19ea966655abedb4c50826606bee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47cd4c43a9c5b9e38ad13c158558af99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#a47cd4c43a9c5b9e38ad13c158558af99">compile_node</a> (<a class="el" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a> &amp;grammar_lexer)</td></tr>
+<tr class="memdesc:a47cd4c43a9c5b9e38ad13c158558af99"><td class="mdescLeft">&#160;</td><td class="mdescRight">负责把节点编译成代码  <a href="classtrc_1_1compiler_1_1detail__compiler.html#a47cd4c43a9c5b9e38ad13c158558af99">More...</a><br /></td></tr>
+<tr class="separator:a47cd4c43a9c5b9e38ad13c158558af99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a902bbad02f4a1250e55a2af9edc155c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#a902bbad02f4a1250e55a2af9edc155c5">retie</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_space::TVM_static_data</a> *<a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html#aeb731f91b8ead6d3054458b237bb88b4">vm</a>)</td></tr>
 <tr class="memdesc:a902bbad02f4a1250e55a2af9edc155c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">重新绑定数据  <a href="classtrc_1_1compiler_1_1detail__compiler.html#a902bbad02f4a1250e55a2af9edc155c5">More...</a><br /></td></tr>
 <tr class="separator:a902bbad02f4a1250e55a2af9edc155c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,6 +165,32 @@ Public Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">head</td><td>根节点 </td></tr>
     <tr><td class="paramname">localinfo</td><td>指向局部信息，默认与全局信息相同 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a47cd4c43a9c5b9e38ad13c158558af99" name="a47cd4c43a9c5b9e38ad13c158558af99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47cd4c43a9c5b9e38ad13c158558af99">&#9670;&nbsp;</a></span>compile_node()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void trc::compiler::detail_compiler::compile_node </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a> &amp;&#160;</td>
+          <td class="paramname"><em>grammar_lexer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>负责把节点编译成代码 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">grammar_lexer</td><td>grammar解析器 </td></tr>
   </table>
   </dd>
 </dl>

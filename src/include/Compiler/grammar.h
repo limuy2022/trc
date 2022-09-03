@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "grammar_env.h"
 #include <Compiler/Compiler.h>
+#include <Compiler/grammar_env.h>
 #include <Compiler/token.h>
 #include <language/error.h>
 
@@ -24,6 +24,12 @@ public:
      */
     grammar_lex(
         const std::string& codes_str, compiler_public_data& compiler_data);
+
+    /**
+     * 编译所有代码
+     * @return
+     */
+    treenode* compile_all();
 
     ~grammar_lex() = default;
 
@@ -106,6 +112,12 @@ private:
      * @param expr 表达式
      */
     void optimize_expr(is_not_end_node* expr);
+
+    /**
+     * @brief 根据token制作相应的数据节点
+     * @warning 不负责变量节点的生成
+     */
+    treenode* make_data_node(token* data_token);
 
     /**
      * @brief 弹出栈顶元素并当操作不合法时报错

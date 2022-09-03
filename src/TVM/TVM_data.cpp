@@ -12,17 +12,24 @@ TVM_dyna_data::TVM_dyna_data()
 }
 
 void TVM_static_data::ReleaseStringData() {
-    for (auto& i : const_s) {
-        free(const_cast<char*>(i));
+    for (size_t i = 0; i < const_s.size; ++i) {
+        free(const_s.array[i]);
     }
     const_s.clear();
-    for (auto& i : const_long) {
-        free(const_cast<char*>(i));
+    for (size_t i = 0; i < const_long.size; ++i) {
+        free(const_long.array[i]);
     }
     const_long.clear();
 }
 
 TVM_static_data::~TVM_static_data() {
     ReleaseStringData();
+}
+
+void TVM_static_data::compress_memory() {
+    const_i.compress_memory();
+    const_s.compress_memory();
+    const_long.compress_memory();
+    const_f.compress_memory();
 }
 }

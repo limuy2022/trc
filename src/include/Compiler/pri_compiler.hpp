@@ -373,13 +373,6 @@ inline bool is_const_value(token_ticks tick) {
 }
 
 /**
- * @brief 判断是否为左值
- */
-inline bool is_left_value(token_ticks tick) {
-    return tick == token_ticks::NAME;
-}
-
-/**
  * @brief 判断是否为\n或\0符号
  */
 inline bool is_end_token(token_ticks tick) {

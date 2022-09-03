@@ -12,6 +12,7 @@
 namespace trc::compiler {
 token* token_lex::lex_string() {
     // 略过当前"符号
+    compiler_data.string_size++;
     char string_begin = *char_ptr;
     ++char_ptr;
     const char* start = char_ptr;
@@ -138,13 +139,19 @@ token* token_lex::lex_int_float() {
     switch (tick_for_res) {
     case token_ticks::FLOAT_VALUE: {
         if (res_len > FLOAT_LONGFLOAT_LINE) {
+            compiler_data.long_float_size++;
             tick_for_res = token_ticks::LONG_FLOAT_VALUE;
+        } else {
+            compiler_data.float_size++;
         }
         break;
     }
     case token_ticks::INT_VALUE: {
         if (res_len > INT_LONGINT_LINE) {
+            compiler_data.long_int_size++;
             tick_for_res = token_ticks::LONG_INT_VALUE;
+        } else {
+            compiler_data.int_size++;
         }
         break;
     }
@@ -193,7 +200,7 @@ token* token_lex::lex_english() {
     size_t len = char_ptr - start;
     for (auto& keyword : keywords_) {
         if (keyword.len == len && !strncmp(start, keyword.str, len)) {
-            // 注：传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
+            // 传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
             return new token(keyword.tick);
         }
     }
@@ -384,7 +391,7 @@ token* token_lex::lex_others() {
 
 void token_lex::unget_token(token* token_data) {
     // 必须没有储存token，否则就是出现了bug
-    //    assert(back_token == nullptr);
+    assert(back_token == nullptr);
     back_token = token_data;
 }
 

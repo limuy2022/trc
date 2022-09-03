@@ -31,35 +31,38 @@ namespace tools_in {
         // 输出常量池
         // 整型常量池
         // 注意：大整数不在此输出
-        n = static_data.static_data.const_i.size();
+        n = static_data.static_data.const_i.size;
         puts("\nint constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%d\n", i, static_data.static_data.const_i[i]);
+            printf("    %zu:%d\n", i, static_data.static_data.const_i.array[i]);
         }
 
         // 浮点数常量池
-        n = static_data.static_data.const_f.size();
+        n = static_data.static_data.const_f.size;
         puts("\nfloat constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%lf\n", i, static_data.static_data.const_f[i]);
+            printf(
+                "    %zu:%lf\n", i, static_data.static_data.const_f.array[i]);
         }
         // 字符串常量池
-        n = static_data.static_data.const_s.size();
+        n = static_data.static_data.const_s.size;
         puts("\nstring constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i, static_data.static_data.const_s[i]);
+            printf("    %zu:%s\n", i, static_data.static_data.const_s.array[i]);
         }
         // 大整数
         puts("\nlong int constant pool:");
-        n = static_data.static_data.const_long.size();
+        n = static_data.static_data.const_long.size;
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i, static_data.static_data.const_long[i]);
+            printf(
+                "    %zu:%s\n", i, static_data.static_data.const_long.array[i]);
         }
         // 输出函数
         puts("\nfunctions:");
-        n = static_data.static_data.funcs.size();
+        n = static_data.static_data.funcs.size;
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i, static_data.static_data.funcs[i].name);
+            printf(
+                "    %zu:%s\n", i, static_data.static_data.funcs.array[i].name);
         }
         putchar('\n');
     }

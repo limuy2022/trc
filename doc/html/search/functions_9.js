@@ -16,13 +16,12 @@ var searchData=
   ['is_5fend_5fnode_13',['is_end_node',['../classtrc_1_1compiler_1_1is__end__node.html#a0d8a97518b696cee3f31058398d29882',1,'trc::compiler::is_end_node']]],
   ['is_5fend_5ftoken_14',['is_end_token',['../namespacetrc_1_1compiler.html#a1360fb843a853f2dec5054e8582b8a2c',1,'trc::compiler']]],
   ['is_5fenglish_15',['is_english',['../namespacetrc_1_1compiler.html#aa9bd462c48d52a2b82d3a15e9ac5edc9',1,'trc::compiler']]],
-  ['is_5fleft_5fvalue_16',['is_left_value',['../namespacetrc_1_1compiler.html#a9048dde6b8f9958999716fb9fa7f7bdc',1,'trc::compiler']]],
-  ['is_5fmagic_17',['is_magic',['../namespacetrc_1_1loader.html#a946705f0d8a6502b32a0955f5ac6481b',1,'trc::loader']]],
-  ['is_5fno_5fvar_5fdata_5fnode_18',['is_no_var_data_node',['../namespacetrc_1_1compiler.html#ab6a74131a1c80b75031b982c6ae68d38',1,'trc::compiler']]],
-  ['is_5fnot_5fend_5fnode_19',['is_not_end_node',['../classtrc_1_1compiler_1_1is__not__end__node.html#a20855f318d8cbc99f39559407e49adef',1,'trc::compiler::is_not_end_node::is_not_end_node(grammar_type type)'],['../classtrc_1_1compiler_1_1is__not__end__node.html#af3c97e723254bf141dfd743d049248e4',1,'trc::compiler::is_not_end_node::is_not_end_node()']]],
-  ['is_5fnovar_5fdata_5ftoken_20',['is_novar_data_token',['../namespacetrc_1_1compiler.html#a5f9c260d73830ac9f0ce231e5a4b7aad',1,'trc::compiler']]],
-  ['is_5fnumber_5fclass_5fnode_21',['is_number_class_node',['../namespacetrc_1_1compiler.html#a4976a24e9f5f2c6061ff2426eca9a746',1,'trc::compiler']]],
-  ['is_5fsentence_5ftoken_22',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
-  ['is_5fsentence_5fwith_5fone_5fargv_23',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]],
-  ['isequal_24',['isequal',['../namespacetrc_1_1utils.html#a4cda5221c3794b0059ed3ac33b79e00a',1,'trc::utils']]]
+  ['is_5fmagic_16',['is_magic',['../namespacetrc_1_1loader.html#a946705f0d8a6502b32a0955f5ac6481b',1,'trc::loader']]],
+  ['is_5fno_5fvar_5fdata_5fnode_17',['is_no_var_data_node',['../namespacetrc_1_1compiler.html#ab6a74131a1c80b75031b982c6ae68d38',1,'trc::compiler']]],
+  ['is_5fnot_5fend_5fnode_18',['is_not_end_node',['../classtrc_1_1compiler_1_1is__not__end__node.html#a20855f318d8cbc99f39559407e49adef',1,'trc::compiler::is_not_end_node::is_not_end_node(grammar_type type)'],['../classtrc_1_1compiler_1_1is__not__end__node.html#af3c97e723254bf141dfd743d049248e4',1,'trc::compiler::is_not_end_node::is_not_end_node()']]],
+  ['is_5fnovar_5fdata_5ftoken_19',['is_novar_data_token',['../namespacetrc_1_1compiler.html#a5f9c260d73830ac9f0ce231e5a4b7aad',1,'trc::compiler']]],
+  ['is_5fnumber_5fclass_5fnode_20',['is_number_class_node',['../namespacetrc_1_1compiler.html#a4976a24e9f5f2c6061ff2426eca9a746',1,'trc::compiler']]],
+  ['is_5fsentence_5ftoken_21',['is_sentence_token',['../namespacetrc_1_1compiler.html#a5c4ec4059941e0c3dc039a727ba1ca4f',1,'trc::compiler']]],
+  ['is_5fsentence_5fwith_5fone_5fargv_22',['is_sentence_with_one_argv',['../namespacetrc_1_1compiler.html#a8cd702879f86ff794468d349572185ea',1,'trc::compiler']]],
+  ['isequal_23',['isequal',['../namespacetrc_1_1utils.html#a4cda5221c3794b0059ed3ac33b79e00a',1,'trc::utils']]]
 ];

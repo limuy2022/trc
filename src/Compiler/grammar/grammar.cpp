@@ -21,6 +21,8 @@ treenode* grammar_lex::assign(grammar_type oper, treenode* left_value) {
 }
 
 treenode* grammar_lex::callfunction(token* funcname) {
+    // 加上参数个数
+    compiler_data.int_size++;
     auto argv_node = new is_not_end_node;
     // 这一段是在切割参数，划分好自己的参数
     token* lex_tmp;
@@ -133,11 +135,7 @@ treenode* grammar_lex::func_define() {
     return func_node;
 }
 
-/**
- * @brief 根据token制作相应的数据节点
- * @warning 不负责变量节点的生成
- */
-treenode* make_data_node(token* data_token) {
+treenode* grammar_lex::make_data_node(token* data_token) {
     auto tmp = data_token->tick;
     if (tmp == token_ticks::INT_VALUE) {
         return new node_base_int_without_sons(atoi(data_token->data));
@@ -148,6 +146,7 @@ treenode* make_data_node(token* data_token) {
             grammar_type::STRING, data_token);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
+        compiler_data.int_size++;
         return new node_base_int_without_sons(change_const[data_token->data]);
     } else if (tmp == token_ticks::LONG_INT_VALUE) {
         return new node_base_data_without_sons(
@@ -407,5 +406,17 @@ token_ticks grammar_lex::get_next_token_tick() {
     auto nexttick = next_tmp->tick;
     token_.unget_token(next_tmp);
     return nexttick;
+}
+
+treenode* grammar_lex::compile_all() {
+    auto* root = new is_not_end_node(grammar_type::TREE);
+    for (;;) {
+        treenode* node = get_node();
+        if (node == nullptr) {
+            break;
+        }
+        root->connect(node);
+    }
+    return root;
 }
 }

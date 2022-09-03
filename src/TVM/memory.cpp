@@ -6,12 +6,8 @@
 namespace trc::TVM_space {
 void free_TVM(TVM* vm) {
     vm->static_data.byte_codes.clear();
-
     vm->static_data.const_i.clear();
-    vm->static_data.const_i.push_back(0);
-
     vm->static_data.const_f.clear();
-    vm->static_data.const_f.push_back(0);
 
     vm->static_data.ReleaseStringData();
     while (vm->dyna_data.frames_top_str != vm->dyna_data.frames - 1) {

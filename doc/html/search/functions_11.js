@@ -23,6 +23,5 @@ var searchData=
   ['tvm_5fbytecode_20',['TVM_bytecode',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__bytecode.html#a85ea11b687d0f87aef99b3f55e6c252c',1,'trc::TVM_space::TVM_bytecode']]],
   ['tvm_5fdyna_5fdata_21',['TVM_dyna_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__dyna__data.html#a31c56d3cd3beacbd33805908593c77d4',1,'trc::TVM_space::TVM_dyna_data']]],
   ['tvm_5fquit_5fmem_22',['TVM_quit_mem',['../namespacetrc_1_1_t_v_m__space.html#ac02f5e8af7a378027b6f4d12f4947e39',1,'trc::TVM_space']]],
-  ['tvm_5fstatic_5fdata_23',['TVM_static_data',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a477a2bcaee29b40f909b691871e4cb1b',1,'trc::TVM_space::TVM_static_data']]],
-  ['type_24',['TYPE',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ab9899fb0acbc7d0c1a5398616db1dc77',1,'trc::TVM_space::builtin']]]
+  ['type_23',['TYPE',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#ab9899fb0acbc7d0c1a5398616db1dc77',1,'trc::TVM_space::builtin']]]
 ];

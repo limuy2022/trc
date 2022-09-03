@@ -50,7 +50,7 @@ void import_to_path(std::string& import_name) {
  * @param file_data 读取出的内容的存放地
  * @param file 文件
  */
-inline void read_file_detail(
+static inline void read_file_detail(
     const std::string& path, std::string& file_data, FILE* file) {
     struct stat buffer;
     stat(path.c_str(), &buffer);

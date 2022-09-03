@@ -23,11 +23,11 @@
 static const char* block[]
     = { "+---+", "/   /|", "+---+ |", "|   | +", "|   |/", "+---+" };
 
-inline static size_t realx(size_t x) {
+static inline size_t realx(size_t x) {
     return x * 2;
 }
 
-inline static size_t realy(size_t x, size_t y) {
+static inline size_t realy(size_t x, size_t y) {
     return y * 4 - x * 2;
 }
 

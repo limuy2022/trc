@@ -24,7 +24,7 @@ template <typename floattype> bool isequal(floattype a, floattype b) {
  * @param data 数据
  */
 template <typename T>
-inline bool inrange(const T& start, const T& end, const T& data) {
+static inline bool inrange(const T& start, const T& end, const T& data) {
     return start <= data && data <= end;
 }
 

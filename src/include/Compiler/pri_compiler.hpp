@@ -278,7 +278,7 @@ public:
  * @brief 判断是否为字母，包括_
  * @param c 字符
  */
-inline bool is_english(char c) {
+static inline bool is_english(char c) {
     return isalpha(c) || c == '_';
 }
 
@@ -332,14 +332,14 @@ extern const next_order_map<const char*, token_ticks> str_token_ticks_cal_map;
 /**
  * @brief 判断枚举值是否是可运算的
  */
-inline bool is_cal_value(token_ticks tick) {
+static inline bool is_cal_value(token_ticks tick) {
     return utils::inrange(token_ticks::NAME, token_ticks::INT_VALUE, tick);
 }
 
 /**
  * @brief 判断是不是条件运算符token
  */
-inline bool is_condit_token(token_ticks tick) {
+static inline bool is_condit_token(token_ticks tick) {
     return utils::inrange(token_ticks::AND, token_ticks::GREATER_EQUAL, tick);
 }
 
@@ -347,35 +347,35 @@ inline bool is_condit_token(token_ticks tick) {
  * @brief 判断是不是运算符token
  * @warning 不包含条件运算符token
  */
-inline bool is_cal_token(token_ticks tick) {
+static inline bool is_cal_token(token_ticks tick) {
     return utils::inrange(token_ticks::ADD, token_ticks::POW, tick);
 }
 
 /**
  * @brief 判断是不是语句token
  */
-inline bool is_sentence_token(token_ticks tick) {
+static inline bool is_sentence_token(token_ticks tick) {
     return utils::inrange(token_ticks::IMPORT, token_ticks::ASSERT, tick);
 }
 
 /**
  * @brief 判断是不是带参数的语句token
  */
-inline bool is_sentence_with_one_argv(token_ticks tick) {
+static inline bool is_sentence_with_one_argv(token_ticks tick) {
     return utils::inrange(token_ticks::GOTO, token_ticks::GOTO, tick);
 }
 
 /**
  * @brief 判断是不是常量token
  */
-inline bool is_const_value(token_ticks tick) {
+static inline bool is_const_value(token_ticks tick) {
     return utils::inrange(token_ticks::NULL_, token_ticks::FALSE_, tick);
 }
 
 /**
  * @brief 判断是否为\n或\0符号
  */
-inline bool is_end_token(token_ticks tick) {
+static inline bool is_end_token(token_ticks tick) {
     return tick == token_ticks::END_OF_TOKENS
         || tick == token_ticks::END_OF_LINE;
 }
@@ -383,21 +383,21 @@ inline bool is_end_token(token_ticks tick) {
 /**
  * @brief 判断是不是会引起语句块的节点
  */
-inline bool is_blocked_token(token_ticks tick) {
+static inline bool is_blocked_token(token_ticks tick) {
     return utils::inrange(token_ticks::FOR, token_ticks::CLASS, tick);
 }
 
 /**
  * @brief 判断是不是非变量数据
  */
-inline bool is_novar_data_token(token_ticks tick) {
+static inline bool is_novar_data_token(token_ticks tick) {
     return utils::inrange(token_ticks::NULL_, token_ticks::INT_VALUE, tick);
 }
 
 /**
  * @brief 判断是不是数据节点
  */
-inline bool is_no_var_data_node(grammar_type node_type) {
+static inline bool is_no_var_data_node(grammar_type node_type) {
     return utils::inrange(
         grammar_type::NUMBER, grammar_type::STRING, node_type);
 }
@@ -405,7 +405,7 @@ inline bool is_no_var_data_node(grammar_type node_type) {
 /**
  * @brief 判断是不是数字类型的节点，浮点数，整型，长整型等都算在内
  */
-inline bool is_number_class_node(grammar_type node_type) {
+static inline bool is_number_class_node(grammar_type node_type) {
     return utils::inrange(
         grammar_type::NUMBER, grammar_type::LONG_FLOAT, node_type);
 }

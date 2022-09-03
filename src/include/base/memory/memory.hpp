@@ -8,7 +8,7 @@ namespace trc::memory {
  * @tparam T 容器类型
  * @param f 容器
  */
-template <typename T> inline void free_stl(T& f) {
+template <typename T> static inline void free_stl(T& f) {
     T().swap(f);
 }
 

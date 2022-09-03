@@ -8,7 +8,6 @@
 #include <base/color.h>
 #include <base/easter_eggs.h>
 #include <base/memory/memory.h>
-#include <base/trcdef.h>
 #include <base/utils/data.hpp>
 #include <cstring>
 #include <gflags/gflags.h>
@@ -67,7 +66,7 @@ static inline void find_mode_to_run(char* mode) {
 /**
  * @brief 释放内存，程序结束时使用
  */
-inline static void quit_mem() {
+static inline void quit_mem() {
     trc::TVM_space::TVM_quit_mem();
 }
 

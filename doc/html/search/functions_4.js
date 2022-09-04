@@ -9,7 +9,5 @@ var searchData=
   ['dllfree_6',['dllfree',['../namespacetrc_1_1autodll.html#a9aaa07d183109a4133d70c406b9c6329',1,'trc::autodll']]],
   ['dllfuncload_7',['dllfuncload',['../namespacetrc_1_1autodll.html#a157b8b595887f19ab034af7f5e42f5aa',1,'trc::autodll']]],
   ['dllopen_8',['dllopen',['../namespacetrc_1_1autodll.html#a74cb5e4028a8415621cf5a6a1f4a28ff',1,'trc::autodll']]],
-  ['draw_9',['draw',['../classtrc_1_1eggs_1_1drawer.html#af16e4e29d00eae8f52699ca8c73bee55',1,'trc::eggs::drawer::draw()'],['../classtrc_1_1utils_1_1progress__bar.html#a2719be4c254cc688ce3b82e81d352d4e',1,'trc::utils::progress_bar::draw()']]],
-  ['draw_5fpictures_10',['draw_pictures',['../namespacetrc_1_1eggs.html#a3390aa00ef6559f77abf6954a482e0be',1,'trc::eggs']]],
-  ['drawer_11',['drawer',['../classtrc_1_1eggs_1_1drawer.html#abbc66e1dc081f7624d5ddc3811f9ee22',1,'trc::eggs::drawer']]]
+  ['draw_9',['draw',['../classtrc_1_1utils_1_1progress__bar.html#a2719be4c254cc688ce3b82e81d352d4e',1,'trc::utils::progress_bar']]]
 ];

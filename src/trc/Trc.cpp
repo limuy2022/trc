@@ -6,7 +6,6 @@
 
 #include <TVM/memory.h>
 #include <base/color.h>
-#include <base/easter_eggs.h>
 #include <base/memory/memory.h>
 #include <base/utils/data.hpp>
 #include <cstring>
@@ -30,9 +29,6 @@ static inline void show_error(const char* mode) {
  */
 static void showversion() {
     trc::color::green("Version %s\n", trc::def::version);
-    // 调用小彩蛋模块
-    trc::eggs::canvas_data data = { { 0, 1, 0 }, { 1, 2, 1 }, { 0, 1, 0 } };
-    trc::eggs::draw_pictures(data);
 }
 
 // 命令函数的接口类型

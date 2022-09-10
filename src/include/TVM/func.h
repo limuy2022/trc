@@ -12,12 +12,6 @@ public:
 
     ~func_();
 
-    /**
-     * @param name 函数名
-     * @warning 不会拷贝字符串，而是直接使用，不要在函数外释放字符串
-     */
-    explicit func_(char* name);
-
     // 字节码信息
     struct_codes bytecodes;
     // 符号表长度

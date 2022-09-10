@@ -9,6 +9,5 @@ var searchData=
   ['free_5ffunc_6',['free_func',['../classtrc_1_1_t_v_m__space_1_1frame__.html#ac97612c1c1b8fad5e530d3055ea7ef5b',1,'trc::TVM_space::frame_']]],
   ['free_5fmodule_7',['free_module',['../namespacetrc_1_1_t_v_m__space.html#a1b34ab9d30dfa0cd0b1a5b371f7dc4b1',1,'trc::TVM_space']]],
   ['free_5ftree_8',['free_tree',['../namespacetrc_1_1compiler.html#af8e2fabe582e3d503faa2f476a5204d5',1,'trc::compiler']]],
-  ['free_5ftvm_9',['free_TVM',['../namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0',1,'trc::TVM_space']]],
-  ['func_5f_10',['func_',['../classtrc_1_1_t_v_m__space_1_1func__.html#ab6531b983f3b63ceb67fc86a5a41131c',1,'trc::TVM_space::func_']]]
+  ['free_5ftvm_9',['free_TVM',['../namespacetrc_1_1_t_v_m__space.html#a7c1eac1bcdfe3c792e88979d0c76ccb0',1,'trc::TVM_space']]]
 ];

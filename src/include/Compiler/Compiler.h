@@ -28,14 +28,14 @@ public:
     detail_compiler(compiler_public_data&, TVM_space::TVM_static_data* vm);
 
     // 编译时信息记录
-    CompileEnvironment infoenv;
+    module_compile_env infoenv;
 
     /**
      * @brief 将一个节点解析成字节码
      * @param head 根节点
      * @param localinfo 指向局部信息，默认与全局信息相同
      */
-    void compile(treenode* head, CompileEnvironment& localinfo);
+    void compile(treenode* head, basic_compile_env& localinfo);
 
     /**
      * @brief 负责把节点编译成代码
@@ -92,18 +92,19 @@ private:
      * @param bycode 指定字节码，是定义还是赋值
      */
     void add_var(byteCodeNumber bycode, is_not_end_node* root,
-        CompileEnvironment& localinfo, size_t index);
+        basic_compile_env& localinfo, size_t index);
 
     /**
      * @brief 添加字节码，并完善对应环境
      */
-    void add_opcode(byteCodeNumber, TVM_space::bytecode_index_t index);
+    void add_opcode(byteCodeNumber opcode, TVM_space::bytecode_index_t index,
+        TVM_space::struct_codes& bytecode);
 
     /**
      * @brief 添加带有语句块的特殊代码
      */
     template <bool compiletype>
-    void add_block(is_not_end_node* root, CompileEnvironment& localinfo);
+    void add_block(is_not_end_node* root, basic_compile_env& localinfo);
 
     /**
      * @brief 生成一条字节码的对应行号表记录
@@ -139,31 +140,31 @@ void free_tree(compiler::treenode* head);
 
 template <bool compiletype>
 void detail_compiler::add_block(
-    is_not_end_node* root, CompileEnvironment& localinfo) {
+    is_not_end_node* root, basic_compile_env& localinfo) {
     // 开头表达式
 
     // 记录语句块一开始的位置
     size_t goto_addr;
     if constexpr (compiletype) {
-        goto_addr = vm->byte_codes.size();
+        goto_addr = localinfo.bytecode.size();
     }
     auto iter = root->son.begin();
     compile(*iter, localinfo);
     iter++;
     // 单独处理跳转语句，否则无法处理常量表
     // 0只是用来占位的
-    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0);
+    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0, localinfo.bytecode);
     // 获取跳转表达式的字节码位置
-    size_t fix_bytecode = vm->byte_codes.size() - 1;
+    size_t fix_bytecode = localinfo.bytecode.size() - 1;
     // 然后编译其它所有的节点
     for (; iter != root->son.end(); ++iter) {
         compile(*iter, localinfo);
     }
     if constexpr (compiletype) {
         // while循环比if多一句goto
-        add_opcode(byteCodeNumber::GOTO_, goto_addr);
+        add_opcode(byteCodeNumber::GOTO_, goto_addr, localinfo.bytecode);
     }
     // 然后重新修改跳转地址
-    vm->byte_codes[fix_bytecode].index = vm->byte_codes.size();
+    localinfo.bytecode[fix_bytecode].index = localinfo.bytecode.size();
 }
 }

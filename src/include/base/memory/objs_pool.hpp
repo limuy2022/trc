@@ -149,7 +149,7 @@ template <typename T> void objs_pool<T>::full_gc() {
 template <typename T> objs_pool<T>::~objs_pool() {
     typename std::list<T*>::iterator tmp = blocks.begin();
     for (int i = 0, n = blocks.size(); i < n; ++i, ++tmp) {
-        delete[](*tmp);
+        delete[] (*tmp);
     }
 }
 }

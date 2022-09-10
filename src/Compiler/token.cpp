@@ -390,8 +390,6 @@ token* token_lex::lex_others() {
 }
 
 void token_lex::unget_token(token* token_data) {
-    // 必须没有储存token，否则就是出现了bug
-    assert(back_token == nullptr);
     back_token = token_data;
 }
 

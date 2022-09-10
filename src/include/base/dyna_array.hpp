@@ -33,8 +33,12 @@ template <typename T> dyna_array<T>::~dyna_array() {
 }
 
 template <typename T> void dyna_array<T>::compress_memory() {
-    // 因为该函数用于压缩内存，所以不存在分配失败的可能，故不做null校验
-    array = (T*)realloc(array, sizeof(T) * size);
+    T* new_array = new T[size];
+    for (size_t i = 0; i < size; ++i) {
+        new_array[i] = std::move(array[i]);
+    }
+    delete[] array;
+    array = new_array;
 }
 
 template <typename T> T* dyna_array<T>::end() {

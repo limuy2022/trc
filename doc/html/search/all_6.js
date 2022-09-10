@@ -32,7 +32,7 @@ var searchData=
   ['func_29',['FUNC',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a1e49c8ad07b69571bfcafaf18ac9fa5b',1,'trc::compiler']]],
   ['func_2ecpp_30',['func.cpp',['../func_8cpp.html',1,'']]],
   ['func_2eh_31',['func.h',['../func_8h.html',1,'']]],
-  ['func_5f_32',['func_',['../classtrc_1_1_t_v_m__space_1_1func__.html#ab6531b983f3b63ceb67fc86a5a41131c',1,'trc::TVM_space::func_::func_()'],['../classtrc_1_1_t_v_m__space_1_1func__.html',1,'trc::TVM_space::func_']]],
+  ['func_5f_32',['func_',['../classtrc_1_1_t_v_m__space_1_1func__.html',1,'trc::TVM_space']]],
   ['func_5fdefine_33',['FUNC_DEFINE',['../namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa6109302d4e2a2870e63b3df1c1d52c2c',1,'trc::compiler']]],
   ['func_5floader_2ecpp_34',['func_loader.cpp',['../func__loader_8cpp.html',1,'']]],
   ['func_5floader_2eh_35',['func_loader.h',['../func__loader_8h.html',1,'']]],

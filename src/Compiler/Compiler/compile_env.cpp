@@ -5,25 +5,34 @@
 #include <language/error.h>
 
 namespace trc::compiler {
-CompileEnvironment::CompileEnvironment(compiler_public_data& compiler_data)
-    : compiler_data(compiler_data) {
+basic_compile_env::basic_compile_env(
+    compiler_public_data& compiler_data, TVM_space::struct_codes& bytecodes)
+    : compiler_data(compiler_data)
+    , bytecode(bytecodes) {
 }
 
-CompileEnvironment::~CompileEnvironment() {
+basic_compile_env::~basic_compile_env() {
     // 释放掉变量名内存
     for (auto i : var_names_list) {
         delete[] i;
     }
+}
+
+module_compile_env::~module_compile_env() {
     for (auto i : functions) {
         delete[] i;
     }
 }
 
-size_t CompileEnvironment::get_name_size() {
+size_t module_compile_env::get_func_size() {
+    return functions.size();
+}
+
+size_t basic_compile_env::get_name_size() {
     return var_names_list.size();
 }
 
-size_t CompileEnvironment::get_index_of_function(const char* name) {
+size_t module_compile_env::get_index_of_function(const char* name) {
     // 如果在函数列表中
     for (size_t i = 0, n = functions.size(); i < n; ++i) {
         if (!strcmp(functions[i], name)) {
@@ -35,7 +44,7 @@ size_t CompileEnvironment::get_index_of_function(const char* name) {
     return 0;
 }
 
-void CompileEnvironment::add_function(const char* name) {
+void module_compile_env::add_function(const char* name) {
     size_t n = functions.size();
     for (size_t i = 0; i < n; ++i) {
         if (!strcmp(functions[i], name)) {
@@ -46,7 +55,7 @@ void CompileEnvironment::add_function(const char* name) {
     functions.push_back(name);
 }
 
-size_t CompileEnvironment::get_index_of_var(char* name, bool report_error) {
+size_t basic_compile_env::get_index_of_var(char* name, bool report_error) {
     size_t n = var_names_list.size();
     for (size_t i = 0; i < n; ++i) {
         if (!strcmp(var_names_list[i], name)) {
@@ -62,7 +71,7 @@ size_t CompileEnvironment::get_index_of_var(char* name, bool report_error) {
     return size_tmax;
 }
 
-size_t CompileEnvironment::add_var(char* name) {
+size_t basic_compile_env::add_var(char* name) {
     size_t n = var_names_list.size();
     for (size_t i = 0; i < n; ++i) {
         if (!strcmp(var_names_list[i], name)) {

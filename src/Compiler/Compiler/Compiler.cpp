@@ -50,9 +50,9 @@ void detail_compiler::generate_line_table() {
     }
 }
 
-void detail_compiler::add_opcode(
-    byteCodeNumber opcode, TVM_space::bytecode_index_t index) {
-    vm->byte_codes.emplace_back((bytecode_t)opcode, index);
+void detail_compiler::add_opcode(byteCodeNumber opcode,
+    TVM_space::bytecode_index_t index, TVM_space::struct_codes& bytecode) {
+    bytecode.emplace_back((bytecode_t)opcode, index);
     generate_line_table();
 }
 
@@ -105,13 +105,13 @@ byteCodeNumber detail_compiler::build_opcode(token_ticks symbol) {
 }
 
 void detail_compiler::add_var(byteCodeNumber bycode, is_not_end_node* root,
-    CompileEnvironment& localinfo, size_t index) {
+    basic_compile_env& localinfo, size_t index) {
     // 处理等式右边的数据
     compile(*(++root->son.begin()), localinfo);
-    add_opcode(bycode, index);
+    add_opcode(bycode, index, localinfo.bytecode);
 }
 
-void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
+void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
     grammar_type type = head->type;
     if (head->has_son) {
         auto* root = (is_not_end_node*)head;
@@ -128,18 +128,18 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
         case grammar_type::BUILTIN_FUNC: {
             // 内置函数
             // 先递归编译参数
-            auto argv_nodes = (is_not_end_node*)root->son.front();
-            for (auto i : argv_nodes->son) {
+            for (auto i : root->son) {
                 compile(i, localinfo);
             }
             // 然后编译参数个数
-            int num_of_nodes
-                = ((is_not_end_node*)root->son.front())->son.size();
-            add_opcode(byteCodeNumber::LOAD_INT_, add_int(num_of_nodes));
+            int num_of_nodes = root->son.size();
+            add_opcode(byteCodeNumber::LOAD_INT_, add_int(num_of_nodes),
+                localinfo.bytecode);
             // 最后加上调用函数
             // 内置函数以编码形式保存，这是它的位置
             int function_index = ((node_base_int*)root)->value;
-            add_opcode(byteCodeNumber::CALL_BUILTIN_, function_index);
+            add_opcode(byteCodeNumber::CALL_BUILTIN_, function_index,
+                localinfo.bytecode);
             break;
         }
         case grammar_type::OPCODE_ARGV: {
@@ -147,16 +147,34 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 参数
             auto argv_
                 = ((node_base_int_without_sons*)root->son.front())->value;
-            add_opcode(
-                build_opcode(((node_base_tick*)root)->tick), add_int(argv_));
+            add_opcode(build_opcode(((node_base_tick*)root)->tick),
+                add_int(argv_), localinfo.bytecode);
             break;
         }
         case grammar_type::FUNC_DEFINE: {
             // 首先添加函数定义
             infoenv.add_function(((node_base_data*)root)->data);
+            size_t func_index = infoenv.get_func_size();
             // 然后为函数新建一个新的局部环境，进行编译
-            CompileEnvironment localfuncenv(compiler_data);
-
+            basic_compile_env localfuncenv(
+                compiler_data, vm->funcs[func_index].bytecodes);
+            // 编译构建变量的代码
+            auto index = root->son.begin();
+            for (auto i : ((is_not_end_node*)(*index))->son) {
+                add_opcode(byteCodeNumber::STORE_LOCAL_,
+                    localfuncenv.add_var(
+                        ((node_base_data_without_sons*)i)->swap_string_data()),
+                    localinfo.bytecode);
+            }
+            // 编译函数体
+            // 指向第一条函数体代码
+            index++;
+            for (auto end = root->son.end(); index != end; ++index) {
+                compile(*index, localfuncenv);
+            }
+            // 设置函数符号表
+            vm->funcs[func_index].symbol_form_size
+                = localfuncenv.get_name_size();
             break;
         }
         case grammar_type::VAR_DEFINE: {
@@ -196,7 +214,12 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 调用自定义函数
             char* nodedata = ((node_base_data*)root)->data;
             size_t index = infoenv.get_index_of_function(nodedata);
-            add_opcode(byteCodeNumber::CALL_FUNCTION_, index);
+            // 编译参数
+            for (auto i : root->son) {
+                compile(i, localinfo);
+            }
+            add_opcode(
+                byteCodeNumber::CALL_FUNCTION_, index, localinfo.bytecode);
             break;
         }
             // 需要跳转的语句块
@@ -221,17 +244,20 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             size_t index_argv;
             // 首先尝试在局部变量中查找
             if (&localinfo == &infoenv) {
-                //相等，说明现在处于全局作用域中
+                // 相等，说明现在处于全局作用域中
                 index_argv = localinfo.get_index_of_var(varname, true);
-                add_opcode(byteCodeNumber::LOAD_NAME_, index_argv);
+                add_opcode(
+                    byteCodeNumber::LOAD_NAME_, index_argv, localinfo.bytecode);
             } else {
                 index_argv = localinfo.get_index_of_var(varname, false);
                 if (index_argv == size_tmax) {
                     // 如果在局部变量中没有查找到
                     index_argv = infoenv.get_index_of_var(varname, true);
-                    add_opcode(byteCodeNumber::LOAD_NAME_, index_argv);
+                    add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
+                        localinfo.bytecode);
                 } else {
-                    add_opcode(byteCodeNumber::LOAD_LOCAL_, index_argv);
+                    add_opcode(byteCodeNumber::LOAD_LOCAL_, index_argv,
+                        localinfo.bytecode);
                 }
             }
             break;
@@ -240,34 +266,38 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
             // 整型节点
             auto value = ((node_base_int_without_sons*)head)->value;
             auto index_argv = add_int(value);
-            add_opcode(byteCodeNumber::LOAD_INT_, index_argv);
+            add_opcode(
+                byteCodeNumber::LOAD_INT_, index_argv, localinfo.bytecode);
             break;
         }
         case grammar_type::STRING: {
             // 字符串节点
             auto index_argv = add_string(
                 ((node_base_data_without_sons*)head)->swap_string_data());
-            add_opcode(byteCodeNumber::LOAD_STRING_, index_argv);
+            add_opcode(
+                byteCodeNumber::LOAD_STRING_, index_argv, localinfo.bytecode);
             break;
         }
         case grammar_type::FLOAT: {
             // 浮点型节点
             auto value = ((node_base_float_without_sons*)head)->value;
             auto index_argv = add_float(value);
-            add_opcode(byteCodeNumber::LOAD_FLOAT_, index_argv);
+            add_opcode(
+                byteCodeNumber::LOAD_FLOAT_, index_argv, localinfo.bytecode);
             break;
         }
         case grammar_type::LONG_INT: {
             // 长整型节点
             auto index_argv = add_long(
                 ((node_base_data_without_sons*)head)->swap_string_data());
-            add_opcode(byteCodeNumber::LOAD_LONG_, index_argv);
+            add_opcode(
+                byteCodeNumber::LOAD_LONG_, index_argv, localinfo.bytecode);
             break;
         }
         case grammar_type::OPCODE: {
             // 生成字节码, 0代表没有参数
             token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
-            add_opcode(build_opcode(tick), 0);
+            add_opcode(build_opcode(tick), 0, localinfo.bytecode);
             break;
         }
         default: {
@@ -281,7 +311,7 @@ void detail_compiler::compile(treenode* head, CompileEnvironment& localinfo) {
 
 detail_compiler::detail_compiler(
     compiler_public_data& compiler_data, TVM_space::TVM_static_data* vm)
-    : infoenv(compiler_data)
+    : infoenv(compiler_data, vm->byte_codes)
     , vm(vm)
     , compiler_data(compiler_data) {
 }
@@ -303,15 +333,11 @@ void free_tree(treenode* head) {
 void detail_compiler::compile_node(grammar_lex& grammar_lexer) {
     treenode* root = grammar_lexer.compile_all();
     // 申请虚拟机常量池的内存，统计元素个数时没有去重，可能会多申请，后面会压缩掉多余的储存空间
-    vm->const_i.array = (int*)malloc(sizeof(int) * compiler_data.int_size);
-    vm->const_f.array
-        = (double*)malloc(sizeof(double) * compiler_data.float_size);
-    vm->const_s.array
-        = (char**)malloc(sizeof(char*) * compiler_data.string_size);
-    vm->const_long.array
-        = (char**)malloc(sizeof(char*) * compiler_data.long_int_size);
-    vm->funcs.array = (TVM_space::func_*)malloc(
-        sizeof(TVM_space::func_) * compiler_data.func_size);
+    vm->const_i.array = new int[compiler_data.int_size];
+    vm->const_f.array = new double[compiler_data.float_size];
+    vm->const_s.array = new char*[compiler_data.string_size];
+    vm->const_long.array = new char*[compiler_data.long_int_size];
+    vm->funcs.array = new TVM_space::func_[compiler_data.func_size];
     // 对于全局对象，局部作用域等于全局作用域
     compile(root, infoenv);
     delete root;

@@ -4,14 +4,54 @@
 #include <base/trcdef.h>
 
 namespace trc::TVM_space {
-TVM_BUILTINS_FUNC builtin_funcs[] { &builtin::EXIT, &builtin::PRINT,
-    &builtin::PRINTLN, &builtin::INPUT, &builtin::LENGTH, &builtin::HELP,
-    &builtin::STRING_, &builtin::INT_, &builtin::BOOL_, &builtin::FLOAT_,
-    &builtin::TYPE };
-
 void TVM::CALL_BUILTIN(bytecode_index_t name) {
     auto firsti = (def::INTOBJ)pop();
-    builtin_funcs[name](firsti->value, this);
+    switch (name) {
+    case 0: {
+        builtin::EXIT(firsti->value, this);
+        break;
+    }
+    case 1: {
+        builtin::PRINT(firsti->value, this);
+        break;
+    }
+    case 2: {
+        builtin::PRINTLN(firsti->value, this);
+        break;
+    }
+    case 3: {
+        builtin::INPUT(firsti->value, this);
+        break;
+    }
+    case 4: {
+        builtin::LENGTH(firsti->value, this);
+        break;
+    }
+    case 5: {
+        builtin::HELP(firsti->value, this);
+        break;
+    }
+    case 6: {
+        builtin::STRING_(firsti->value, this);
+        break;
+    }
+    case 7: {
+        builtin::INT_(firsti->value, this);
+        break;
+    }
+    case 8: {
+        builtin::BOOL_(firsti->value, this);
+        break;
+    }
+    case 9: {
+        builtin::FLOAT_(firsti->value, this);
+        break;
+    }
+    case 10: {
+        builtin::TYPE(firsti->value, this);
+        break;
+    }
+    }
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {

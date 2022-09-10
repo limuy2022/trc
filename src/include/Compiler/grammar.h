@@ -129,6 +129,11 @@ private:
      */
     void check_expr(is_not_end_node* root);
 
+    /**
+     * @brief 获取参数列表
+     */
+    void get_param_list(is_not_end_node* root);
+
     // 编译期间要用到的数据
     trc::compiler::compiler_public_data& compiler_data;
 

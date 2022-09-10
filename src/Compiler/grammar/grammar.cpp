@@ -20,11 +20,9 @@ treenode* grammar_lex::assign(grammar_type oper, treenode* left_value) {
     return ass;
 }
 
-treenode* grammar_lex::callfunction(token* funcname) {
-    // 加上参数个数
-    compiler_data.int_size++;
-    auto argv_node = new is_not_end_node;
-    // 这一段是在切割参数，划分好自己的参数
+void grammar_lex::get_param_list(is_not_end_node* root) {
+    // 删除(符号
+    delete token_.get_token();
     token* lex_tmp;
     // 设置解析器遇到逗号停止解析
     special_tick_for_end = token_ticks::COMMA;
@@ -37,25 +35,31 @@ treenode* grammar_lex::callfunction(token* funcname) {
             delete lex_tmp;
         } else {
             token_.unget_token(lex_tmp);
-            argv_node->connect(get_node());
+            root->connect(get_node());
         }
     }
     special_tick_for_end = token_ticks::UNKNOWN;
-    // 由于栈先进后出的特征，在此处将参数进行反转
-    argv_node->son.reverse();
+}
+
+treenode* grammar_lex::callfunction(token* funcname) {
+    // 加上参数个数
+    compiler_data.int_size++;
     // 函数名问题：判断内置函数和自定义函数
+    is_not_end_node* ans;
     if (trc::utils::str_check_in(
             funcname->data, loader::num_func.begin(), loader::num_func.end())) {
         // 内置函数
-        auto builtin = new node_base_int(
+        ans = new node_base_int(
             loader::func_num[funcname->data], grammar_type::BUILTIN_FUNC);
-        builtin->connect(argv_node);
-        return builtin;
+    } else {
+        // 自定义函数
+        ans = new node_base_data(grammar_type::CALL_FUNC, funcname);
     }
-    // 自定义函数
-    auto user_defined = new node_base_data(grammar_type::CALL_FUNC, funcname);
-    user_defined->connect(argv_node);
-    return user_defined;
+    // 处理参数
+    get_param_list(ans);
+    // 由于栈先进后出的特征，在此处将参数进行反转
+    ans->son.reverse();
+    return ans;
 }
 
 treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
@@ -95,7 +99,6 @@ treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     }
     // 将参数反转，因为栈先进后出
     std::reverse(argv_node->son.begin(), argv_node->son.end());
-
     auto len = new node_base_int_without_sons(argc);
     head->connect(argv_node);
     head->connect(len);
@@ -131,6 +134,10 @@ treenode* grammar_lex::func_define() {
     auto name = check_excepted(token_ticks::NAME);
     auto func_node = new node_base_data(grammar_type::FUNC_DEFINE, name);
     delete name;
+    // 处理参数列表
+    auto* argv_list = new is_not_end_node;
+    get_param_list(argv_list);
+    func_node->connect(argv_list);
     read_block(func_node);
     return func_node;
 }
@@ -208,8 +215,6 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
                 // 函数调用
                 // warning:该地如果直接返回就会造成类似input()+input()这样的解析错误
                 // 所以我们要暂存运算结果
-                // 删除(符号
-                delete token_.get_token();
                 now_node = callfunction(now);
             }
             delete now;
@@ -410,11 +415,7 @@ token_ticks grammar_lex::get_next_token_tick() {
 
 treenode* grammar_lex::compile_all() {
     auto* root = new is_not_end_node(grammar_type::TREE);
-    for (;;) {
-        treenode* node = get_node();
-        if (node == nullptr) {
-            break;
-        }
+    for (treenode* node = get_node(); node != nullptr; node = get_node()) {
         root->connect(node);
     }
     return root;

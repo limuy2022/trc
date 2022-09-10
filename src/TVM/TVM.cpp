@@ -169,9 +169,7 @@ void TVM::run_bycode(const TVM_bytecode* bycode) {
 
 void free_module(TVM* vm) {
     for (size_t i = 0; i < vm->modules_num; ++i) {
-        if (vm->modules[i]->modules_num != 0) {
-            free_module(vm->modules[i]);
-        }
+        free_module(vm->modules[i]);
         delete vm->modules[i];
     }
 }

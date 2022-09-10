@@ -60,9 +60,9 @@ enum class token_ticks {
     TRUE_, // true
     FALSE_, // false
     STRING_VALUE, // 字符串值
-    LONG_FLOAT_VALUE, //长浮点型值
+    LONG_FLOAT_VALUE, // 长浮点型值
     FLOAT_VALUE, // 浮点数值
-    LONG_INT_VALUE, //长整型值
+    LONG_INT_VALUE, // 长整型值
     INT_VALUE, // 整型值
     LEFT_BIG_BRACE, // {
     RIGHT_BIG_BRACE, // }
@@ -74,7 +74,7 @@ enum class token_ticks {
     COMMA, // ,
     UNKNOWN, // unknown value,可以暂时用来占个位
     END_OF_TOKENS, // 解析结束
-    END_OF_LINE, //行结束
+    END_OF_LINE, // 行结束
 };
 
 /**

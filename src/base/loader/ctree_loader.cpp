@@ -9,10 +9,10 @@
 #include <base/Error.h>
 #include <base/ctree_loader.h>
 #include <base/utils/bytes.h>
+#include <bit>
 #include <cstdio>
 #include <cstring>
 #include <language/error.h>
-#include <platform.h>
 #include <string>
 #include <vector>
 
@@ -50,7 +50,7 @@ namespace trc::loader {
 static void fread_cross_plat(void* a, size_t b, size_t c, FILE* d) {
     fread(a, b, c, d);
     /*为大端则转成小端*/
-    if (!trc::def::byte_order) {
+    if constexpr (std::endian::native == std::endian::little) {
         trc::utils::bytes_order_change((trc::def::byte_t*)a, b * c);
     }
 }
@@ -61,7 +61,7 @@ static void fread_cross_plat(void* a, size_t b, size_t c, FILE* d) {
  * @warning 字符串等数据无需通过此种方式读取
  */
 static void fwrite_cross_plat(const void* a, size_t b, size_t c, FILE* d) {
-    if (!def::byte_order) {
+    if constexpr (std::endian::native == std::endian::little) {
         /*为小端则转成大端*/
         utils::bytes_order_change((def::byte_t*)a, b * c);
         fwrite(a, b, c, d);

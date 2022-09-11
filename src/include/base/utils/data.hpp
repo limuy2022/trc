@@ -44,17 +44,6 @@ template <typename T, typename V> int index_vector(const T& v1, const V& data) {
 }
 
 /**
- * @brief 检查data是否在容器T每一项值的里面
- * @tparam T 容器类型
- * @tparam O 数据类型
- * @param data 数据
- * @param arr 容器
- */
-template <typename T, typename O> bool check_in(const O& data, T begin, T end) {
-    return std::find(begin, end, data) != end;
-}
-
-/**
  * @brief 检查data是否在容器T每一项值的里面(字符串专用)
  */
 template <typename T> bool str_check_in(const char* data, T begin, T end) {

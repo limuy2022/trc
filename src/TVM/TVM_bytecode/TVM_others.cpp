@@ -2,8 +2,8 @@
 #include <TVM/TVM.h>
 #include <TVM/lib.h>
 #include <TVM/memory.h>
+#include <algorithm>
 #include <base/Error.h>
-#include <base/utils/data.hpp>
 #include <base/utils/filesys.h>
 #include <filesystem>
 #include <language/error.h>
@@ -55,7 +55,8 @@ static void fix_path(const std::string& path) {
     if (utils::file_exists(path)) {
         return;
     }
-    if (utils::check_in(path, cpp_libs::names.begin(), cpp_libs::names.end())) {
+    if (find(cpp_libs::names.begin(), cpp_libs::names.end(), path)
+        != cpp_libs::names.end()) {
         return;
     }
     if (utils::file_exists(

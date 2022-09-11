@@ -32,16 +32,6 @@ TEST(data, index_strstl) {
     EXPECT_EQ(utils::index_vector(p, "llll"), -1);
 }
 
-TEST(check_in, check_in) {
-    std::vector<int> a = { 9, 8, 7 };
-    std::list<int> b = { 9, 9, 1, -2, 0 };
-    EXPECT_TRUE(trc::utils::check_in(8, a.begin(), a.end()));
-    EXPECT_FALSE(trc::utils::check_in(10, a.begin(), a.end()));
-    EXPECT_TRUE(trc::utils::check_in(-2, b.begin(), b.end()));
-    EXPECT_TRUE(trc::utils::check_in(0, b.begin(), b.end()));
-    EXPECT_FALSE(trc::utils::check_in(-1, b.begin(), b.end()));
-}
-
 TEST(check_in, str_check_in) {
     std::vector<const char*> a = {};
     EXPECT_FALSE(utils::str_check_in("pp", a.begin(), a.end()));

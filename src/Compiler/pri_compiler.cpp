@@ -27,6 +27,12 @@ is_not_end_node::is_not_end_node(grammar_type type) {
     this->type = type;
 }
 
+is_not_end_node::~is_not_end_node() {
+    for (auto i : son) {
+        delete i;
+    }
+}
+
 is_end_node::is_end_node() {
     this->has_son = false;
 }

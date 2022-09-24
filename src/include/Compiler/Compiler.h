@@ -133,11 +133,6 @@ detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
     const std::string& codes, const compiler_option* option,
     detail_compiler* compiler_ptr = nullptr, bool return_compiler_ptr = false);
 
-/**
- * @brief 释放整棵树的内存
- */
-void free_tree(compiler::treenode* head);
-
 template <bool compiletype>
 void detail_compiler::add_block(
     is_not_end_node* root, basic_compile_env& localinfo) {

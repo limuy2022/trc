@@ -164,6 +164,8 @@ class is_not_end_node : public treenode {
 public:
     explicit is_not_end_node(grammar_type type);
 
+    ~is_not_end_node();
+
     is_not_end_node();
 
     std::list<treenode*> son;

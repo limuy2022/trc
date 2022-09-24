@@ -72,7 +72,7 @@ namespace tools_in {
             printf("%zu:", index);
             out(tmp);
             putchar('\n');
-            compiler::free_tree(tmp);
+            delete tmp;
             tmp = grammar_t.get_node();
             index++;
         }

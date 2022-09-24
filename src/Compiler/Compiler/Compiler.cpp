@@ -305,8 +305,6 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         }
         }
     }
-    // 释放自己的所有子节点
-    free_tree(head);
 }
 
 detail_compiler::detail_compiler(
@@ -318,16 +316,6 @@ detail_compiler::detail_compiler(
 
 void detail_compiler::retie(TVM_space::TVM_static_data* vm) {
     this->vm = vm;
-}
-
-void free_tree(treenode* head) {
-    if (head->has_son) {
-        auto node = ((is_not_end_node*)head);
-        for (auto i : node->son) {
-            free_tree(i);
-        }
-        node->son.clear();
-    }
 }
 
 void detail_compiler::compile_node(grammar_lex& grammar_lexer) {

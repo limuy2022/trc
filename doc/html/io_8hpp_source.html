@@ -82,60 +82,9 @@ $(function() {
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1io.html">trc::io</a> {</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacetrc_1_1io.html#a401f20ac79f439c66444a27be4f8577c">readstr</a>(<span class="keywordtype">char</span>*&amp;, FILE* stream = stdin);</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment">// 用来占位的变量,不要读取，可能是无意义的值</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">readflagdefault</a>;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="namespacetrc_1_1io.html#a9742a885a9f9183f15b2b9a18540f702">   33</a></span>T <a class="code hl_function" href="namespacetrc_1_1io.html#a9742a885a9f9183f15b2b9a18540f702">fast_int_read</a>(FILE* stream = stdin, <span class="keywordtype">bool</span>&amp; readflag = <a class="code hl_variable" href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">readflagdefault</a>) {</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    T res = 0;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">int</span> f = 1;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">int</span> c;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">for</span> (;;) {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        c = fgetc(stream);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="keywordflow">if</span> (<span class="charliteral">&#39;0&#39;</span> &lt;= c &amp;&amp; c &lt;= <span class="charliteral">&#39;9&#39;</span>) {</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        }</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">if</span> (c == EOF) {</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>            readflag = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>            <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        }</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;-&#39;</span>) {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            f = -1;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        }</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordflow">do</span> {</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        res *= 10;</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        res += c - <span class="charliteral">&#39;0&#39;</span>;</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        c = fgetc(stream);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    } <span class="keywordflow">while</span> (<span class="charliteral">&#39;0&#39;</span> &lt;= c &amp;&amp; c &lt;= <span class="charliteral">&#39;9&#39;</span>);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordflow">return</span> res * f;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> fast_int_write_internal(T num, FILE* stream) {</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordflow">if</span> (num &lt; 10) {</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        fputc(num + <span class="charliteral">&#39;0&#39;</span>, stream);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        fast_int_write_internal(num / 10, stream);</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        fputc(num % 10 + <span class="charliteral">&#39;0&#39;</span>, stream);</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    }</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>}</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="namespacetrc_1_1io.html#a945022c6007119a6d2eab3a25dfe3616">   78</a></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code hl_function" href="namespacetrc_1_1io.html#a945022c6007119a6d2eab3a25dfe3616">fast_int_write</a>(T num, FILE* stream = stdout) {</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordflow">if</span> (num &lt; 0) {</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        fputc(<span class="charliteral">&#39;-&#39;</span>, stream);</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        fast_int_write_internal(-num, stream);</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        fast_int_write_internal(num, stream);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    }</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>}</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>}</div>
 <div class="ttc" id="anamespacetrc_1_1io_html"><div class="ttname"><a href="namespacetrc_1_1io.html">trc::io</a></div><div class="ttdef"><b>Definition:</b> io.cpp:16</div></div>
 <div class="ttc" id="anamespacetrc_1_1io_html_a401f20ac79f439c66444a27be4f8577c"><div class="ttname"><a href="namespacetrc_1_1io.html#a401f20ac79f439c66444a27be4f8577c">trc::io::readstr</a></div><div class="ttdeci">bool readstr(char *&amp;str, FILE *stream)</div><div class="ttdoc">读入一个长度不限的字符串(不包括换行符)</div><div class="ttdef"><b>Definition:</b> io.cpp:17</div></div>
-<div class="ttc" id="anamespacetrc_1_1io_html_a945022c6007119a6d2eab3a25dfe3616"><div class="ttname"><a href="namespacetrc_1_1io.html#a945022c6007119a6d2eab3a25dfe3616">trc::io::fast_int_write</a></div><div class="ttdeci">void fast_int_write(T num, FILE *stream=stdout)</div><div class="ttdoc">快速输出一个整数，当向文件输出性能比printf要高</div><div class="ttdef"><b>Definition:</b> io.hpp:78</div></div>
-<div class="ttc" id="anamespacetrc_1_1io_html_a9742a885a9f9183f15b2b9a18540f702"><div class="ttname"><a href="namespacetrc_1_1io.html#a9742a885a9f9183f15b2b9a18540f702">trc::io::fast_int_read</a></div><div class="ttdeci">T fast_int_read(FILE *stream=stdin, bool &amp;readflag=readflagdefault)</div><div class="ttdoc">快速读入一个整数，当从文件读入时性能比scanf高</div><div class="ttdef"><b>Definition:</b> io.hpp:33</div></div>
-<div class="ttc" id="anamespacetrc_1_1io_html_af468ce944abe4f1b84e560a41a008ea0"><div class="ttname"><a href="namespacetrc_1_1io.html#af468ce944abe4f1b84e560a41a008ea0">trc::io::readflagdefault</a></div><div class="ttdeci">bool readflagdefault</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -9,20 +9,14 @@ namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;
 
 void trc_int::putline(FILE* out) {
-    if (out == stdin) {
-        // 当在控制台输出时，printf比快输要快
-        if constexpr (sizeof(int) == sizeof(trc_int_t)) {
-            fprintf(out, "%d", value);
-        } else if constexpr (sizeof(long long) == sizeof(trc_int_t)) {
-            fprintf(out, "%lld", value);
-        } else if constexpr (sizeof(short) == sizeof(trc_int_t)) {
-            fprintf(out, "%hd", value);
-        } else if constexpr (sizeof(long) == sizeof(trc_int_t)) {
-            fprintf(out, "%ld", value);
-        }
-    } else {
-        // 当向文件输出时，快输比printf要快
-        io::fast_int_write(value, out);
+    if constexpr (sizeof(int) == sizeof(trc_int_t)) {
+        fprintf(out, "%d", value);
+    } else if constexpr (sizeof(long long) == sizeof(trc_int_t)) {
+        fprintf(out, "%lld", value);
+    } else if constexpr (sizeof(short) == sizeof(trc_int_t)) {
+        fprintf(out, "%hd", value);
+    } else if constexpr (sizeof(long) == sizeof(trc_int_t)) {
+        fprintf(out, "%ld", value);
     }
 }
 

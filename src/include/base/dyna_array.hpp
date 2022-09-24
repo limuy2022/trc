@@ -29,7 +29,7 @@ public:
 };
 
 template <typename T> dyna_array<T>::~dyna_array() {
-    free(array);
+    delete[] array;
 }
 
 template <typename T> void dyna_array<T>::compress_memory() {
@@ -47,7 +47,7 @@ template <typename T> T* dyna_array<T>::end() {
 
 template <typename T> void dyna_array<T>::clear() {
     size = 0;
-    free(array);
+    delete[] array;
     array = nullptr;
 }
 

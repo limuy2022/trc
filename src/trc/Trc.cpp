@@ -7,7 +7,6 @@
 #include <TVM/memory.h>
 #include <base/color.h>
 #include <base/memory/memory.h>
-#include <base/utils/data.hpp>
 #include <cstring>
 #include <gflags/gflags.h>
 #include <language/language.h>
@@ -17,42 +16,44 @@
 #include <gtest/gtest.h>
 #endif
 
+namespace trc {
 /**
  * @brief 报出找不到模式错误
  */
 static inline void show_error(const char* mode) {
-    trc::color::red("Trc:\"%s\"%s", mode, language::trc::mode_not_found);
+    color::red("Trc:\"%s\"%s", mode, language::trc::mode_not_found);
 }
 
 /**
  * @brief 输出版本号，version命令行参数对应的函数
  */
 static void showversion() {
-    trc::color::green("Version %s\n", trc::def::version);
+    color::green("Version %s\n", def::version);
 }
 
 // 命令函数的接口类型
 typedef void (*argv_func_tools)();
 
-static const char* tools_func_name[] = { "tdb", "help", "version", "run",
-    "token", "dis", "grammar", "brun", "build", "style" };
-
-static const argv_func_tools tools_func[] = { trc::tools::tools_out::tdb,
-    trc::tools::tools_out::help, showversion, trc::tools::tools_out::run,
-    trc::tools::tools_out::out_token, trc::tools::tools_out::dis,
-    trc::tools::tools_out::out_grammar, trc::tools::tools_out::brun,
-    trc::tools::tools_out::build, trc::tools::tools_out::style };
+struct {
+    const char* name;
+    argv_func_tools tool_func;
+} cmd_tool[] = { { "tdb", tools::tools_out::tdb },
+    { "help", tools::tools_out::help }, { "version", showversion },
+    { "run", tools::tools_out::run }, { "token", tools::tools_out::out_token },
+    { "dis", tools::tools_out::dis },
+    { "grammar", tools::tools_out::out_grammar },
+    { "brun", tools::tools_out::brun }, { "build", tools::tools_out::build },
+    { "style", tools::tools_out::style } };
 
 /**
  * @brief 查找对应工具并运行
  * @param mode 对应工具
  */
 static inline void find_mode_to_run(char* mode) {
-    for (int i = 0, end = trc::utils::sizeof_static_array(tools_func); i < end;
-         ++i) {
-        if (!strcmp(mode, tools_func_name[i])) {
+    for (auto i : cmd_tool) {
+        if (!strcmp(mode, i.name)) {
             // 匹配上了
-            tools_func[i]();
+            i.tool_func();
             return;
         }
     }
@@ -63,7 +64,8 @@ static inline void find_mode_to_run(char* mode) {
  * @brief 释放内存，程序结束时使用
  */
 static inline void quit_mem() {
-    trc::TVM_space::TVM_quit_mem();
+    TVM_space::TVM_quit_mem();
+}
 }
 
 int main(int argc, char* argv[]) {
@@ -87,7 +89,7 @@ int main(int argc, char* argv[]) {
         trc::tools::tools_out::tshell();
     } else {
         // 指定模式，匹配调用模式
-        find_mode_to_run(argv[1]);
+        trc::find_mode_to_run(argv[1]);
     }
 #else
     ::testing::GTEST_FLAG(output) = "xml:unittest.xml";
@@ -97,6 +99,6 @@ int main(int argc, char* argv[]) {
 #endif
     // 卸载系统
     // 卸载内存，做收尾工作
-    quit_mem();
+    trc::quit_mem();
     return 0;
 }

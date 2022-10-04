@@ -153,7 +153,8 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         }
         case grammar_type::FUNC_DEFINE: {
             // 首先添加函数定义
-            infoenv.add_function(((node_base_data*)root)->data);
+            auto funcname = ((node_base_data*)root)->swap_string_data();
+            infoenv.add_function(funcname);
             size_t func_index = infoenv.get_func_size();
             // 然后为函数新建一个新的局部环境，进行编译
             basic_compile_env localfuncenv(

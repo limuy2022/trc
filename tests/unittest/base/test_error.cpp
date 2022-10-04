@@ -1,6 +1,5 @@
 ﻿#include <base/Error.h>
 #include <cstdarg>
-#include <cstdlib>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -11,7 +10,7 @@ static void test_make_error_msg(const char* right_msg, int error_name, ...) {
     va_start(ap, error_name);
     char* program_result = error::make_error_msg(error_name, ap);
     EXPECT_STREQ(right_msg, program_result);
-    free(program_result);
+    delete[] program_result;
     va_end(ap);
 }
 
@@ -28,5 +27,5 @@ TEST(error, make_error_msg) {
         "oooooooooooo");
     // 测试插入字符
     test_make_error_msg("SystemError:hope to pass", error::SystemError,
-        "% ## %", "hope", 't', 'o', "pass");
+        "% %% %", "hope", "t", "o", "pass");
 }

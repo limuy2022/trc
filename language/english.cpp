@@ -19,7 +19,7 @@ namespace error {
     const char* error_from = "Error from ";
     const char* error_in_line = "Error in line ";
 
-    // 格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
+    // 格式化报错信息，规则：%代表插入的是字符串
     const char* nameerror = "name \"%\" is not defined.";
     const char* openfileerror = "Could't open \"%\".";
     const char* versionerror = R"(Could't run them.Because % is higher than %)";
@@ -43,7 +43,7 @@ namespace error {
     const char* syntaxerror_escape_char
         = R"(Escape character % is not defined.)";
     const char* syntaxerror = "invalid syntax.";
-    const char* syntaxerror_unmatched_char = "unmatched '#'";
+    const char* syntaxerror_unmatched_char = "unmatched '%'";
 
     const char* asserterror_default = "assert";
     const char* asserterror_user = "%";

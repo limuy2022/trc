@@ -446,8 +446,9 @@ token_lex::token_lex(
 token_lex::~token_lex() {
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
+        char error_tmp[] = { check_brace.top(), '\0' };
         compiler_data.error.send_error_module(error::SyntaxError,
-            language::error::syntaxerror_unmatched_char, check_brace.top());
+            language::error::syntaxerror_unmatched_char, error_tmp);
     }
     compiler_data.error.line = 0;
 }

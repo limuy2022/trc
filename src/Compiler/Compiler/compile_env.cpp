@@ -45,8 +45,7 @@ size_t module_compile_env::get_index_of_function(const char* name) {
 }
 
 void module_compile_env::add_function(const char* name) {
-    size_t n = functions.size();
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0, n = functions.size(); i < n; ++i) {
         if (!strcmp(functions[i], name)) {
             compiler_data.error.send_error_module(error::RedefinedError,
                 language::error::funcredefinederror, name);

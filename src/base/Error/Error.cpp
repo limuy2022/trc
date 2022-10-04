@@ -1,4 +1,5 @@
-﻿#include <base/Error.h>
+﻿#include <algorithm>
+#include <base/Error.h>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -12,21 +13,6 @@ namespace error_env {
     jmp_buf error_back_place;
 }
 
-// 检查并重新申请内存
-#define CHECK_AND_REALLOC_ERROR_MSG_STR(will_added_len)                                            \
-    do {                                                                                           \
-        if (used_size >= finally_out_length) {                                                     \
-            /* 需要的内存已经超过了申请的，之所以是等于，是因为还有\0 */ \
-            /* 多申请5个作预留 */                                                           \
-            finally_out_length += (will_added_len) + 5;                                            \
-            finally_out = (char*)realloc(finally_out, finally_out_length);                         \
-            if (finally_out == nullptr) {                                                          \
-                error::send_error(                                                                 \
-                    error::MemoryError, language::error::memoryerror);                             \
-            }                                                                                      \
-        }                                                                                          \
-    } while (0)
-
 char* make_error_msg(int error_name, va_list& ap) {
     // 报错的模板字符串
     const char* base_string = va_arg(ap, const char*);
@@ -34,49 +20,37 @@ char* make_error_msg(int error_name, va_list& ap) {
     size_t base_string_len = strlen(base_string);
     // 错误名的长度
     size_t error_name_map_len = strlen(language::error::error_map[error_name]);
-    // finally_out增加的大小，大于等于base_string加上错误名的长度,且预留\0后再多预留4个字节
-    size_t finally_out_length = error_name_map_len + base_string_len + 5;
-    // 具体报错数据储存容器
-    char* finally_out = (char*)malloc(finally_out_length * sizeof(char));
-    if (finally_out == nullptr) {
-        error::send_error(error::MemoryError, language::error::memoryerror);
+    // finally_out的大小
+    size_t finally_out_length = error_name_map_len + base_string_len + 1;
+    size_t saver_size
+        = std::count(base_string, base_string + base_string_len, '%');
+    const char** string_saver = new const char*[saver_size];
+    for (size_t i = 0; i < saver_size; ++i) {
+        string_saver[i] = va_arg(ap, const char*);
+        finally_out_length += strlen(string_saver[i]);
     }
+    // 具体报错数据储存容器
+    char* finally_out = new char[finally_out_length];
     // 将错误名拷贝到报错数据中
     strcpy(finally_out, language::error::error_map[error_name]);
-    // 已使用长度
-    size_t used_size = error_name_map_len;
     // 字符串索引
     size_t res_string_index = error_name_map_len;
+    // 指向填充模板字符串的字符串索引
+    size_t string_saver_index = 0;
     for (size_t i = 0; i < base_string_len; ++i) {
-        switch (base_string[i]) {
-        case '%': {
+        if (base_string[i] == '%') {
             // 插入字符串
-            const char* addtmp = va_arg(ap, const char*);
+            const char* addtmp = string_saver[string_saver_index++];
             size_t addtmp_len = strlen(addtmp);
-            used_size += addtmp_len;
-            CHECK_AND_REALLOC_ERROR_MSG_STR(addtmp_len);
             // 不用strcat是因为效率更高一点
             strncpy(finally_out + res_string_index, addtmp, addtmp_len);
             res_string_index += addtmp_len;
-            break;
-        }
-        case '#': {
-            // 插入字符
-            char addchar = va_arg(ap, int);
-            used_size++;
-            CHECK_AND_REALLOC_ERROR_MSG_STR(1);
-            finally_out[res_string_index] = addchar;
-            res_string_index++;
-            break;
-        }
-        default: {
-            finally_out[res_string_index] = base_string[i];
-            res_string_index++;
-            used_size++;
-        }
+        } else {
+            finally_out[res_string_index++] = base_string[i];
         }
     }
-    finally_out[used_size] = '\0';
+    delete[] string_saver;
+    finally_out[res_string_index] = '\0';
     return finally_out;
 }
 
@@ -88,7 +62,7 @@ static void send_error_detail(int name, va_list& ap,
     const std::string& module = "__main__", size_t line_index = 0) {
     char* error_msg = make_error_msg(name, ap);
     send_error_(error_msg, module.c_str(), line_index);
-    free(error_msg);
+    delete[] error_msg;
     // 检查设置判断是否报错
     if (error_env::quit) {
         // 报错，退出程序

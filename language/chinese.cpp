@@ -39,7 +39,7 @@ namespace error {
     const char* syntaxerror_lexanno = "多行注释应当以*/结尾";
     const char* syntaxerror_escape_char = R"(转义符%未定义)";
     const char* syntaxerror = "错误的语法";
-    const char* syntaxerror_unmatched_char = "未匹配的'#'";
+    const char* syntaxerror_unmatched_char = "未匹配的'%'";
 
     const char* asserterror_default = "断言";
     const char* asserterror_user = "%";

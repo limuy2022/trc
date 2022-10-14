@@ -93,19 +93,17 @@ void send_error_module_aplist(
     int name, const std::string& module, size_t line_index, va_list& ap);
 
 /**
- * @brief 通用函数，填充报错信息
+ * @brief 输出报错信息
  * @param error_name 异常名
  * @param ap 可变参数
- * @warning 使用完请释放，并且使用free释放！
  */
-char* make_error_msg(int error_name, va_list& ap);
+void make_error_msg(int error_name, va_list& ap);
 
 /**
  * @brief 输出报错信息
  * @warning
  * 不接收可变参数，接受已经处理好的报错信息和数据
- * @details 格式化报错信息，规则：%代表插入的是字符串，#代表插入的是字符
+ * @details 格式化报错信息，规则：%代表插入的是字符串
  */
-void send_error_(
-    const char* error_msg, const char* module, size_t line_index) noexcept;
+void send_error_(const char* module, size_t line_index) noexcept;
 }

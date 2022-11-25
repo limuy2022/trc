@@ -33,7 +33,7 @@ fs::path listfiles::nextitem() {
 
 bool file_exists(const std::string& path) {
     // 如果存在且不为目录，返回true
-    return fs::exists(path) ? !fs::is_directory(path) : false;
+    return fs::exists(path) && !fs::is_directory(path);
 }
 
 void import_to_path(std::string& import_name) {
@@ -52,7 +52,7 @@ void import_to_path(std::string& import_name) {
  */
 static inline void read_file_detail(
     const std::string& path, std::string& file_data, FILE* file) {
-    struct stat buffer;
+    struct stat buffer { };
     stat(path.c_str(), &buffer);
     size_t size = buffer.st_size;
     file_data.resize(size + 1);
@@ -78,11 +78,5 @@ int readcode_with_code(std::string& file_data, const std::string& path) {
     read_file_detail(path, file_data, file);
     fclose(file);
     return 0;
-}
-
-void write_to_file(FILE* file, const char* str, size_t len) {
-    for (size_t i = 0; i < len; ++i) {
-        fputc(str[i], file);
-    }
 }
 }

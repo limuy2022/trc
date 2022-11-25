@@ -21,7 +21,7 @@ namespace def {
 
 void noreach_internal(size_t line, const char* funcname, const char* filename) {
     fprintf(stderr,
-        "Fatal error in function \"%s\" file %s line "
+        "\nFatal error in function \"%s\" file %s line "
         "%zu\n%s",
         funcname, filename, line, language::error::noreach);
     exit(EXIT_FAILURE);

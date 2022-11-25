@@ -21,6 +21,8 @@ testlog.log
 *.a
 *.exp
 *.pdb
+cmake-build-debug/
+cmake-build-unittest/
 
 # 单元测试中的临时输出文件
 *.out

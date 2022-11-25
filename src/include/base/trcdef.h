@@ -15,9 +15,9 @@ typedef std::vector<std::string> vecs;
 /**
  * @param str 报错的辅助输出信息
  */
-#define NOREACH(str, ...)                                                      \
+#define NOREACH(...)                                                           \
     do {                                                                       \
-        printf(str "\n", __VA_ARGS__);                                         \
+        printf(__VA_ARGS__);                                                   \
         trc::noreach_internal(__LINE__, __FUNCTION__, __FILE__);               \
     } while (0)
 

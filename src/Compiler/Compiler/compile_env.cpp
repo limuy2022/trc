@@ -1,5 +1,4 @@
 ﻿#include <Compiler/compile_env.h>
-#include <algorithm>
 #include <base/Error.h>
 #include <cstring>
 #include <language/error.h>
@@ -7,8 +6,8 @@
 namespace trc::compiler {
 basic_compile_env::basic_compile_env(
     compiler_public_data& compiler_data, TVM_space::struct_codes& bytecodes)
-    : compiler_data(compiler_data)
-    , bytecode(bytecodes) {
+    : bytecode(bytecodes)
+    , compiler_data(compiler_data) {
 }
 
 basic_compile_env::~basic_compile_env() {
@@ -45,8 +44,8 @@ size_t module_compile_env::get_index_of_function(const char* name) {
 }
 
 void module_compile_env::add_function(const char* name) {
-    for (size_t i = 0, n = functions.size(); i < n; ++i) {
-        if (!strcmp(functions[i], name)) {
+    for (auto function : functions) {
+        if (!strcmp(function, name)) {
             compiler_data.error.send_error_module(error::RedefinedError,
                 language::error::funcredefinederror, name);
         }
@@ -71,9 +70,8 @@ size_t basic_compile_env::get_index_of_var(char* name, bool report_error) {
 }
 
 size_t basic_compile_env::add_var(char* name) {
-    size_t n = var_names_list.size();
-    for (size_t i = 0; i < n; ++i) {
-        if (!strcmp(var_names_list[i], name)) {
+    for (auto i : var_names_list) {
+        if (!strcmp(i, name)) {
             // 报错
             compiler_data.error.send_error_module(error::RedefinedError,
                 language::error::varredefinederror, name);
@@ -81,6 +79,6 @@ size_t basic_compile_env::add_var(char* name) {
     }
     // 直接转移字符串所有权
     var_names_list.push_back(name);
-    return n;
+    return var_names_list.size();
 }
 }

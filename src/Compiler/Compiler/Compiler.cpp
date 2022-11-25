@@ -213,8 +213,8 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         }
         case grammar_type::CALL_FUNC: {
             // 调用自定义函数
-            char* nodedata = ((node_base_data*)root)->data;
-            size_t index = infoenv.get_index_of_function(nodedata);
+            char* funcname = ((node_base_data*)root)->data;
+            size_t index = infoenv.get_index_of_function(funcname);
             // 编译参数
             for (auto i : root->son) {
                 compile(i, localinfo);
@@ -363,5 +363,6 @@ detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
         compiler_ptr->compile_node(grammar_lexer);
         return nullptr;
     }
+    NOREACH("The argvs of compiler are wrong");
 }
 }

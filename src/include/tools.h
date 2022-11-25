@@ -12,7 +12,9 @@ namespace trc {
 namespace TVM_space {
     class TVM;
 }
-
+namespace compiler {
+    class treenode;
+}
 namespace tools {
     // 命令行参数
     extern char** argv;
@@ -39,7 +41,7 @@ namespace tools {
 
         void __out_token(const std::string& path);
 
-        void __style_file(const char* filepath);
+        void __style_file(FILE* file, compiler::treenode* node, int tabsize);
     }
 
     /**

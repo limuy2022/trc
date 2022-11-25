@@ -1,55 +1,178 @@
 ﻿#include <Compiler/pri_compiler.hpp>
 #include <Compiler/token.h>
+#include <base/func_loader.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
 #include <string>
 #include <tools.h>
 
 namespace trc::tools {
+static compiler::compiler_public_data shared_data {
+    compiler::compiler_error("__main__"), &compiler::nooptimize_option
+};
+
 namespace tools_in {
-    void __style_file(const char* filepath) {
-        std::string filedata;
-        utils::readcode(filedata, filepath);
-        // 覆盖掉该文件的所有内容
-        FILE* file = fopen(filepath, "w");
-        // 调用token解析器进行解析
-        compiler::compiler_public_data shared_data {
-            compiler::compiler_error("__main__"), &compiler::nooptimize_option
-        };
-        // 清空文件并通过token_lex解析过滤掉所有个人风格然后再全部重新按照规则排列，是为了让代码风格更加统一
-        compiler::token_lex lexer(filedata, shared_data);
-        // 指向现在解析的token
-        compiler::token* now_write;
-        // 记录token解析开始时和结束时位置
-        const char *token_begin, *token_end;
-        // 用于控制缩进的代码
-        int tab_size = 0;
-        for (;;) {
-            // 此处需要截取出具体的字符串，因为token_lex返回的token大部分都不会带字符串信息
-            // 所以必须记录开始和结尾的字符串指针位置相减得到具体字符串
-            token_begin = lexer.get_charptr();
-            now_write = lexer.get_token();
-            token_end = lexer.get_charptr();
-            if (now_write->tick == compiler::token_ticks::END_OF_TOKENS) {
+    /**
+     * 编译if和while等块状代码
+     * @param file 文件指针
+     * @param node 当前语法树的节点
+     * @param tabsize 缩进
+     * @param name 语句块的名字
+     */
+    static void block_format(
+        FILE* file, is_not_end_node* node, int tabsize, const char* name) {
+        fprintf(file, "%s", name);
+        // 开头表达式
+        auto iter = node->son.begin();
+        __style_file(file, *iter, 0);
+        iter++;
+        // 然后编译其它所有的节点
+        for (; iter != node->son.end(); ++iter) {
+            __style_file(file, *iter, tabsize + 1);
+        }
+    }
+
+    void __style_file(FILE* file, treenode* node, int tabsize) {
+        // 一棵语法树就是一段代码
+        for (int i = 1; i <= tabsize; ++i) {
+            fputc('\t', file);
+        }
+        grammar_type type = node->type;
+        if (node->has_son) {
+            auto* root = (is_not_end_node*)node;
+            switch (type) {
+                // 运算符表达式或条件表达式
+            case grammar_type::EXPR: {
+                for (auto i : root->son) {
+                    __style_file(file, i, tabsize);
+                }
                 break;
             }
-            compiler::token_ticks tick = now_write->tick;
-            if (compiler::is_cal_token(tick)
-                || compiler::is_condit_token(tick)) {
-                // 运算符左右加空格
-                fputc(' ', file);
-                utils::write_to_file(
-                    file, token_begin, token_end - token_begin);
-                fputc(' ', file);
-            } else if (tick == compiler::token_ticks::COMMA) {
-                // 逗号后空一格
-                utils::write_to_file(
-                    file, token_begin, token_end - token_begin);
-                fputc(' ', file);
-            } else {
-                // 未匹配到需要格式化的代码直接按照原样写入文件
-                utils::write_to_file(
-                    file, token_begin, token_end - token_begin);
+            // 树
+            case grammar_type::TREE: {
+                for (auto i : root->son) {
+                    __style_file(file, i, tabsize + 1);
+                }
+                break;
+            }
+            case grammar_type::BUILTIN_FUNC: {
+                // 内置函数
+                // 先递归编译参数
+                int function_index = ((node_base_int*)root)->value;
+                fprintf(file, "%s(", loader::num_func[function_index]);
+                auto i = root->son.begin();
+                auto end = root->son.end();
+                end--;
+                for (; i != end; ++i) {
+                    __style_file(file, *i, 0);
+                    fprintf(file, ", ");
+                }
+                __style_file(file, *i, 0);
+                fputc(')', file);
+                break;
+            }
+            case grammar_type::FUNC_DEFINE: {
+                // 首先添加函数定义
+                auto funcname = ((node_base_data*)root)->data;
+                fprintf(file, "func %s(", funcname);
+                // 编译构建变量的代码
+                auto index = root->son.begin();
+                auto i = ((is_not_end_node*)(*index))->son.begin(),
+                     end_iter = ((is_not_end_node*)(*index))->son.end();
+                end_iter--;
+                for (; i != end_iter; ++i) {
+                    fprintf(
+                        file, "%s, ", ((node_base_data_without_sons*)*i)->data);
+                }
+                fprintf(
+                    file, "%s) {", ((node_base_data_without_sons*)*i)->data);
+                // 编译函数体
+                // 指向第一条函数体代码
+                index++;
+                for (auto end = root->son.end(); index != end; ++index) {
+                    __style_file(file, *index, tabsize + 1);
+                }
+                break;
+            }
+            case grammar_type::VAR_DEFINE: {
+                // 变量定义
+                auto iter = root->son.begin();
+                // 处理等式左边的数据
+                char* argv_ = ((node_base_data_without_sons*)*iter)->data;
+                fprintf(file, "%s := ", argv_);
+                // 处理等式右边的数据
+                iter++;
+                __style_file(file, *iter, 0);
+                break;
+            }
+            case grammar_type::VAR_ASSIGN: {
+                // 变量赋值
+                auto iter = root->son.begin();
+                // 处理等式左边的数据
+                char* argv_
+                    = ((node_base_data_without_sons*)*iter)->swap_string_data();
+                fprintf(file, "%s = ", argv_);
+                // 处理等式右边的数据
+                iter++;
+                __style_file(file, *iter, 0);
+                break;
+            }
+            case grammar_type::CALL_FUNC: {
+                // 调用自定义函数
+                char* funcname = ((node_base_data*)root)->data;
+                fprintf(file, "%s", funcname);
+                // 编译参数
+                for (auto i : root->son) {
+                    __style_file(file, i, 0);
+                }
+                break;
+            }
+                // 需要跳转的语句块
+            case grammar_type::IF_BLOCK: {
+                block_format(file, (is_not_end_node*)node, tabsize, "if");
+                break;
+            }
+            case grammar_type::WHILE_BLOCK: {
+                block_format(file, (is_not_end_node*)node, tabsize, "while");
+                break;
+            }
+            default: {
+                NOREACH("Unexpeceted grammar treee node type %d", (int)type);
+            }
+            }
+        } else {
+            switch (type) {
+            case grammar_type::VAR_NAME: {
+                // 变量名节点
+                auto varname = ((node_base_data_without_sons*)node)->data;
+                fprintf(file, "%s", varname);
+                break;
+            }
+            case grammar_type::NUMBER: {
+                // 整型节点
+                auto value = ((node_base_int_without_sons*)node)->value;
+                fprintf(file, "%d", value);
+                break;
+            }
+            case grammar_type::STRING: {
+                // 字符串节点
+                fprintf(file, "%s", ((node_base_data_without_sons*)node)->data);
+                break;
+            }
+            case grammar_type::FLOAT: {
+                // 浮点型节点
+                auto value = ((node_base_float_without_sons*)node)->value;
+                fprintf(file, "%lf", value);
+                break;
+            }
+            case grammar_type::LONG_INT: {
+                // 长整型节点
+                fprintf(file, "%s", ((node_base_data_without_sons*)node)->data);
+                break;
+            }
+            default: {
+                NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
+            }
             }
         }
         fclose(file);
@@ -59,7 +182,17 @@ namespace tools_in {
 namespace tools_out {
     void style() {
         for (int i = 2; i < argc; ++i) {
-            tools_in::__style_file(argv[i]);
+            std::string filedata;
+            utils::readcode(filedata, argv[i]);
+            // 覆盖掉该文件的所有内容
+            FILE* file = fopen(argv[i], "w");
+            // 清空文件并通过生成语法树解析过滤掉所有个人风格然后再全部重新按照规则排列，是为了让代码风格更加统一
+            compiler::grammar_lex lexer(filedata, shared_data);
+            for (auto node = lexer.get_node(); node != nullptr;
+                 node = lexer.get_node()) {
+                tools_in::__style_file(file, node, 0);
+            }
+            fclose(file);
         }
     }
 }

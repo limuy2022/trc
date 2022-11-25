@@ -52,9 +52,4 @@ void readcode(std::string& file_data, const std::string& path);
  * @return 成功返回0，失败返回1
  */
 int readcode_with_code(std::string& file_data, const std::string& path);
-
-/**
- * @brief 将指定长度的字符串写入文件
- */
-void write_to_file(FILE* file, const char* str, size_t len);
 }

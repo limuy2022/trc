@@ -64,7 +64,7 @@ treenode* grammar_lex::callfunction(token* funcname) {
 
 treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     auto head = new node_base_tick(grammar_type::TREE, sentence_name);
-    size_t argc = 0;
+    int argc = 0;
 
     token* now = token_.get_token();
     if (is_end_token(now->tick)) {

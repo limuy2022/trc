@@ -25,7 +25,7 @@ When building GoogleTest as a standalone project, the typical workflow starts
 with
 
 ```
-git clone https://github.com/google/googletest.git -b release-1.12.0
+git clone https://github.com/google/googletest.git -b release-1.12.1
 cd googletest        # Main directory of the cloned repository.
 mkdir build          # Create a directory to hold the build output.
 cd build
@@ -186,9 +186,9 @@ to the compiler flags.
 Note: while the above steps aren't technically necessary today when using some
 compilers (e.g. GCC), they may become necessary in the future, if we decide to
 improve the speed of loading the library (see
-<http://gcc.gnu.org/wiki/Visibility> for details). Therefore you are recommended
-to always add the above flags when using GoogleTest as a shared library.
-Otherwise a future release of GoogleTest may break your build script.
+<https://gcc.gnu.org/wiki/Visibility> for details). Therefore you are
+recommended to always add the above flags when using GoogleTest as a shared
+library. Otherwise a future release of GoogleTest may break your build script.
 
 ### Avoiding Macro Name Clashes
 

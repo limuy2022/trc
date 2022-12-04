@@ -41,31 +41,31 @@ tick_node::tick_node(token_ticks tick)
     : tick(tick) {
 }
 
-void data_node::swap_token_data(token* token_value) {
-    this->data = token_value->data;
+void string_node::swap_token_data(token* token_value) {
+    this->value = token_value->data;
     token_value->data = nullptr;
 }
 
-data_node::~data_node() {
+string_node::~string_node() {
     // 直接释放是因为可以释放空指针
-    free(data);
+    free(value);
 }
 
-char* data_node::swap_string_data() {
+char* string_node::swap_string_data() {
     // 防止被多次调用
-    assert(data != nullptr);
-    char* str_data_ptr = data;
+    assert(value != nullptr);
+    char* str_data_ptr = value;
     // 置空是使释放时不会释放掉内存
-    data = nullptr;
+    value = nullptr;
     return str_data_ptr;
 }
 
-data_node::data_node(token* data) {
+string_node::string_node(token* data) {
     swap_token_data(data);
 }
 
 node_base_data::node_base_data(grammar_type type_argv, token* data)
-    : data_node(data) {
+    : string_node(data) {
     this->type = type_argv;
 }
 
@@ -74,9 +74,9 @@ node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
     this->type = type;
 }
 
-node_base_data_without_sons::node_base_data_without_sons(
+node_base_string_without_sons::node_base_string_without_sons(
     grammar_type type, token* data)
-    : data_node(data) {
+    : string_node(data) {
     this->type = type;
 }
 

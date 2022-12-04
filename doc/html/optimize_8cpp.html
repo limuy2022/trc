@@ -99,6 +99,9 @@ Macros</h2></td></tr>
 <tr class="memitem:aed226bc08ef8f871d51a4545e420d9bc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#aed226bc08ef8f871d51a4545e420d9bc">DELETE_NODE</a>(l,  n)</td></tr>
 <tr class="memdesc:aed226bc08ef8f871d51a4545e420d9bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除一个节点，同时释放它的内存  <a href="optimize_8cpp.html#aed226bc08ef8f871d51a4545e420d9bc">More...</a><br /></td></tr>
 <tr class="separator:aed226bc08ef8f871d51a4545e420d9bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b0db93d48307cd9ace79ecb87d482c8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#a6b0db93d48307cd9ace79ecb87d482c8">int_mul_str</a>(astr,  bint)</td></tr>
+<tr class="memdesc:a6b0db93d48307cd9ace79ecb87d482c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">数字与字符串相乘  <a href="optimize_8cpp.html#a6b0db93d48307cd9ace79ecb87d482c8">More...</a><br /></td></tr>
+<tr class="separator:a6b0db93d48307cd9ace79ecb87d482c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aed226bc08ef8f871d51a4545e420d9bc" name="aed226bc08ef8f871d51a4545e420d9bc"></a>
@@ -136,6 +139,57 @@ Macros</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">l</td><td>node,链表 </td></tr>
     <tr><td class="paramname">n</td><td>需要删除的子节点的迭代器 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6b0db93d48307cd9ace79ecb87d482c8" name="a6b0db93d48307cd9ace79ecb87d482c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b0db93d48307cd9ace79ecb87d482c8">&#9670;&#160;</a></span>int_mul_str</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define int_mul_str</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">astr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">bint&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
+<div class="line">        <span class="keyword">auto</span> anode = (node_base_string_without_sons*)*astr;                    \</div>
+<div class="line">        <span class="keyword">auto</span> bnode = (node_base_int_without_sons*)*bint;                       \</div>
+<div class="line">        <span class="keywordtype">size_t</span> len = strlen(anode-&gt;value);                                     \</div>
+<div class="line">        anode-&gt;value = (<span class="keywordtype">char</span>*)realloc(anode-&gt;value, len * bnode-&gt;value + 1);   \</div>
+<div class="line">        if (anode-&gt;value == <span class="keyword">nullptr</span>) {                                         \</div>
+<div class="line">            compiler_data.error.send_error_module(                             \</div>
+<div class="line">                error::MemoryError, <a class="code hl_variable" href="namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d">language::error::memoryerror</a>);             \</div>
+<div class="line">        }                                                                      \</div>
+<div class="line">        for (<span class="keywordtype">int</span> i = 1; i &lt;= bnode-&gt;value; ++i) {                              \</div>
+<div class="line">            strncpy(anode-&gt;value + len * i, anode-&gt;value, len);                \</div>
+<div class="line">        }                                                                      \</div>
+<div class="line">    } <span class="keywordflow">while</span> (0)</div>
+<div class="ttc" id="anamespacelanguage_1_1error_html_a926fb90838cf2a43bb5b3f0eb0db152d"><div class="ttname"><a href="namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d">language::error::memoryerror</a></div><div class="ttdeci">TRC_language_c_api const char * memoryerror</div><div class="ttdef"><b>Definition:</b> error.h:13</div></div>
+</div><!-- fragment -->
+<p>数字与字符串相乘 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">astr</td><td>指向字符串的迭代器（指针） </td></tr>
+    <tr><td class="paramname">bint</td><td>指向数字的迭代器（指针） </td></tr>
   </table>
   </dd>
 </dl>

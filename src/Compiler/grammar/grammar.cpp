@@ -149,17 +149,17 @@ treenode* grammar_lex::make_data_node(token* data_token) {
     } else if (tmp == token_ticks::FLOAT_VALUE) {
         return new node_base_float_without_sons(atof(data_token->data));
     } else if (tmp == token_ticks::STRING_VALUE) {
-        return new node_base_data_without_sons(
+        return new node_base_string_without_sons(
             grammar_type::STRING, data_token);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
         compiler_data.int_size++;
         return new node_base_int_without_sons(change_const[data_token->data]);
     } else if (tmp == token_ticks::LONG_INT_VALUE) {
-        return new node_base_data_without_sons(
+        return new node_base_string_without_sons(
             grammar_type::LONG_INT, data_token);
     } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
-        return new node_base_data_without_sons(
+        return new node_base_string_without_sons(
             grammar_type::LONG_FLOAT, data_token);
     } else {
         NOREACH("Unexpected data token type %d", (int)tmp);
@@ -209,7 +209,7 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
             // 注：有token回退情况的请放在此分支之前
             if (nexttick != token_ticks::LEFT_SMALL_BRACE) {
                 // 是标识符且不为函数调用
-                now_node = new node_base_data_without_sons(
+                now_node = new node_base_string_without_sons(
                     grammar_type::VAR_NAME, now);
             } else {
                 // 函数调用

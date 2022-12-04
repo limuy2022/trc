@@ -184,13 +184,13 @@ public:
 /**
  * @brief 储存字符串类型的数据节点
  */
-class data_node {
+class string_node {
 public:
-    char* data = nullptr;
+    char* value = nullptr;
 
-    explicit data_node(token* data);
+    explicit string_node(token* data);
 
-    virtual ~data_node();
+    virtual ~string_node();
 
     /**
      * @brief 交换token对象中的const
@@ -224,7 +224,7 @@ public:
 /**
  * @brief 基于数据的节点
  */
-class node_base_data : public is_not_end_node, public data_node {
+class node_base_data : public is_not_end_node, public string_node {
 public:
     node_base_data(grammar_type type_argv, token* data);
 };
@@ -240,9 +240,9 @@ public:
 /**
  * @brief 基于字符串的叶子节点
  */
-class node_base_data_without_sons : public data_node, public is_end_node {
+class node_base_string_without_sons : public string_node, public is_end_node {
 public:
-    explicit node_base_data_without_sons(grammar_type type, token* data);
+    explicit node_base_string_without_sons(grammar_type type, token* data);
 };
 
 /**

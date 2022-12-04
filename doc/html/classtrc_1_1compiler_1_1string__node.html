@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trc: trc::compiler::data_node Class Reference</title>
+<title>Trc: trc::compiler::string_node Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,56 +69,56 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacetrc.html">trc</a></li><li class="navelem"><a class="el" href="namespacetrc_1_1compiler.html">compiler</a></li><li class="navelem"><a class="el" href="classtrc_1_1compiler_1_1data__node.html">data_node</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacetrc.html">trc</a></li><li class="navelem"><a class="el" href="namespacetrc_1_1compiler.html">compiler</a></li><li class="navelem"><a class="el" href="classtrc_1_1compiler_1_1string__node.html">string_node</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="classtrc_1_1compiler_1_1data__node-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">trc::compiler::data_node Class Reference</div></div>
+<a href="classtrc_1_1compiler_1_1string__node-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">trc::compiler::string_node Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>储存字符串类型的数据节点  
- <a href="classtrc_1_1compiler_1_1data__node.html#details">More...</a></p>
+ <a href="classtrc_1_1compiler_1_1string__node.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="pri__compiler_8hpp_source.html">pri_compiler.hpp</a>&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for trc::compiler::data_node:</div>
+Inheritance diagram for trc::compiler::string_node:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classtrc_1_1compiler_1_1data__node.png" usemap="#trc::compiler::data_5Fnode_map" alt=""/>
-  <map id="trc::compiler::data_5Fnode_map" name="trc::compiler::data_5Fnode_map">
-<area href="classtrc_1_1compiler_1_1node__base__data.html" title="基于数据的节点" alt="trc::compiler::node_base_data" shape="rect" coords="0,56,259,80"/>
-<area href="classtrc_1_1compiler_1_1node__base__data__without__sons.html" title="基于字符串的叶子节点" alt="trc::compiler::node_base_data_without_sons" shape="rect" coords="269,56,528,80"/>
+  <img src="classtrc_1_1compiler_1_1string__node.png" usemap="#trc::compiler::string_5Fnode_map" alt=""/>
+  <map id="trc::compiler::string_5Fnode_map" name="trc::compiler::string_5Fnode_map">
+<area href="classtrc_1_1compiler_1_1node__base__data.html" title="基于数据的节点" alt="trc::compiler::node_base_data" shape="rect" coords="0,56,266,80"/>
+<area href="classtrc_1_1compiler_1_1node__base__string__without__sons.html" title="基于字符串的叶子节点" alt="trc::compiler::node_base_string_without_sons" shape="rect" coords="276,56,542,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a47efd51f974611cbc33ebe47fe4a1e82"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a47efd51f974611cbc33ebe47fe4a1e82">data_node</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *<a class="el" href="classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10">data</a>)</td></tr>
-<tr class="separator:a47efd51f974611cbc33ebe47fe4a1e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a960ef87421c59bd487038f1dbde6743e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a960ef87421c59bd487038f1dbde6743e">~data_node</a> ()</td></tr>
-<tr class="separator:a960ef87421c59bd487038f1dbde6743e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a7aca10a9ea43dbc1c1dc8e696b0962"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a6a7aca10a9ea43dbc1c1dc8e696b0962">swap_token_data</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *token_value)</td></tr>
-<tr class="memdesc:a6a7aca10a9ea43dbc1c1dc8e696b0962"><td class="mdescLeft">&#160;</td><td class="mdescRight">交换token对象中的const char*给此节点，只进行对象所有权的转移而消除了多次申请，释放和拷贝内存  <a href="classtrc_1_1compiler_1_1data__node.html#a6a7aca10a9ea43dbc1c1dc8e696b0962">More...</a><br /></td></tr>
-<tr class="separator:a6a7aca10a9ea43dbc1c1dc8e696b0962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0345aca7a57d22f72c9bf30d61d7fdb2"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a0345aca7a57d22f72c9bf30d61d7fdb2">swap_string_data</a> ()</td></tr>
-<tr class="memdesc:a0345aca7a57d22f72c9bf30d61d7fdb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">将自己的字符串所有权转移给其它对象，消除多次申请拷贝和释放内存  <a href="classtrc_1_1compiler_1_1data__node.html#a0345aca7a57d22f72c9bf30d61d7fdb2">More...</a><br /></td></tr>
-<tr class="separator:a0345aca7a57d22f72c9bf30d61d7fdb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad43b12f59c35a76c4668db91b78f3e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html#aad43b12f59c35a76c4668db91b78f3e0">string_node</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *data)</td></tr>
+<tr class="separator:aad43b12f59c35a76c4668db91b78f3e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcd0d8cac2a2f3e4b679f59b50b0eb7e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html#adcd0d8cac2a2f3e4b679f59b50b0eb7e">~string_node</a> ()</td></tr>
+<tr class="separator:adcd0d8cac2a2f3e4b679f59b50b0eb7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9350a80b2c584cc6194486f32a49d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html#adb9350a80b2c584cc6194486f32a49d6">swap_token_data</a> (<a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *token_value)</td></tr>
+<tr class="memdesc:adb9350a80b2c584cc6194486f32a49d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">交换token对象中的const char*给此节点，只进行对象所有权的转移而消除了多次申请，释放和拷贝内存  <a href="classtrc_1_1compiler_1_1string__node.html#adb9350a80b2c584cc6194486f32a49d6">More...</a><br /></td></tr>
+<tr class="separator:adb9350a80b2c584cc6194486f32a49d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66680212d5ad2a2eb43389f89de5bfb2"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html#a66680212d5ad2a2eb43389f89de5bfb2">swap_string_data</a> ()</td></tr>
+<tr class="memdesc:a66680212d5ad2a2eb43389f89de5bfb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">将自己的字符串所有权转移给其它对象，消除多次申请拷贝和释放内存  <a href="classtrc_1_1compiler_1_1string__node.html#a66680212d5ad2a2eb43389f89de5bfb2">More...</a><br /></td></tr>
+<tr class="separator:a66680212d5ad2a2eb43389f89de5bfb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a5de276d403bd7687293df0002d8c8e10"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1data__node.html#a5de276d403bd7687293df0002d8c8e10">data</a> = nullptr</td></tr>
-<tr class="separator:a5de276d403bd7687293df0002d8c8e10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2f109195f6dbe7c55ff963a2ff35dbe"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html#ad2f109195f6dbe7c55ff963a2ff35dbe">value</a> = nullptr</td></tr>
+<tr class="separator:ad2f109195f6dbe7c55ff963a2ff35dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >储存字符串类型的数据节点 </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a47efd51f974611cbc33ebe47fe4a1e82" name="a47efd51f974611cbc33ebe47fe4a1e82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47efd51f974611cbc33ebe47fe4a1e82">&#9670;&#160;</a></span>data_node()</h2>
+<a id="aad43b12f59c35a76c4668db91b78f3e0" name="aad43b12f59c35a76c4668db91b78f3e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad43b12f59c35a76c4668db91b78f3e0">&#9670;&#160;</a></span>string_node()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -127,7 +127,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">trc::compiler::data_node::data_node </td>
+          <td class="memname">trc::compiler::string_node::string_node </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *&#160;</td>
           <td class="paramname"><em>data</em></td><td>)</td>
@@ -143,8 +143,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a960ef87421c59bd487038f1dbde6743e" name="a960ef87421c59bd487038f1dbde6743e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a960ef87421c59bd487038f1dbde6743e">&#9670;&#160;</a></span>~data_node()</h2>
+<a id="adcd0d8cac2a2f3e4b679f59b50b0eb7e" name="adcd0d8cac2a2f3e4b679f59b50b0eb7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcd0d8cac2a2f3e4b679f59b50b0eb7e">&#9670;&#160;</a></span>~string_node()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,7 +153,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">trc::compiler::data_node::~data_node </td>
+          <td class="memname">trc::compiler::string_node::~string_node </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -169,14 +169,14 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a0345aca7a57d22f72c9bf30d61d7fdb2" name="a0345aca7a57d22f72c9bf30d61d7fdb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0345aca7a57d22f72c9bf30d61d7fdb2">&#9670;&#160;</a></span>swap_string_data()</h2>
+<a id="a66680212d5ad2a2eb43389f89de5bfb2" name="a66680212d5ad2a2eb43389f89de5bfb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66680212d5ad2a2eb43389f89de5bfb2">&#9670;&#160;</a></span>swap_string_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char * trc::compiler::data_node::swap_string_data </td>
+          <td class="memname">char * trc::compiler::string_node::swap_string_data </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -189,14 +189,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a6a7aca10a9ea43dbc1c1dc8e696b0962" name="a6a7aca10a9ea43dbc1c1dc8e696b0962"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a7aca10a9ea43dbc1c1dc8e696b0962">&#9670;&#160;</a></span>swap_token_data()</h2>
+<a id="adb9350a80b2c584cc6194486f32a49d6" name="adb9350a80b2c584cc6194486f32a49d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb9350a80b2c584cc6194486f32a49d6">&#9670;&#160;</a></span>swap_token_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void trc::compiler::data_node::swap_token_data </td>
+          <td class="memname">void trc::compiler::string_node::swap_token_data </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classtrc_1_1compiler_1_1token.html">token</a> *&#160;</td>
           <td class="paramname"><em>token_value</em></td><td>)</td>
@@ -216,14 +216,14 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a5de276d403bd7687293df0002d8c8e10" name="a5de276d403bd7687293df0002d8c8e10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5de276d403bd7687293df0002d8c8e10">&#9670;&#160;</a></span>data</h2>
+<a id="ad2f109195f6dbe7c55ff963a2ff35dbe" name="ad2f109195f6dbe7c55ff963a2ff35dbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2f109195f6dbe7c55ff963a2ff35dbe">&#9670;&#160;</a></span>value</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* trc::compiler::data_node::data = nullptr</td>
+          <td class="memname">char* trc::compiler::string_node::value = nullptr</td>
         </tr>
       </table>
 </div><div class="memdoc">

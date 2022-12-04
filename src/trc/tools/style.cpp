@@ -73,7 +73,7 @@ namespace tools_in {
             }
             case grammar_type::FUNC_DEFINE: {
                 // 首先添加函数定义
-                auto funcname = ((node_base_data*)root)->data;
+                auto funcname = ((node_base_data*)root)->value;
                 fprintf(file, "func %s(", funcname);
                 // 编译构建变量的代码
                 auto index = root->son.begin();
@@ -81,11 +81,11 @@ namespace tools_in {
                      end_iter = ((is_not_end_node*)(*index))->son.end();
                 end_iter--;
                 for (; i != end_iter; ++i) {
-                    fprintf(
-                        file, "%s, ", ((node_base_data_without_sons*)*i)->data);
+                    fprintf(file, "%s, ",
+                        ((node_base_string_without_sons*)*i)->value);
                 }
                 fprintf(
-                    file, "%s) {", ((node_base_data_without_sons*)*i)->data);
+                    file, "%s) {", ((node_base_string_without_sons*)*i)->value);
                 // 编译函数体
                 // 指向第一条函数体代码
                 index++;
@@ -98,7 +98,7 @@ namespace tools_in {
                 // 变量定义
                 auto iter = root->son.begin();
                 // 处理等式左边的数据
-                char* argv_ = ((node_base_data_without_sons*)*iter)->data;
+                char* argv_ = ((node_base_string_without_sons*)*iter)->value;
                 fprintf(file, "%s := ", argv_);
                 // 处理等式右边的数据
                 iter++;
@@ -109,8 +109,8 @@ namespace tools_in {
                 // 变量赋值
                 auto iter = root->son.begin();
                 // 处理等式左边的数据
-                char* argv_
-                    = ((node_base_data_without_sons*)*iter)->swap_string_data();
+                char* argv_ = ((node_base_string_without_sons*)*iter)
+                                  ->swap_string_data();
                 fprintf(file, "%s = ", argv_);
                 // 处理等式右边的数据
                 iter++;
@@ -119,7 +119,7 @@ namespace tools_in {
             }
             case grammar_type::CALL_FUNC: {
                 // 调用自定义函数
-                char* funcname = ((node_base_data*)root)->data;
+                char* funcname = ((node_base_data*)root)->value;
                 fprintf(file, "%s", funcname);
                 // 编译参数
                 for (auto i : root->son) {
@@ -144,7 +144,7 @@ namespace tools_in {
             switch (type) {
             case grammar_type::VAR_NAME: {
                 // 变量名节点
-                auto varname = ((node_base_data_without_sons*)node)->data;
+                auto varname = ((node_base_string_without_sons*)node)->value;
                 fprintf(file, "%s", varname);
                 break;
             }
@@ -156,7 +156,8 @@ namespace tools_in {
             }
             case grammar_type::STRING: {
                 // 字符串节点
-                fprintf(file, "%s", ((node_base_data_without_sons*)node)->data);
+                fprintf(
+                    file, "%s", ((node_base_string_without_sons*)node)->value);
                 break;
             }
             case grammar_type::FLOAT: {
@@ -167,7 +168,8 @@ namespace tools_in {
             }
             case grammar_type::LONG_INT: {
                 // 长整型节点
-                fprintf(file, "%s", ((node_base_data_without_sons*)node)->data);
+                fprintf(
+                    file, "%s", ((node_base_string_without_sons*)node)->value);
                 break;
             }
             default: {

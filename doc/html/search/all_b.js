@@ -7,7 +7,7 @@ var searchData=
   ['left_5fbig_5fbrace_4',['LEFT_BIG_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a21b9033eda58eb069cd134064891d1f5',1,'trc::compiler']]],
   ['left_5fmid_5fbrace_5',['LEFT_MID_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a185b92d7b5de1f8913b39b56c96701ed',1,'trc::compiler']]],
   ['left_5fsmall_5fbrace_6',['LEFT_SMALL_BRACE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a427b58cc7cb78012dede972567dbb49b',1,'trc::compiler']]],
-  ['len_7',['len',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__list.html#a65c7e0a3f4c9d40c5e840a262a38e78e',1,'trc::TVM_space::types::trc_list::len()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#aa386b8918b75da1eb5917815d044c300',1,'trc::TVM_space::types::trc_string::len()'],['../namespacetrc_1_1compiler.html#a0c54c2149a258e275f81be1b197907a3',1,'trc::compiler::len()'],['../namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d',1,'trc::utils::len()']]],
+  ['len_7',['len',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__list.html#a65c7e0a3f4c9d40c5e840a262a38e78e',1,'trc::TVM_space::types::trc_list::len()'],['../namespacetrc_1_1compiler.html#a0c54c2149a258e275f81be1b197907a3',1,'trc::compiler::len()'],['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__string.html#aa386b8918b75da1eb5917815d044c300',1,'trc::TVM_space::types::trc_string::len()'],['../namespacetrc_1_1utils.html#a7f4800bbbf0ebf0d3ca60412ded4074d',1,'trc::utils::len()']]],
   ['length_8',['LENGTH',['../namespacetrc_1_1_t_v_m__space_1_1builtin.html#a2ad12a2b85f97b508e2c3a19a456f469',1,'trc::TVM_space::builtin']]],
   ['less_9',['LESS',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a1798e8c3621ca53d9e3a80d257306000',1,'trc::compiler']]],
   ['less_5f_10',['LESS_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca660c84390d99d629ba2bdb893b7aa6c7',1,'TVM.h']]],
@@ -41,6 +41,5 @@ var searchData=
   ['long_5fpool_38',['long_pool',['../structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html#a0be27ea8bda90a0f13ab45ceae0ade31',1,'trc::TVM_space::objs_pool_TVM']]],
   ['longobj_39',['LONGOBJ',['../namespacetrc_1_1def.html#ab6f2b9ba7d9a2782d022dd05a33ac6d5',1,'trc::def']]],
   ['tdb_40',['tdb',['../namespacelanguage_1_1tdb.html',1,'language']]],
-  ['trc_41',['trc',['../namespacelanguage_1_1trc.html',1,'language']]],
-  ['tvm_42',['TVM',['../namespacelanguage_1_1_t_v_m.html',1,'language']]]
+  ['trc_41',['trc',['../namespacelanguage_1_1trc.html',1,'language']]]
 ];

@@ -20,7 +20,7 @@ protected:
 
     void TearDown() override;
 
-    TVM* vm{};
+    TVM* vm {};
 };
 
 void compiler_env_set::TearDown() {

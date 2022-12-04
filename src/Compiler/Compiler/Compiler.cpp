@@ -163,8 +163,8 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             auto index = root->son.begin();
             for (auto i : ((is_not_end_node*)(*index))->son) {
                 add_opcode(byteCodeNumber::STORE_LOCAL_,
-                    localfuncenv.add_var(
-                        ((node_base_data_without_sons*)i)->swap_string_data()),
+                    localfuncenv.add_var(((node_base_string_without_sons*)i)
+                                             ->swap_string_data()),
                     localinfo.bytecode);
             }
             // 编译函数体
@@ -181,7 +181,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         case grammar_type::VAR_DEFINE: {
             // 变量定义
             // 处理等式左边的数据
-            char* argv_ = ((node_base_data_without_sons*)root->son.front())
+            char* argv_ = ((node_base_string_without_sons*)root->son.front())
                               ->swap_string_data();
             auto index_argv = localinfo.add_var(argv_);
             if (&localinfo == &infoenv) {
@@ -197,7 +197,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         }
         case grammar_type::VAR_ASSIGN: {
             // 变量赋值
-            char* argv_ = ((node_base_data_without_sons*)root->son.front())
+            char* argv_ = ((node_base_string_without_sons*)root->son.front())
                               ->swap_string_data();
             auto index_argv = localinfo.get_index_of_var(argv_, true);
             if (&localinfo == &infoenv) {
@@ -213,7 +213,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         }
         case grammar_type::CALL_FUNC: {
             // 调用自定义函数
-            char* funcname = ((node_base_data*)root)->data;
+            char* funcname = ((node_base_data*)root)->value;
             size_t index = infoenv.get_index_of_function(funcname);
             // 编译参数
             for (auto i : root->son) {
@@ -240,7 +240,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         switch (type) {
         case grammar_type::VAR_NAME: {
             // 变量名节点，生成读取变量的字节码
-            auto varname = ((node_base_data_without_sons*)head)->data;
+            auto varname = ((node_base_string_without_sons*)head)->value;
             // 获取变量的索引
             size_t index_argv;
             // 首先尝试在局部变量中查找
@@ -274,7 +274,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         case grammar_type::STRING: {
             // 字符串节点
             auto index_argv = add_string(
-                ((node_base_data_without_sons*)head)->swap_string_data());
+                ((node_base_string_without_sons*)head)->swap_string_data());
             add_opcode(
                 byteCodeNumber::LOAD_STRING_, index_argv, localinfo.bytecode);
             break;
@@ -290,7 +290,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
         case grammar_type::LONG_INT: {
             // 长整型节点
             auto index_argv = add_long(
-                ((node_base_data_without_sons*)head)->swap_string_data());
+                ((node_base_string_without_sons*)head)->swap_string_data());
             add_opcode(
                 byteCodeNumber::LOAD_LONG_, index_argv, localinfo.bytecode);
             break;

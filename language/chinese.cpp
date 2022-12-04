@@ -59,11 +59,6 @@ namespace help {
                            "者作为工作脚本，也可以帮助你去学习编译原理.";
 }
 
-namespace TVM {
-    const char* type_change_error_msg = "不能转换为";
-    const char* oper_not_def_error_msg = "无法使用";
-}
-
 namespace trc {
     const char* mode_not_found = "模式没有被定义\n";
 }

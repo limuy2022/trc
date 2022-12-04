@@ -42,8 +42,8 @@ namespace tools_in {
             break;
         }
         default: {
-            auto tmp = (compiler::data_node*)data;
-            printf("%s", tmp->data);
+            auto tmp = (compiler::string_node*)data;
+            printf("%s", tmp->value);
         }
         }
         putchar(',');

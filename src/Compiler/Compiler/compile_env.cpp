@@ -79,6 +79,6 @@ size_t basic_compile_env::add_var(char* name) {
     }
     // 直接转移字符串所有权
     var_names_list.push_back(name);
-    return var_names_list.size();
+    return var_names_list.size() - 1;
 }
 }

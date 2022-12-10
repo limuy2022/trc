@@ -207,19 +207,65 @@ TEST_F(compiler_env_set, expr_with_func) {
         vm);
 }
 
-// 优化类型相同的表达式代码
-TEST_F(compiler_env_set, optimize_same_types) {
+/*常量折叠单元测试开始*/
+
+// 整形和整形
+TEST_F(compiler_env_set, const_fold_opt_1) {
     compiler::Compiler(vm->static_data, "1+2*3", &compiler::optimize_option);
     ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 7);
 }
 
-// 优化类型不同的表达式代码
-TEST_F(compiler_env_set, optimize_with_different_types) {
+// 整形和浮点型
+TEST_F(compiler_env_set, const_fold_opt_2) {
     compiler::Compiler(vm->static_data, "1.2*4", &compiler::optimize_option);
     ASSERT_EQ(vm->static_data.const_f.size, 1);
     EXPECT_EQ(vm->static_data.const_f[0], 4.8);
 }
+
+// 浮点型和整形
+TEST_F(compiler_env_set, const_fold_opt_3) {
+    compiler::Compiler(vm->static_data, "4*1.2", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_f.size, 1);
+    EXPECT_EQ(vm->static_data.const_f[0], 4.8);
+}
+
+// 整形和字符串
+TEST_F(compiler_env_set, const_fold_opt_4) {
+    compiler::Compiler(
+        vm->static_data, "3*\"abc123\"", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size, 0);
+    ASSERT_EQ(vm->static_data.const_s.size, 1);
+    EXPECT_STREQ(vm->static_data.const_s[0], "abc123abc123abc123");
+}
+
+// 字符串和整形
+TEST_F(compiler_env_set, const_fold_opt_5) {
+    compiler::Compiler(
+        vm->static_data, "\"abc123\"*3", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size, 0);
+    ASSERT_EQ(vm->static_data.const_s.size, 1);
+    EXPECT_STREQ(vm->static_data.const_s[0], "abc123abc123abc123");
+}
+
+// 字符串和字符串
+TEST_F(compiler_env_set, const_fold_opt_6) {
+    compiler::Compiler(
+        vm->static_data, R"("12"+"34")", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_s.size, 1);
+    EXPECT_STREQ(vm->static_data.const_s[0], "1234");
+}
+
+// 复杂的综合测试
+TEST_F(compiler_env_set, const_fold_opt_7) {
+    compiler::Compiler(
+        vm->static_data, R"("ab"*(10+(1-2)))", &compiler::optimize_option);
+    ASSERT_EQ(vm->static_data.const_s.size, 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 0);
+    EXPECT_STREQ(vm->static_data.const_s[0], "ababababababababab");
+}
+
+/*常量折叠单元测试结束*/
 
 // 测试条件判断的解析
 TEST_F(compiler_env_set, if_lex) {

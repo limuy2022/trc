@@ -182,8 +182,10 @@ Macros</h2></td></tr>
 <div class="line">        for (<span class="keywordtype">int</span> i = 1; i &lt;= bnode-&gt;value; ++i) {                              \</div>
 <div class="line">            strncpy(anode-&gt;value + len * i, anode-&gt;value, len);                \</div>
 <div class="line">        }                                                                      \</div>
+<div class="line">        anode-&gt;value[<a class="code hl_variable" href="namespacetrc_1_1compiler.html#a0c54c2149a258e275f81be1b197907a3">len</a> * bnode-&gt;value] = <span class="charliteral">&#39;\0&#39;</span>;                               \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
 <div class="ttc" id="anamespacelanguage_1_1error_html_a926fb90838cf2a43bb5b3f0eb0db152d"><div class="ttname"><a href="namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d">language::error::memoryerror</a></div><div class="ttdeci">TRC_language_c_api const char * memoryerror</div><div class="ttdef"><b>Definition:</b> error.h:13</div></div>
+<div class="ttc" id="anamespacetrc_1_1compiler_html_a0c54c2149a258e275f81be1b197907a3"><div class="ttname"><a href="namespacetrc_1_1compiler.html#a0c54c2149a258e275f81be1b197907a3">trc::compiler::len</a></div><div class="ttdeci">size_t len</div><div class="ttdef"><b>Definition:</b> token.cpp:176</div></div>
 </div><!-- fragment -->
 <p>数字与字符串相乘 </p>
 <dl class="params"><dt>Parameters</dt><dd>

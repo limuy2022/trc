@@ -1,4 +1,5 @@
-import os,shutil
+import os
+import shutil
 
 os.chdir("..")
 shutil.rmtree("doc/html")

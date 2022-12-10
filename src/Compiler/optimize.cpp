@@ -35,6 +35,7 @@
         for (int i = 1; i <= bnode->value; ++i) {                              \
             strncpy(anode->value + len * i, anode->value, len);                \
         }                                                                      \
+        anode->value[len * bnode->value] = '\0';                               \
     } while (0)
 
 namespace trc::compiler {
@@ -47,8 +48,8 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
         // 运算符
         if ((*i)->type == grammar_type::OPCODE) {
             // 获取变量值
-            auto a = pop_oper_stack(cal_struct);
             auto b = pop_oper_stack(cal_struct);
+            auto a = pop_oper_stack(cal_struct);
             auto t1 = (*a)->type, t2 = (*b)->type;
             if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
                 // 有一个是变量就无法优化，todo:通过上文进行值推测进行变量优化

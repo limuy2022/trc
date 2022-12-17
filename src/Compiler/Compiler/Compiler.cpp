@@ -233,7 +233,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             break;
         }
         default: {
-            NOREACH("Unexpeceted grammar treee node type %d", (int)type);
+            NOREACH("Unexpeceted grammar tree node type %d", (int)type);
         }
         }
     } else {
@@ -302,7 +302,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             break;
         }
         default: {
-            NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
+            NOREACH("Unexpeceted grammar tree node type %d.", (int)type);
         }
         }
     }

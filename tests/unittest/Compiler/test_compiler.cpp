@@ -99,21 +99,6 @@ TEST_F(compiler_env_set, long_int) {
         vm);
 }
 
-// 测试带运算的赋值
-TEST_F(compiler_env_set, assign_with_oper) {
-    compiler::Compiler(
-        vm->static_data, "a:=1+34\n", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size, 2);
-    EXPECT_EQ(vm->static_data.const_i[0], 1);
-    EXPECT_EQ(vm->static_data.const_i[1], 34);
-    ASSERT_EQ(vm->static_data.global_symbol_table_size, 1);
-    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
-                       { (bytecode_t)byteCodeNumber::STORE_NAME_, 0 } },
-        vm);
-}
-
 // 测试函数调用的解析
 // 测试内置变量的解析
 TEST_F(compiler_env_set, builtin_without_var) {
@@ -132,11 +117,9 @@ TEST_F(compiler_env_set, builtin_with_var) {
     compiler::Compiler(
         vm->static_data, "a:=856+1\nprint(a)", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size, 2);
-    EXPECT_EQ(vm->static_data.const_i[0], 856);
+    EXPECT_EQ(vm->static_data.const_i[0], 857);
     EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
                        { (bytecode_t)byteCodeNumber::STORE_NAME_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_NAME_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
@@ -160,28 +143,15 @@ TEST_F(compiler_env_set, func_in_func) {
 }
 
 // 测试运算符表达式的解析
-// 简单常量相加
-TEST_F(compiler_env_set, simple) {
-    compiler::Compiler(vm->static_data, "1+4", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size, 2);
-    EXPECT_EQ(vm->static_data.const_i[0], 1);
-    EXPECT_EQ(vm->static_data.const_i[1], 4);
-    bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
-                       { (bytecode_t)byteCodeNumber::ADD_, 0 } },
-        vm);
-}
-
 // 函数中包括运算符表达式
 TEST_F(compiler_env_set, expr_in_func) {
     compiler::Compiler(
         vm->static_data, "print(1+1)", &compiler::nooptimize_option);
-    ASSERT_EQ(vm->static_data.const_i.size, 1);
-    EXPECT_EQ(vm->static_data.const_i[0], 1);
+    ASSERT_EQ(vm->static_data.const_i.size, 2);
+    EXPECT_EQ(vm->static_data.const_i[0], 2);
+    EXPECT_EQ(vm->static_data.const_i[1], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::ADD_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
+                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 1 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 } },
         vm);
 }
@@ -211,21 +181,21 @@ TEST_F(compiler_env_set, expr_with_func) {
 
 // 整形和整形
 TEST_F(compiler_env_set, const_fold_opt_1) {
-    compiler::Compiler(vm->static_data, "1+2*3", &compiler::optimize_option);
+    compiler::Compiler(vm->static_data, "1+2*3", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 7);
 }
 
 // 整形和浮点型
 TEST_F(compiler_env_set, const_fold_opt_2) {
-    compiler::Compiler(vm->static_data, "1.2*4", &compiler::optimize_option);
+    compiler::Compiler(vm->static_data, "1.2*4", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_f.size, 1);
     EXPECT_EQ(vm->static_data.const_f[0], 4.8);
 }
 
 // 浮点型和整形
 TEST_F(compiler_env_set, const_fold_opt_3) {
-    compiler::Compiler(vm->static_data, "4*1.2", &compiler::optimize_option);
+    compiler::Compiler(vm->static_data, "4*1.2", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_f.size, 1);
     EXPECT_EQ(vm->static_data.const_f[0], 4.8);
 }
@@ -233,7 +203,7 @@ TEST_F(compiler_env_set, const_fold_opt_3) {
 // 整形和字符串
 TEST_F(compiler_env_set, const_fold_opt_4) {
     compiler::Compiler(
-        vm->static_data, "3*\"abc123\"", &compiler::optimize_option);
+        vm->static_data, "3*\"abc123\"", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size, 0);
     ASSERT_EQ(vm->static_data.const_s.size, 1);
     EXPECT_STREQ(vm->static_data.const_s[0], "abc123abc123abc123");
@@ -242,7 +212,7 @@ TEST_F(compiler_env_set, const_fold_opt_4) {
 // 字符串和整形
 TEST_F(compiler_env_set, const_fold_opt_5) {
     compiler::Compiler(
-        vm->static_data, "\"abc123\"*3", &compiler::optimize_option);
+        vm->static_data, "\"abc123\"*3", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_i.size, 0);
     ASSERT_EQ(vm->static_data.const_s.size, 1);
     EXPECT_STREQ(vm->static_data.const_s[0], "abc123abc123abc123");
@@ -251,7 +221,7 @@ TEST_F(compiler_env_set, const_fold_opt_5) {
 // 字符串和字符串
 TEST_F(compiler_env_set, const_fold_opt_6) {
     compiler::Compiler(
-        vm->static_data, R"("12"+"34")", &compiler::optimize_option);
+        vm->static_data, R"("12"+"34")", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_s.size, 1);
     EXPECT_STREQ(vm->static_data.const_s[0], "1234");
 }
@@ -259,7 +229,7 @@ TEST_F(compiler_env_set, const_fold_opt_6) {
 // 复杂的综合测试
 TEST_F(compiler_env_set, const_fold_opt_7) {
     compiler::Compiler(
-        vm->static_data, R"("ab"*(10+(1-2)))", &compiler::optimize_option);
+        vm->static_data, R"("ab"*(10+(1-2)))", &compiler::nooptimize_option);
     ASSERT_EQ(vm->static_data.const_s.size, 1);
     ASSERT_EQ(vm->static_data.const_i.size, 0);
     EXPECT_STREQ(vm->static_data.const_s[0], "ababababababababab");

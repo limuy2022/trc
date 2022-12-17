@@ -120,16 +120,6 @@ private:
     treenode* make_data_node(token* data_token);
 
     /**
-     * @brief 弹出栈顶元素并当操作不合法时报错
-     */
-    template <typename T> T pop_oper_stack(std::stack<T>& s);
-
-    /**
-     * @brief 检查后缀表达式是否正确
-     */
-    void check_expr(is_not_end_node* root);
-
-    /**
      * @brief 获取参数列表
      */
     void get_param_list(is_not_end_node* root);
@@ -146,14 +136,4 @@ private:
     // 特殊的临时终结符，临时将某token_ticks提升到和\n一样的权限,记得撤销！
     token_ticks special_tick_for_end = token_ticks::UNKNOWN;
 };
-
-template <typename T> T grammar_lex::pop_oper_stack(std::stack<T>& s) {
-    if (s.empty()) {
-        compiler_data.error.send_error_module(
-            error::SyntaxError, language::error::syntaxerror);
-    }
-    T a = s.top();
-    s.pop();
-    return a;
-}
 }

@@ -285,7 +285,8 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
             return;
         }
         while ((quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE) {
-            st.push_back(new node_base_tick(grammar_type::OPCODE, quicktmp));
+            st.push_back(new node_base_tick_without_sons(
+                grammar_type::OPCODE, quicktmp));
             oper_stack.pop();
         }
         oper_stack.pop();
@@ -296,7 +297,8 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
         while (!oper_stack.empty()
             && (quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE
             && cal_priority[tick] <= cal_priority[quicktmp]) {
-            st.push_back(new node_base_tick(grammar_type::OPCODE, quicktmp));
+            st.push_back(new node_base_tick_without_sons(
+                grammar_type::OPCODE, quicktmp));
             oper_stack.pop();
         }
     } else {
@@ -304,51 +306,6 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
     }
     oper_stack.push(raw_lex->tick);
     delete raw_lex;
-}
-
-void grammar_lex::check_expr(is_not_end_node* root) {
-    std::stack<treenode*> check_struct;
-    for (auto i = root->son.begin(), n = root->son.end(); i != n; ++i) {
-        if ((*i)->type == grammar_type::OPCODE) {
-            // 运算符
-            treenode* a = pop_oper_stack(check_struct);
-            treenode* b = pop_oper_stack(check_struct);
-            auto t1 = a->type, t2 = b->type;
-            if (t1 == grammar_type::VAR_NAME || t2 == grammar_type::VAR_NAME) {
-                // 变量类型不确定，没有检查的意义
-                continue;
-            }
-            if (!(is_no_var_data_node(t1) && is_no_var_data_node(t2))) {
-                // 非基础类型，todo:支持类和操作符重载后，非基础类型也要支持表达式检查，记得把优化器的非基础表达式检查加上
-                continue;
-            }
-            // 类型检查比较简单，检查字符型的运算就可以了
-            // 数字与字符串只能允许乘法运算
-            if (t1 == grammar_type::STRING && is_number_class_node(t2)) {
-                if (((node_base_tick_without_sons*)root)->tick
-                    != token_ticks::MUL) {
-                    compiler_data.error.send_error_module(
-                        OPERERROR_MSG(t1, t2, *i));
-                }
-                if (t1 != grammar_type::NUMBER) {
-                    compiler_data.error.send_error_module(
-                        OPERERROR_MSG(t1, t2, *i));
-                }
-            } else if (t2 == grammar_type::STRING && is_number_class_node(t1)) {
-                if (((node_base_tick_without_sons*)root)->tick
-                    != token_ticks::MUL) {
-                    compiler_data.error.send_error_module(
-                        OPERERROR_MSG(t1, t2, *i));
-                }
-                if (t2 != grammar_type::NUMBER) {
-                    compiler_data.error.send_error_module(
-                        OPERERROR_MSG(t1, t2, *i));
-                }
-            }
-        } else {
-            check_struct.push(*i);
-        }
-    }
 }
 
 #undef OPERERROR
@@ -383,14 +340,9 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
             new node_base_tick_without_sons(grammar_type::OPCODE, tmp));
         oper_stack.pop();
     }
-    // 此处已经成功且正确生成后缀表达式，在此检查参数判断是否进行常量折叠
-    if (compiler_data.option->optimize) {
-        // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型
-        optimize_expr(head);
-    } else {
-        // 不进行优化，就要额外进行类型检查
-        check_expr(head);
-    }
+    // 此处已经成功且正确生成后缀表达式
+    // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型
+    optimize_expr(head);
     return head;
 }
 

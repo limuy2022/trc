@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['blue_0',['BLUE',['../color_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'color.h']]]
+  ['add_5flabel_0',['add_label',['../optimize_8cpp.html#aee43296e7f8f87997daa001f2359f920',1,'optimize.cpp']]]
 ];

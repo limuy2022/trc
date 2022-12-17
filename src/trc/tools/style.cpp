@@ -137,7 +137,7 @@ namespace tools_in {
                 break;
             }
             default: {
-                NOREACH("Unexpeceted grammar treee node type %d", (int)type);
+                NOREACH("Unexpeceted grammar tree node type %d", (int)type);
             }
             }
         } else {
@@ -173,7 +173,7 @@ namespace tools_in {
                 break;
             }
             default: {
-                NOREACH("Unexpeceted grammar treee node type %d.", (int)type);
+                NOREACH("Unexpeceted grammar tree node type %d.", (int)type);
             }
             }
         }

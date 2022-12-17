@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['delete_5fnode_0',['DELETE_NODE',['../optimize_8cpp.html#aed226bc08ef8f871d51a4545e420d9bc',1,'optimize.cpp']]]
+  ['close_5fcolor_0',['CLOSE_COLOR',['../color_8h.html#af989058e4b497cae0aaaed634b3c2195',1,'color.h']]],
+  ['create_5fkeyword_1',['CREATE_KEYWORD',['../_compiler_2token_8cpp.html#a9b50aadf6559a42b5362dc148267e35e',1,'token.cpp']]]
 ];

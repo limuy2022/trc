@@ -146,12 +146,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">        printf(__VA_ARGS__);                                                   \</div>
+<div class="line">        fprintf(stderr, __VA_ARGS__);                                          \</div>
 <div class="line">        trc::noreach_internal(__LINE__, __FUNCTION__, __FILE__);               \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>报错的辅助输出信息 </td></tr>
+    <tr><td class="paramname">...</td><td>报错的辅助输出信息 </td></tr>
   </table>
   </dd>
 </dl>

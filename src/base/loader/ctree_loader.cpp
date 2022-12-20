@@ -21,6 +21,8 @@ static uint16_t MAGIC_VALUE = 0xACFD;
 
 /**
  * 由于读入和写入是相对的，所以用宏定义来简化这一点
+ * @param file 文件指针
+ * @param vm 虚拟机指针
  * @param str load or write
  */
 #define LOAD_WRITE(file, vm, str)                                              \

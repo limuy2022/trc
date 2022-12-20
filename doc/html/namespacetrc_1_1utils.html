@@ -184,8 +184,8 @@ Functions</h2></td></tr>
 <p>改变字节序：大端改成小端，小端改成大端 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">bytes</td><td>需要转换的起点 </td></tr>
-    <tr><td class="paramname">size</td><td>需要转换的字节数 </td></tr>
+    <tr><td class="paramname">bytes_</td><td>需要转换的数组首地址 </td></tr>
+    <tr><td class="paramname">size</td><td>数组长度 </td></tr>
   </table>
   </dd>
 </dl>
@@ -237,7 +237,8 @@ template&lt;typename T , typename O &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>数据 </td></tr>
-    <tr><td class="paramname">l</td><td>容器 </td></tr>
+    <tr><td class="paramname">begin</td><td>容器起点 </td></tr>
+    <tr><td class="paramname">end</td><td>容器终点 </td></tr>
   </table>
   </dd>
 </dl>
@@ -674,14 +675,15 @@ template&lt;typename T &gt; </div>
 <p>检查字符串数据是否在容器中，成功返回元素所在索引，否则返回-1 </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>迭代器类型 </td></tr>
-    <tr><td class="paramname">O</td><td>容器类型 </td></tr>
+    <tr><td class="paramname">T</td><td>容器类型 </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>数据 </td></tr>
+    <tr><td class="paramname">begin</td><td>容器起点 </td></tr>
+    <tr><td class="paramname">end</td><td>容器终点 </td></tr>
   </table>
   </dd>
 </dl>

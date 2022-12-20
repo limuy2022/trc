@@ -226,6 +226,14 @@ TEST_F(compiler_env_set, const_fold_opt_6) {
     EXPECT_STREQ(vm->static_data.const_s[0], "1234");
 }
 
+// 小括号
+TEST_F(compiler_env_set, const_fold_opt_9) {
+    compiler::Compiler(
+        vm->static_data, R"((2+2)-(1*1))", &compiler::nooptimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
+    EXPECT_EQ(vm->static_data.const_i[0], 3);
+}
+
 // 复杂的综合测试
 TEST_F(compiler_env_set, const_fold_opt_7) {
     compiler::Compiler(
@@ -233,6 +241,21 @@ TEST_F(compiler_env_set, const_fold_opt_7) {
     ASSERT_EQ(vm->static_data.const_s.size, 1);
     ASSERT_EQ(vm->static_data.const_i.size, 0);
     EXPECT_STREQ(vm->static_data.const_s[0], "ababababababababab");
+}
+
+// 简单条件表达式折叠
+TEST_F(compiler_env_set, const_fold_opt_10) {
+    compiler::Compiler(vm->static_data, "1!=2", &compiler::nooptimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
+    EXPECT_EQ(vm->static_data.const_i[0], 1);
+}
+
+// 测试较复杂条件表达式的常量折叠
+TEST_F(compiler_env_set, const_fold_opt_8) {
+    compiler::Compiler(
+        vm->static_data, R"((1==1)+(1!=2))", &compiler::nooptimize_option);
+    ASSERT_EQ(vm->static_data.const_i.size, 1);
+    EXPECT_EQ(vm->static_data.const_i[0], 2);
 }
 
 /*常量折叠单元测试结束*/
@@ -245,9 +268,7 @@ TEST_F(compiler_env_set, if_lex) {
     ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::EQUAL_, 0 },
-                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 7 },
+                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 5 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 } },
@@ -261,9 +282,7 @@ TEST_F(compiler_env_set, while_lex) {
     ASSERT_EQ(vm->static_data.const_i.size, 1);
     EXPECT_EQ(vm->static_data.const_i[0], 1);
     bytecode_check({ { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
-                       { (bytecode_t)byteCodeNumber::EQUAL_, 0 },
-                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 8 },
+                       { (bytecode_t)byteCodeNumber::IF_FALSE_GOTO_, 6 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::LOAD_INT_, 0 },
                        { (bytecode_t)byteCodeNumber::CALL_BUILTIN_, 1 },

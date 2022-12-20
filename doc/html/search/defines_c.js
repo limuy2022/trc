@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sub_5flabel_0',['sub_label',['../optimize_8cpp.html#a3d18e144de756ebc718a9e2424ad18f5',1,'optimize.cpp']]]
+  ['red_0',['RED',['../color_8h.html#a8d23feea868a983c8c2b661e1e16972f',1,'color.h']]]
 ];

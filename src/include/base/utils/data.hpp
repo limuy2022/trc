@@ -61,7 +61,8 @@ template <typename T> bool str_check_in(const char* data, T begin, T end) {
  * @tparam T 数据类型
  * @tparam O 迭代器类型
  * @param data 数据
- * @param l 容器
+ * @param begin 容器起点
+ * @param end 容器终点
  */
 template <typename T, typename O>
 int check_in_i(const T& data, O begin, O end) {
@@ -77,9 +78,10 @@ int check_in_i(const T& data, O begin, O end) {
 /**
  * @brief
  * 检查字符串数据是否在容器中，成功返回元素所在索引，否则返回-1
- * @tparam T 迭代器类型
- * @tparam O 容器类型
+ * @tparam T 容器类型
  * @param data 数据
+ * @param begin 容器起点
+ * @param end 容器终点
  */
 template <typename T> int str_check_in_i(const char* data, T begin, T end) {
     int res = 0;

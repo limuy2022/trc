@@ -59,8 +59,7 @@ private:
 
     /**
      * @brief 将中缀表达式转换成后缀表达式
-     * @param first_data_node 生成第一个数据的节点
-     * @param first_cal_symbol 第一个运算符
+     * @param first_data_node 生成第一个数据的节点(没有第一个数据请传入nullptr)
      * @details 常量折叠在此进行
      */
     treenode* change_to_last_expr(treenode* first_data_node);
@@ -110,8 +109,10 @@ private:
     /**
      * @brief 优化表达式(常量折叠)和修正表达式节点
      * @param expr 表达式
+     * @return
+     * 如果被折叠成一个元素，就会返回一个全新的节点，如果没有折叠成一个节点，就会返回nullptr
      */
-    void optimize_expr(is_not_end_node* expr);
+    treenode* optimize_expr(is_not_end_node* expr);
 
     /**
      * @brief 根据token制作相应的数据节点

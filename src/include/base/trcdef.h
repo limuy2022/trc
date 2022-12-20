@@ -13,11 +13,11 @@
 typedef std::vector<std::string> vecs;
 
 /**
- * @param str 报错的辅助输出信息
+ * @param ... 报错的辅助输出信息
  */
 #define NOREACH(...)                                                           \
     do {                                                                       \
-        printf(__VA_ARGS__);                                                   \
+        fprintf(stderr, __VA_ARGS__);                                          \
         trc::noreach_internal(__LINE__, __FUNCTION__, __FILE__);               \
     } while (0)
 

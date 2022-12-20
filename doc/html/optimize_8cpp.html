@@ -104,6 +104,10 @@ Macros</h2></td></tr>
 <tr class="separator:a3d18e144de756ebc718a9e2424ad18f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae75013ca7003754a0f6e13de0f944a6b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#ae75013ca7003754a0f6e13de0f944a6b">mul_label</a>(a,  b)</td></tr>
 <tr class="separator:ae75013ca7003754a0f6e13de0f944a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad610ac860e0965819c9bc2c99c5ddee3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#ad610ac860e0965819c9bc2c99c5ddee3">equal_label</a>(a,  b,  receive)</td></tr>
+<tr class="separator:ad610ac860e0965819c9bc2c99c5ddee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5626e79b85e4132d07e6d06fecf0531a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#a5626e79b85e4132d07e6d06fecf0531a">unequal_label</a>(a,  b,  receive)</td></tr>
+<tr class="separator:a5626e79b85e4132d07e6d06fecf0531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aee43296e7f8f87997daa001f2359f920" name="aee43296e7f8f87997daa001f2359f920"></a>
@@ -133,6 +137,46 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::ADD: {                                                   \</div>
 <div class="line">        a-&gt;value += b-&gt;value;                                                  \</div>
+<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad610ac860e0965819c9bc2c99c5ddee3" name="ad610ac860e0965819c9bc2c99c5ddee3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad610ac860e0965819c9bc2c99c5ddee3">&#9670;&#160;</a></span>equal_label</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define equal_label</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">a, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">b, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">receive&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::EQUAL: {                                                 \</div>
+<div class="line">        <span class="keyword">auto</span> tmp = <span class="keyword">new</span> node_base_int_without_sons(a-&gt;value == b-&gt;value);       \</div>
+<div class="line">        <span class="keyword">delete</span> a;                                                              \</div>
+<div class="line">        receive = tmp;                                                         \</div>
 <div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
@@ -250,6 +294,46 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::SUB: {                                                   \</div>
 <div class="line">        a-&gt;value -= b-&gt;value;                                                  \</div>
+<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a5626e79b85e4132d07e6d06fecf0531a" name="a5626e79b85e4132d07e6d06fecf0531a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5626e79b85e4132d07e6d06fecf0531a">&#9670;&#160;</a></span>unequal_label</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define unequal_label</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">a, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">b, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">receive&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::UNEQUAL: {                                               \</div>
+<div class="line">        <span class="keyword">auto</span> tmp = <span class="keyword">new</span> node_base_int_without_sons(a-&gt;value != b-&gt;value);       \</div>
+<div class="line">        <span class="keyword">delete</span> a;                                                              \</div>
+<div class="line">        receive = tmp;                                                         \</div>
 <div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->

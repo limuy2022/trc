@@ -73,7 +73,7 @@ public:
  * @brief 报出错误，错误名称和错误信息
  * @warning 一般报错，不带模块和行号
  * @param name 错误名
- * @param 可变参数 const char* 类型的字符串
+ * @param ... const char* 类型的字符串
  * @code error::send_error(error::ValueError, "%
  * can't be %", "int", "string")
  * @endcode

@@ -31,24 +31,44 @@
         a->value += b->value;                                                  \
         break;                                                                 \
     }
+
 #define sub_label(a, b)                                                        \
     case token_ticks::SUB: {                                                   \
         a->value -= b->value;                                                  \
         break;                                                                 \
     }
+
 #define mul_label(a, b)                                                        \
     case token_ticks::MUL: {                                                   \
         a->value *= b->value;                                                  \
         break;                                                                 \
     }
+
+#define equal_label(a, b, receive)                                             \
+    case token_ticks::EQUAL: {                                                 \
+        auto tmp = new node_base_int_without_sons(a->value == b->value);       \
+        delete a;                                                              \
+        receive = tmp;                                                         \
+        break;                                                                 \
+    }
+
+#define unequal_label(a, b, receive)                                           \
+    case token_ticks::UNEQUAL: {                                               \
+        auto tmp = new node_base_int_without_sons(a->value != b->value);       \
+        delete a;                                                              \
+        receive = tmp;                                                         \
+        break;                                                                 \
+    }
+
 namespace trc::compiler {
 // todo:加上长整型和长浮点型的常量折叠,转换等功能
-// todo:加上条件表达式的常量折叠功能
-void grammar_lex::optimize_expr(is_not_end_node* expr) {
+treenode* grammar_lex::optimize_expr(is_not_end_node* expr) {
     // 方法很简单，首先模拟执行过程，如果都是同种数据就进行运算压栈，不同种数据或者有变量就原封不动放入栈，一边在栈中模拟运算一边修改节点值
     std::list<decltype(expr->son)::value_type> cal_struct;
-    for (auto i : expr->son) {
+    while (!expr->son.empty()) {
         // 运算符
+        auto i = expr->son.front();
+        expr->son.pop_front();
         if (i->type == grammar_type::OPCODE) {
             // 获取变量值
             if (cal_struct.size() < 2) {
@@ -96,10 +116,11 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
                         anode_float->value /= bnode->value;
                         break;
                     }
-                    default: {
-                        NOREACH("Optimizer met an unexpected cal token %d",
-                            (int)(operator_));
-                    }
+                        equal_label(anode, bnode, a)
+                            unequal_label(anode, bnode, a) default : {
+                            NOREACH("Optimizer met an unexpected cal token %d",
+                                (int)(operator_));
+                        }
                     }
                     break;
                 }
@@ -228,7 +249,13 @@ void grammar_lex::optimize_expr(is_not_end_node* expr) {
             cal_struct.push_back(i);
         }
     }
+    // 如果栈里只剩下一项元素，可以把这一项元素代替掉expr
+    if (cal_struct.size() == 1) {
+        delete expr;
+        return cal_struct.front();
+    }
     // 将旧的表达式替换为新的表达式
     expr->son = std::move(cal_struct);
+    return nullptr;
 }
 }

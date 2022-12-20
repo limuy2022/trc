@@ -200,10 +200,16 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
             token_.unget_token(now);
             if (end_with_oper) {
                 return now_node;
-            } else {
-                // 先前已经生成了节点，直接调用
-                return change_to_last_expr(now_node);
             }
+            // 先前已经生成了节点，直接调用
+            return change_to_last_expr(now_node);
+        } else if (now->tick == token_ticks::LEFT_SMALL_BRACE) {
+            // 遇到左半边小括号，进行表达式处理
+            now_node = change_to_last_expr(nullptr);
+            // 删除左括号
+            delete now;
+            // 删除右括号
+            delete token_.get_token();
         } else if (nexttick = get_next_token_tick();
                    now->tick == token_ticks::NAME) {
             // 注：有token回退情况的请放在此分支之前
@@ -279,9 +285,9 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
     }
     token_ticks quicktmp;
     if (tick == token_ticks::RIGHT_SMALL_BRACE) {
+        correct_braces--;
         if (correct_braces == 0) {
             // 代表解析结束，因为遇到了不属于自己的括号
-            correct_braces = -1;
             return;
         }
         while ((quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE) {
@@ -290,7 +296,6 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
             oper_stack.pop();
         }
         oper_stack.pop();
-        correct_braces--;
         return;
     }
     if (tick != token_ticks::LEFT_SMALL_BRACE) {
@@ -313,9 +318,11 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
 treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
     auto head = new is_not_end_node(grammar_type::EXPR);
     std::stack<token_ticks> oper_stack;
-    head->son.push_back(first_data_node);
+    if (first_data_node != nullptr) {
+        head->son.push_back(first_data_node);
+    }
     // 防止吞了别的语句的括号如函数,记录括号对数
-    int correct_braces = 0;
+    int correct_braces = 1;
     for (;;) {
         trc::compiler::token* raw_lex = token_.get_token();
         if (is_end_token(raw_lex->tick)) {
@@ -327,8 +334,8 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
         }
         ConvertDataToExpressions(
             raw_lex, head->son, oper_stack, correct_braces);
-        if (correct_braces == -1) {
-            // -1作为特殊含义表达，意思是解析到了尽头，所以将token退还确保代码正常
+        if (correct_braces == 0) {
+            // 0作为特殊含义表达，意思是解析到了尽头，所以将token退还确保代码正常
             token_.unget_token(raw_lex);
             break;
         }
@@ -342,7 +349,11 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
     }
     // 此处已经成功且正确生成后缀表达式
     // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型
-    optimize_expr(head);
+    treenode* res;
+    if ((res = optimize_expr(head)) != nullptr) {
+        // 如果被折叠成一个元素，就会返回一个全新的节点，原先的节点会被释放
+        return res;
+    }
     return head;
 }
 

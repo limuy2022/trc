@@ -16,7 +16,7 @@
 using namespace trc::compiler;
 
 static compiler_public_data compiler_data { std::string("token_unittest"),
-    &trc::compiler::nooptimize_option };
+    trc::compiler::nooptimize_option };
 
 typedef std::vector<std::pair<token_ticks, const char*>> test_token_t;
 

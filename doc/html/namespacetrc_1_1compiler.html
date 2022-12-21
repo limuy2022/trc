@@ -102,6 +102,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1grammar__lex.html">grammar_lex</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成语法树的解析器  <a href="classtrc_1_1compiler_1_1grammar__lex.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1int__node.html">int_node</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1is__end__node.html">is_end_node</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述叶子节点的类  <a href="classtrc_1_1compiler_1_1is__end__node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,6 +136,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html">node_base_tick_without_sons</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">基于标签的叶子节点  <a href="classtrc_1_1compiler_1_1node__base__tick__without__sons.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1number__node.html">number_node</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">数值型的类接口  <a href="classtrc_1_1compiler_1_1number__node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1compiler_1_1string__node.html">string_node</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">储存字符串类型的数据节点  <a href="classtrc_1_1compiler_1_1string__node.html#details">More...</a><br /></td></tr>
@@ -258,9 +263,12 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa579535a614e7626fec5669349db7aef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html">detail_compiler</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#aa579535a614e7626fec5669349db7aef">Compiler</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_space::TVM_static_data</a> &amp;vm, const std::string &amp;codes, const <a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> *option, <a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html">detail_compiler</a> *compiler_ptr=nullptr, bool return_compiler_ptr=false)</td></tr>
-<tr class="memdesc:aa579535a614e7626fec5669349db7aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">传入一台虚拟机和未编译的代码，将代码编译后填充进vm中  <a href="namespacetrc_1_1compiler.html#aa579535a614e7626fec5669349db7aef">More...</a><br /></td></tr>
-<tr class="separator:aa579535a614e7626fec5669349db7aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d19af43406cb8c05d71e6cfe8040957"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html">detail_compiler</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a5d19af43406cb8c05d71e6cfe8040957">Compiler</a> (<a class="el" href="classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html">TVM_space::TVM_static_data</a> &amp;vm, const std::string &amp;codes, const <a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> &amp;option, <a class="el" href="classtrc_1_1compiler_1_1detail__compiler.html">detail_compiler</a> *compiler_ptr=nullptr, bool return_compiler_ptr=false)</td></tr>
+<tr class="memdesc:a5d19af43406cb8c05d71e6cfe8040957"><td class="mdescLeft">&#160;</td><td class="mdescRight">传入一台虚拟机和未编译的代码，将代码编译后填充进vm中  <a href="namespacetrc_1_1compiler.html#a5d19af43406cb8c05d71e6cfe8040957">More...</a><br /></td></tr>
+<tr class="separator:a5d19af43406cb8c05d71e6cfe8040957"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affe8246ecd31add178afa29cab106cfa"><td class="memTemplParams" colspan="2">template&lt;typename result_type , typename value_type &gt; </td></tr>
+<tr class="memitem:affe8246ecd31add178afa29cab106cfa"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#affe8246ecd31add178afa29cab106cfa">number_node_cal</a> (value_type avalue, value_type bvalue, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> oper, <a class="el" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a> &amp;compiler_data)</td></tr>
+<tr class="separator:affe8246ecd31add178afa29cab106cfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a794920f374878c75cabe0b9525f3a098"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtrc_1_1compiler_1_1next__order__map.html">next_order_map</a>&lt; const char *, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56ef">grammar_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a794920f374878c75cabe0b9525f3a098">str_grammar_type_cal_map</a> (<a class="el" href="namespacetrc_1_1compiler.html#aab5220b60dc300da23593695796f3e8b">name_map_grammar</a>, <a class="el" href="namespacetrc_1_1compiler.html#a4bcc8ae504de95341ebb688e6fcf56efa34f55eca38e0605a84f169ff61a2a396">grammar_type::NUMBER</a>)</td></tr>
 <tr class="separator:a794920f374878c75cabe0b9525f3a098"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33f3e1d1748bd19c3494b897d59ffd28"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtrc_1_1compiler_1_1next__order__map.html">next_order_map</a>&lt; const char *, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a33f3e1d1748bd19c3494b897d59ffd28">str_token_ticks_cal_map</a> (<a class="el" href="namespacetrc_1_1compiler.html#a742c940e53cef48c27a3099253a5aaaf">name_map_token</a>, <a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a9eeb52badb613229884838847294b90d">token_ticks::ADD</a>)</td></tr>
@@ -268,9 +276,9 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ab22508056fd079f05491ce3b01113b30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ab22508056fd079f05491ce3b01113b30">optimize_option</a> { true, true }</td></tr>
+<tr class="memitem:ab22508056fd079f05491ce3b01113b30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#ab22508056fd079f05491ce3b01113b30">optimize_option</a> { true, true, true }</td></tr>
 <tr class="separator:ab22508056fd079f05491ce3b01113b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3207667e7c684e06c7c5462b85c9fcf1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a3207667e7c684e06c7c5462b85c9fcf1">nooptimize_option</a> { true, false }</td></tr>
+<tr class="memitem:a3207667e7c684e06c7c5462b85c9fcf1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a3207667e7c684e06c7c5462b85c9fcf1">nooptimize_option</a> { true, false, true }</td></tr>
 <tr class="separator:a3207667e7c684e06c7c5462b85c9fcf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1585c35a0079e8001f12f788884d282d"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#a1585c35a0079e8001f12f788884d282d">change_const</a></td></tr>
 <tr class="separator:a1585c35a0079e8001f12f788884d282d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -441,8 +449,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aa579535a614e7626fec5669349db7aef" name="aa579535a614e7626fec5669349db7aef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa579535a614e7626fec5669349db7aef">&#9670;&#160;</a></span>Compiler()</h2>
+<a id="a5d19af43406cb8c05d71e6cfe8040957" name="a5d19af43406cb8c05d71e6cfe8040957"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d19af43406cb8c05d71e6cfe8040957">&#9670;&#160;</a></span>Compiler()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -462,7 +470,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> &amp;&#160;</td>
           <td class="paramname"><em>option</em>, </td>
         </tr>
         <tr>
@@ -490,13 +498,55 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">vm</td><td>虚拟机,编译过的要用TVM_space::free_TVM去释放内存 </td></tr>
     <tr><td class="paramname">codes</td><td>源代码 </td></tr>
-    <tr><td class="paramname">option</td><td>编译器参数,如果已经指定编译器传入nullptr </td></tr>
+    <tr><td class="paramname">option</td><td>编译器参数,如果已经指定编译器传入{}，函数会忽略该参数 </td></tr>
     <tr><td class="paramname">compiler_ptr</td><td>提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息 </td></tr>
     <tr><td class="paramname">return_compiler_ptr</td><td>是否返回当前编译函数生成的编译器对象，可用于保存编译信息 </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>使用前需要提前用TVM_space::free_TVM去释放内存 </dd></dl>
+
+</div>
+</div>
+<a id="affe8246ecd31add178afa29cab106cfa" name="affe8246ecd31add178afa29cab106cfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affe8246ecd31add178afa29cab106cfa">&#9670;&#160;</a></span>number_node_cal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename result_type , typename value_type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtrc_1_1compiler_1_1treenode.html">treenode</a> * trc::compiler::number_node_cal </td>
+          <td>(</td>
+          <td class="paramtype">value_type&#160;</td>
+          <td class="paramname"><em>avalue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">value_type&#160;</td>
+          <td class="paramname"><em>bvalue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452">token_ticks</a>&#160;</td>
+          <td class="paramname"><em>oper</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structtrc_1_1compiler_1_1compiler__public__data.html">compiler_public_data</a> &amp;&#160;</td>
+          <td class="paramname"><em>compiler_data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -740,7 +790,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> trc::compiler::nooptimize_option { true, false }</td>
+          <td class="memname"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> trc::compiler::nooptimize_option { true, false, true }</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -754,7 +804,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> trc::compiler::optimize_option { true, true }</td>
+          <td class="memname"><a class="el" href="structtrc_1_1compiler_1_1compiler__option.html">compiler_option</a> trc::compiler::optimize_option { true, true, true }</td>
         </tr>
       </table>
 </div><div class="memdoc">

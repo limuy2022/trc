@@ -9,9 +9,11 @@ typedef error::error_module compiler_error;
  */
 struct compiler_option {
     // 是否生成行号表
-    bool number_table;
+    bool number_table = true;
     // 是否开启优化
-    bool optimize;
+    bool optimize = false;
+    // 是否进行常量折叠
+    bool const_fold = true;
 };
 
 /**
@@ -19,7 +21,7 @@ struct compiler_option {
  */
 struct compiler_public_data {
     compiler_error error;
-    const compiler_option* option;
+    const compiler_option option;
     // 储存虚拟机常量池的大小
     size_t int_size = 0, float_size = 0, string_size = 0, long_int_size = 0,
            func_size = 0, long_float_size = 0;

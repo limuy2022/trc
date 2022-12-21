@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['int_5fcache_5fbegin_0',['INT_CACHE_BEGIN',['../_t_r_e_8h.html#a14707670c9943023bfa2a9c5d05f58ca',1,'TRE.h']]],
-  ['int_5fcache_5fend_1',['INT_CACHE_END',['../_t_r_e_8h.html#a5b15389557cf6f5b7ec6659015a8f6c6',1,'TRE.h']]],
-  ['int_5fcache_5flen_2',['INT_CACHE_LEN',['../_t_r_e_8h.html#a94a60d9200e56483b369736cc5519327',1,'TRE.h']]],
-  ['int_5flongint_5fline_3',['INT_LONGINT_LINE',['../trc__long_8h.html#a2dc1520f1d137caf74e9b87716612e56',1,'trc_long.h']]],
-  ['int_5fmul_5fstr_4',['int_mul_str',['../optimize_8cpp.html#a6b0db93d48307cd9ace79ecb87d482c8',1,'optimize.cpp']]]
+  ['mallocfloat_0',['MALLOCFLOAT',['../_t_v_m_2memory_8h.html#ad7b18a490f345c66d3a06a4a14d35b71',1,'memory.h']]],
+  ['mallocflong_1',['MALLOCFLONG',['../_t_v_m_2memory_8h.html#ae20334762ba44f36f58e5b0edecb63d6',1,'memory.h']]],
+  ['mallocint_2',['MALLOCINT',['../_t_v_m_2memory_8h.html#a533c37722198fc6db70f9e934e702a96',1,'memory.h']]],
+  ['malloclong_3',['MALLOCLONG',['../_t_v_m_2memory_8h.html#aa9d0f25ef6e41a22f2f8c4ee9094c8b0',1,'memory.h']]],
+  ['mallocstring_4',['MALLOCSTRING',['../_t_v_m_2memory_8h.html#a0b7455c4cf7d62dbcfe219febc0c97ce',1,'memory.h']]],
+  ['map_5fmin_5fsize_5',['MAP_MIN_SIZE',['../trc__map_8h.html#a87c92adbd1f4322b9624df6b49aae91a',1,'trc_map.h']]]
 ];

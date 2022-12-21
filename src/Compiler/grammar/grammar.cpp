@@ -161,9 +161,9 @@ treenode* grammar_lex::make_data_node(token* data_token) {
     } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
         return new node_base_string_without_sons(
             grammar_type::LONG_FLOAT, data_token);
-    } else {
-        NOREACH("Unexpected data token type %d", (int)tmp);
     }
+    NOREACH("Unexpected data token type %d", (int)tmp);
+    return nullptr;
 }
 
 token* grammar_lex::clear_enter() {
@@ -349,10 +349,12 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
     }
     // 此处已经成功且正确生成后缀表达式
     // 进行常量折叠(折叠时会顺便转换类型,修正表达式节点)，也会检查数据类型
-    treenode* res;
-    if ((res = optimize_expr(head)) != nullptr) {
-        // 如果被折叠成一个元素，就会返回一个全新的节点，原先的节点会被释放
-        return res;
+    if (compiler_data.option.const_fold) {
+        treenode* res;
+        if ((res = optimize_expr(head)) != nullptr) {
+            // 如果被折叠成一个元素，就会返回一个全新的节点，原先的节点会被释放
+            return res;
+        }
     }
     return head;
 }

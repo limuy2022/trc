@@ -206,6 +206,14 @@ public:
     char* swap_string_data();
 };
 
+/**
+ * @brief 数值型的类接口
+ */
+class number_node {
+public:
+    virtual double to_float() = 0;
+};
+
 class tick_node {
 public:
     token_ticks tick;
@@ -245,13 +253,23 @@ public:
     explicit node_base_string_without_sons(grammar_type type, token* data);
 };
 
-/**
- * @brief 基于整型的叶子节点
- */
-class node_base_int_without_sons : public is_end_node {
+class int_node : public number_node {
 public:
     int value;
 
+    int_node(int value)
+        : value(value) {};
+
+    double to_float() {
+        return value;
+    }
+};
+
+/**
+ * @brief 基于整型的叶子节点
+ */
+class node_base_int_without_sons : public is_end_node, public int_node {
+public:
     explicit node_base_int_without_sons(
         int value, grammar_type type = grammar_type::NUMBER);
 };
@@ -259,21 +277,23 @@ public:
 /**
  * @brief 基于整形的非叶子节点
  */
-class node_base_int : public is_not_end_node {
+class node_base_int : public is_not_end_node, public int_node {
 public:
-    int value;
-
     explicit node_base_int(int value, grammar_type type = grammar_type::NUMBER);
 };
 
 /**
  * @brief 基于浮点型的叶子节点
  */
-class node_base_float_without_sons : public is_end_node {
+class node_base_float_without_sons : public is_end_node, public number_node {
 public:
     double value;
 
     explicit node_base_float_without_sons(double value);
+
+    double to_float() {
+        return value;
+    }
 };
 
 /**

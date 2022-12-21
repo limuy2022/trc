@@ -75,7 +75,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">optimize.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -98,90 +99,14 @@ Macros</h2></td></tr>
 <tr class="memitem:a6b0db93d48307cd9ace79ecb87d482c8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#a6b0db93d48307cd9ace79ecb87d482c8">int_mul_str</a>(astr,  bint)</td></tr>
 <tr class="memdesc:a6b0db93d48307cd9ace79ecb87d482c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">数字与字符串相乘  <a href="optimize_8cpp.html#a6b0db93d48307cd9ace79ecb87d482c8">More...</a><br /></td></tr>
 <tr class="separator:a6b0db93d48307cd9ace79ecb87d482c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee43296e7f8f87997daa001f2359f920"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#aee43296e7f8f87997daa001f2359f920">add_label</a>(a,  b)</td></tr>
-<tr class="separator:aee43296e7f8f87997daa001f2359f920"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d18e144de756ebc718a9e2424ad18f5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#a3d18e144de756ebc718a9e2424ad18f5">sub_label</a>(a,  b)</td></tr>
-<tr class="separator:a3d18e144de756ebc718a9e2424ad18f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae75013ca7003754a0f6e13de0f944a6b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#ae75013ca7003754a0f6e13de0f944a6b">mul_label</a>(a,  b)</td></tr>
-<tr class="separator:ae75013ca7003754a0f6e13de0f944a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad610ac860e0965819c9bc2c99c5ddee3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#ad610ac860e0965819c9bc2c99c5ddee3">equal_label</a>(a,  b,  receive)</td></tr>
-<tr class="separator:ad610ac860e0965819c9bc2c99c5ddee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5626e79b85e4132d07e6d06fecf0531a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="optimize_8cpp.html#a5626e79b85e4132d07e6d06fecf0531a">unequal_label</a>(a,  b,  receive)</td></tr>
-<tr class="separator:a5626e79b85e4132d07e6d06fecf0531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:affe8246ecd31add178afa29cab106cfa"><td class="memTemplParams" colspan="2">template&lt;typename result_type , typename value_type &gt; </td></tr>
+<tr class="memitem:affe8246ecd31add178afa29cab106cfa"><td class="memTemplItemLeft" align="right" valign="top">treenode *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1compiler.html#affe8246ecd31add178afa29cab106cfa">trc::compiler::number_node_cal</a> (value_type avalue, value_type bvalue, token_ticks oper, compiler_public_data &amp;compiler_data)</td></tr>
+<tr class="separator:affe8246ecd31add178afa29cab106cfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="aee43296e7f8f87997daa001f2359f920" name="aee43296e7f8f87997daa001f2359f920"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee43296e7f8f87997daa001f2359f920">&#9670;&#160;</a></span>add_label</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define add_label</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">a, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::ADD: {                                                   \</div>
-<div class="line">        a-&gt;value += b-&gt;value;                                                  \</div>
-<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ad610ac860e0965819c9bc2c99c5ddee3" name="ad610ac860e0965819c9bc2c99c5ddee3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad610ac860e0965819c9bc2c99c5ddee3">&#9670;&#160;</a></span>equal_label</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define equal_label</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">a, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">receive&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::EQUAL: {                                                 \</div>
-<div class="line">        <span class="keyword">auto</span> tmp = <span class="keyword">new</span> node_base_int_without_sons(a-&gt;value == b-&gt;value);       \</div>
-<div class="line">        <span class="keyword">delete</span> a;                                                              \</div>
-<div class="line">        receive = tmp;                                                         \</div>
-<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="a6b0db93d48307cd9ace79ecb87d482c8" name="a6b0db93d48307cd9ace79ecb87d482c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6b0db93d48307cd9ace79ecb87d482c8">&#9670;&#160;</a></span>int_mul_str</h2>
 
@@ -208,8 +133,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">        <span class="keyword">auto</span> anode = (node_base_string_without_sons*)astr;                     \</div>
-<div class="line">        <span class="keyword">auto</span> bnode = (node_base_int_without_sons*)bint;                        \</div>
+<div class="line">        <span class="keyword">auto</span> anode = (node_base_string_without_sons*)(astr);                   \</div>
+<div class="line">        <span class="keyword">auto</span> bnode = (node_base_int_without_sons*)(bint);                      \</div>
 <div class="line">        <span class="keywordtype">size_t</span> len = strlen(anode-&gt;value);                                     \</div>
 <div class="line">        anode-&gt;value = (<span class="keywordtype">char</span>*)realloc(anode-&gt;value, len * bnode-&gt;value + 1);   \</div>
 <div class="line">        if (anode-&gt;value == <span class="keyword">nullptr</span>) {                                         \</div>
@@ -233,110 +158,6 @@ Macros</h2></td></tr>
   </dd>
 </dl>
 
-</div>
-</div>
-<a id="ae75013ca7003754a0f6e13de0f944a6b" name="ae75013ca7003754a0f6e13de0f944a6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae75013ca7003754a0f6e13de0f944a6b">&#9670;&#160;</a></span>mul_label</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define mul_label</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">a, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::MUL: {                                                   \</div>
-<div class="line">        a-&gt;value *= b-&gt;value;                                                  \</div>
-<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a3d18e144de756ebc718a9e2424ad18f5" name="a3d18e144de756ebc718a9e2424ad18f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d18e144de756ebc718a9e2424ad18f5">&#9670;&#160;</a></span>sub_label</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define sub_label</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">a, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::SUB: {                                                   \</div>
-<div class="line">        a-&gt;value -= b-&gt;value;                                                  \</div>
-<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a5626e79b85e4132d07e6d06fecf0531a" name="a5626e79b85e4132d07e6d06fecf0531a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5626e79b85e4132d07e6d06fecf0531a">&#9670;&#160;</a></span>unequal_label</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define unequal_label</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">a, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">receive&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> token_ticks::UNEQUAL: {                                               \</div>
-<div class="line">        <span class="keyword">auto</span> tmp = <span class="keyword">new</span> node_base_int_without_sons(a-&gt;value != b-&gt;value);       \</div>
-<div class="line">        <span class="keyword">delete</span> a;                                                              \</div>
-<div class="line">        receive = tmp;                                                         \</div>
-<div class="line">        <span class="keywordflow">break</span>;                                                                 \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

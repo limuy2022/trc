@@ -17,3 +17,5 @@
 | KeyError            |     键错误 |
 | MemoryError         |    内存错误 |
 | SystemError         |    系统错误 |
+| OperatorError       |    运算错误 |
+| RedefinedError      |  重复定义错误 |

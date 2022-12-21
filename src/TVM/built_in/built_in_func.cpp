@@ -72,6 +72,6 @@ void BOOL_(int argc, TVM* vm) {
 }
 
 void TYPE(int argc, TVM* vm) {
-    vm->top() = MALLOCSTRING(type_int::int_name_s[(int)vm->top()->gettype()]);
+    vm->top() = MALLOCSTRING(type_int::int_name[(int)vm->top()->gettype()]);
 }
 }

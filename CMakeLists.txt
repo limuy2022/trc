@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_UNITY_BUILD ON)
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+	# release模式下开启LTO的支持
+	message("LTO is opened")
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 # ccache的使用
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)

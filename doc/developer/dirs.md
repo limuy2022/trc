@@ -18,6 +18,8 @@ tests:测试用例，也是学习的好样例
 
 bin:编译后的可执行文件
 
+language:国际化trc的各种语言
+
 src:源文件
 
 	src/include:头文件
@@ -29,7 +31,3 @@ src:源文件
 	src/trc:命令行工具和启动程序
 
 	src/TVM:执行字节码的虚拟机
-
-	src/TVMbase:TVM的底层
-
-    src/language:国际化trc的各种语言

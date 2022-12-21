@@ -337,7 +337,7 @@ void detail_compiler::compile_node(grammar_lex& grammar_lexer) {
 }
 
 detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
-    const std::string& codes, const compiler_option* option,
+    const std::string& codes, const compiler_option& option,
     detail_compiler* compiler_ptr, bool return_compiler_ptr) {
     if (compiler_ptr == nullptr && !return_compiler_ptr) [[likely]] {
         // 如果不需要返回变量信息或者没有提供指定编译器

@@ -122,7 +122,7 @@ private:
  * 传入一台虚拟机和未编译的代码，将代码编译后填充进vm中
  * @param vm 虚拟机,编译过的要用TVM_space::free_TVM去释放内存
  * @param codes 源代码
- * @param option 编译器参数,如果已经指定编译器传入nullptr
+ * @param option 编译器参数,如果已经指定编译器传入{}，函数会忽略该参数
  * @param compiler_ptr
  * 提供的编译器，不指定则自己创建，指定则可以使用上一次编译的信息
  * @param return_compiler_ptr
@@ -130,7 +130,7 @@ private:
  * @warning 使用前需要提前用TVM_space::free_TVM去释放内存
  */
 detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
-    const std::string& codes, const compiler_option* option,
+    const std::string& codes, const compiler_option& option,
     detail_compiler* compiler_ptr = nullptr, bool return_compiler_ptr = false);
 
 template <bool compiletype>

@@ -68,7 +68,7 @@ namespace tools::tools_out {
         auto option = generate_compiler_params();
         // 先传入空代码获取对象
         compiler::detail_compiler* info_saver
-            = compiler::Compiler(vm->static_data, "", &option, nullptr, true);
+            = compiler::Compiler(vm->static_data, "", option, nullptr, true);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -81,7 +81,7 @@ namespace tools::tools_out {
             // 设置好报错时返回到的地址
             if (!setjmp(error::error_env::error_back_place)) {
                 compiler::Compiler(
-                    vm->static_data, code_str, nullptr, info_saver, false);
+                    vm->static_data, code_str, {}, info_saver, false);
                 vm->reload_data();
                 vm->run_all();
             }

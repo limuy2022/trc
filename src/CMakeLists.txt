@@ -1,10 +1,6 @@
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(compile_flag_gcc_clang " -Wextra -Wall -fdata-sections -ffunction-sections -fno-exceptions")
 set(compile_flag_msvc " /EHs")
-if(NOT "${TRC_BUILD_TYPE}" STREQUAL "Test")
-	set(compile_flag_gcc_clang " ${compile_flag_gcc_clang} -fno-rtti")
-	set(compile_flag_msvc "${compile_flag_msvc} /GR-")
-endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${compile_flag_gcc_clang}")

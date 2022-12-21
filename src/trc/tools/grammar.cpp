@@ -61,7 +61,7 @@ namespace tools_in {
         utils::readcode(file_data, path);
 
         compiler::compiler_public_data compiler_data { path,
-            &compiler::nooptimize_option };
+            compiler::nooptimize_option };
         compiler::grammar_lex grammar_t(file_data, compiler_data);
 
         printf("From file %s:\n", path.c_str());

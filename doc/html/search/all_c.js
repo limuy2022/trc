@@ -17,8 +17,8 @@ var searchData=
   ['memory_2ecpp_14',['memory.cpp',['../memory_8cpp.html',1,'']]],
   ['memory_2eh_15',['memory.h',['../base_2memory_2memory_8h.html',1,'(Global Namespace)'],['../_t_v_m_2memory_8h.html',1,'(Global Namespace)']]],
   ['memory_2ehpp_16',['memory.hpp',['../memory_8hpp.html',1,'']]],
-  ['memoryerror_17',['MemoryError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68',1,'trc::error']]],
-  ['memoryerror_18',['memoryerror',['../namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d',1,'language::error']]],
+  ['memoryerror_17',['memoryerror',['../namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d',1,'language::error']]],
+  ['memoryerror_18',['MemoryError',['../namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1aefcbf02b7390dbd1903637c96131ce68',1,'trc::error']]],
   ['mod_19',['MOD',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452ac5a28f4b35a2884fa3277150ac5d0967',1,'trc::compiler']]],
   ['mod_5f_20',['MOD_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dcaf5d9a97e906069922b1d13ba3199feb6',1,'TVM.h']]],
   ['mode_5fnot_5ffound_21',['mode_not_found',['../namespacelanguage_1_1trc.html#a4f33af5f37bf235932d657aee688f1a3',1,'language::trc']]],
@@ -28,6 +28,5 @@ var searchData=
   ['modules_25',['modules',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#ab8ecceaf551182aabfc945fa76da1a32',1,'trc::TVM_space::TVM']]],
   ['modules_5fnum_26',['modules_num',['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#ab809444c415f0692c0a4dfef6d4c4aa2',1,'trc::TVM_space::TVM']]],
   ['mul_27',['MUL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2cdf52a55876063ec93b7d18bc741f6c',1,'trc::compiler']]],
-  ['mul_5f_28',['MUL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca15fb46fcb44e72461e271fb8be2bca83',1,'TVM.h']]],
-  ['mul_5flabel_29',['mul_label',['../optimize_8cpp.html#ae75013ca7003754a0f6e13de0f944a6b',1,'optimize.cpp']]]
+  ['mul_5f_28',['MUL_',['../_t_v_m_8h.html#a0157471db423bc2d6be08779ff8b39dca15fb46fcb44e72461e271fb8be2bca83',1,'TVM.h']]]
 ];

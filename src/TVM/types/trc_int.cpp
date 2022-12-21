@@ -1,7 +1,6 @@
 ﻿#include <TVM/TRE.h>
 #include <TVM/memory.h>
 #include <TVM/types/trc_int.h>
-#include <base/io.hpp>
 #include <cmath>
 #include <cstdio>
 
@@ -17,6 +16,8 @@ void trc_int::putline(FILE* out) {
         fprintf(out, "%hd", value);
     } else if constexpr (sizeof(long) == sizeof(trc_int_t)) {
         fprintf(out, "%ld", value);
+    } else {
+        NOREACH("Unsupport int size.");
     }
 }
 
@@ -29,8 +30,19 @@ trc_int::trc_int(int value)
 }
 
 def::INTOBJ trc_int::operator==(def::OBJ value_i) {
-    return (((def::INTOBJ)(value_i))->value != value ? TVM_share::false_
-                                                     : TVM_share::true_);
+    switch (value_i->gettype()) {
+    case RUN_TYPE_TICK::int_T: {
+        return (((def::INTOBJ)(value_i))->value != value ? TVM_share::false_
+                                                         : TVM_share::true_);
+    }
+    case RUN_TYPE_TICK::float_T: {
+        return (((def::FLOATOBJ)(value_i))->value != value ? TVM_share::false_
+                                                           : TVM_share::true_);
+    }
+    default: {
+        return nullptr;
+    }
+    }
 }
 
 def::INTOBJ trc_int::operator!=(def::OBJ value_i) {

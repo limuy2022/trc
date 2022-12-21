@@ -7,32 +7,68 @@
 namespace trc::TVM_space {
 void TVM::EQUAL() {
     def::OBJ secondv = pop();
-    top() = top()->operator==(secondv);
+    auto tmp = top()->operator==(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror,
+            "==", type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::UNEQUAL() {
     def::OBJ secondv = pop();
-    top() = top()->operator!=(secondv);
+    auto tmp = top()->operator!=(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror,
+            "!=", type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::GREATER_EQUAL() {
     def::OBJ secondv = pop();
-    top() = top()->operator>=(secondv);
+    auto tmp = top()->operator>=(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror,
+            ">=", type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::LESS_EQUAL() {
     def::OBJ secondv = pop();
-    top() = top()->operator<=(secondv);
+    auto tmp = top()->operator<=(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror,
+            "<=", type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::LESS() {
     def::OBJ secondv = pop();
-    top() = top()->operator<(secondv);
+    auto tmp = top()->operator<(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror, "<",
+            type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::GREATER() {
     def::OBJ secondv = pop();
-    top() = top()->operator>(secondv);
+    auto tmp = top()->operator>(secondv);
+    if (tmp == nullptr) {
+        error_report(error::OperatorError, language::error::operatorerror, ">",
+            type_int::int_name[int(top()->gettype())],
+            type_int::int_name[int(secondv->gettype())]);
+    }
+    top() = tmp;
 }
 
 void TVM::IF_FALSE_GOTO(bytecode_index_t index) {

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['name_0',['name',['../classtrc_1_1error_1_1error__module.html#a9823ae8dd06e52cc17514d9e6b1eda17',1,'trc::error::error_module::name()'],['../classtrc_1_1_t_v_m__space_1_1func__.html#a66e0c2c623bd11a5bce1b78558025511',1,'trc::TVM_space::func_::name()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m.html#a0d838c089c3810212a59c751c689eb2f',1,'trc::TVM_space::TVM::name()'],['../namespacetrc.html#ab2049ad43a641e2a976e80db2c4da78d',1,'trc::name()']]],
-  ['name_5fint_5fs_1',['name_int_s',['../namespacetrc_1_1_t_v_m__space_1_1type__int.html#ae72c9d202cd894c4fe8d111ee69c125a',1,'trc::TVM_space::type_int']]],
+  ['name_5fint_1',['name_int',['../namespacetrc_1_1_t_v_m__space_1_1type__int.html#a67b7bc3514abcf7e70372dd0c7262c0d',1,'trc::TVM_space::type_int']]],
   ['name_5fmap_5fgrammar_2',['name_map_grammar',['../namespacetrc_1_1compiler.html#aab5220b60dc300da23593695796f3e8b',1,'trc::compiler']]],
   ['name_5fmap_5ftoken_3',['name_map_token',['../namespacetrc_1_1compiler.html#a742c940e53cef48c27a3099253a5aaaf',1,'trc::compiler']]],
   ['nameerror_4',['nameerror',['../namespacelanguage_1_1error.html#a319b939ec40693bda72585c29175017f',1,'language::error']]],

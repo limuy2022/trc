@@ -93,7 +93,7 @@ namespace tools_in {
         std::string file_data;
         utils::readcode(file_data, path);
         compiler::compiler_public_data compiler_data { path,
-            &compiler::nooptimize_option };
+            compiler::nooptimize_option };
         // 解析
         compiler::token_lex token_c(file_data, compiler_data);
         out(path, token_c);

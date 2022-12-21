@@ -88,12 +88,12 @@ node_base_tick_without_sons::node_base_tick_without_sons(
 
 node_base_int_without_sons::node_base_int_without_sons(
     int value, grammar_type type)
-    : value(value) {
+    : int_node(value) {
     this->type = type;
 }
 
 node_base_int::node_base_int(int value, grammar_type type)
-    : value(value) {
+    : int_node(value) {
     this->type = type;
 }
 

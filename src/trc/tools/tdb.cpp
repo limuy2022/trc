@@ -84,7 +84,7 @@ static void debug(const std::string& code) {
     char* instruction = nullptr;
     TVM_space::free_TVM(vm);
     auto option = tools::generate_compiler_params();
-    trc::compiler::Compiler(vm->static_data, code, &option);
+    trc::compiler::Compiler(vm->static_data, code, option);
     vm->reload_data();
     // 用于输出代码行信息
     const vecs& out_data = cutlines(code);

@@ -36,7 +36,7 @@ namespace TVM_share {
 }
 
 namespace type_int {
-    extern std::map<std::string, int> name_int_s;
-    extern std::string int_name_s[];
+    extern std::map<std::string, int> name_int;
+    extern const char* int_name[];
 }
 }

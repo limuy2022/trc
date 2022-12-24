@@ -8,7 +8,7 @@ DEFINE_bool(noline_number_table, false, "Controls whether a line number.");
 DEFINE_bool(
     optimize, false, "Controls whether optimization code is generated.");
 // 是否进行常量折叠
-DEFINE_bool(no_const_fold, true,
+DEFINE_bool(no_const_fold, false,
     "Controls whether optimization includes costant fold.");
 
 namespace trc::tools {

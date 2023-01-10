@@ -44,12 +44,13 @@ static void get_block(std::string& res) {
         io::readstr(temp, stdin);
         res += temp;
         res += '\n';
-        if (is_block(temp))
+        if (is_block(temp)) {
             ++break_num;
-        else if (is_end(temp)) {
+        } else if (is_end(temp)) {
             --break_num;
-            if (!break_num)
+            if (break_num == 0) {
                 break;
+            }
         }
     }
     free(temp);
@@ -70,6 +71,8 @@ namespace tools::tools_out {
         compiler::detail_compiler* info_saver
             = compiler::Compiler(vm->static_data, "", option, nullptr, true);
         for (;;) {
+            // 重新还原行号
+            info_saver->compiler_data.error.line = 0;
             printf("%s", "\ntshell>");
             free(code);
             io::readstr(code, stdin);

@@ -10,7 +10,6 @@
 #include <base/Error.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
-#include <filesystem>
 #include <language/error.h>
 #include <string>
 #include <sys/stat.h>
@@ -18,24 +17,6 @@
 namespace fs = std::filesystem;
 
 namespace trc::utils {
-listfiles::listfiles(const std::string& path)
-    : iter(path)
-    , now(begin(iter)) {
-}
-
-fs::path listfiles::nextitem() {
-    now++;
-    if (now == end(iter)) {
-        return "";
-    }
-    return now->path();
-}
-
-bool file_exists(const std::string& path) {
-    // 如果存在且不为目录，返回true
-    return fs::exists(path) && !fs::is_directory(path);
-}
-
 void import_to_path(std::string& import_name) {
     for (char& i : import_name) {
         if (i == '.') {

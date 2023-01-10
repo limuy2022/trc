@@ -52,18 +52,18 @@ void TVM::GOTO(bytecode_index_t index) {
  * 如果路径不正确将路径转换成正确的，否则报错
  */
 static void fix_path(const std::string& path) {
-    if (utils::file_exists(path)) {
+    if (fs::is_regular_file(path)) {
         return;
     }
     if (find(cpp_libs::names.begin(), cpp_libs::names.end(), path)
         != cpp_libs::names.end()) {
         return;
     }
-    if (utils::file_exists(
+    if (fs::is_regular_file(
             fs::path("TVM/packages/self_support").append(path).string())) {
         return;
     }
-    if (utils::file_exists(
+    if (fs::is_regular_file(
             fs::path("TVM/packages/other_support").append(path).string())) {
         return;
     }

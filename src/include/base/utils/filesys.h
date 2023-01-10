@@ -9,30 +9,6 @@ namespace fs = std::filesystem;
 
 namespace trc::utils {
 /**
- * @brief 遍历目录
- */
-class listfiles {
-public:
-    /**
-     * @param path 遍历的目录
-     */
-    listfiles(const std::string& path);
-
-    /**
-     * @return 获取下一项，为空字符串说明到头了
-     */
-    fs::path nextitem();
-
-private:
-    fs::recursive_directory_iterator iter, now;
-};
-
-/**
- * @brief 检查文件是否存在
- */
-bool file_exists(const std::string& path);
-
-/**
  * @brief
  * 在虚拟机执行过程中，动态加载字节码时路径转换
  * @code math.lang -> math/lang @endcode

@@ -98,7 +98,7 @@ private:
      * @brief 添加字节码，并完善对应环境
      */
     void add_opcode(byteCodeNumber opcode, TVM_space::bytecode_index_t index,
-        TVM_space::struct_codes& bytecode);
+        TVM_space::struct_codes& bytecode, line_t line);
 
     /**
      * @brief 添加带有语句块的特殊代码
@@ -109,7 +109,7 @@ private:
     /**
      * @brief 生成一条字节码的对应行号表记录
      */
-    void generate_line_table();
+    void generate_line_table(line_t line);
 
     size_t prev_value = ULLONG_MAX;
 
@@ -148,7 +148,7 @@ void detail_compiler::add_block(
     iter++;
     // 单独处理跳转语句，否则无法处理常量表
     // 0只是用来占位的
-    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0, localinfo.bytecode);
+    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0, localinfo.bytecode, 0);
     // 获取跳转表达式的字节码位置
     size_t fix_bytecode = localinfo.bytecode.size() - 1;
     // 然后编译其它所有的节点
@@ -157,7 +157,7 @@ void detail_compiler::add_block(
     }
     if constexpr (compiletype) {
         // while循环比if多一句goto
-        add_opcode(byteCodeNumber::GOTO_, goto_addr, localinfo.bytecode);
+        add_opcode(byteCodeNumber::GOTO_, goto_addr, localinfo.bytecode, 0);
     }
     // 然后重新修改跳转地址
     localinfo.bytecode[fix_bytecode].index = localinfo.bytecode.size();

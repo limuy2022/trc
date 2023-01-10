@@ -4,6 +4,8 @@
 
 namespace trc::compiler {
 typedef error::error_module compiler_error;
+typedef unsigned int line_t;
+
 /**
  * @brief 编译器的参数
  */

@@ -188,7 +188,9 @@ struct {
     CREATE_KEYWORD("not", token_ticks::NOT),
     CREATE_KEYWORD("null", token_ticks::NULL_),
     CREATE_KEYWORD("true", token_ticks::TRUE_),
-    CREATE_KEYWORD("false", token_ticks::FALSE_) };
+    CREATE_KEYWORD("false", token_ticks::FALSE_),
+    CREATE_KEYWORD("break", token_ticks::BREAK),
+    CREATE_KEYWORD("continue", token_ticks::CONTINUE) };
 
 #undef CREATE_KEYWORD
 
@@ -198,9 +200,9 @@ token* token_lex::lex_english() {
         ++char_ptr;
     } while ((is_english(*char_ptr) || isdigit(*char_ptr)) && !end_of_lex());
     size_t len = char_ptr - start;
-    for (auto& keyword : keywords_) {
+    for (const auto& keyword : keywords_) {
         if (keyword.len == len && !strncmp(start, keyword.str, len)) {
-            // 传入空串的原因是能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
+            // 传入空串是因为能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
             return new token(keyword.tick);
         }
     }

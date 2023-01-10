@@ -9,10 +9,12 @@
 #include <stack>
 #include <string>
 
+#define LINE_NUM compiler_data.error.line
+
 namespace trc::compiler {
 treenode* grammar_lex::assign(grammar_type oper, treenode* left_value) {
     // 申请新的树节点
-    auto ass = new trc::compiler::is_not_end_node(oper);
+    auto ass = new is_not_end_node(oper, LINE_NUM);
     // 保存变量名
     ass->connect(left_value);
     // 存放等号右边的值
@@ -49,11 +51,11 @@ treenode* grammar_lex::callfunction(token* funcname) {
     if (trc::utils::str_check_in(
             funcname->data, loader::num_func.begin(), loader::num_func.end())) {
         // 内置函数
-        ans = new node_base_int(
-            loader::func_num[funcname->data], grammar_type::BUILTIN_FUNC);
+        ans = new node_base_int(loader::func_num[funcname->data],
+            grammar_type::BUILTIN_FUNC, LINE_NUM);
     } else {
         // 自定义函数
-        ans = new node_base_data(grammar_type::CALL_FUNC, funcname);
+        ans = new node_base_data(grammar_type::CALL_FUNC, funcname, LINE_NUM);
     }
     // 处理参数
     get_param_list(ans);
@@ -63,7 +65,7 @@ treenode* grammar_lex::callfunction(token* funcname) {
 }
 
 treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
-    auto head = new node_base_tick(grammar_type::TREE, sentence_name);
+    auto head = new node_base_tick(grammar_type::TREE, sentence_name, LINE_NUM);
     int argc = 0;
 
     token* now = token_.get_token();
@@ -75,7 +77,7 @@ treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     }
     token_.unget_token(now);
 
-    auto* argv_node = new is_not_end_node;
+    auto* argv_node = new is_not_end_node(LINE_NUM);
 
     if (is_sentence_with_one_argv(sentence_name)) {
         head->type = grammar_type::OPCODE_ARGV;
@@ -99,7 +101,7 @@ treenode* grammar_lex::sentence_tree(token_ticks sentence_name) {
     }
     // 将参数反转，因为栈先进后出
     std::reverse(argv_node->son.begin(), argv_node->son.end());
-    auto len = new node_base_int_without_sons(argc);
+    auto len = new node_base_int_without_sons(argc, LINE_NUM);
     head->connect(argv_node);
     head->connect(len);
     return head;
@@ -120,7 +122,7 @@ void grammar_lex::read_block(is_not_end_node* root) {
 }
 
 treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
-    auto head = new is_not_end_node(compile_type);
+    auto head = new is_not_end_node(compile_type, LINE_NUM);
     // 条件表达式
     // 设置遇到左大括号停止
     special_tick_for_end = token_ticks::LEFT_BIG_BRACE;
@@ -132,10 +134,11 @@ treenode* grammar_lex::while_if_tree(grammar_type compile_type) {
 
 treenode* grammar_lex::func_define() {
     auto name = check_excepted(token_ticks::NAME);
-    auto func_node = new node_base_data(grammar_type::FUNC_DEFINE, name);
+    auto func_node
+        = new node_base_data(grammar_type::FUNC_DEFINE, name, LINE_NUM);
     delete name;
     // 处理参数列表
-    auto* argv_list = new is_not_end_node;
+    auto* argv_list = new is_not_end_node(LINE_NUM);
     get_param_list(argv_list);
     func_node->connect(argv_list);
     read_block(func_node);
@@ -145,22 +148,24 @@ treenode* grammar_lex::func_define() {
 treenode* grammar_lex::make_data_node(token* data_token) {
     auto tmp = data_token->tick;
     if (tmp == token_ticks::INT_VALUE) {
-        return new node_base_int_without_sons(atoi(data_token->data));
+        return new node_base_int_without_sons(atoi(data_token->data), LINE_NUM);
     } else if (tmp == token_ticks::FLOAT_VALUE) {
-        return new node_base_float_without_sons(atof(data_token->data));
+        return new node_base_float_without_sons(
+            atof(data_token->data), LINE_NUM);
     } else if (tmp == token_ticks::STRING_VALUE) {
         return new node_base_string_without_sons(
-            grammar_type::STRING, data_token);
+            grammar_type::STRING, data_token, LINE_NUM);
     } else if (is_const_value(tmp)) {
         // 在此将常量转换成数字
         compiler_data.int_size++;
-        return new node_base_int_without_sons(change_const[data_token->data]);
+        return new node_base_int_without_sons(
+            change_const[data_token->data], LINE_NUM);
     } else if (tmp == token_ticks::LONG_INT_VALUE) {
         return new node_base_string_without_sons(
-            grammar_type::LONG_INT, data_token);
+            grammar_type::LONG_INT, data_token, LINE_NUM);
     } else if (tmp == token_ticks::LONG_FLOAT_VALUE) {
         return new node_base_string_without_sons(
-            grammar_type::LONG_FLOAT, data_token);
+            grammar_type::LONG_FLOAT, data_token, LINE_NUM);
     }
     NOREACH("Unexpected data token type %d", (int)tmp);
     return nullptr;
@@ -216,7 +221,7 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
             if (nexttick != token_ticks::LEFT_SMALL_BRACE) {
                 // 是标识符且不为函数调用
                 now_node = new node_base_string_without_sons(
-                    grammar_type::VAR_NAME, now);
+                    grammar_type::VAR_NAME, now, LINE_NUM);
             } else {
                 // 函数调用
                 // warning:该地如果直接返回就会造成类似input()+input()这样的解析错误
@@ -292,7 +297,7 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
         }
         while ((quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE) {
             st.push_back(new node_base_tick_without_sons(
-                grammar_type::OPCODE, quicktmp));
+                grammar_type::OPCODE, quicktmp, LINE_NUM));
             oper_stack.pop();
         }
         oper_stack.pop();
@@ -303,7 +308,7 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
             && (quicktmp = oper_stack.top()) != token_ticks::LEFT_SMALL_BRACE
             && cal_priority[tick] <= cal_priority[quicktmp]) {
             st.push_back(new node_base_tick_without_sons(
-                grammar_type::OPCODE, quicktmp));
+                grammar_type::OPCODE, quicktmp, LINE_NUM));
             oper_stack.pop();
         }
     } else {
@@ -316,7 +321,7 @@ void grammar_lex::ConvertDataToExpressions(token* raw_lex,
 #undef OPERERROR
 
 treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
-    auto head = new is_not_end_node(grammar_type::EXPR);
+    auto head = new is_not_end_node(grammar_type::EXPR, LINE_NUM);
     std::stack<token_ticks> oper_stack;
     if (first_data_node != nullptr) {
         head->son.push_back(first_data_node);
@@ -343,8 +348,8 @@ treenode* grammar_lex::change_to_last_expr(treenode* first_data_node) {
     // 无需测试括号是否正确匹配上，这是token_lex的职责
     while (!oper_stack.empty()) {
         token_ticks tmp = oper_stack.top();
-        head->son.push_back(
-            new node_base_tick_without_sons(grammar_type::OPCODE, tmp));
+        head->son.push_back(new node_base_tick_without_sons(
+            grammar_type::OPCODE, tmp, LINE_NUM));
         oper_stack.pop();
     }
     // 此处已经成功且正确生成后缀表达式
@@ -379,7 +384,7 @@ token_ticks grammar_lex::get_next_token_tick() {
 }
 
 treenode* grammar_lex::compile_all() {
-    auto* root = new is_not_end_node(grammar_type::TREE);
+    auto* root = new is_not_end_node(grammar_type::TREE, LINE_NUM);
     for (treenode* node = get_node(); node != nullptr; node = get_node()) {
         root->connect(node);
     }

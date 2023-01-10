@@ -40,20 +40,24 @@ static byteCodeNumber opcodesym_int[] = {
     byteCodeNumber::ASSERT_,
 };
 
-void detail_compiler::generate_line_table() {
-    vm->line_number_table.push_back(compiler_data.error.line);
-    if (compiler_data.error.line != prev_value) {
-        line_to_bycodeindex_table.resize(compiler_data.error.line + 1);
-        line_to_bycodeindex_table[compiler_data.error.line]
-            = vm->line_number_table.size() - 1;
-        prev_value = compiler_data.error.line;
+void detail_compiler::generate_line_table(line_t line) {
+    // 判断是否需要生成行号表
+    if (!compiler_data.option.number_table) {
+        return;
+    }
+    vm->line_number_table.push_back(line);
+    if (line != prev_value) {
+        line_to_bycodeindex_table.resize(line + 1);
+        line_to_bycodeindex_table[line] = vm->line_number_table.size() - 1;
+        prev_value = line;
     }
 }
 
 void detail_compiler::add_opcode(byteCodeNumber opcode,
-    TVM_space::bytecode_index_t index, TVM_space::struct_codes& bytecode) {
+    TVM_space::bytecode_index_t index, TVM_space::struct_codes& bytecode,
+    line_t line) {
     bytecode.emplace_back((bytecode_t)opcode, index);
-    generate_line_table();
+    generate_line_table(line);
 }
 
 TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
@@ -108,7 +112,7 @@ void detail_compiler::add_var(byteCodeNumber bycode, is_not_end_node* root,
     basic_compile_env& localinfo, size_t index) {
     // 处理等式右边的数据
     compile(*(++root->son.begin()), localinfo);
-    add_opcode(bycode, index, localinfo.bytecode);
+    add_opcode(bycode, index, localinfo.bytecode, root->line);
 }
 
 void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
@@ -134,12 +138,12 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             // 然后编译参数个数
             int num_of_nodes = root->son.size();
             add_opcode(byteCodeNumber::LOAD_INT_, add_int(num_of_nodes),
-                localinfo.bytecode);
+                localinfo.bytecode, root->line);
             // 最后加上调用函数
             // 内置函数以编码形式保存，这是它的位置
             int function_index = ((node_base_int*)root)->value;
             add_opcode(byteCodeNumber::CALL_BUILTIN_, function_index,
-                localinfo.bytecode);
+                localinfo.bytecode, root->line);
             break;
         }
         case grammar_type::OPCODE_ARGV: {
@@ -148,7 +152,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             auto argv_
                 = ((node_base_int_without_sons*)root->son.front())->value;
             add_opcode(build_opcode(((node_base_tick*)root)->tick),
-                add_int(argv_), localinfo.bytecode);
+                add_int(argv_), localinfo.bytecode, root->line);
             break;
         }
         case grammar_type::FUNC_DEFINE: {
@@ -165,7 +169,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
                 add_opcode(byteCodeNumber::STORE_LOCAL_,
                     localfuncenv.add_var(((node_base_string_without_sons*)i)
                                              ->swap_string_data()),
-                    localinfo.bytecode);
+                    localinfo.bytecode, i->line);
             }
             // 编译函数体
             // 指向第一条函数体代码
@@ -219,8 +223,8 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             for (auto i : root->son) {
                 compile(i, localinfo);
             }
-            add_opcode(
-                byteCodeNumber::CALL_FUNCTION_, index, localinfo.bytecode);
+            add_opcode(byteCodeNumber::CALL_FUNCTION_, index,
+                localinfo.bytecode, root->line);
             break;
         }
             // 需要跳转的语句块
@@ -247,18 +251,18 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             if (&localinfo == &infoenv) {
                 // 相等，说明现在处于全局作用域中
                 index_argv = localinfo.get_index_of_var(varname, true);
-                add_opcode(
-                    byteCodeNumber::LOAD_NAME_, index_argv, localinfo.bytecode);
+                add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
+                    localinfo.bytecode, head->line);
             } else {
                 index_argv = localinfo.get_index_of_var(varname, false);
                 if (index_argv == size_tmax) {
                     // 如果在局部变量中没有查找到
                     index_argv = infoenv.get_index_of_var(varname, true);
                     add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
-                        localinfo.bytecode);
+                        localinfo.bytecode, head->line);
                 } else {
                     add_opcode(byteCodeNumber::LOAD_LOCAL_, index_argv,
-                        localinfo.bytecode);
+                        localinfo.bytecode, head->line);
                 }
             }
             break;
@@ -267,38 +271,38 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             // 整型节点
             auto value = ((node_base_int_without_sons*)head)->value;
             auto index_argv = add_int(value);
-            add_opcode(
-                byteCodeNumber::LOAD_INT_, index_argv, localinfo.bytecode);
+            add_opcode(byteCodeNumber::LOAD_INT_, index_argv,
+                localinfo.bytecode, head->line);
             break;
         }
         case grammar_type::STRING: {
             // 字符串节点
             auto index_argv = add_string(
                 ((node_base_string_without_sons*)head)->swap_string_data());
-            add_opcode(
-                byteCodeNumber::LOAD_STRING_, index_argv, localinfo.bytecode);
+            add_opcode(byteCodeNumber::LOAD_STRING_, index_argv,
+                localinfo.bytecode, head->line);
             break;
         }
         case grammar_type::FLOAT: {
             // 浮点型节点
             auto value = ((node_base_float_without_sons*)head)->value;
             auto index_argv = add_float(value);
-            add_opcode(
-                byteCodeNumber::LOAD_FLOAT_, index_argv, localinfo.bytecode);
+            add_opcode(byteCodeNumber::LOAD_FLOAT_, index_argv,
+                localinfo.bytecode, head->line);
             break;
         }
         case grammar_type::LONG_INT: {
             // 长整型节点
             auto index_argv = add_long(
                 ((node_base_string_without_sons*)head)->swap_string_data());
-            add_opcode(
-                byteCodeNumber::LOAD_LONG_, index_argv, localinfo.bytecode);
+            add_opcode(byteCodeNumber::LOAD_LONG_, index_argv,
+                localinfo.bytecode, head->line);
             break;
         }
         case grammar_type::OPCODE: {
             // 生成字节码, 0代表没有参数
             token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
-            add_opcode(build_opcode(tick), 0, localinfo.bytecode);
+            add_opcode(build_opcode(tick), 0, localinfo.bytecode, head->line);
             break;
         }
         default: {

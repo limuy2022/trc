@@ -149,9 +149,15 @@ enum class grammar_type {
  */
 class treenode {
 public:
+    line_t line = 0;
+
     virtual ~treenode() = 0;
 
-    bool has_son;
+    explicit treenode(line_t line)
+        : line(line) {
+    }
+
+    bool has_son {};
 
     grammar_type type = grammar_type::TREE;
 };
@@ -162,11 +168,11 @@ public:
  */
 class is_not_end_node : public treenode {
 public:
-    explicit is_not_end_node(grammar_type type);
+    explicit is_not_end_node(grammar_type type, line_t line = 0);
 
-    ~is_not_end_node();
+    explicit is_not_end_node(line_t line);
 
-    is_not_end_node();
+    ~is_not_end_node() override;
 
     std::list<treenode*> son;
 
@@ -178,7 +184,7 @@ public:
  */
 class is_end_node : public treenode {
 public:
-    is_end_node();
+    explicit is_end_node(line_t line);
 };
 
 /**
@@ -226,7 +232,7 @@ public:
  */
 class node_base_tick : public is_not_end_node, public tick_node {
 public:
-    node_base_tick(grammar_type type, token_ticks tick);
+    node_base_tick(grammar_type type, token_ticks tick, line_t line = 0);
 };
 
 /**
@@ -234,7 +240,7 @@ public:
  */
 class node_base_data : public is_not_end_node, public string_node {
 public:
-    node_base_data(grammar_type type_argv, token* data);
+    node_base_data(grammar_type type_argv, token* data, line_t line = 0);
 };
 
 /**
@@ -242,7 +248,8 @@ public:
  */
 class node_base_tick_without_sons : public is_end_node, public tick_node {
 public:
-    node_base_tick_without_sons(grammar_type type, token_ticks);
+    node_base_tick_without_sons(
+        grammar_type type, token_ticks, line_t line = 0);
 };
 
 /**
@@ -250,17 +257,18 @@ public:
  */
 class node_base_string_without_sons : public string_node, public is_end_node {
 public:
-    explicit node_base_string_without_sons(grammar_type type, token* data);
+    explicit node_base_string_without_sons(
+        grammar_type type, token* data, line_t line = 0);
 };
 
 class int_node : public number_node {
 public:
     int value;
 
-    int_node(int value)
+    explicit int_node(int value)
         : value(value) {};
 
-    double to_float() {
+    double to_float() override {
         return value;
     }
 };
@@ -271,7 +279,7 @@ public:
 class node_base_int_without_sons : public is_end_node, public int_node {
 public:
     explicit node_base_int_without_sons(
-        int value, grammar_type type = grammar_type::NUMBER);
+        int value, line_t line = 0, grammar_type type = grammar_type::NUMBER);
 };
 
 /**
@@ -279,7 +287,8 @@ public:
  */
 class node_base_int : public is_not_end_node, public int_node {
 public:
-    explicit node_base_int(int value, grammar_type type = grammar_type::NUMBER);
+    explicit node_base_int(
+        int value, grammar_type type = grammar_type::NUMBER, line_t line = 0);
 };
 
 /**
@@ -289,9 +298,9 @@ class node_base_float_without_sons : public is_end_node, public number_node {
 public:
     double value;
 
-    explicit node_base_float_without_sons(double value);
+    explicit node_base_float_without_sons(double value, line_t line = 0);
 
-    double to_float() {
+    double to_float() override {
         return value;
     }
 };

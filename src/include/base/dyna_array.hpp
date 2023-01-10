@@ -5,8 +5,6 @@
 namespace trc::utils {
 /**
  * 简单的动态数组封装
- * @tparam T 必须为POD类型
- * @warning 请使用malloc申请
  */
 template <typename T> class dyna_array {
 public:

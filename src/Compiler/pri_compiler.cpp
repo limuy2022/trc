@@ -4,10 +4,7 @@
 
 #include <Compiler/pri_compiler.hpp>
 #include <array>
-#include <base/Error.h>
 #include <cassert>
-#include <cstring>
-#include <language/error.h>
 #include <map>
 #include <string>
 
@@ -18,12 +15,14 @@ void is_not_end_node::connect(treenode* son_node) {
     son.push_back(son_node);
 }
 
-is_not_end_node::is_not_end_node() {
+is_not_end_node::is_not_end_node(line_t line)
+    : treenode(line) {
     this->has_son = true;
 }
 
-is_not_end_node::is_not_end_node(grammar_type type) {
-    new (this) is_not_end_node;
+is_not_end_node::is_not_end_node(grammar_type type, line_t line)
+    : treenode(line) {
+    this->has_son = true;
     this->type = type;
 }
 
@@ -33,7 +32,8 @@ is_not_end_node::~is_not_end_node() {
     }
 }
 
-is_end_node::is_end_node() {
+is_end_node::is_end_node(line_t line)
+    : treenode(line) {
     this->has_son = false;
 }
 
@@ -64,41 +64,49 @@ string_node::string_node(token* data) {
     swap_token_data(data);
 }
 
-node_base_data::node_base_data(grammar_type type_argv, token* data)
-    : string_node(data) {
+node_base_data::node_base_data(grammar_type type_argv, token* data, line_t line)
+    : is_not_end_node(line)
+    , string_node(data) {
     this->type = type_argv;
 }
 
-node_base_tick::node_base_tick(grammar_type type, token_ticks tick)
-    : tick_node(tick) {
+node_base_tick::node_base_tick(grammar_type type, token_ticks tick, line_t line)
+    : is_not_end_node(line)
+    , tick_node(tick) {
     this->type = type;
 }
 
 node_base_string_without_sons::node_base_string_without_sons(
-    grammar_type type, token* data)
-    : string_node(data) {
+    grammar_type type, token* data, line_t line)
+    : string_node(data)
+    , is_end_node(line) {
     this->type = type;
 }
 
 node_base_tick_without_sons::node_base_tick_without_sons(
-    grammar_type type, token_ticks tick)
-    : tick_node(tick) {
+    grammar_type type, token_ticks tick, line_t line)
+    : is_end_node(line)
+    , tick_node(tick) {
     this->type = type;
 }
 
 node_base_int_without_sons::node_base_int_without_sons(
-    int value, grammar_type type)
-    : int_node(value) {
+    int value, line_t line, grammar_type type)
+    : is_end_node(line)
+    , int_node(value) {
     this->type = type;
 }
 
-node_base_int::node_base_int(int value, grammar_type type)
-    : int_node(value) {
+node_base_int::node_base_int(int value, grammar_type type, line_t line)
+    : is_not_end_node((line))
+    , int_node(value) {
     this->type = type;
 }
 
-node_base_float_without_sons::node_base_float_without_sons(double value)
-    : value(value) {
+node_base_float_without_sons::node_base_float_without_sons(
+    double value, line_t line)
+    : is_end_node((line))
+    , value(value) {
     this->type = grammar_type::FLOAT;
 }
 

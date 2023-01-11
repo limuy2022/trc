@@ -2,8 +2,6 @@
 
 #include <TVM/TVMdef.h>
 #include <base/trcdef.h>
-#include <map>
-#include <string>
 
 namespace trc::TVM_space {
 class func_ {

@@ -13,7 +13,7 @@
 #include <TVM/memory.h>
 #include <TVM/types/trc_flong.h>
 #include <TVM/types/trc_string.h>
-#include <base/io.hpp>
+#include <base/io.h>
 #include <base/trcdef.h>
 #include <cstdio>
 #include <cstring>
@@ -50,7 +50,7 @@ trc_string::trc_string()
     *value = '\0';
 }
 
-size_t trc_string::len() {
+size_t trc_string::len() const {
     return char_num;
 }
 
@@ -75,11 +75,7 @@ def::OBJ trc_string::operator+=(def::OBJ value_i) {
     return this;
 }
 
-char& trc_string::operator[](unsigned int index) {
-    return value[index];
-}
-
-const char& trc_string::operator[](unsigned int index) const {
+char& trc_string::operator[](unsigned int index) const {
     return value[index];
 }
 

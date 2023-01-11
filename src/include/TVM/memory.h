@@ -7,7 +7,6 @@
 #include <TVM/types/trc_long.h>
 #include <TVM/types/trc_string.h>
 #include <base/memory/objs_pool.hpp>
-#include <platform.h>
 
 // 申请对象池
 #define MALLOCINT trc::TVM_space::global_objs_pool->int_pool.trcmalloc

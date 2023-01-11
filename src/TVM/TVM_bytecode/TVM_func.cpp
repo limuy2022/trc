@@ -4,9 +4,9 @@
 #include <base/trcdef.h>
 
 namespace trc::TVM_space {
-void TVM::CALL_BUILTIN(bytecode_index_t name) {
+void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
     auto firsti = (def::INTOBJ)pop();
-    switch (name) {
+    switch (builtin_func_name) {
     case 0: {
         builtin::EXIT(firsti->value, this);
         break;
@@ -50,6 +50,10 @@ void TVM::CALL_BUILTIN(bytecode_index_t name) {
     case 10: {
         builtin::TYPE(firsti->value, this);
         break;
+    }
+    default: {
+        NOREACH(
+            "there is not a builin function %hu to call", builtin_func_name);
     }
     }
 }

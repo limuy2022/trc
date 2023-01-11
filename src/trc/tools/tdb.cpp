@@ -9,7 +9,7 @@
 #include <TVM/TVM.h>
 #include <TVM/memory.h>
 #include <algorithm>
-#include <base/io.hpp>
+#include <base/io.h>
 #include <base/utils/filesys.h>
 #include <cstdio>
 #include <cstring>

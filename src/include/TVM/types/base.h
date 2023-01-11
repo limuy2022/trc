@@ -6,7 +6,6 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-
 #include <base/trcdef.h>
 #include <cstdio>
 

@@ -20,7 +20,7 @@ RUN_TYPE_TICK trc_list::gettype() {
     return type;
 }
 
-void trc_list::del(int index) {
+void trc_list::del(int index) const {
     listnode* p = head;
     for (int i = 0; i < index - 1; ++i)
         p = p->next;
@@ -28,14 +28,14 @@ void trc_list::del(int index) {
     delete p->next;
 }
 
-def::OBJ trc_list::operator[](int index) {
+def::OBJ trc_list::operator[](int index) const {
     listnode* p = head->next;
     for (int i = 0; i < index; ++i)
         p = p->next;
     return p->data;
 }
 
-void trc_list::insert(int index, def::OBJ data) {
+void trc_list::insert(int index, def::OBJ data) const {
     listnode *p = head, *s = new listnode, *temp;
     for (int i = 0; i < index; ++i)
         p = p->next;
@@ -45,7 +45,7 @@ void trc_list::insert(int index, def::OBJ data) {
     s->next = temp;
 }
 
-void trc_list::append(def::OBJ data) {
+void trc_list::append(def::OBJ data) const {
     listnode *p = head, *s = new listnode;
     while (p->next != nullptr)
         p = p->next;
@@ -54,12 +54,13 @@ void trc_list::append(def::OBJ data) {
     s->next = nullptr;
 }
 
-int trc_list::len() {
+size_t trc_list::len() const {
     listnode* t = head->next;
-    if (head->next == nullptr)
-        return 0; // 为空
-
-    int length = 1;
+    if (head->next == nullptr) {
+        // 为空
+        return 0;
+    }
+    size_t length = 1;
     while (t->next != nullptr) {
         length++;
         t = t->next;
@@ -67,7 +68,7 @@ int trc_list::len() {
     return length;
 }
 
-void trc_list::clear() {
+void trc_list::clear() const {
     listnode *t = head->next, *s;
     while (t != nullptr) {
         s = t;
@@ -89,7 +90,7 @@ void trc_list::putline(FILE* out) {
     fputc(']', out);
 }
 
-bool trc_list::check_in_(def::OBJ data) {
+bool trc_list::check_in_(def::OBJ data) const {
     listnode* t = head->next;
     while (t != nullptr) {
         if (TVM_share::obj_to_bool(data->operator==(t->data)))

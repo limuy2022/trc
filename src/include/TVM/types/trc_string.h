@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <TVM/TVMdef.h>
-
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 #include <string>
@@ -18,23 +17,21 @@ public:
 
     trc_string& operator=(const std::string&);
 
-    trc_string(const std::string& init);
+    explicit trc_string(const std::string& init);
 
     trc_string();
 
     ~trc_string() override;
 
-    size_t len();
+    [[nodiscard]] size_t len() const;
 
-    char& operator[](unsigned int index);
-
-    const char& operator[](unsigned int index) const;
+    char& operator[](unsigned int index) const;
 
     trc_string& operator=(const trc_string& value_i);
 
     def::OBJ operator+=(def::OBJ value_i);
 
-    const char* c_str() const;
+    [[nodiscard]] const char* c_str() const;
 
     void putline(FILE* out) override;
 

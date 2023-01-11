@@ -23,15 +23,15 @@ namespace tools_in {
         fprintf(file, "%s", name);
         // 开头表达式
         auto iter = node->son.begin();
-        __style_file(file, *iter, 0);
+        _style_file(file, *iter, 0);
         iter++;
         // 然后编译其它所有的节点
         for (; iter != node->son.end(); ++iter) {
-            __style_file(file, *iter, tabsize + 1);
+            _style_file(file, *iter, tabsize + 1);
         }
     }
 
-    void __style_file(FILE* file, treenode* node, int tabsize) {
+    void _style_file(FILE* file, treenode* node, int tabsize) {
         // 一棵语法树就是一段代码
         for (int i = 1; i <= tabsize; ++i) {
             fputc('\t', file);
@@ -43,14 +43,14 @@ namespace tools_in {
                 // 运算符表达式或条件表达式
             case grammar_type::EXPR: {
                 for (auto i : root->son) {
-                    __style_file(file, i, tabsize);
+                    _style_file(file, i, tabsize);
                 }
                 break;
             }
             // 树
             case grammar_type::TREE: {
                 for (auto i : root->son) {
-                    __style_file(file, i, tabsize + 1);
+                    _style_file(file, i, tabsize + 1);
                 }
                 break;
             }
@@ -63,10 +63,10 @@ namespace tools_in {
                 auto end = root->son.end();
                 end--;
                 for (; i != end; ++i) {
-                    __style_file(file, *i, 0);
+                    _style_file(file, *i, 0);
                     fprintf(file, ", ");
                 }
-                __style_file(file, *i, 0);
+                _style_file(file, *i, 0);
                 fputc(')', file);
                 break;
             }
@@ -89,7 +89,7 @@ namespace tools_in {
                 // 指向第一条函数体代码
                 index++;
                 for (auto end = root->son.end(); index != end; ++index) {
-                    __style_file(file, *index, tabsize + 1);
+                    _style_file(file, *index, tabsize + 1);
                 }
                 break;
             }
@@ -101,7 +101,7 @@ namespace tools_in {
                 fprintf(file, "%s := ", argv_);
                 // 处理等式右边的数据
                 iter++;
-                __style_file(file, *iter, 0);
+                _style_file(file, *iter, 0);
                 break;
             }
             case grammar_type::VAR_ASSIGN: {
@@ -113,7 +113,7 @@ namespace tools_in {
                 fprintf(file, "%s = ", argv_);
                 // 处理等式右边的数据
                 iter++;
-                __style_file(file, *iter, 0);
+                _style_file(file, *iter, 0);
                 break;
             }
             case grammar_type::CALL_FUNC: {
@@ -122,7 +122,7 @@ namespace tools_in {
                 fprintf(file, "%s", funcname);
                 // 编译参数
                 for (auto i : root->son) {
-                    __style_file(file, i, 0);
+                    _style_file(file, i, 0);
                 }
                 break;
             }
@@ -191,7 +191,7 @@ namespace tools_out {
             compiler::grammar_lex lexer(filedata, shared_data);
             for (auto node = lexer.get_node(); node != nullptr;
                  node = lexer.get_node()) {
-                tools_in::__style_file(file, node, 0);
+                tools_in::_style_file(file, node, 0);
             }
             fclose(file);
         }

@@ -2,6 +2,7 @@
  * 在TVM中，内置函数是通过一个编号来表示的，最大化减小体积
  */
 
+#include <array>
 #include <map>
 #include <string>
 

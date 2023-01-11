@@ -8,8 +8,6 @@
 #include <TVM/func.h>
 #include <TVM/object.h>
 #include <base/dyna_array.hpp>
-#include <map>
-#include <stack>
 #include <string>
 #include <vector>
 
@@ -62,7 +60,7 @@ constexpr size_t TVM_FRAME_SIZE = 1024;
 class TVM_dyna_data {
 public:
     // 操作数栈
-    def::OBJ stack_data[TVM_STACK_SIZE];
+    def::OBJ stack_data[TVM_STACK_SIZE] {};
     // 栈顶指针
     def::OBJ* stack_top_ptr;
     // 帧栈顶指针

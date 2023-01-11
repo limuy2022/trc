@@ -8,7 +8,7 @@
  */
 
 #include <base/Error.h>
-#include <base/io.hpp>
+#include <base/io.h>
 #include <cstdio>
 #include <cstdlib>
 #include <language/error.h>
@@ -30,7 +30,7 @@ bool readstr(char*& str, FILE* stream) {
             return false;
         }
         if (index > len) {
-            len += 15;
+            len += 20;
             str = (char*)realloc(str, (len + 1) * sizeof(char));
             if (str == nullptr) {
                 error::send_error(

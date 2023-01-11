@@ -48,9 +48,13 @@ enum error_type {
     RedefinedError
 };
 
+/**
+ * @brief 作为模块报错的参数
+ */
 struct error_argv {
+    // 错误名
     error_type error;
-    // 默认值为零，代表取当前行号
+    // 行号,默认值为零，代表取当前行号
     line_t line = 0;
 };
 
@@ -70,8 +74,6 @@ public:
 
     /**
      * @brief 报出错误
-     * @param error 错误名
-     * @param line 行号
      */
     void send_error_module(error_argv argv, ...);
 };
@@ -104,7 +106,7 @@ void send_error_module_aplist(
  * @param error_name 异常名
  * @param ap 可变参数
  */
-void make_error_msg(int error_name, va_list& ap);
+void output_error_msg(int error_name, va_list& ap);
 
 /**
  * @brief 输出报错信息

@@ -20,7 +20,7 @@ class symbol_form {
 public:
     def::OBJ* vars = nullptr;
     void reset(size_t size);
-    symbol_form(size_t size);
+    explicit symbol_form(size_t size);
     symbol_form() = default;
     ~symbol_form();
 };

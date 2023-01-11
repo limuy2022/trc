@@ -5,7 +5,6 @@
 #include <TVM/TRE.h>
 #include <TVM/TVM.h>
 #include <TVM/memory.h>
-#include <TVM/types/trc_string.h>
 #include <base/Error.h>
 #include <base/memory/objs_pool.hpp>
 #include <cstdio>
@@ -18,7 +17,7 @@ void LENGTH(int argc, TVM* vm) {
             error::ArgumentError, language::error::argumenterror, "len", "1");
     }
     auto firsts = (def::STRINGOBJ)vm->pop();
-    vm->push(new types::trc_int(firsts->len()));
+    vm->push(new types::trc_int((int)firsts->len()));
 }
 
 void HELP([[maybe_unused]] int argc, [[maybe_unused]] TVM* vm) {

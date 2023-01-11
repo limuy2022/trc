@@ -5,9 +5,8 @@
 
 #include <Compiler/Compiler.h>
 #include <TVM/TVM.h>
-#include <TVM/memory.h>
 #include <base/Error.h>
-#include <base/io.hpp>
+#include <base/io.h>
 #include <csetjmp>
 #include <cstdio>
 #include <generated_params.h>

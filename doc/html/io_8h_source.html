@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trc: src/include/base/utils/type.hpp File Reference</title>
+<title>Trc: src/include/base/io.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,35 +69,23 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_01acc8edd7825447466b0239e256824e.html">base</a></li><li class="navelem"><a class="el" href="dir_80fac997784967a29201b8eae37981ba.html">utils</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_01acc8edd7825447466b0239e256824e.html">base</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a>  </div>
-  <div class="headertitle"><div class="title">type.hpp File Reference</div></div>
+  <div class="headertitle"><div class="title">io.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;sstream&gt;</code><br />
-</div>
-<p><a href="type_8hpp_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespacetrc"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc.html">trc</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacetrc_1_1utils"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html">trc::utils</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplParams" colspan="2">template&lt;typename outtype , typename intype &gt; </td></tr>
-<tr class="memitem:a10fddf0485656e34179e2d7892bdd1cf"><td class="memTemplItemLeft" align="right" valign="top">outtype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">trc::utils::to_type</a> (const intype &amp;value)</td></tr>
-<tr class="memdesc:a10fddf0485656e34179e2d7892bdd1cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">任意转化类型  <a href="namespacetrc_1_1utils.html#a10fddf0485656e34179e2d7892bdd1cf">More...</a><br /></td></tr>
-<tr class="separator:a10fddf0485656e34179e2d7892bdd1cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-</div><!-- contents -->
+<a href="io_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetrc_1_1io.html">trc::io</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacetrc_1_1io.html#a401f20ac79f439c66444a27be4f8577c">readstr</a>(<span class="keywordtype">char</span>*&amp;, FILE* stream = stdin);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>}</div>
+<div class="ttc" id="anamespacetrc_1_1io_html"><div class="ttname"><a href="namespacetrc_1_1io.html">trc::io</a></div><div class="ttdef"><b>Definition:</b> io.cpp:16</div></div>
+<div class="ttc" id="anamespacetrc_1_1io_html_a401f20ac79f439c66444a27be4f8577c"><div class="ttname"><a href="namespacetrc_1_1io.html#a401f20ac79f439c66444a27be4f8577c">trc::io::readstr</a></div><div class="ttdeci">bool readstr(char *&amp;str, FILE *stream)</div><div class="ttdoc">读入一个长度不限的字符串(不包括换行符)</div><div class="ttdef"><b>Definition:</b> io.cpp:17</div></div>
+</div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5

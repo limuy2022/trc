@@ -10,9 +10,9 @@
 namespace trc::TVM_space::types {
 class trc_flong : public trcobj {
 public:
-    trc_flong(const std::string&);
+    explicit trc_flong(const std::string&);
 
-    trc_flong(double init_data);
+    explicit trc_flong(double init_data);
 
     trc_flong();
 

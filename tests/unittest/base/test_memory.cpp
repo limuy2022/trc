@@ -1,7 +1,5 @@
-﻿#include <base/memory/memory.h>
-#include <base/memory/memory.hpp>
+﻿#include <base/memory/memory.hpp>
 #include <base/memory/objs_pool.hpp>
-#include <cstring>
 #include <gtest/gtest.h>
 #include <list>
 #include <stack>

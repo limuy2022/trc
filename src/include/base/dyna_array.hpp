@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <cstdlib>
-
 namespace trc::utils {
 /**
  * 简单的动态数组封装

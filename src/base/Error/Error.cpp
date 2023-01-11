@@ -2,7 +2,6 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <language/error.h>
 #include <string>
 
@@ -12,7 +11,7 @@ namespace error_env {
     jmp_buf error_back_place;
 }
 
-void make_error_msg(int error_name, va_list& ap) {
+void output_error_msg(int error_name, va_list& ap) {
     // 输出错误名
     fprintf(stderr, "%s", language::error::error_map[error_name]);
     // 报错的模板字符串
@@ -35,7 +34,7 @@ void make_error_msg(int error_name, va_list& ap) {
 static void send_error_detail(int name, va_list& ap,
     const std::string& module = "__main__", size_t line_index = 0) {
     send_error_(module.c_str(), line_index);
-    make_error_msg(name, ap);
+    output_error_msg(name, ap);
     // 检查设置判断是否报错
     if (error_env::quit) {
         // 报错，退出程序

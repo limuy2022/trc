@@ -1,14 +1,13 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 
 namespace trc::TVM_space::types {
 class trc_float : public trcobj {
 public:
-    double value;
+    double value {};
 
     void putline(FILE* out) override;
 
@@ -16,7 +15,7 @@ public:
 
     trc_float();
 
-    trc_float(const double& value);
+    explicit trc_float(const double& value);
 
     def::OBJ to_int() override;
 

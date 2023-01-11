@@ -1,8 +1,6 @@
 ﻿/**
  * 基础数据结构map
  * 采用哈希表加红黑树实现
- * 注意：如果你仔细阅读了这里的代码，你会发现这个哈希表其实实现的并不复杂，
- * 效率也只能算是一般，不过有时间再改吧
  */
 
 #include <TVM/TVMdef.h>
@@ -65,7 +63,7 @@ size_t trc_map::hash_func(def::OBJ value) const {
 }
 
 def::OBJ& trc_map::get_value(const def::OBJ key_) const {
-    int key = hash_func(key_);
+    size_t key = hash_func(key_);
     data_info& value_ = data_[key];
     // 判断是否存在数据
     if (!value_.is_data) {
@@ -132,7 +130,7 @@ void trc_map::resize() {
 }
 
 bool trc_map::delete_value(const def::OBJ key_) {
-    int key = hash_func(key_);
+    size_t key = hash_func(key_);
     data_info& value_ = data_[key];
     // 键不存在
     if (!value_.is_data) {

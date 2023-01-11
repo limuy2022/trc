@@ -59,7 +59,7 @@ namespace trc::TVM_space {
  */
 class TVM {
 public:
-    TVM(std::string name = "__main__");
+    explicit TVM(std::string name = "__main__");
 
     ~TVM();
     /**
@@ -89,7 +89,7 @@ public:
         *(++dyna_data.stack_top_ptr) = a;
     }
 
-    inline def::OBJ& top() {
+    [[nodiscard]] inline def::OBJ& top() const {
         return *(dyna_data.stack_top_ptr);
     }
 
@@ -130,7 +130,7 @@ public:
     TVM_dyna_data dyna_data;
 
     // 储存模块
-    TVM** modules;
+    TVM** modules {};
 
     // 需要导入模块的个数（当时没有被导入也算）
     size_t modules_num = 0;
@@ -224,7 +224,7 @@ private:
     /**
      * @brief 执行内置函数
      */
-    void CALL_BUILTIN(bytecode_index_t name);
+    void CALL_BUILTIN(bytecode_index_t builtin_func_name);
 
     /**
      * @brief 模块导入
@@ -282,7 +282,7 @@ private:
     /**
      * @brief 取反栈顶的值
      */
-    void NOT();
+    void NOT() const;
 
     /**
      * @brief
@@ -305,12 +305,12 @@ private:
     /**
      * @brief 生成函数局部变量
      */
-    void STORE_LOCAL(bytecode_index_t name);
+    void STORE_LOCAL(bytecode_index_t var_index);
 
     /**
      * @brief 读取函数局部变量
      */
-    void LOAD_LOCAL(bytecode_index_t name);
+    void LOAD_LOCAL(bytecode_index_t var_index);
 
     /**
      * @brief 执行自定义函数

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <TVM/TVMdef.h>
-
 #include <TVM/types/base.h>
 #include <TVM/types/trc_int.h>
 #include <base/Error.h>
@@ -9,7 +8,7 @@
 #include <string>
 
 // int型缓存起始值
-#define INT_CACHE_BEGIN -5
+#define INT_CACHE_BEGIN (-5)
 // int型缓存结束值
 #define INT_CACHE_END 256
 // int型缓存长度

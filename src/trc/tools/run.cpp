@@ -11,7 +11,7 @@
 
 namespace trc::tools {
 namespace tools_in {
-    void __run(TVM_space::TVM* vm, const std::string& path) {
+    void _run(TVM_space::TVM* vm, const std::string& path) {
         if (loader::is_magic(path)) {
             /*是ctree文件*/
             loader::loader_ctree(vm, path);
@@ -31,7 +31,7 @@ namespace tools_out {
     void run() {
         auto vm = new TVM_space::TVM;
         for (int i = 2; i < argc; ++i) {
-            tools_in::__run(vm, argv[i]);
+            tools_in::_run(vm, argv[i]);
         }
         delete vm;
     }

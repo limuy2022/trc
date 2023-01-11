@@ -24,14 +24,14 @@ const unsigned int bitopt = utils::len(opt);
 
 trc_long::trc_long(const std::string& a) {
     size_t l_s = a.length();
-    int end_index;
+    size_t end_index;
     if (a[0] == '-') {
-        used = size = ceil(((l_s - 1) * 1.0) / (bitopt - 1)) + 1;
+        used = size = (size_t)ceil((double(l_s - 1) * 1.0) / (bitopt - 1)) + 1;
         value = (bit_type*)(malloc(sizeof(bit_type) * size));
         value[0] = 1;
         end_index = 1;
     } else {
-        used = size = ceil((l_s * 1.0) / (bitopt - 1)) + 1;
+        used = size = (size_t)ceil((double)l_s / double(bitopt - 1)) + 1;
         value = (bit_type*)(malloc(sizeof(bit_type) * size));
         value[0] = 0;
         end_index = 0;
@@ -40,7 +40,7 @@ trc_long::trc_long(const std::string& a) {
     memset(value + 1, 0, (size - 1) * sizeof(bit_type));
     bit_type k = 1;
     size_t j = 1;
-    for (int i = l_s - 1; i >= end_index; --i) {
+    for (size_t i = l_s - 1; i >= end_index; --i) {
         if (k == opt) {
             k = 1;
             j++;
@@ -71,7 +71,8 @@ trc_long::~trc_long() {
 }
 
 void trc_long::cal_used_size() {
-    for (int i = size; i >= 0; --i) {
+    // 不可使用无符号类型，否则将会永远死循环
+    for (auto i = (long long)size; i >= 0; --i) {
         if (value[i] != 0) {
             used = i;
             return;
@@ -186,7 +187,7 @@ def::OBJ trc_long::operator%(def::OBJ) {
     return res;
 }
 
-def::OBJ trc_long::pow(def::OBJ) {
+def::OBJ trc_long::pow_(def::OBJ) {
     // TODO
     def::LONGOBJ res = MALLOCLONG();
     return res;

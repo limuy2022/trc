@@ -13,7 +13,7 @@
 
 namespace trc::tools {
 namespace tools_in {
-    void __build(TVM_space::TVM* vm, const std::string& path) {
+    void _build(TVM_space::TVM* vm, const std::string& path) {
         auto option = generate_compiler_params();
         std::string scode;
         utils::readcode(scode, path);
@@ -28,7 +28,7 @@ namespace tools_out {
         auto vm = new TVM_space::TVM;
         // 解析到命令行参数停止
         for (int i = 2; i < argc; ++i) {
-            tools_in::__build(vm, argv[i]);
+            tools_in::_build(vm, argv[i]);
         }
         delete vm;
     }

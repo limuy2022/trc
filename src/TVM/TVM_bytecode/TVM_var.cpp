@@ -14,12 +14,12 @@ void TVM::STORE_NAME(bytecode_index_t index) {
     dyna_data.global_symbol_table.vars[index] = pop();
 }
 
-void TVM::STORE_LOCAL(bytecode_index_t name) {
-    dyna_data.frames_top_str->localvars.vars[name] = pop();
+void TVM::STORE_LOCAL(bytecode_index_t var_index) {
+    dyna_data.frames_top_str->localvars.vars[var_index] = pop();
 }
 
-void TVM::LOAD_LOCAL(bytecode_index_t name) {
-    push(dyna_data.frames_top_str->localvars.vars[name]);
+void TVM::LOAD_LOCAL(bytecode_index_t var_index) {
+    push(dyna_data.frames_top_str->localvars.vars[var_index]);
 }
 
 void TVM::CHANGE_LOCAL(bytecode_index_t index) {

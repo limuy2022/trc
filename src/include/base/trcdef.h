@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <array>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -55,10 +54,10 @@ namespace def {
     // 字节类型
     typedef unsigned char byte_t;
     // 版本号
-    extern const char* version;
+    inline const char* version = "0.2";
     // github项目地址
-    extern const char* repo_github;
+    inline const char* repo_github = "https://github.com/limuy2022/trc.git";
     // gitee项目地址
-    extern const char* repo_gitee;
+    inline const char* repo_gitee = "https://gitee.com/li-muyangangel/trc.git";
 }
 }

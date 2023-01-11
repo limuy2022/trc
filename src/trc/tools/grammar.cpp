@@ -56,7 +56,7 @@ namespace tools_in {
         putchar(']');
     }
 
-    void __out_grammar(const std::string& path) {
+    void _out_grammar(const std::string& path) {
         std::string file_data;
         utils::readcode(file_data, path);
 
@@ -82,7 +82,7 @@ namespace tools_in {
 namespace tools_out {
     void out_grammar() {
         for (int i = 2; i < argc; ++i)
-            tools_in::__out_grammar(argv[i]);
+            tools_in::_out_grammar(argv[i]);
     }
 }
 }

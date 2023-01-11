@@ -2,7 +2,7 @@
  * 测试自己封装的io库
  */
 
-#include <base/io.hpp>
+#include <base/io.h>
 #include <cstdio>
 #include <cstdlib>
 #include <filesys_tools.h>

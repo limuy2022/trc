@@ -24,24 +24,24 @@ namespace tools {
      * @brief 工具内部实现
      */
     namespace tools_in {
-        void __brun(TVM_space::TVM* vm, const std::string& path);
+        void _brun(TVM_space::TVM* vm, const std::string& path);
 
         /**
          * @brief 负责编译工作的底层函数
          * @param vm 填充的虚拟机
          * @param path 文件的路径
          */
-        void __build(TVM_space::TVM* vm, const std::string& path);
+        void _build(TVM_space::TVM* vm, const std::string& path);
 
-        void __dis(TVM_space::TVM* vm, const char* file_path);
+        void _dis(TVM_space::TVM* vm, const char* file_path);
 
-        void __out_grammar(const std::string& path);
+        void _out_grammar(const std::string& path);
 
-        void __run(TVM_space::TVM* vm, const std::string& path);
+        void _run(TVM_space::TVM* vm, const std::string& path);
 
-        void __out_token(const std::string& path);
+        void _out_token(const std::string& path);
 
-        void __style_file(FILE* file, compiler::treenode* node, int tabsize);
+        void _style_file(FILE* file, compiler::treenode* node, int tabsize);
     }
 
     /**

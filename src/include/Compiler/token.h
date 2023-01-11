@@ -30,13 +30,6 @@ public:
      */
     void unget_token(token* token_data);
 
-    /**
-     * @brief 返回一个只读的指向当前编译字符的指针
-     */
-    inline const char* get_charptr() {
-        return char_ptr;
-    }
-
     compiler_public_data& compiler_data;
 
 private:
@@ -50,7 +43,7 @@ private:
     const char* char_ptr;
 
     // 判断是否解析到了终点
-    bool end_of_lex() const noexcept;
+    [[nodiscard]] bool end_of_lex() const noexcept;
 
     // 解析数字（包括浮点数）
     token* lex_int_float();

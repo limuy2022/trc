@@ -90,6 +90,7 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrc_1_1error_1_1error__argv.html">error_argv</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">作为模块报错的参数  <a href="structtrc_1_1error_1_1error__argv.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html">error_module</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">关于模块报错的异常封装  <a href="classtrc_1_1error_1_1error__module.html#details">More...</a><br /></td></tr>
@@ -123,9 +124,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a522e15f2d8a093b0f1a3619092c5e014"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error.html#a522e15f2d8a093b0f1a3619092c5e014">make_error_msg</a> (int error_name, va_list &amp;ap)</td></tr>
-<tr class="memdesc:a522e15f2d8a093b0f1a3619092c5e014"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出报错信息  <a href="namespacetrc_1_1error.html#a522e15f2d8a093b0f1a3619092c5e014">More...</a><br /></td></tr>
-<tr class="separator:a522e15f2d8a093b0f1a3619092c5e014"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cac535e384c9abf48a968de8627b994"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error.html#a8cac535e384c9abf48a968de8627b994">output_error_msg</a> (int error_name, va_list &amp;ap)</td></tr>
+<tr class="memdesc:a8cac535e384c9abf48a968de8627b994"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出报错信息  <a href="namespacetrc_1_1error.html#a8cac535e384c9abf48a968de8627b994">More...</a><br /></td></tr>
+<tr class="separator:a8cac535e384c9abf48a968de8627b994"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14a0953efcb05626ea69c9c43247e0cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetrc_1_1error.html#a14a0953efcb05626ea69c9c43247e0cb">send_error_module_aplist</a> (int <a class="el" href="namespacetrc.html#ab2049ad43a641e2a976e80db2c4da78d">name</a>, const std::string &amp;module, size_t line_index, va_list &amp;ap)</td></tr>
 <tr class="memdesc:a14a0953efcb05626ea69c9c43247e0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">报出有模块有行号的异常  <a href="namespacetrc_1_1error.html#a14a0953efcb05626ea69c9c43247e0cb">More...</a><br /></td></tr>
 <tr class="separator:a14a0953efcb05626ea69c9c43247e0cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,14 +171,14 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a522e15f2d8a093b0f1a3619092c5e014" name="a522e15f2d8a093b0f1a3619092c5e014"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a522e15f2d8a093b0f1a3619092c5e014">&#9670;&#160;</a></span>make_error_msg()</h2>
+<a id="a8cac535e384c9abf48a968de8627b994" name="a8cac535e384c9abf48a968de8627b994"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cac535e384c9abf48a968de8627b994">&#9670;&#160;</a></span>output_error_msg()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void trc::error::make_error_msg </td>
+          <td class="memname">void trc::error::output_error_msg </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>error_name</em>, </td>
@@ -241,7 +242,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">...</td><td>const char* 类型的字符串 <div class="fragment"><div class="line"> <a class="code hl_function" href="namespacetrc_1_1error.html#ad35c03d3f0abebc561906ab8c1e69767">error::send_error</a>(<a class="code hl_enumvalue" href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">error::ValueError</a>, <span class="stringliteral">&quot;%</span></div>
 <div class="line"><span class="stringliteral">can&#39;t be %&quot;</span>, <span class="stringliteral">&quot;int&quot;</span>, <span class="stringliteral">&quot;string&quot;</span>)</div>
 <div class="ttc" id="anamespacetrc_1_1error_html_a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16"><div class="ttname"><a href="namespacetrc_1_1error.html#a2ce0d1f9b0a271e0d62ef5989882f1a1ac1d06465fc8e356c873bf2365b64eb16">trc::error::ValueError</a></div><div class="ttdeci">@ ValueError</div><div class="ttdef"><b>Definition:</b> Error.h:34</div></div>
-<div class="ttc" id="anamespacetrc_1_1error_html_ad35c03d3f0abebc561906ab8c1e69767"><div class="ttname"><a href="namespacetrc_1_1error.html#ad35c03d3f0abebc561906ab8c1e69767">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:53</div></div>
+<div class="ttc" id="anamespacetrc_1_1error_html_ad35c03d3f0abebc561906ab8c1e69767"><div class="ttname"><a href="namespacetrc_1_1error.html#ad35c03d3f0abebc561906ab8c1e69767">trc::error::send_error</a></div><div class="ttdeci">void send_error(int name,...)</div><div class="ttdoc">报出错误，错误名称和错误信息</div><div class="ttdef"><b>Definition:</b> Error.cpp:52</div></div>
 </div><!-- fragment --> </td></tr>
   </table>
   </dd>

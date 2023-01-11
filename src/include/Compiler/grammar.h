@@ -3,7 +3,6 @@
 #include <Compiler/Compiler.h>
 #include <Compiler/grammar_env.h>
 #include <Compiler/token.h>
-#include <language/error.h>
 
 namespace trc::compiler {
 /**

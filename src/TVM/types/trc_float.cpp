@@ -63,7 +63,7 @@ def::OBJ trc_float::operator*(def::OBJ value_i) {
 
 def::OBJ trc_float::operator/(def::OBJ value_i) {
     double second = ((def::FLOATOBJ)(value_i))->value;
-    return second ? MALLOCFLOAT(value / second) : nullptr;
+    return second != 0 ? MALLOCFLOAT(value / second) : nullptr;
 }
 
 def::OBJ trc_float::operator%(def::OBJ value_i) {
@@ -79,17 +79,19 @@ def::OBJ trc_float::zdiv(def::OBJ value_i) {
 }
 
 def::INTOBJ trc_float::operator!() {
-    return !value ? TVM_share::false_ : TVM_share::true_;
+    return value == 0 ? TVM_share::true_ : TVM_share::false_;
 }
 
 def::INTOBJ trc_float::operator&&(def::OBJ value_i) {
-    return value && ((def::FLOATOBJ)(value_i))->value ? TVM_share::true_
-                                                      : TVM_share::false_;
+    return value != 0 && ((def::FLOATOBJ)(value_i))->value != 0
+        ? TVM_share::true_
+        : TVM_share::false_;
 }
 
 def::INTOBJ trc_float::operator||(def::OBJ value_i) {
-    return (value || ((def::FLOATOBJ)(value_i))->value ? TVM_share::true_
-                                                       : TVM_share::false_);
+    return (value != 0 || ((def::FLOATOBJ)(value_i))->value != 0
+            ? TVM_share::true_
+            : TVM_share::false_);
 }
 
 def::OBJ trc_float::to_string() {
@@ -97,7 +99,7 @@ def::OBJ trc_float::to_string() {
 }
 
 def::OBJ trc_float::to_bool() {
-    return (value ? TVM_share::true_ : TVM_share::false_);
+    return (value != 0 ? TVM_share::true_ : TVM_share::false_);
 }
 
 def::OBJ trc_float::to_int() {

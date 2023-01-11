@@ -7,10 +7,6 @@
 #include <Compiler/compiler_def.h>
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVMdef.h>
-#include <base/Error.h>
-#include <language/error.h>
-#include <map>
-#include <string>
 #include <vector>
 
 namespace trc::compiler {
@@ -30,6 +26,7 @@ public:
     /**
      * @brief 将变量添加进符号表，存在该符号则报出重定义错误
      * @param name
+     * @param line 该变量所处的行号
      */
     size_t add_var(char* name, line_t line);
 
@@ -64,11 +61,14 @@ public:
     /**
      * @brief 获取某个函数在符号表中的位置
      * @param name 变量名
+     * @param line 该函数名所处的行号
      */
     size_t get_index_of_function(const char* name, line_t line);
 
     /**
      * @brief 将函数添加进符号表，负责报出重定义错误
+     * @param name 函数名
+     * @param line 该函数名所在的行号
      */
     void add_function(const char* name, line_t line);
 

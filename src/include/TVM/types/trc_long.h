@@ -24,7 +24,7 @@ typedef uint64_t bit_type;
 
 class trc_long : public trcobj {
 public:
-    trc_long(const std::string& a);
+    explicit trc_long(const std::string& a);
 
     trc_long();
 
@@ -32,7 +32,7 @@ public:
      * @param size 表示申请多少个位作为预留
      * @warning 不会自动添加符号位
      */
-    trc_long(size_t size);
+    explicit trc_long(size_t size);
 
     /**
      * @brief 将另一个类型值复制过来
@@ -50,7 +50,7 @@ public:
 
     def::OBJ operator%(def::OBJ) override;
 
-    def::OBJ pow(def::OBJ);
+    def::OBJ pow_(def::OBJ) override;
 
     def::OBJ zdiv(def::OBJ) override;
 

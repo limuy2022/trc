@@ -67,7 +67,7 @@ namespace tools_in {
         putchar('\n');
     }
 
-    void __dis(TVM_space::TVM* vm, const char* file_path) {
+    void _dis(TVM_space::TVM* vm, const char* file_path) {
         if (loader::is_magic(file_path))
             loader::loader_ctree(vm, file_path);
         else {
@@ -84,7 +84,7 @@ namespace tools_out {
     void dis() {
         auto vm = new TVM_space::TVM;
         for (int i = 2; i < argc; ++i)
-            tools_in::__dis(vm, argv[i]);
+            tools_in::_dis(vm, argv[i]);
         delete vm;
     }
 }

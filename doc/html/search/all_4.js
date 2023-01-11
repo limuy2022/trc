@@ -4,7 +4,7 @@ var searchData=
   ['data_2ehpp_1',['data.hpp',['../data_8hpp.html',1,'']]],
   ['data_5finfo_2',['data_info',['../classtrc_1_1_t_v_m__space_1_1types_1_1map__space_1_1data__info.html',1,'trc::TVM_space::types::map_space']]],
   ['define_5fbool_3',['DEFINE_bool',['../generated__params_8cpp.html#a7ff3fce8cb7b513f9daad18d43c65933',1,'DEFINE_bool(noline_number_table, false, &quot;Controls whether a line number.&quot;):&#160;generated_params.cpp'],['../generated__params_8cpp.html#a5cf8c982c09fa904982fd45f7c3ec729',1,'DEFINE_bool(optimize, false, &quot;Controls whether optimization code is generated.&quot;):&#160;generated_params.cpp'],['../generated__params_8cpp.html#a2327e4af44163e8c4be300b9e7624626',1,'DEFINE_bool(no_const_fold, false, &quot;Controls whether optimization includes costant fold.&quot;):&#160;generated_params.cpp']]],
-  ['del_4',['del',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__list.html#a912cea7eed22055ab2ecf93ad507e564',1,'trc::TVM_space::types::trc_list']]],
+  ['del_4',['del',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__list.html#a1a476e3cbf275aecb581926d6801e313',1,'trc::TVM_space::types::trc_list']]],
   ['del_5',['DEL',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a2bbe23c0e8b3f638f0f5aed4b6864513',1,'trc::compiler']]],
   ['delete_5fvalue_6',['delete_value',['../classtrc_1_1_t_v_m__space_1_1types_1_1trc__map.html#ae39f87b826e02f260cb7ec8ef7c1343a',1,'trc::TVM_space::types::trc_map']]],
   ['detail_5fcompiler_7',['detail_compiler',['../classtrc_1_1compiler_1_1detail__compiler.html#a4d17a1c9387c05c4dbaa0b35cb004be4',1,'trc::compiler::detail_compiler::detail_compiler()'],['../classtrc_1_1compiler_1_1detail__compiler.html',1,'trc::compiler::detail_compiler']]],

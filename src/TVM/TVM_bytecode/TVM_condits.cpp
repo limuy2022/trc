@@ -102,7 +102,7 @@ void TVM::ASSERT() {
     }
 }
 
-void TVM::NOT() {
+void TVM::NOT() const {
     top() = top()->operator!();
 }
 

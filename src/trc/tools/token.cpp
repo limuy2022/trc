@@ -89,7 +89,7 @@ namespace tools_in {
         }
     }
 
-    void __out_token(const std::string& path) {
+    void _out_token(const std::string& path) {
         std::string file_data;
         utils::readcode(file_data, path);
         compiler::compiler_public_data compiler_data { path,
@@ -103,7 +103,7 @@ namespace tools_in {
 namespace tools_out {
     void out_token() {
         for (int i = 2; i < argc; ++i) {
-            tools_in::__out_token(argv[i]);
+            tools_in::_out_token(argv[i]);
         }
     }
 }

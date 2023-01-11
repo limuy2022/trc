@@ -27,6 +27,8 @@ namespace trc {
  * 在不能被执行到的地方放上这条语句，出现问题会强行停止程序
  */
 void noreach_internal(size_t line, const char* funcname, const char* filename);
+// 行号类型
+typedef size_t line_t;
 
 namespace TVM_space::types {
     class trc_long;

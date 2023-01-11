@@ -4,7 +4,6 @@
 
 namespace trc::compiler {
 typedef error::error_module compiler_error;
-typedef unsigned int line_t;
 
 /**
  * @brief 编译器的参数
@@ -21,9 +20,15 @@ struct compiler_option {
 /**
  * @brief 储存编译期间要用到的公共数据和成员
  */
-struct compiler_public_data {
+class compiler_public_data {
+public:
+    compiler_public_data(
+        const std::string& module_name, const compiler_option& option)
+        : error(module_name)
+        , option(option) {
+    }
     compiler_error error;
-    const compiler_option option;
+    const compiler_option& option;
     // 储存虚拟机常量池的大小
     size_t int_size = 0, float_size = 0, string_size = 0, long_int_size = 0,
            func_size = 0, long_float_size = 0;

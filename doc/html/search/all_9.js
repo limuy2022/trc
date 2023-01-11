@@ -27,7 +27,7 @@ var searchData=
   ['int_5fname_24',['int_name',['../namespacetrc_1_1_t_v_m__space_1_1type__int.html#a6345add47b6d7ab9700b93d2f3fab9c2',1,'trc::TVM_space::type_int']]],
   ['int_5fnode_25',['int_node',['../classtrc_1_1compiler_1_1int__node.html#a2c6a3c0696ea596efd74c66d31fd63e0',1,'trc::compiler::int_node::int_node()'],['../classtrc_1_1compiler_1_1int__node.html',1,'trc::compiler::int_node']]],
   ['int_5fpool_26',['int_pool',['../structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html#a8c06ea0531f7a546090f18c87cce4d84',1,'trc::TVM_space::objs_pool_TVM']]],
-  ['int_5fsize_27',['int_size',['../structtrc_1_1compiler_1_1compiler__public__data.html#a72d3f7552570abbc4005a1f621a867af',1,'trc::compiler::compiler_public_data']]],
+  ['int_5fsize_27',['int_size',['../classtrc_1_1compiler_1_1compiler__public__data.html#a72d3f7552570abbc4005a1f621a867af',1,'trc::compiler::compiler_public_data']]],
   ['int_5ft_28',['int_T',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774eaebbb68987b0d2917a4c1ee5451920660',1,'trc::TVM_space']]],
   ['int_5fvalue_29',['INT_VALUE',['../namespacetrc_1_1compiler.html#a0845b90df8765369e37eadfd4b4ff452a7f12111b3f331d04dc056ee57986f3b3',1,'trc::compiler']]],
   ['intobj_30',['INTOBJ',['../namespacetrc_1_1def.html#aed109bb3c885cbc404278d090143332d',1,'trc::def']]],

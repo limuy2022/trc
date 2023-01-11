@@ -41,7 +41,7 @@ var searchData=
   ['compiler_5fdef_2eh_38',['compiler_def.h',['../compiler__def_8h.html',1,'']]],
   ['compiler_5ferror_39',['compiler_error',['../namespacetrc_1_1compiler.html#a5f709f8451b10da66b9a1982d91957ee',1,'trc::compiler']]],
   ['compiler_5foption_40',['compiler_option',['../structtrc_1_1compiler_1_1compiler__option.html',1,'trc::compiler']]],
-  ['compiler_5fpublic_5fdata_41',['compiler_public_data',['../structtrc_1_1compiler_1_1compiler__public__data.html',1,'trc::compiler']]],
+  ['compiler_5fpublic_5fdata_41',['compiler_public_data',['../classtrc_1_1compiler_1_1compiler__public__data.html#a3a78b86b7d4ecff54d283447461866e8',1,'trc::compiler::compiler_public_data::compiler_public_data()'],['../classtrc_1_1compiler_1_1compiler__public__data.html',1,'trc::compiler::compiler_public_data']]],
   ['compress_5fmemory_42',['compress_memory',['../classtrc_1_1utils_1_1dyna__array.html#a9b5d1ba3a5f2f8320c3e108369191111',1,'trc::utils::dyna_array::compress_memory()'],['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#aa6af14ac9d547eb7584497106fdb1897',1,'trc::TVM_space::TVM_static_data::compress_memory()']]],
   ['connect_43',['connect',['../classtrc_1_1compiler_1_1is__not__end__node.html#a8f17d1dadfcbc30145ac12cba41a893f',1,'trc::compiler::is_not_end_node']]],
   ['const_5ff_44',['const_f',['../classtrc_1_1_t_v_m__space_1_1_t_v_m__static__data.html#a82cabce0f27f3700e885df3277db6164',1,'trc::TVM_space::TVM_static_data']]],

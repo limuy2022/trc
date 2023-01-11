@@ -139,7 +139,7 @@ Functions</h2></td></tr>
 <div class="line">        anode-&gt;value = (<span class="keywordtype">char</span>*)realloc(anode-&gt;value, len * bnode-&gt;value + 1);   \</div>
 <div class="line">        if (anode-&gt;value == <span class="keyword">nullptr</span>) {                                         \</div>
 <div class="line">            compiler_data.error.send_error_module(                             \</div>
-<div class="line">                error::MemoryError, <a class="code hl_variable" href="namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d">language::error::memoryerror</a>);             \</div>
+<div class="line">                { error::MemoryError }, <a class="code hl_variable" href="namespacelanguage_1_1error.html#a926fb90838cf2a43bb5b3f0eb0db152d">language::error::memoryerror</a>);         \</div>
 <div class="line">        }                                                                      \</div>
 <div class="line">        for (<span class="keywordtype">int</span> j = 1; j &lt;= bnode-&gt;value; ++j) {                              \</div>
 <div class="line">            strncpy(anode-&gt;value + len * j, anode-&gt;value, len);                \</div>

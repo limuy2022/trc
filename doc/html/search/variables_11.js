@@ -11,7 +11,7 @@ var searchData=
   ['str_5fgrammar_5ftype_5fcal_5fmap_8',['str_grammar_type_cal_map',['../namespacetrc_1_1compiler.html#adceb1973caa7cd9c69fc4997583c3ad5',1,'trc::compiler']]],
   ['str_5fpool_9',['str_pool',['../structtrc_1_1_t_v_m__space_1_1objs__pool___t_v_m.html#a4ae82303c5dc35e1f62631e34524b822',1,'trc::TVM_space::objs_pool_TVM']]],
   ['str_5ftoken_5fticks_5fcal_5fmap_10',['str_token_ticks_cal_map',['../namespacetrc_1_1compiler.html#ab49158a2d5828aec391aa2e1111e37d3',1,'trc::compiler']]],
-  ['string_5fsize_11',['string_size',['../structtrc_1_1compiler_1_1compiler__public__data.html#a5adb2a41612c8b49eb32eb8f0c3424e6',1,'trc::compiler::compiler_public_data']]],
+  ['string_5fsize_11',['string_size',['../classtrc_1_1compiler_1_1compiler__public__data.html#a5adb2a41612c8b49eb32eb8f0c3424e6',1,'trc::compiler::compiler_public_data']]],
   ['symbol_5fform_5fsize_12',['symbol_form_size',['../classtrc_1_1_t_v_m__space_1_1func__.html#ac0638180b7f6130861ef5b1cacb6133e',1,'trc::TVM_space::func_']]],
   ['syntaxerror_13',['syntaxerror',['../namespacelanguage_1_1error.html#ac2ab4d2550db16fcf5c06277a2d86ad7',1,'language::error']]],
   ['syntaxerror_5fescape_5fchar_14',['syntaxerror_escape_char',['../namespacelanguage_1_1error.html#adce18b647a9f0979c5ade3c96b79f94e',1,'language::error']]],

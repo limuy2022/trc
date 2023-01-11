@@ -18,7 +18,7 @@
         anode->value = (char*)realloc(anode->value, len * bnode->value + 1);   \
         if (anode->value == nullptr) {                                         \
             compiler_data.error.send_error_module(                             \
-                error::MemoryError, language::error::memoryerror);             \
+                { error::MemoryError }, language::error::memoryerror);         \
         }                                                                      \
         for (int j = 1; j <= bnode->value; ++j) {                              \
             strncpy(anode->value + len * j, anode->value, len);                \
@@ -60,7 +60,7 @@ treenode* number_node_cal(value_type avalue, value_type bvalue,
     }
     case token_ticks::DIV: {
         if (!bvalue) {
-            compiler_data.error.send_error_module(error::ZeroDivError,
+            compiler_data.error.send_error_module({ error::ZeroDivError },
                 language::error::zerodiverror, std::to_string(avalue).c_str());
         }
         // 除法一定是浮点数
@@ -68,7 +68,7 @@ treenode* number_node_cal(value_type avalue, value_type bvalue,
     }
     case token_ticks::MOD: {
         if (!bvalue) {
-            compiler_data.error.send_error_module(error::ZeroDivError,
+            compiler_data.error.send_error_module({ error::ZeroDivError },
                 language::error::zerodiverror, std::to_string(avalue).c_str());
         }
         if constexpr (std::is_same<result_type,
@@ -126,7 +126,7 @@ treenode* grammar_lex::optimize_expr(is_not_end_node* expr) {
             // 获取变量值
             if (cal_struct.size() < 2) {
                 compiler_data.error.send_error_module(
-                    error::SyntaxError, language::error::syntaxerror);
+                    { error::SyntaxError }, language::error::syntaxerror);
             }
             auto b = cal_struct.back();
             cal_struct.pop_back();
@@ -174,7 +174,8 @@ treenode* grammar_lex::optimize_expr(is_not_end_node* expr) {
                         sizeof(char) * (astrlen + strlen(bnode->value) + 1));
                     if (anode->value == nullptr) {
                         compiler_data.error.send_error_module(
-                            error::MemoryError, language::error::memoryerror);
+                            { error::MemoryError },
+                            language::error::memoryerror);
                     }
                     strcpy(anode->value + astrlen, bnode->value);
                     break;

@@ -7,9 +7,8 @@
 #include <tools.h>
 
 namespace trc::tools {
-static compiler::compiler_public_data shared_data {
-    compiler::compiler_error("__main__"), { true, false, true }
-};
+static compiler::compiler_public_data shared_data(
+    "__main__", { true, false, true });
 
 namespace tools_in {
     /**

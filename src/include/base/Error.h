@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <base/trcdef.h>
 #include <csetjmp>
 #include <string>
 
@@ -10,7 +11,7 @@
  * @param operator_node 参与运算的运算符的节点
  */
 #define OPERERROR_MSG(t1, t2, operator_node)                                   \
-    error::OperatorError, language::error::operatorerror,                      \
+    { error::OperatorError }, language::error::operatorerror,                  \
         str_token_ticks_cal_map                                                \
             [((node_base_tick_without_sons*)(operator_node))->tick],           \
         str_grammar_type_cal_map[(t1)], str_grammar_type_cal_map[(t2)]
@@ -47,6 +48,12 @@ enum error_type {
     RedefinedError
 };
 
+struct error_argv {
+    error_type error;
+    // 默认值为零，代表取当前行号
+    line_t line = 0;
+};
+
 /**
  * @brief 关于模块报错的异常封装
  * @details 包含模块名和当前行数
@@ -56,17 +63,17 @@ public:
     // 模块的名字
     const std::string name;
 
-    // 当前操作的行号
-    size_t line = 0;
-
     error_module(std::string name);
+
+    // 当前操作的行号
+    line_t line = 1;
 
     /**
      * @brief 报出错误
-     * @warning
-     * 封装该函数的函数不需要转索引，索引在该函数转换
+     * @param error 错误名
+     * @param line 行号
      */
-    void send_error_module(int error, ...);
+    void send_error_module(error_argv argv, ...);
 };
 
 /**

@@ -1,5 +1,4 @@
-﻿#include <algorithm>
-#include <base/Error.h>
+﻿#include <base/Error.h>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -67,11 +66,14 @@ error_module::error_module(std::string name)
     : name(std::move(name)) {
 }
 
-void error_module::send_error_module(int ename, ...) {
+void error_module::send_error_module(error_argv argv, ...) {
     va_list ap;
-    va_start(ap, ename);
-    // 加1是为了从索引转成行号
-    error::send_error_module_aplist(ename, name, line + 1, ap);
+    va_start(ap, argv);
+    if (argv.line == 0) {
+        // 未指定，替换为当前行号
+        argv.line = this->line;
+    }
+    error::send_error_module_aplist(argv.error, name, argv.line, ap);
     va_end(ap);
 }
 }

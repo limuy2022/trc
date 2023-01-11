@@ -264,7 +264,7 @@ treenode* grammar_lex::get_node(bool end_with_oper) {
             }
         } else {
             compiler_data.error.send_error_module(
-                error::SyntaxError, language::error::syntaxerror);
+                { error::SyntaxError }, language::error::syntaxerror);
         }
         now = token_.get_token();
     }
@@ -369,7 +369,7 @@ token* grammar_lex::check_excepted(token_ticks tick) {
     if (res->tick != tick) {
         delete res;
         compiler_data.error.send_error_module(
-            error::SyntaxError, language::error::syntaxerror);
+            { error::SyntaxError }, language::error::syntaxerror);
         // 用于消除warning
         return nullptr;
     }

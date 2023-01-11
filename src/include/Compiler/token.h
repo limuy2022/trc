@@ -43,7 +43,7 @@ private:
     // 为nullptr标记着没有储存
     token* back_token = nullptr;
 
-    // 经过简单处理的原始字符串代码
+    // 原始字符串代码
     const std::string& rawcode;
 
     // 指向当前正在解析的字符

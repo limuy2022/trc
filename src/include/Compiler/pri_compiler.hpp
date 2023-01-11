@@ -100,7 +100,9 @@ public:
      */
     void set_size(size_t len);
 
-    ~token();
+    ~token() {
+        free(data);
+    }
 };
 
 extern std::map<std::string, int> change_const;

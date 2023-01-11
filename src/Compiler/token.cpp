@@ -24,7 +24,7 @@ token* token_lex::lex_string() {
         if (end_of_lex()) {
             // 读到文件末尾了，说明字符串解析错误
             compiler_data.error.send_error_module(
-                error::SyntaxError, language::error::syntaxerror_lexstring);
+                { error::SyntaxError }, language::error::syntaxerror_lexstring);
         }
         ++char_ptr;
     }
@@ -87,7 +87,7 @@ token* token_lex::lex_string() {
                 break;
             }
             default: {
-                compiler_data.error.send_error_module(error::SyntaxError,
+                compiler_data.error.send_error_module({ error::SyntaxError },
                     language::error::syntaxerror_escape_char);
             }
             }
@@ -225,7 +225,7 @@ void token_lex::check_expected_char(char expected_char) {
     ++char_ptr;
     if (*char_ptr != expected_char) {
         char err_tmp[] = { *char_ptr, '\0' };
-        compiler_data.error.send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module({ error::SyntaxError },
             language::error::syntaxerror_no_expect, err_tmp);
     }
 }
@@ -311,7 +311,7 @@ token* token_lex::lex_others() {
                     if (end_of_lex()) {
                         // 注释未结尾，报错
                         compiler_data.error.send_error_module(
-                            error::SyntaxError,
+                            { error::SyntaxError },
                             language::error::syntaxerror_lexanno);
                     }
                     ++char_ptr;
@@ -337,7 +337,7 @@ token* token_lex::lex_others() {
     case ')': {
         result = new token(token_ticks::RIGHT_SMALL_BRACE);
         if (check_brace.empty() || check_brace.top() != '(') {
-            compiler_data.error.send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module({ error::SyntaxError },
                 language::error::syntaxerror_no_expect, ")");
         }
         check_brace.pop();
@@ -351,7 +351,7 @@ token* token_lex::lex_others() {
     case ']': {
         result = new token(token_ticks::RIGHT_MID_BRACE);
         if (check_brace.empty() || check_brace.top() != '[') {
-            compiler_data.error.send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module({ error::SyntaxError },
                 language::error::syntaxerror_no_expect, "]");
         }
         check_brace.pop();
@@ -365,7 +365,7 @@ token* token_lex::lex_others() {
     case '}': {
         result = new token(token_ticks::RIGHT_BIG_BRACE);
         if (check_brace.empty() || check_brace.top() != '{') {
-            compiler_data.error.send_error_module(error::SyntaxError,
+            compiler_data.error.send_error_module({ error::SyntaxError },
                 language::error::syntaxerror_no_expect, "}");
         }
         check_brace.pop();
@@ -382,7 +382,7 @@ token* token_lex::lex_others() {
     default: {
         // 如果一个字符都没有匹配到，报错
         char error_tmp[2] = { *char_ptr, '\0' };
-        compiler_data.error.send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module({ error::SyntaxError },
             language::error::syntaxerror_no_expect, error_tmp);
     }
     }
@@ -392,6 +392,9 @@ token* token_lex::lex_others() {
 }
 
 void token_lex::unget_token(token* token_data) {
+    if (token_data->tick == token_ticks::END_OF_LINE) {
+        compiler_data.error.line--;
+    }
     back_token = token_data;
 }
 
@@ -449,14 +452,10 @@ token_lex::~token_lex() {
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
         char error_tmp[] = { check_brace.top(), '\0' };
-        compiler_data.error.send_error_module(error::SyntaxError,
+        compiler_data.error.send_error_module({ error::SyntaxError },
             language::error::syntaxerror_unmatched_char, error_tmp);
     }
     compiler_data.error.line = 0;
-}
-
-token::~token() {
-    free(data);
 }
 
 token::token(token_ticks tick, const char* data, size_t len)

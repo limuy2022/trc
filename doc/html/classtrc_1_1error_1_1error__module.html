@@ -90,16 +90,16 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae143b18d8d22c9d4066d8218b6f91878"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#ae143b18d8d22c9d4066d8218b6f91878">error_module</a> (std::string <a class="el" href="classtrc_1_1error_1_1error__module.html#a9823ae8dd06e52cc17514d9e6b1eda17">name</a>)</td></tr>
 <tr class="separator:ae143b18d8d22c9d4066d8218b6f91878"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54f0ef9d1fbc29868d80c5b028c237ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#a54f0ef9d1fbc29868d80c5b028c237ed">send_error_module</a> (int error,...)</td></tr>
-<tr class="memdesc:a54f0ef9d1fbc29868d80c5b028c237ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">报出错误  <a href="classtrc_1_1error_1_1error__module.html#a54f0ef9d1fbc29868d80c5b028c237ed">More...</a><br /></td></tr>
-<tr class="separator:a54f0ef9d1fbc29868d80c5b028c237ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0aa63206e85d80c89d7663664acca7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#ae0aa63206e85d80c89d7663664acca7e">send_error_module</a> (<a class="el" href="structtrc_1_1error_1_1error__argv.html">error_argv</a> argv,...)</td></tr>
+<tr class="memdesc:ae0aa63206e85d80c89d7663664acca7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">报出错误  <a href="classtrc_1_1error_1_1error__module.html#ae0aa63206e85d80c89d7663664acca7e">More...</a><br /></td></tr>
+<tr class="separator:ae0aa63206e85d80c89d7663664acca7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a9823ae8dd06e52cc17514d9e6b1eda17"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#a9823ae8dd06e52cc17514d9e6b1eda17">name</a></td></tr>
 <tr class="separator:a9823ae8dd06e52cc17514d9e6b1eda17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf609025b1a0f85589c2f45e22c8f74a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#abf609025b1a0f85589c2f45e22c8f74a">line</a> = 0</td></tr>
-<tr class="separator:abf609025b1a0f85589c2f45e22c8f74a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5017e652a1114c24fa2d4d31ebc98b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacetrc.html#a395d0d013caf704cb3dc3c0f6ebe808b">line_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrc_1_1error_1_1error__module.html#ad5017e652a1114c24fa2d4d31ebc98b6">line</a> = 1</td></tr>
+<tr class="separator:ad5017e652a1114c24fa2d4d31ebc98b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >关于模块报错的异常封装 </p>
@@ -124,8 +124,8 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a54f0ef9d1fbc29868d80c5b028c237ed" name="a54f0ef9d1fbc29868d80c5b028c237ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54f0ef9d1fbc29868d80c5b028c237ed">&#9670;&#160;</a></span>send_error_module()</h2>
+<a id="ae0aa63206e85d80c89d7663664acca7e" name="ae0aa63206e85d80c89d7663664acca7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0aa63206e85d80c89d7663664acca7e">&#9670;&#160;</a></span>send_error_module()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -133,8 +133,8 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">void trc::error::error_module::send_error_module </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>error</em>, </td>
+          <td class="paramtype"><a class="el" href="structtrc_1_1error_1_1error__argv.html">error_argv</a>&#160;</td>
+          <td class="paramname"><em>argv</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -151,19 +151,25 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>报出错误 </p>
-<dl class="section warning"><dt>Warning</dt><dd>封装该函数的函数不需要转索引，索引在该函数转换 </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">error</td><td>错误名 </td></tr>
+    <tr><td class="paramname">line</td><td>行号 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="abf609025b1a0f85589c2f45e22c8f74a" name="abf609025b1a0f85589c2f45e22c8f74a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf609025b1a0f85589c2f45e22c8f74a">&#9670;&#160;</a></span>line</h2>
+<a id="ad5017e652a1114c24fa2d4d31ebc98b6" name="ad5017e652a1114c24fa2d4d31ebc98b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5017e652a1114c24fa2d4d31ebc98b6">&#9670;&#160;</a></span>line</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t trc::error::error_module::line = 0</td>
+          <td class="memname"><a class="el" href="namespacetrc.html#a395d0d013caf704cb3dc3c0f6ebe808b">line_t</a> trc::error::error_module::line = 1</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -31,14 +31,14 @@ public:
      * @brief 将变量添加进符号表，存在该符号则报出重定义错误
      * @param name
      */
-    size_t add_var(char* name);
+    size_t add_var(char* name, line_t line);
 
     /**
      * @brief 获取某个变量在符号表中的位置，有该符号则报错
      * @param name 变量名
-     * @param report_error 查找不到是否直接报错
+     * @param report_error 查找不到是否直接报错,0为是，否则该参数为行号
      */
-    size_t get_index_of_var(char* name, bool report_error);
+    size_t get_index_of_var(char* name, line_t report_error);
 
     // 字节码保存处
     TVM_space::struct_codes& bytecode;
@@ -65,12 +65,12 @@ public:
      * @brief 获取某个函数在符号表中的位置
      * @param name 变量名
      */
-    size_t get_index_of_function(const char* name);
+    size_t get_index_of_function(const char* name, line_t line);
 
     /**
      * @brief 将函数添加进符号表，负责报出重定义错误
      */
-    void add_function(const char* name);
+    void add_function(const char* name, line_t line);
 
     size_t get_func_size();
 

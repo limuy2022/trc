@@ -14,6 +14,7 @@
 #include <TVM/TVM.h>
 #include <TVM/TVM_data.h>
 #include <base/Error.h>
+#include <limits>
 
 namespace trc::compiler {
 using TVM_space::bytecode_t;
@@ -101,8 +102,8 @@ private:
      * @param bytecode 储存字节码的地方
      * @param line 当前行号
      */
-    void add_opcode(byteCodeNumber opcode, TVM_space::bytecode_index_t index,TVM_space::struct_codes& bytecode,
-        line_t line);
+    void add_opcode(byteCodeNumber opcode, TVM_space::bytecode_index_t index,
+        TVM_space::struct_codes& bytecode, line_t line);
 
     /**
      * @brief 添加带有语句块的特殊代码
@@ -115,10 +116,10 @@ private:
      */
     void generate_line_table(line_t line);
 
-    size_t prev_value = ULLONG_MAX;
+    line_t prev_value = std::numeric_limits<size_t>::max();
 
     // 行号转化为字节码每行的第一个字节码的索引
-    std::vector<size_t> line_to_bycodeindex_table;
+    std::vector<line_t> line_to_bycodeindex_table;
 };
 
 /**
@@ -140,19 +141,19 @@ detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
 template <bool compiletype>
 void detail_compiler::add_block(
     is_not_end_node* root, basic_compile_env& localinfo) {
-    // 开头表达式
-
     // 记录语句块一开始的位置
     size_t goto_addr;
     if constexpr (compiletype) {
         goto_addr = localinfo.bytecode.size();
     }
+    // 开头表达式
     auto iter = root->son.begin();
     compile(*iter, localinfo);
     iter++;
     // 单独处理跳转语句，否则无法处理常量表
-    // 0只是用来占位的
-    add_opcode(byteCodeNumber::IF_FALSE_GOTO_, 0, localinfo.bytecode, root->line);
+    // 0只是用来占位的，后面会被修改为正确的地址
+    add_opcode(
+        byteCodeNumber::IF_FALSE_GOTO_, 0, localinfo.bytecode, root->line);
     // 获取跳转表达式的字节码位置
     size_t fix_bytecode = localinfo.bytecode.size() - 1;
     // 然后编译其它所有的节点
@@ -161,7 +162,8 @@ void detail_compiler::add_block(
     }
     if constexpr (compiletype) {
         // while循环比if多一句goto
-        add_opcode(byteCodeNumber::GOTO_, goto_addr, localinfo.bytecode, root->line);
+        add_opcode(
+            byteCodeNumber::GOTO_, goto_addr, localinfo.bytecode, root->line);
     }
     // 然后重新修改跳转地址
     localinfo.bytecode[fix_bytecode].index = localinfo.bytecode.size();

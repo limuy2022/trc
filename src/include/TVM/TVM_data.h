@@ -41,7 +41,7 @@ public:
     // 类信息
     std::vector<class_header> class_msg;
     // 行号表，字节码对应到相应行号的表(可以选择不生成)
-    std::vector<size_t> line_number_table;
+    std::vector<line_t> line_number_table;
     // 全局符号表大小
     size_t global_symbol_table_size {};
     /**

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <TVM/TVMdef.h>
-
 #include <TVM/types/base.h>
 #include <base/trcdef.h>
 #include <cstdint>

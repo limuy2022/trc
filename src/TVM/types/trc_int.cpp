@@ -1,6 +1,7 @@
 ﻿#include <TVM/TRE.h>
 #include <TVM/memory.h>
 #include <TVM/types/trc_int.h>
+#include <cinttypes>
 #include <cmath>
 #include <cstdio>
 
@@ -8,17 +9,7 @@ namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;
 
 void trc_int::putline(FILE* out) {
-    if constexpr (sizeof(int) == sizeof(trc_int_t)) {
-        fprintf(out, "%d", value);
-    } else if constexpr (sizeof(long long) == sizeof(trc_int_t)) {
-        fprintf(out, "%lld", value);
-    } else if constexpr (sizeof(short) == sizeof(trc_int_t)) {
-        fprintf(out, "%hd", value);
-    } else if constexpr (sizeof(long) == sizeof(trc_int_t)) {
-        fprintf(out, "%ld", value);
-    } else {
-        NOREACH("Unsupport int size.");
-    }
+    fprintf(out, "%" PRId32, value);
 }
 
 trc_int::~trc_int() = default;

@@ -70,8 +70,6 @@ namespace tools::tools_out {
         compiler::detail_compiler* info_saver
             = compiler::Compiler(vm->static_data, "", option, nullptr, true);
         for (;;) {
-            // 重新还原行号
-            info_saver->compiler_data.error.line = 0;
             printf("%s", "\ntshell>");
             free(code);
             io::readstr(code, stdin);
@@ -87,6 +85,8 @@ namespace tools::tools_out {
                 vm->reload_data();
                 vm->run_all();
             }
+            // 重新还原行号
+            info_saver->compiler_data.error.reset_line();
         }
         // 该地不需要释放内存的原因是退出只可能是ctrl+c或者exit函数，而退出后会由操作系统回收内存
     }

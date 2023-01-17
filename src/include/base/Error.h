@@ -67,15 +67,23 @@ public:
     // 模块的名字
     const std::string name;
 
-    error_module(std::string name);
-
-    // 当前操作的行号
-    line_t line = 1;
-
+    explicit error_module(std::string name)
+        : name(std::move(name)) {}
     /**
      * @brief 报出错误
      */
     void send_error_module(error_argv argv, ...);
+
+    line_t get_line() const {return line;}
+
+    void add_line() {line++;}
+
+    void sub_line() {line--;}
+
+    void reset_line(){line = 1;}
+private:
+    // 当前操作的行号
+    line_t line = 1;
 };
 
 /**

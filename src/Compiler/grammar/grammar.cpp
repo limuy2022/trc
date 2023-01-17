@@ -9,7 +9,7 @@
 #include <stack>
 #include <string>
 
-#define LINE_NUM compiler_data.error.line
+#define LINE_NUM compiler_data.error.get_line()
 
 namespace trc::compiler {
 treenode* grammar_lex::assign(grammar_type oper, treenode* left_value) {

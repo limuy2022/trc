@@ -73,7 +73,7 @@ namespace tools_in {
         bool change_line = true;
         for (;;) {
             if (change_line) {
-                printf("\n%zu:", token_c.compiler_data.error.line);
+                printf("\n%zu:", token_c.compiler_data.error.get_line());
                 change_line = false;
             }
             token_lex = token_c.get_token();

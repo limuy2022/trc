@@ -61,10 +61,6 @@ void send_error_(const char* module, size_t line_index) noexcept {
         language::error::error_in_line, line_index);
 }
 
-error_module::error_module(std::string name)
-    : name(std::move(name)) {
-}
-
 void error_module::send_error_module(error_argv argv, ...) {
     va_list ap;
     va_start(ap, argv);

@@ -9,7 +9,7 @@ public:
     ~dyna_array();
 
     /**
-     * 用于压缩使用的内存，调整内存用多少分配多少
+     * @brief 用于压缩使用的内存，调整内存用多少分配多少
      */
     void compress_memory();
 

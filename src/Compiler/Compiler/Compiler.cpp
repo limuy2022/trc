@@ -6,10 +6,10 @@
 #include <Compiler/grammar.h>
 #include <Compiler/pri_compiler.hpp>
 #include <TVM/TVMdef.h>
-#include <base/code_loader.h>
 #include <base/utils/data.hpp>
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace trc::compiler {
 // 将对应字符转化为字节码的过程，此过程会直接通过映射的方式编译出字节码
@@ -206,7 +206,7 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             // 变量赋值
             char* argv_ = ((node_base_string_without_sons*)root->son.front())
                               ->swap_string_data();
-            auto index_argv = localinfo.get_index_of_var(argv_, true);
+            auto index_argv = localinfo.get_index_of_var(argv_,true, root->line);
             if (&localinfo == &infoenv) {
                 // 全局环境
                 add_var(
@@ -253,14 +253,14 @@ void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
             // 首先尝试在局部变量中查找
             if (&localinfo == &infoenv) {
                 // 相等，说明现在处于全局作用域中
-                index_argv = localinfo.get_index_of_var(varname, head->line);
+                index_argv = localinfo.get_index_of_var(varname, true, head->line);
                 add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
                     localinfo.bytecode, head->line);
             } else {
-                index_argv = localinfo.get_index_of_var(varname, 0);
-                if (index_argv == size_tmax) {
+                index_argv = localinfo.get_index_of_var(varname, false);
+                if (index_argv == std::numeric_limits<size_t>::max()) {
                     // 如果在局部变量中没有查找到
-                    index_argv = infoenv.get_index_of_var(varname, head->line);
+                    index_argv = infoenv.get_index_of_var(varname, true, head->line);
                     add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
                         localinfo.bytecode, head->line);
                 } else {

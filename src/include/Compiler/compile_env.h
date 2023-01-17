@@ -10,8 +10,6 @@
 #include <vector>
 
 namespace trc::compiler {
-inline size_t size_tmax = -1;
-
 class basic_compile_env {
 public:
     explicit basic_compile_env(compiler_public_data& compiler_data,
@@ -35,7 +33,7 @@ public:
      * @param name 变量名
      * @param report_error 查找不到是否直接报错,0为是，否则该参数为行号
      */
-    size_t get_index_of_var(char* name, line_t report_error);
+    size_t get_index_of_var(char* name,bool report_error, line_t line = 0);
 
     // 字节码保存处
     TVM_space::struct_codes& bytecode;

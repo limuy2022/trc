@@ -2,6 +2,7 @@
 #include <base/Error.h>
 #include <cstring>
 #include <language/error.h>
+#include <limits>
 
 namespace trc::compiler {
 basic_compile_env::basic_compile_env(
@@ -55,7 +56,7 @@ void module_compile_env::add_function(const char* name, line_t line) {
     functions.push_back(name);
 }
 
-size_t basic_compile_env::get_index_of_var(char* name, line_t report_error) {
+size_t basic_compile_env::get_index_of_var(char* name, bool report_error, line_t line) {
     size_t n = var_names_list.size();
     for (size_t i = 0; i < n; ++i) {
         if (!strcmp(var_names_list[i], name)) {
@@ -65,11 +66,11 @@ size_t basic_compile_env::get_index_of_var(char* name, line_t report_error) {
     if (report_error) {
         // 并不在当前符号表,报错
         compiler_data.error.send_error_module(
-            { error::NameError, report_error }, language::error::nameerror,
+            { error::NameError, line }, language::error::nameerror,
             name);
     }
-    // -1转换到无符号整型中是最大值，代表不存在
-    return size_tmax;
+    // size_t最大值，代表不存在
+    return std::numeric_limits<size_t>::max();
 }
 
 size_t basic_compile_env::add_var(char* name, line_t line) {

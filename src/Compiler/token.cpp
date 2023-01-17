@@ -305,7 +305,7 @@ token* token_lex::lex_others() {
                             break;
                         } else if (*char_ptr == '\n') {
                             // 跨行注释也需要更新行号
-                            compiler_data.error.line++;
+                            compiler_data.error.add_line();
                         }
                     }
                     if (end_of_lex()) {
@@ -393,7 +393,7 @@ token* token_lex::lex_others() {
 
 void token_lex::unget_token(token* token_data) {
     if (token_data->tick == token_ticks::END_OF_LINE) {
-        compiler_data.error.line--;
+        compiler_data.error.sub_line();
     }
     back_token = token_data;
 }
@@ -413,7 +413,7 @@ token* token_lex::get_token() {
     }
     if (*char_ptr == '\n') {
         // 加一行
-        compiler_data.error.line++;
+        compiler_data.error.add_line();
         ++char_ptr;
         return new token(token_ticks::END_OF_LINE);
     }
@@ -455,7 +455,7 @@ token_lex::~token_lex() {
         compiler_data.error.send_error_module({ error::SyntaxError },
             language::error::syntaxerror_unmatched_char, error_tmp);
     }
-    compiler_data.error.line = 0;
+    compiler_data.error.reset_line();
 }
 
 token::token(token_ticks tick, const char* data, size_t len)

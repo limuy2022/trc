@@ -1,8 +1,8 @@
-﻿#include <TVM/TVM.h>
-#include <TVM/types/trc_string.h>
-#include <base/Error.h>
-#include <base/trcdef.h>
-#include <language/error.h>
+﻿#include <TVM/TVM.hpp>
+#include <TVM/types/trc_string.hpp>
+#include <base/Error.hpp>
+#include <base/trcdef.hpp>
+#include <language/error.hpp>
 
 namespace trc::TVM_space {
 void TVM::EQUAL() {

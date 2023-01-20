@@ -2,9 +2,9 @@
  * 管理内存申请
  */
 
-#include <base/Error.h>
-#include <base/memory/memory.h>
-#include <language/error.h>
+#include <base/Error.hpp>
+#include <base/memory/memory.hpp>
+#include <language/error.hpp>
 #include <new>
 
 namespace trc::memory {

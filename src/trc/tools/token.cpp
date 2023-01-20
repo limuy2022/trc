@@ -2,11 +2,10 @@
  * 工具：输出token，调试工具
  */
 
-#include <Compiler/Compiler.h>
-#include <Compiler/token.h>
-#include <base/utils/filesys.h>
+#include <Compiler/token.hpp>
+#include <base/utils/filesys.hpp>
 #include <cstdio>
-#include <tools.h>
+#include <tools.hpp>
 
 // token标记映射到名称，便于输出
 // todo:从最新的token进行更新
@@ -69,33 +68,34 @@ namespace tools_in {
     static void out(
         const std::string& file_name, compiler::token_lex& token_c) {
         printf("From file %s:", file_name.c_str());
-        compiler::token* token_lex;
         bool change_line = true;
         for (;;) {
             if (change_line) {
                 printf("\n%zu:", token_c.compiler_data.error.get_line());
                 change_line = false;
             }
-            token_lex = token_c.get_token();
-            if (token_lex->tick == compiler::token_ticks::END_OF_TOKENS) {
+            auto token_lex = token_c.get_token();
+            if (token_lex.tick == compiler::token_ticks::END_OF_TOKENS) {
                 return;
             }
-            if (token_lex->tick == compiler::token_ticks::END_OF_LINE) {
+            if (token_lex.tick == compiler::token_ticks::END_OF_LINE) {
                 change_line = true;
                 continue;
             }
-            printf("%s, %s", token_lex->data,
-                tokenticks_to_string[(int)token_lex->tick]);
+            printf("%zu, %s", token_lex.data,
+                tokenticks_to_string[(int)token_lex.tick]);
         }
     }
 
     void _out_token(const std::string& path) {
         std::string file_data;
         utils::readcode(file_data, path);
-        compiler::compiler_public_data compiler_data { path,
-            compiler::nooptimize_option };
+        TVM_space::TVM_static_data vm;
+        compiler::compiler_public_data compiler_data(
+            path, compiler::nooptimize_option, vm);
         // 解析
-        compiler::token_lex token_c(file_data, compiler_data);
+        compiler::token_lex token_c(compiler_data);
+        token_c.set_code(file_data);
         out(path, token_c);
     }
 }

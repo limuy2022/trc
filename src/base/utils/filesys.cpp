@@ -7,14 +7,12 @@
  *
  */
 
-#include <base/Error.h>
-#include <base/utils/filesys.h>
+#include <base/Error.hpp>
+#include <base/utils/filesys.hpp>
 #include <cstdio>
-#include <language/error.h>
+#include <language/error.hpp>
 #include <string>
 #include <sys/stat.h>
-
-namespace fs = std::filesystem;
 
 namespace trc::utils {
 void import_to_path(std::string& import_name) {

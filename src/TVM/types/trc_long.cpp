@@ -5,9 +5,9 @@
  * 这样可以减少非常多的运算
  */
 
-#include <TVM/TRE.h>
-#include <TVM/memory.h>
-#include <TVM/types/trc_long.h>
+#include <TVM/TRE.hpp>
+#include <TVM/memory.hpp>
+#include <TVM/types/trc_long.hpp>
 #include <base/utils/data.hpp>
 #include <cassert>
 #include <cmath>

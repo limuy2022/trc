@@ -1,7 +1,7 @@
-﻿#include <TVM/TVM.h>
-#include <TVM/built_in_func.h>
-#include <TVM/func.h>
-#include <base/trcdef.h>
+﻿#include <TVM/TVM.hpp>
+#include <TVM/built_in_func.hpp>
+#include <TVM/func.hpp>
+#include <base/trcdef.hpp>
 
 namespace trc::TVM_space {
 void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
@@ -59,7 +59,7 @@ void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
 }
 
 void TVM::CALL_FUNCTION(bytecode_index_t index) {
-    const func_& fast = static_data.funcs.array[index];
+    const func_& fast = static_data.funcs[index];
     // 启动函数环境
     (++dyna_data.frames_top_str)->set_func(fast);
     // 调用函数

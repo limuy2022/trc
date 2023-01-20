@@ -1,9 +1,10 @@
 ﻿/**
  * 进度条
  */
-#include <base/trcdef.h>
+
+#include <base/trcdef.hpp>
 #include <base/utils/data.hpp>
-#include <base/utils/progress_bar.h>
+#include <base/utils/progress_bar.hpp>
 #include <cstdio>
 
 namespace trc::utils {

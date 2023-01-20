@@ -3,9 +3,9 @@
  * 注：先编译再保存
  */
 
-#include <TVM/TVM.h>
+#include <TVM/TVM.hpp>
 #include <string>
-#include <tools.h>
+#include <tools.hpp>
 
 namespace trc::tools {
 namespace tools_in {

@@ -1,6 +1,6 @@
-﻿#include <TVM/TRE.h>
-#include <TVM/types/trc_list.h>
-#include <base/trcdef.h>
+﻿#include <TVM/TRE.hpp>
+#include <TVM/types/trc_list.hpp>
+#include <base/trcdef.hpp>
 #include <cstdio>
 
 namespace trc::TVM_space::types {

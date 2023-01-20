@@ -23,8 +23,7 @@ template <typename floattype> bool isequal(floattype a, floattype b) {
  * @param end 结尾
  * @param data 数据
  */
-template <typename T>
-static inline bool inrange(const T& start, const T& end, const T& data) {
+template <typename T> inline bool inrange(T start, T end, T data) {
     return start <= data && data <= end;
 }
 
@@ -128,6 +127,7 @@ bool map_check_in_second(const T& m1, const O& data) {
  * @tparam T 数组类型
  * @param arr 数组
  * @return 数组的长度
+ * @warning 必须为静态数组
  */
 template <typename T> constexpr size_t sizeof_static_array(T& arr) {
     return sizeof(arr) / sizeof(arr[0]);
@@ -158,7 +158,7 @@ template <typename T> unsigned int len(T in) {
         }
         in /= 100000;
         out += 5;
-    } while (in != 0);
+    } while (in);
     return out;
 }
 }

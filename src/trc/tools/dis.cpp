@@ -2,14 +2,14 @@
  * 反编译程序，将其反编译成助记符
  */
 
-#include <Compiler/Compiler.h>
-#include <base/code_loader.h>
-#include <base/ctree_loader.h>
-#include <base/utils/filesys.h>
+#include <Compiler/Compiler.hpp>
+#include <base/code_loader.hpp>
+#include <base/ctree_loader.hpp>
+#include <base/utils/filesys.hpp>
 #include <cstdio>
-#include <generated_params.h>
+#include <generated_params.hpp>
 #include <string>
-#include <tools.h>
+#include <tools.hpp>
 
 namespace trc::tools {
 namespace tools_in {
@@ -25,44 +25,43 @@ namespace tools_in {
             printf("    %zu:%s|%hd, \n",
                 static_data.static_data
                     .line_number_table[static_data.run_index],
-                loader::int_code[bycode.bycode], bycode.index);
+                loader::int_code[(unsigned int)bycode.bycode], bycode.index);
         }
         size_t n;
         // 输出常量池
         // 整型常量池
         // 注意：大整数不在此输出
-        n = static_data.static_data.const_i.size;
+        n = static_data.static_data.const_i.size();
         puts("\nint constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%d\n", i, static_data.static_data.const_i.array[i]);
+            printf("    %zu:%d\n", i, static_data.static_data.const_i[i]);
         }
 
         // 浮点数常量池
-        n = static_data.static_data.const_f.size;
+        n = static_data.static_data.const_f.size();
         puts("\nfloat constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf(
-                "    %zu:%lf\n", i, static_data.static_data.const_f.array[i]);
+            printf("    %zu:%lf\n", i, static_data.static_data.const_f[i]);
         }
         // 字符串常量池
-        n = static_data.static_data.const_s.size;
+        n = static_data.static_data.const_s.size();
         puts("\nstring constant pool:");
         for (size_t i = 0; i < n; ++i) {
-            printf("    %zu:%s\n", i, static_data.static_data.const_s.array[i]);
+            printf(
+                "    %zu:%s\n", i, static_data.static_data.const_s[i].c_str());
         }
         // 大整数
         puts("\nlong int constant pool:");
-        n = static_data.static_data.const_long.size;
+        n = static_data.static_data.const_long.size();
         for (size_t i = 0; i < n; ++i) {
-            printf(
-                "    %zu:%s\n", i, static_data.static_data.const_long.array[i]);
+            printf("    %zu:%s\n", i,
+                static_data.static_data.const_long[i].c_str());
         }
         // 输出函数
         puts("\nfunctions:");
-        n = static_data.static_data.funcs.size;
+        n = static_data.static_data.funcs.size();
         for (size_t i = 0; i < n; ++i) {
-            printf(
-                "    %zu:%s\n", i, static_data.static_data.funcs.array[i].name);
+            printf("    %zu:%s\n", i, static_data.static_data.funcs[i].name);
         }
         putchar('\n');
     }
@@ -74,7 +73,8 @@ namespace tools_in {
             std::string codes;
             utils::readcode(codes, file_path);
             auto option = generate_compiler_params();
-            compiler::Compiler(vm->static_data, codes, option);
+            compiler::Compiler(compiler::main_module, option, vm->static_data)
+                .compile(codes);
         }
         out(*vm, file_path);
     }

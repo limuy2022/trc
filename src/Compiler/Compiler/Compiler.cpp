@@ -1,373 +1,293 @@
 ﻿/**
- * 字节码生成器
+ * 生成语法树并且生成字节码
+ * 语法制导翻译
  */
 
-#include <Compiler/Compiler.h>
-#include <Compiler/grammar.h>
-#include <Compiler/pri_compiler.hpp>
-#include <TVM/TVMdef.h>
-#include <base/utils/data.hpp>
+#include <Compiler/Compiler.hpp>
+#include <language/error.hpp>
 #include <string>
-#include <vector>
-#include <limits>
+
+#define LINE_NUM compiler_data.error.get_line()
 
 namespace trc::compiler {
-// 将对应字符转化为字节码的过程，此过程会直接通过映射的方式编译出字节码
-static byteCodeNumber opcodesym_int[] = {
-    byteCodeNumber::UNKNOWN, // for
-    byteCodeNumber::IF_FALSE_GOTO_, // while
-    byteCodeNumber::IF_FALSE_GOTO_, // if
-    byteCodeNumber::UNKNOWN, // func
-    byteCodeNumber::UNKNOWN, // class
-    byteCodeNumber::ADD_,
-    byteCodeNumber::SUB_,
-    byteCodeNumber::MUL_,
-    byteCodeNumber::DIV_,
-    byteCodeNumber::ZDIV_,
-    byteCodeNumber::MOD_,
-    byteCodeNumber::POW_,
-    byteCodeNumber::AND_,
-    byteCodeNumber::OR_,
-    byteCodeNumber::NOT_,
-    byteCodeNumber::EQUAL_,
-    byteCodeNumber::UNEQUAL_,
-    byteCodeNumber::LESS_,
-    byteCodeNumber::GREATER_,
-    byteCodeNumber::LESS_EQUAL_,
-    byteCodeNumber::GREATER_EQUAL_,
-    byteCodeNumber::IMPORT_,
-    byteCodeNumber::GOTO_,
-    byteCodeNumber::ASSERT_,
-};
-
-void detail_compiler::generate_line_table(line_t line) {
+void Compiler::generate_line_table(line_t line) {
     // 判断是否需要生成行号表
     if (!compiler_data.option.number_table) {
         return;
     }
-    vm->line_number_table.push_back(line);
+    compiler_data.vm.line_number_table.push_back(line);
     if (line != prev_value) {
-        // 该处不使用push_back是因为行号不为连续行号，中间可能有空行断开
-        line_to_bycodeindex_table.resize(line + 1);
-        line_to_bycodeindex_table[line] = vm->line_number_table.size() - 1;
+        while(line_to_bycodeindex_table.size() != line) {
+            line_to_bycodeindex_table.push_back(compiler_data.vm.byte_codes.size() - 1);
+        }
         prev_value = line;
     }
 }
 
-void detail_compiler::add_opcode(byteCodeNumber opcode,
-    TVM_space::bytecode_index_t index, TVM_space::struct_codes& bytecode,
-    line_t line) {
-    bytecode.emplace_back((bytecode_t)opcode, index);
-    generate_line_table(line);
+void Compiler::add_opcode(
+    byteCodeNumber opcode, TVM_space::bytecode_index_t index) {
+    local->bytecode.emplace_back(opcode, index);
+    generate_line_table(LINE_NUM);
 }
 
-TVM_space::bytecode_index_t detail_compiler::add_int(int value) const {
-    size_t size = vm->const_i.size;
-    int index = utils::check_in_i(value, vm->const_i.array, vm->const_i.end());
-    if (index != -1) {
-        return index;
-    }
-    vm->const_i.array[vm->const_i.size++] = value;
-    return size;
-}
-
-TVM_space::bytecode_index_t detail_compiler::add_float(double value) const {
-    size_t size = vm->const_f.size;
-    int index = utils::check_in_i(value, vm->const_f.array, vm->const_f.end());
-    if (index != -1) {
-        return index;
-    }
-    vm->const_f.array[vm->const_f.size++] = value;
-    return size;
-}
-
-TVM_space::bytecode_index_t detail_compiler::add_string(char* value) const {
-    int index
-        = utils::str_check_in_i(value, vm->const_s.array, vm->const_s.end());
-    size_t size = vm->const_s.size;
-    if (index != -1) {
-        free(value);
-        return index;
-    }
-    vm->const_s.array[vm->const_s.size++] = value;
-    return size;
-}
-
-TVM_space::bytecode_index_t detail_compiler::add_long(char* value) const {
-    size_t size = vm->const_long.size;
-    int index = utils::str_check_in_i(
-        value, vm->const_long.array, vm->const_long.end());
-    if (index != -1) {
-        free(value);
-        return index;
-    }
-    vm->const_long.array[vm->const_long.size++] = value;
-    return size;
-}
-
-byteCodeNumber detail_compiler::build_opcode(token_ticks symbol) {
-    return opcodesym_int[(int)symbol];
-}
-
-void detail_compiler::add_var(byteCodeNumber bycode, is_not_end_node* root,
-    basic_compile_env& localinfo, size_t index) {
-    // 处理等式右边的数据
-    compile(*(++root->son.begin()), localinfo);
-    add_opcode(bycode, index, localinfo.bytecode, root->line);
-}
-
-void detail_compiler::compile(treenode* head, basic_compile_env& localinfo) {
-    grammar_type type = head->type;
-    if (head->has_son) {
-        auto* root = (is_not_end_node*)head;
-        switch (type) {
-            // 运算符表达式或条件表达式
-        case grammar_type::EXPR:
-        // 树
-        case grammar_type::TREE: {
-            for (auto i : root->son) {
-                compile(i, localinfo);
-            }
-            break;
+bool Compiler::id(bool error_report) {
+    // 变量名节点，生成读取变量的字节码
+    auto t = token_.get_token();
+    auto varname = t.data;
+    // 获取变量的索引
+    size_t index_argv;
+    // 首先尝试在局部变量中查找
+    if (local == &infoenv) {
+        // 相等，说明现在处于全局作用域中
+        index_argv = local->get_index_of_var(varname, error_report);
+        if (index_argv == unsave) {
+            goto failed;
         }
-        case grammar_type::BUILTIN_FUNC: {
-            // 内置函数
-            // 先递归编译参数
-            for (auto i : root->son) {
-                compile(i, localinfo);
-            }
-            // 然后编译参数个数
-            int num_of_nodes = (int)root->son.size();
-            add_opcode(byteCodeNumber::LOAD_INT_, add_int(num_of_nodes),
-                localinfo.bytecode, root->line);
-            // 最后加上调用函数
-            // 内置函数以编码形式保存，这是它的位置
-            int function_index = ((node_base_int*)root)->value;
-            add_opcode(byteCodeNumber::CALL_BUILTIN_, function_index,
-                localinfo.bytecode, root->line);
-            break;
-        }
-        case grammar_type::OPCODE_ARGV: {
-            // 带参数字节码
-            // 参数
-            auto argv_
-                = ((node_base_int_without_sons*)root->son.front())->value;
-            add_opcode(build_opcode(((node_base_tick*)root)->tick),
-                add_int(argv_), localinfo.bytecode, root->line);
-            break;
-        }
-        case grammar_type::FUNC_DEFINE: {
-            // 首先添加函数定义
-            auto funcname = ((node_base_data*)root)->swap_string_data();
-            infoenv.add_function(funcname, root->line);
-            size_t func_index = infoenv.get_func_size();
-            // 然后为函数新建一个新的局部环境，进行编译
-            basic_compile_env localfuncenv(
-                compiler_data, vm->funcs[func_index].bytecodes);
-            // 编译构建变量的代码
-            auto index = root->son.begin();
-            for (auto i : ((is_not_end_node*)(*index))->son) {
-                add_opcode(byteCodeNumber::STORE_LOCAL_,
-                    localfuncenv.add_var(
-                        ((node_base_string_without_sons*)i)->swap_string_data(),
-                        i->line),
-                    localinfo.bytecode, i->line);
-            }
-            // 编译函数体
-            // 指向第一条函数体代码
-            index++;
-            for (auto end = root->son.end(); index != end; ++index) {
-                compile(*index, localfuncenv);
-            }
-            // 设置函数符号表
-            vm->funcs[func_index].symbol_form_size
-                = localfuncenv.get_name_size();
-            break;
-        }
-        case grammar_type::VAR_DEFINE: {
-            // 变量定义
-            // 处理等式左边的数据
-            auto left_value = root->son.front();
-            char* argv_ = ((node_base_string_without_sons*)left_value)
-                              ->swap_string_data();
-            auto index_argv = localinfo.add_var(argv_, left_value->line);
-            if (&localinfo == &infoenv) {
-                // 全局环境
-                add_var(
-                    byteCodeNumber::STORE_NAME_, root, localinfo, index_argv);
-            } else {
-                // 局部环境
-                add_var(
-                    byteCodeNumber::STORE_LOCAL_, root, localinfo, index_argv);
-            }
-            break;
-        }
-        case grammar_type::VAR_ASSIGN: {
-            // 变量赋值
-            char* argv_ = ((node_base_string_without_sons*)root->son.front())
-                              ->swap_string_data();
-            auto index_argv = localinfo.get_index_of_var(argv_,true, root->line);
-            if (&localinfo == &infoenv) {
-                // 全局环境
-                add_var(
-                    byteCodeNumber::CHANGE_VALUE_, root, localinfo, index_argv);
-            } else {
-                // 局部环境
-                add_var(
-                    byteCodeNumber::CHANGE_LOCAL_, root, localinfo, index_argv);
-            }
-            break;
-        }
-        case grammar_type::CALL_FUNC: {
-            // 调用自定义函数
-            char* funcname = ((node_base_data*)root)->value;
-            size_t index = infoenv.get_index_of_function(funcname, root->line);
-            // 编译参数
-            for (auto i : root->son) {
-                compile(i, localinfo);
-            }
-            add_opcode(byteCodeNumber::CALL_FUNCTION_, index,
-                localinfo.bytecode, root->line);
-            break;
-        }
-            // 需要跳转的语句块
-        case grammar_type::IF_BLOCK: {
-            add_block<false>(root, localinfo);
-            break;
-        }
-        case grammar_type::WHILE_BLOCK: {
-            add_block<true>(root, localinfo);
-            break;
-        }
-        default: {
-            NOREACH("Unexpeceted grammar tree node type %d", (int)type);
-        }
-        }
+        add_opcode(byteCodeNumber::LOAD_NAME, index_argv);
     } else {
-        switch (type) {
-        case grammar_type::VAR_NAME: {
-            // 变量名节点，生成读取变量的字节码
-            auto varname = ((node_base_string_without_sons*)head)->value;
-            // 获取变量的索引
-            size_t index_argv;
-            // 首先尝试在局部变量中查找
-            if (&localinfo == &infoenv) {
-                // 相等，说明现在处于全局作用域中
-                index_argv = localinfo.get_index_of_var(varname, true, head->line);
-                add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
-                    localinfo.bytecode, head->line);
+        index_argv = local->get_index_of_var(varname, false);
+        if (index_argv == unsave) {
+            // 如果在局部变量中没有查找到
+            index_argv = infoenv.get_index_of_var(varname, error_report);
+            if (index_argv == unsave) {
+                goto failed;
+            }
+            add_opcode(byteCodeNumber::LOAD_NAME, index_argv);
+        } else {
+            add_opcode(byteCodeNumber::LOAD_LOCAL, index_argv);
+        }
+    }
+    return true;
+failed:
+    token_.unget_token(t);
+    return false;
+}
+
+Compiler::Compiler(const std::string& module_name,
+    const compiler_option& option, TVM_space::TVM_static_data& vm)
+    : compiler_data(module_name, option, vm)
+    , infoenv(compiler_data, vm.byte_codes)
+    , token_(compiler_data) {
+}
+
+void Compiler::compile(const std::string& codes) {
+    token_.set_code(codes);
+    local = &infoenv;
+    while (get_next_token_tick() != token_ticks::END_OF_TOKENS) {
+        sentence();
+    }
+    // 设置全局符号表
+    compiler_data.vm.global_symbol_table_size = infoenv.get_name_size();
+    // 压缩内存
+    compiler_data.vm.compress_memory();
+}
+
+void Compiler::argv() {
+    do {
+        value();
+        if (get_next_token_tick() != token_ticks::COMMA) {
+            break;
+        }
+        token_.get_token();
+    } while (true);
+}
+
+bool Compiler::const_value() {
+    token data_token = token_.get_token();
+    switch (data_token.tick) {
+    case token_ticks::INT_VALUE: {
+        add_opcode(byteCodeNumber::LOAD_INT, data_token.data);
+        return true;
+    }
+    case token_ticks::FLOAT_VALUE: {
+        add_opcode(byteCodeNumber::LOAD_FLOAT, data_token.data);
+        return true;
+    }
+    case token_ticks::STRING_VALUE: {
+        add_opcode(byteCodeNumber::LOAD_STRING, data_token.data);
+        return true;
+    }
+    case token_ticks::TRUE_: {
+        // 常量true转换成数字1
+        // 第1项是数字1
+        add_opcode(byteCodeNumber::LOAD_INT, 1);
+        return true;
+    }
+    case token_ticks::FALSE_:
+    case token_ticks::NULL_: {
+        add_opcode(byteCodeNumber::LOAD_INT, 0);
+        return true;
+    }
+    case token_ticks::LONG_INT_VALUE: {
+        add_opcode(byteCodeNumber::LOAD_LONG, data_token.data);
+        return true;
+    }
+    default: {
+        token_.unget_token(data_token);
+        return false;
+    }
+    }
+}
+
+token Compiler::clear_enter() {
+    token now;
+    do {
+        now = token_.get_token();
+    } while (now.tick == token_ticks::END_OF_LINE);
+    return now;
+}
+
+bool Compiler::sentence() {
+    auto now = clear_enter();
+    switch (now.tick) {
+    case token_ticks::IF: {
+        add_block<false>();
+        return true;
+    }
+    case token_ticks::WHILE: {
+        add_block<true>();
+        return true;
+    }
+    case token_ticks::NAME: {
+        switch (get_next_token_tick()) {
+        case token_ticks::ASSIGN: {
+            // 变量赋值
+            token_.get_token();
+            item(true);
+            auto index_argv = local->get_index_of_var(now.data, true);
+            if (local == &infoenv) {
+                // 全局环境
+                add_opcode(byteCodeNumber::CHANGE_VALUE, index_argv);
             } else {
-                index_argv = localinfo.get_index_of_var(varname, false);
-                if (index_argv == std::numeric_limits<size_t>::max()) {
-                    // 如果在局部变量中没有查找到
-                    index_argv = infoenv.get_index_of_var(varname, true, head->line);
-                    add_opcode(byteCodeNumber::LOAD_NAME_, index_argv,
-                        localinfo.bytecode, head->line);
-                } else {
-                    add_opcode(byteCodeNumber::LOAD_LOCAL_, index_argv,
-                        localinfo.bytecode, head->line);
-                }
+                // 局部环境
+                add_opcode(byteCodeNumber::CHANGE_LOCAL, index_argv);
             }
             break;
         }
-        case grammar_type::NUMBER: {
-            // 整型节点
-            auto value = ((node_base_int_without_sons*)head)->value;
-            auto index_argv = add_int(value);
-            add_opcode(byteCodeNumber::LOAD_INT_, index_argv,
-                localinfo.bytecode, head->line);
+        case token_ticks::STORE: {
+            // 变量定义
+            token_.get_token();
+            item(true);
+            auto index_argv = local->add_var(now.data);
+            if (local == &infoenv) {
+                // 全局环境
+                add_opcode(byteCodeNumber::STORE_NAME, index_argv);
+            } else {
+                // 局部环境
+                add_opcode(byteCodeNumber::STORE_LOCAL, index_argv);
+            }
             break;
         }
-        case grammar_type::STRING: {
-            // 字符串节点
-            auto index_argv = add_string(
-                ((node_base_string_without_sons*)head)->swap_string_data());
-            add_opcode(byteCodeNumber::LOAD_STRING_, index_argv,
-                localinfo.bytecode, head->line);
-            break;
-        }
-        case grammar_type::FLOAT: {
-            // 浮点型节点
-            auto value = ((node_base_float_without_sons*)head)->value;
-            auto index_argv = add_float(value);
-            add_opcode(byteCodeNumber::LOAD_FLOAT_, index_argv,
-                localinfo.bytecode, head->line);
-            break;
-        }
-        case grammar_type::LONG_INT: {
-            // 长整型节点
-            auto index_argv = add_long(
-                ((node_base_string_without_sons*)head)->swap_string_data());
-            add_opcode(byteCodeNumber::LOAD_LONG_, index_argv,
-                localinfo.bytecode, head->line);
-            break;
-        }
-        case grammar_type::OPCODE: {
-            // 生成字节码, 0代表没有参数
-            token_ticks tick = ((node_base_tick_without_sons*)head)->tick;
-            add_opcode(build_opcode(tick), 0, localinfo.bytecode, head->line);
+        case token_ticks::LEFT_SMALL_BRACE: {
+            token_.get_token();
+            argv();
+            token_.get_token();
             break;
         }
         default: {
-            NOREACH("Unexpeceted grammar tree node type %d.", (int)type);
+            compiler_data.error.send_error_module(
+                error::SyntaxError, language::error::syntaxerror);
         }
         }
+        return true;
+    }
+    case token_ticks::FUNC: {
+        return true;
+    }
+    case token_ticks::ASSERT: {
+        argv();
+        return true;
+    }
+    case token_ticks::GOTO: {
+        token t = token_.get_token();
+        if (t.tick != token_ticks::INT_VALUE) {
+            compiler_data.error.send_error_module(
+                error::SyntaxError, language::error::syntaxerror);
+        }
+        add_opcode(byteCodeNumber::GOTO, t.data);
+    }
+    default: {
+        return false;
+    }
     }
 }
 
-detail_compiler::detail_compiler(
-    compiler_public_data& compiler_data, TVM_space::TVM_static_data* vm)
-    : infoenv(compiler_data, vm->byte_codes)
-    , vm(vm)
-    , compiler_data(compiler_data) {
+bool Compiler::value() {
+    return const_value() || id(false);
 }
 
-void detail_compiler::retie(TVM_space::TVM_static_data* vm) {
-    this->vm = vm;
-}
-
-void detail_compiler::compile_node(grammar_lex& grammar_lexer) {
-    treenode* root = grammar_lexer.compile_all();
-    // 申请虚拟机常量池的内存，统计元素个数时没有去重，可能会多申请，后面会压缩掉多余的储存空间
-    vm->const_i.array = new int[compiler_data.int_size];
-    vm->const_f.array = new double[compiler_data.float_size];
-    vm->const_s.array = new char*[compiler_data.string_size];
-    vm->const_long.array = new char*[compiler_data.long_int_size];
-    vm->funcs.array = new TVM_space::func_[compiler_data.func_size];
-    // 对于全局对象，局部作用域等于全局作用域
-    compile(root, infoenv);
-    delete root;
-    // 设置全局符号表
-    vm->global_symbol_table_size = infoenv.get_name_size();
-    // 压缩内存
-    vm->compress_memory();
-}
-
-detail_compiler* Compiler(TVM_space::TVM_static_data& vm,
-    const std::string& codes, const compiler_option& option,
-    detail_compiler* compiler_ptr, bool return_compiler_ptr) {
-    if (compiler_ptr == nullptr && !return_compiler_ptr) [[likely]] {
-        // 如果不需要返回变量信息或者没有提供指定编译器
-        // 不需要保存变量信息
-        compiler_public_data compiler_data("__main__", option);
-        grammar_lex grammar_lexer(codes, compiler_data);
-        detail_compiler lex_d(compiler_data, &vm);
-        lex_d.compile_node(grammar_lexer);
-        return nullptr;
-    } else if (return_compiler_ptr) {
-        // 需要返回保存变量信息(tshell和tdb需要使用)
-        auto* compiler_data = new compiler_public_data("__main__", option);
-        grammar_lex grammar_lexer(codes, *compiler_data);
-        auto* lex_d = new detail_compiler(*compiler_data, &vm);
-        lex_d->compile_node(grammar_lexer);
-        return lex_d;
-    } else if (compiler_ptr != nullptr) {
-        // 使用已经保存了的信息类进行编译
-        compiler_ptr->retie(&vm);
-        grammar_lex grammar_lexer(codes, compiler_ptr->compiler_data);
-        compiler_ptr->compile_node(grammar_lexer);
-        return nullptr;
+bool Compiler::factor() {
+    if (value()) {
+        return true;
     }
-    NOREACH("The argvs of compiler are wrong");
+    return match(token_ticks::LEFT_SMALL_BRACE) && expr()
+        && match(token_ticks::RIGHT_SMALL_BRACE);
+}
+
+bool Compiler::term(bool first_call) {
+    if (first_call&&term(false)) {
+        byteCodeNumber bytecode;
+        if (match(token_ticks::MUL)) {
+            bytecode = byteCodeNumber::MUL;
+        } else if (match(token_ticks::DIV)) {
+            bytecode = byteCodeNumber::DIV;
+        } else if (match(token_ticks::POW)) {
+            bytecode = byteCodeNumber::POW;
+        } else if (match(token_ticks::ZDIV)) {
+            bytecode = byteCodeNumber::ZDIV;
+        }
+        if (!factor()) {
+            return false;
+        }
+        add_opcode(bytecode, 0);
+    } else {
+        return factor();
+    }
+}
+
+bool Compiler::expr(bool first_call) {
+    if (first_call&&expr(false)) {
+        byteCodeNumber bytecode;
+        if (match(token_ticks::ADD)) {
+            bytecode = byteCodeNumber::ADD;
+        } else if (match(token_ticks::SUB)) {
+            bytecode = byteCodeNumber::SUB;
+        }
+        if (!term()) {
+            return false;
+        }
+        add_opcode(bytecode, 0);
+    } else {
+        return term();
+    }
+}
+
+bool Compiler::func_call() {
+    if (!id(false)) {
+        return false;
+    }
+    match(token_ticks::LEFT_SMALL_BRACE);
+    argv();
+    match(token_ticks::RIGHT_SMALL_BRACE);
+}
+
+bool Compiler::item(bool error_reoprt) {
+    return expr() || func_call() || value();
+}
+
+bool Compiler::match(token_ticks tick) {
+    token res = token_.get_token();
+    if (res.tick != tick) {
+        token_.unget_token(res);
+        return false;
+    }
+    return true;
+}
+
+token_ticks Compiler::get_next_token_tick() {
+    token next_tmp = token_.get_token();
+    auto nexttick = next_tmp.tick;
+    token_.unget_token(next_tmp);
+    return nexttick;
 }
 }

@@ -1,4 +1,4 @@
-#include <TVM/lib.h>
+#include <TVM/lib.hpp>
 #include <array>
 
 namespace trc::TVM_space::cpp_libs {

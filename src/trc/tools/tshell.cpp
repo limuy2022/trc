@@ -3,13 +3,13 @@
  * repl:read-execute-print-loop
  */
 
-#include <Compiler/Compiler.h>
-#include <TVM/TVM.h>
-#include <base/Error.h>
-#include <base/io.h>
+#include <Compiler/Compiler.hpp>
+#include <TVM/TVM.hpp>
+#include <base/Error.hpp>
+#include <base/io.hpp>
 #include <csetjmp>
 #include <cstdio>
-#include <generated_params.h>
+#include <generated_params.hpp>
 #include <string>
 
 /**
@@ -67,8 +67,8 @@ namespace tools::tools_out {
         // 解析命令行参数
         auto option = generate_compiler_params();
         // 先传入空代码获取对象
-        compiler::detail_compiler* info_saver
-            = compiler::Compiler(vm->static_data, "", option, nullptr, true);
+        compiler::Compiler info_saver(
+            compiler::main_module, option, vm->static_data);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -80,13 +80,12 @@ namespace tools::tools_out {
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
             if (!setjmp(error::error_env::error_back_place)) {
-                compiler::Compiler(
-                    vm->static_data, code_str, {}, info_saver, false);
+                info_saver.compile(code);
                 vm->reload_data();
                 vm->run_all();
             }
             // 重新还原行号
-            info_saver->compiler_data.error.reset_line();
+            info_saver.compiler_data.error.reset_line();
         }
         // 该地不需要释放内存的原因是退出只可能是ctrl+c或者exit函数，而退出后会由操作系统回收内存
     }

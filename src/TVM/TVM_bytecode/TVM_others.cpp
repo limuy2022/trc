@@ -1,17 +1,17 @@
-﻿#include <TVM/TRE.h>
-#include <TVM/TVM.h>
-#include <TVM/lib.h>
-#include <TVM/memory.h>
+﻿#include <TVM/TRE.hpp>
+#include <TVM/TVM.hpp>
+#include <TVM/lib.hpp>
+#include <TVM/memory.hpp>
 #include <array>
-#include <base/Error.h>
+#include <base/Error.hpp>
 #include <filesystem>
-#include <language/error.h>
+#include <language/error.hpp>
 
 namespace fs = std::filesystem;
 
 namespace trc::TVM_space {
 void TVM::LOAD_INT(bytecode_index_t index) {
-    int value = static_data.const_i.array[index];
+    int value = static_data.const_i[index];
     if (INT_CACHE_BEGIN <= value && value <= INT_CACHE_END) {
         // 处在缓存范围中
 
@@ -26,15 +26,15 @@ void TVM::LOAD_MAP(bytecode_index_t argc) {
 }
 
 void TVM::LOAD_FLOAT(bytecode_index_t index) {
-    push(MALLOCFLOAT(static_data.const_f.array[index]));
+    push(MALLOCFLOAT(static_data.const_f[index]));
 }
 
 void TVM::LOAD_STRING(bytecode_index_t index) {
-    push(MALLOCSTRING(static_data.const_s.array[index]));
+    push(MALLOCSTRING(static_data.const_s[index]));
 }
 
 void TVM::LOAD_LONG(bytecode_index_t index) {
-    push(MALLOCLONG(static_data.const_long.array[index]));
+    push(MALLOCLONG(static_data.const_long[index]));
 }
 
 void TVM::LOAD_ARRAY(bytecode_index_t index) {

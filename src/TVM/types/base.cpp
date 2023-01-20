@@ -4,7 +4,7 @@
  * 部分有报出相应错误的功能和职责
  */
 
-#include <TVM/types/base.h>
+#include <TVM/types/base.hpp>
 
 namespace trc::TVM_space::types {
 def::OBJ trcobj::to_int() {

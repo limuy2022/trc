@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['name_5flist_5ft_0',['name_list_t',['../classtrc_1_1compiler_1_1basic__compile__env.html#aa2dbbccd13e18de5948fdeec02b432a4',1,'trc::compiler::basic_compile_env']]]
+  ['line_5ft_0',['line_t',['../namespacetrc.html#a395d0d013caf704cb3dc3c0f6ebe808b',1,'trc']]],
+  ['longobj_1',['LONGOBJ',['../namespacetrc_1_1def.html#ab6f2b9ba7d9a2782d022dd05a33ac6d5',1,'trc::def']]]
 ];

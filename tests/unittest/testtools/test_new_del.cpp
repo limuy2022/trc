@@ -1,4 +1,4 @@
-﻿#include <test_new_del.h>
+﻿#include <test_new_del.hpp>
 
 namespace count_new_del {
 int del_cnt = 0, new_cnt = 0;

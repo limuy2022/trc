@@ -1,4 +1,4 @@
-#include <TVM/TVMdef.h>
+#include <TVM/TVMdef.hpp>
 
 namespace trc::TVM_space {
 symbol_form::~symbol_form() {

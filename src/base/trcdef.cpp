@@ -7,10 +7,10 @@
  *
  */
 
-#include <base/trcdef.h>
+#include <base/trcdef.hpp>
 #include <cstdio>
 #include <cstdlib>
-#include <language/error.h>
+#include <language/error.hpp>
 
 namespace trc {
 void noreach_internal(size_t line, const char* funcname, const char* filename) {

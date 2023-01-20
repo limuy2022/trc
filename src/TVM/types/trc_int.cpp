@@ -1,6 +1,6 @@
-﻿#include <TVM/TRE.h>
-#include <TVM/memory.h>
-#include <TVM/types/trc_int.h>
+﻿#include <TVM/TRE.hpp>
+#include <TVM/memory.hpp>
+#include <TVM/types/trc_int.hpp>
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>

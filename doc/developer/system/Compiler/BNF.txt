@@ -1,0 +1,23 @@
+# 简单的BNF文法表示
+item -> expr | func_call | value
+sentence -> id = item
+sentence -> id := item
+func_call -> id(argv)
+argv -> argv,value | value
+
+expr -> expr + term | expr - term | term
+term -> term * factor | term / factor | term ** factor | term % factor | factor
+factor -> value | (expr)
+
+const_value -> string | int | float
+value -> const_value | id
+
+ifsentence -> if item {
+    sentence
+}
+whilesentence -> while item {
+    sentence
+}
+sentnece -> ifsentence | whilesentence
+sentence -> assert argv
+sentence -> goto int

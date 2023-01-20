@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['red_0',['RED',['../color_8h.html#a8d23feea868a983c8c2b661e1e16972f',1,'color.h']]]
+  ['white_0',['WHITE',['../color_8hpp.html#a87b537f5fa5c109d3c05c13d6b18f382',1,'color.hpp']]]
 ];

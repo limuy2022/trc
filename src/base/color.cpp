@@ -1,5 +1,5 @@
-﻿#include <base/color.h>
-#include <platform.h>
+﻿#include <base/color.hpp>
+#include <platform.hpp>
 #ifdef WINDOWS_PLAT
 #include <windows.h>
 #endif

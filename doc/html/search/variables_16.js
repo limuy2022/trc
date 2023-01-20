@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zerodiverror_0',['zerodiverror',['../namespacelanguage_1_1error.html#a369cf6ff7ff577b064991bbfbc393348',1,'language::error']]]
+  ['yellow_0',['yellow',['../namespacetrc_1_1color.html#a0abda2ad2c9818ef16cb73a9b7e2f272',1,'trc::color']]]
 ];

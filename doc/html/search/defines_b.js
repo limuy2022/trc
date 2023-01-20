@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['trc_5flanguage_5fc_5fapi_0',['TRC_language_c_api',['../library_8h.html#a7c680b5e31e3ec5d3f3fe97c78137613',1,'library.h']]]
+  ['yellow_0',['YELLOW',['../color_8hpp.html#abf681265909adf3d3e8116c93c0ba179',1,'color.hpp']]]
 ];

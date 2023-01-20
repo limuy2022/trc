@@ -1,12 +1,4 @@
 var searchData=
 [
-  ['next_5forder_5fmap_0',['next_order_map',['../classtrc_1_1compiler_1_1next__order__map.html',1,'trc::compiler']]],
-  ['node_5fbase_5fdata_1',['node_base_data',['../classtrc_1_1compiler_1_1node__base__data.html',1,'trc::compiler']]],
-  ['node_5fbase_5ffloat_5fwithout_5fsons_2',['node_base_float_without_sons',['../classtrc_1_1compiler_1_1node__base__float__without__sons.html',1,'trc::compiler']]],
-  ['node_5fbase_5fint_3',['node_base_int',['../classtrc_1_1compiler_1_1node__base__int.html',1,'trc::compiler']]],
-  ['node_5fbase_5fint_5fwithout_5fsons_4',['node_base_int_without_sons',['../classtrc_1_1compiler_1_1node__base__int__without__sons.html',1,'trc::compiler']]],
-  ['node_5fbase_5fstring_5fwithout_5fsons_5',['node_base_string_without_sons',['../classtrc_1_1compiler_1_1node__base__string__without__sons.html',1,'trc::compiler']]],
-  ['node_5fbase_5ftick_6',['node_base_tick',['../classtrc_1_1compiler_1_1node__base__tick.html',1,'trc::compiler']]],
-  ['node_5fbase_5ftick_5fwithout_5fsons_7',['node_base_tick_without_sons',['../classtrc_1_1compiler_1_1node__base__tick__without__sons.html',1,'trc::compiler']]],
-  ['number_5fnode_8',['number_node',['../classtrc_1_1compiler_1_1number__node.html',1,'trc::compiler']]]
+  ['symbol_5fform_0',['symbol_form',['../classtrc_1_1_t_v_m__space_1_1symbol__form.html',1,'trc::TVM_space']]]
 ];

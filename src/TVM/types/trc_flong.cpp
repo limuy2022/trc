@@ -2,7 +2,7 @@
  * 高精度浮点数运算
  */
 
-#include <TVM/types/trc_flong.h>
+#include <TVM/types/trc_flong.hpp>
 #include <string>
 
 namespace trc::TVM_space::types {

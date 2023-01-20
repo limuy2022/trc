@@ -7,8 +7,8 @@
  *
  */
 
-#include <base/utils/filesys.h>
-#include <filesys_tools.h>
+#include <base/utils/filesys.hpp>
+#include <filesys_tools.hpp>
 #include <gtest/gtest.h>
 #include <list>
 #include <string>

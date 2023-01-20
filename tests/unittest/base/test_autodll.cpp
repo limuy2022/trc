@@ -1,6 +1,6 @@
 ﻿#include "../testdata/autodll/create_dll.h"
-#include <base/autodll.h>
-#include <filesys_tools.h>
+#include <base/autodll.hpp>
+#include <filesys_tools.hpp>
 #include <gtest/gtest.h>
 
 using namespace trc;

@@ -4,14 +4,14 @@
  * Author  :   李沐阳
  */
 
-#include <TVM/memory.h>
-#include <base/color.h>
-#include <base/memory/memory.h>
+#include <TVM/memory.hpp>
+#include <base/color.hpp>
+#include <base/memory/memory.hpp>
 #include <cstring>
 #include <gflags/gflags.h>
-#include <language/language.h>
-#include <platform.h>
-#include <tools.h>
+#include <language/language.hpp>
+#include <platform.hpp>
+#include <tools.hpp>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
@@ -40,9 +40,8 @@ struct {
 } cmd_tool[] = { { "tdb", tools::tools_out::tdb },
     { "help", tools::tools_out::help }, { "version", showversion },
     { "run", tools::tools_out::run }, { "token", tools::tools_out::out_token },
-    { "dis", tools::tools_out::dis },
-    { "grammar", tools::tools_out::out_grammar },
-    { "brun", tools::tools_out::brun }, { "build", tools::tools_out::build },
+    { "dis", tools::tools_out::dis }, { "brun", tools::tools_out::brun },
+    { "build", tools::tools_out::build },
     { "style", tools::tools_out::style } };
 
 /**

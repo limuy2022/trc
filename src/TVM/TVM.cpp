@@ -1,9 +1,7 @@
-﻿#include <TVM/TVM.h>
-#include <TVM/func.h>
-#include <TVM/memory.h>
-#include <base/Error.h>
-#include <base/trcdef.h>
-#include <cstdarg>
+﻿#include <TVM/TVM.hpp>
+#include <TVM/func.hpp>
+#include <TVM/memory.hpp>
+#include <base/trcdef.hpp>
 #include <utility>
 
 namespace trc::TVM_space {
@@ -20,149 +18,152 @@ void TVM::reload_data() {
 
 void TVM::run_bycode(const TVM_bytecode* bycode) {
     switch (bycode->bycode) {
-    case 0: {
+    case byteCodeNumber::LOAD_INT: {
         LOAD_INT(bycode->index);
         break;
     }
-    case 1: {
+    case byteCodeNumber::ADD: {
         ADD();
         break;
     }
-    case 2: {
+    case byteCodeNumber::SUB: {
         SUB();
         break;
     }
-    case 3: {
+    case byteCodeNumber::MUL: {
         MUL();
         break;
     }
-    case 4: {
+    case byteCodeNumber::DIV: {
         DIV();
         break;
     }
-    case 5: {
+    case byteCodeNumber::GOTO: {
         GOTO(bycode->index);
         break;
     }
-    case 6: {
+    case byteCodeNumber::STORE_NAME: {
         STORE_NAME(bycode->index);
         break;
     }
-    case 7: {
+    case byteCodeNumber::LOAD_NAME: {
         LOAD_NAME(bycode->index);
         break;
     }
-    case 8: {
+    case byteCodeNumber::LOAD_FLOAT: {
         LOAD_FLOAT(bycode->index);
         break;
     }
-    case 9: {
+    case byteCodeNumber::LOAD_STRING: {
         LOAD_STRING(bycode->index);
         break;
     }
-    case 10: {
+    case byteCodeNumber::CALL_BUILTIN: {
         CALL_BUILTIN(bycode->index);
         break;
     }
-    case 11: {
+    case byteCodeNumber::IMPORT: {
         IMPORT();
         break;
     }
-    case 12: {
+    case byteCodeNumber::POW: {
         POW();
         break;
     }
-    case 13: {
+    case byteCodeNumber::ZDIV: {
         ZDIV();
         break;
     }
-    case 14: {
+    case byteCodeNumber::MOD: {
         MOD();
         break;
     }
-    case 15: {
+    case byteCodeNumber::IF_FALSE_GOTO: {
         IF_FALSE_GOTO(bycode->index);
         break;
     }
-    case 16: {
+    case byteCodeNumber::CHANGE_VALUE: {
         CHANGE_VALUE(bycode->index);
         break;
     }
-    case 17: {
+    case byteCodeNumber::EQUAL: {
         EQUAL();
         break;
     }
-    case 18: {
+    case byteCodeNumber::UNEQUAL: {
         UNEQUAL();
         break;
     }
-    case 19: {
+    case byteCodeNumber::GREATER_EQUAL: {
         GREATER_EQUAL();
         break;
     }
-    case 20: {
+    case byteCodeNumber::LESS_EQUAL: {
         LESS_EQUAL();
         break;
     }
-    case 21: {
+    case byteCodeNumber::LESS: {
         LESS();
         break;
     }
-    case 22: {
+    case byteCodeNumber::GREATER: {
         GREATER();
         break;
     }
-    case 23: {
+    case byteCodeNumber::ASSERT: {
         ASSERT();
         break;
     }
-    case 24: {
+    case byteCodeNumber::NOT: {
         NOT();
         break;
     }
-    case 25: {
+    case byteCodeNumber::AND: {
         AND();
         break;
     }
-    case 26: {
+    case byteCodeNumber::OR: {
         OR();
         break;
     }
-    case 27: {
+    case byteCodeNumber::STORE_LOCAL: {
         STORE_LOCAL(bycode->index);
         break;
     }
-    case 28: {
+    case byteCodeNumber::LOAD_LOCAL: {
         LOAD_LOCAL(bycode->index);
         break;
     }
-    case 29: {
+    case byteCodeNumber::CALL_FUNCTION: {
         CALL_FUNCTION(bycode->index);
         break;
     }
-    case 30: {
+    case byteCodeNumber::FREE_FUNCTION: {
         FREE_FUNCTION();
         break;
     }
-    case 31: {
+    case byteCodeNumber::CHANGE_LOCAL: {
         CHANGE_LOCAL(bycode->index);
         break;
     }
-    case 32: {
+    case byteCodeNumber::LOAD_LONG: {
         LOAD_LONG(bycode->index);
         break;
     }
-    case 33: {
+    case byteCodeNumber::LOAD_ARRAY: {
         LOAD_ARRAY(bycode->index);
         break;
     }
-    case 34: {
+    case byteCodeNumber::CALL_METHOD: {
         CALL_METHOD(bycode->index);
         break;
     }
-    case 35: {
+    case byteCodeNumber::LOAD_MAP: {
         LOAD_MAP(bycode->index);
         break;
+    }
+    default: {
+        NOREACH("Unsupport bytecode!%d", int(bycode->bycode));
     }
     }
 }
@@ -199,14 +200,6 @@ void TVM::run_func(const trc::TVM_space::func_& function) {
         run_bycode(&function.bytecodes[run_index]);
     }
     run_index = save_now;
-}
-
-void TVM::error_report(int error, ...) {
-    va_list ap;
-    va_start(ap, error);
-    error::send_error_module_aplist(
-        error, name, static_data.line_number_table[run_index] + 1, ap);
-    va_end(ap);
 }
 
 void TVM::run_line_bycode() {

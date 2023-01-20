@@ -3,14 +3,14 @@
  * 采用哈希表加红黑树实现
  */
 
-#include <TVM/TVMdef.h>
-#include <TVM/types/trc_float.h>
-#include <TVM/types/trc_int.h>
-#include <TVM/types/trc_map.h>
-#include <TVM/types/trc_string.h>
-#include <base/Error.h>
+#include <TVM/TVMdef.hpp>
+#include <TVM/types/trc_float.hpp>
+#include <TVM/types/trc_int.hpp>
+#include <TVM/types/trc_map.hpp>
+#include <TVM/types/trc_string.hpp>
+#include <base/Error.hpp>
 #include <cstdlib>
-#include <language/error.h>
+#include <language/error.hpp>
 
 namespace trc::TVM_space::types {
 namespace map_space {

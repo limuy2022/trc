@@ -4,15 +4,15 @@
  * 注:大端小端将被统一为大端,因此具备跨平台能力
  */
 
-#include <TVM/TVM.h>
-#include <TVM/func.h>
-#include <base/Error.h>
-#include <base/ctree_loader.h>
-#include <base/utils/bytes.h>
+#include <TVM/TVM.hpp>
+#include <TVM/func.hpp>
+#include <base/Error.hpp>
+#include <base/ctree_loader.hpp>
+#include <base/utils/bytes.hpp>
 #include <bit>
 #include <cstdio>
 #include <cstring>
-#include <language/error.h>
+#include <language/error.hpp>
 #include <string>
 #include <vector>
 
@@ -88,11 +88,11 @@ static char* load_string_one(FILE* file) {
 /**
  * @brief 写入单个字符串
  */
-static void write_string_one(FILE* file, const char* data) {
-    auto n = static_cast<uint32_t>(strlen(data));
+static void write_string_one(FILE* file, const std::string& data) {
+    auto n = static_cast<uint32_t>(data.length());
     // 写入数据长度
     fwrite_cross_plat(&n, sizeof(n), 1, file);
-    fwrite(data, n, sizeof(char), file);
+    fwrite(data.c_str(), n, sizeof(char), file);
 }
 
 /**
@@ -103,11 +103,11 @@ static void write_string_one(FILE* file, const char* data) {
  * @param const_pool 常量池
  */
 template <typename T>
-static void write_pool(FILE* file, utils::dyna_array<T>& const_pool) {
-    uint32_t size = const_pool.size;
+static void write_pool(FILE* file, std::vector<T>& const_pool) {
+    uint32_t size = const_pool.size();
     fwrite_cross_plat(&size, sizeof(size), 1, file);
-    for (size_t i = 0; i < const_pool.size; ++i) {
-        fwrite_cross_plat(&const_pool.array[i], sizeof(T), 1, file);
+    for (size_t i = 0; i < const_pool.size(); ++i) {
+        fwrite_cross_plat(&const_pool[i], sizeof(T), 1, file);
     }
 }
 
@@ -118,13 +118,12 @@ static void write_pool(FILE* file, utils::dyna_array<T>& const_pool) {
  * @param const_pool 常量池
  */
 template <typename T>
-static void load_pool(FILE* file, utils::dyna_array<T>& const_pool) {
+static void load_pool(FILE* file, std::vector<T>& const_pool) {
     uint32_t size;
     fread_cross_plat(&size, sizeof(size), 1, file);
-    const_pool.array = (T*)malloc(size * sizeof(T));
-    const_pool.size = size;
+    const_pool.resize(size);
     for (uint32_t i = 0; i < size; --i) {
-        fread_cross_plat(const_pool.array + i, sizeof(T), 1, file);
+        fread_cross_plat(&const_pool[i], sizeof(T), 1, file);
     }
 }
 
@@ -136,12 +135,12 @@ static void load_pool(FILE* file, utils::dyna_array<T>& const_pool) {
  * @param const_pool 字符串型常量池
  */
 static void write_string_pool(
-    FILE* file, utils::dyna_array<char*>& const_pool) {
+    FILE* file, std::vector<std::string>& const_pool) {
     // 数据长度
-    auto size = static_cast<uint32_t>(const_pool.size);
+    auto size = static_cast<uint32_t>(const_pool.size());
     fwrite_cross_plat(&size, sizeof(size), 1, file);
-    for (size_t i = 0; i < const_pool.size; ++i) {
-        write_string_one(file, const_pool.array[i]);
+    for (const auto& i : const_pool) {
+        write_string_one(file, i);
     }
 }
 
@@ -153,14 +152,13 @@ static void write_string_pool(
  * @param file 文件
  * @param const_pool 字符串型常量池
  */
-static void load_string_pool(FILE* file, utils::dyna_array<char*>& const_pool) {
+static void load_string_pool(FILE* file, std::vector<std::string>& const_pool) {
     uint32_t size;
     // 数据长度
     fread_cross_plat(&size, sizeof(size), 1, file);
-    const_pool.array = (char**)malloc(size * sizeof(char*));
-    const_pool.size = size;
+    const_pool.resize(size);
     for (size_t i = 0; i < size; ++i) {
-        const_pool.array[i] = load_string_one(file);
+        const_pool[i] = load_string_one(file);
     }
 }
 
@@ -188,7 +186,7 @@ static void load_bytecodes(FILE* file, TVM_space::struct_codes& bycodes) {
     uint32_t size;
     fread_cross_plat(&size, sizeof(size), 1, file);
     // 读取具体字节码
-    TVM_space::bytecode_t name;
+    TVM_space::byteCodeNumber name;
     TVM_space::bytecode_index_t argv;
     bycodes.reserve(size);
     for (uint32_t i = 0; i < size; ++i) {
@@ -263,15 +261,13 @@ static void load_global_bytecode(
  * @param file 文件
  */
 static void load_functions(
-    FILE* file, utils::dyna_array<trc::TVM_space::func_>& const_funcl) {
+    FILE* file, std::vector<trc::TVM_space::func_>& const_funcl) {
     uint32_t len;
     fread(&len, sizeof(len), 1, file);
-    const_funcl.array
-        = (TVM_space::func_*)malloc(len * sizeof(TVM_space::func_));
-    const_funcl.size = len;
+    const_funcl.resize(len);
     for (uint32_t i = 0; i < len; ++i) {
-        const_funcl.array[i].name = load_string_one(file);
-        load_bytecodes(file, const_funcl.array[i].bytecodes);
+        const_funcl[i].name = load_string_one(file);
+        load_bytecodes(file, const_funcl[i].bytecodes);
     }
 }
 
@@ -280,10 +276,10 @@ static void load_functions(
  * @param file 文件
  */
 static void write_functions(
-    FILE* file, const utils::dyna_array<TVM_space::func_>& const_funcl) {
-    for (size_t i = 0; i < const_funcl.size; ++i) {
-        write_string_one(file, const_funcl.array[i].name);
-        write_bytecodes(file, const_funcl.array[i].bytecodes);
+    FILE* file, const std::vector<TVM_space::func_>& const_funcl) {
+    for (const auto& i : const_funcl) {
+        write_string_one(file, i.name);
+        write_bytecodes(file, i.bytecodes);
     }
 }
 

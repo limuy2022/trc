@@ -1,5 +1,5 @@
-﻿#include <TVM/TRE.h>
-#include <TVM/TVM.h>
+﻿#include <TVM/TRE.hpp>
+#include <TVM/TVM.hpp>
 
 namespace trc::TVM_space {
 void TVM::ADD() {

@@ -1,6 +1,6 @@
-﻿#include <TVM/TRE.h>
-#include <TVM/TVM.h>
-#include <TVM/memory.h>
+﻿#include <TVM/TRE.hpp>
+#include <TVM/TVM.hpp>
+#include <TVM/memory.hpp>
 #include <map>
 
 namespace trc::TVM_space {
@@ -9,7 +9,6 @@ void free_TVM(TVM* vm) {
     vm->static_data.const_i.clear();
     vm->static_data.const_f.clear();
 
-    vm->static_data.ReleaseStringData();
     while (vm->dyna_data.frames_top_str != vm->dyna_data.frames - 1) {
         vm->dyna_data.frames_top_str->free_func();
         vm->dyna_data.frames_top_str--;

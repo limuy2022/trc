@@ -4,8 +4,8 @@
 
 #include <clocale>
 #include <cstdio>
-#include <language/error.h>
-#include <language/language.h>
+#include <language/error.hpp>
+#include <language/language.hpp>
 
 namespace language {
 namespace error {

@@ -6,11 +6,11 @@
  * @copyright Copyright (c) 2022
  */
 
-#include <base/Error.h>
-#include <base/autodll.h>
+#include <base/Error.hpp>
+#include <base/autodll.hpp>
 #include <cstring>
-#include <language/error.h>
-#include <platform.h>
+#include <language/error.hpp>
+#include <platform.hpp>
 #include <string>
 #ifdef LINUX_PLAT
 #include <filesystem>

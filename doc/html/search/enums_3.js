@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['run_5ftype_5ftick_0',['RUN_TYPE_TICK',['../namespacetrc_1_1_t_v_m__space.html#aac100ee4aa450fb829dede002c97774e',1,'trc::TVM_space']]]
+  ['token_5fticks_0',['token_ticks',['../namespacetrc_1_1compiler.html#a312c3efcbe5384ad4d23514e0386b92a',1,'trc::compiler']]]
 ];

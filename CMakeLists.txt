@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_UNITY_BUILD ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	# release模式下开启LTO的支持

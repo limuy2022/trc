@@ -1,4 +1,4 @@
-﻿#include <TVM/TVM_data.h>
+﻿#include <TVM/TVM_data.hpp>
 #include <cstdlib>
 
 namespace trc::TVM_space {
@@ -11,25 +11,11 @@ TVM_dyna_data::TVM_dyna_data()
     , frames_top_str(frames - 1) {
 }
 
-void TVM_static_data::ReleaseStringData() {
-    for (size_t i = 0; i < const_s.size; ++i) {
-        free(const_s.array[i]);
-    }
-    const_s.clear();
-    for (size_t i = 0; i < const_long.size; ++i) {
-        free(const_long.array[i]);
-    }
-    const_long.clear();
-}
-
-TVM_static_data::~TVM_static_data() {
-    ReleaseStringData();
-}
-
 void TVM_static_data::compress_memory() {
-    const_i.compress_memory();
-    const_s.compress_memory();
-    const_long.compress_memory();
-    const_f.compress_memory();
+    const_i.shrink_to_fit();
+    const_s.shrink_to_fit();
+    const_long.shrink_to_fit();
+    const_f.shrink_to_fit();
+    funcs.shrink_to_fit();
 }
 }

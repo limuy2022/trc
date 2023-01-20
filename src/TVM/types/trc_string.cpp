@@ -8,13 +8,13 @@
  * 另外，trc_string类并不提供对char和char*进行操作的函数，基本仅支持trc_string本身
  */
 
-#include <TVM/TRE.h>
-#include <TVM/TVMdef.h>
-#include <TVM/memory.h>
-#include <TVM/types/trc_flong.h>
-#include <TVM/types/trc_string.h>
-#include <base/io.h>
-#include <base/trcdef.h>
+#include <TVM/TRE.hpp>
+#include <TVM/TVMdef.hpp>
+#include <TVM/memory.hpp>
+#include <TVM/types/trc_flong.hpp>
+#include <TVM/types/trc_string.hpp>
+#include <base/io.hpp>
+#include <base/trcdef.hpp>
 #include <cstdio>
 #include <cstring>
 

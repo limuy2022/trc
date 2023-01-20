@@ -2,12 +2,12 @@
  * 执行编译好的ctree文件
  */
 
-#include <Compiler/Compiler.h>
-#include <TVM/TVM.h>
-#include <base/ctree_loader.h>
-#include <base/utils/filesys.h>
-#include <generated_params.h>
-#include <tools.h>
+#include <Compiler/Compiler.hpp>
+#include <TVM/TVM.hpp>
+#include <base/ctree_loader.hpp>
+#include <base/utils/filesys.hpp>
+#include <generated_params.hpp>
+#include <tools.hpp>
 
 namespace trc::tools {
 namespace tools_in {
@@ -20,7 +20,8 @@ namespace tools_in {
             std::string scodes;
             utils::readcode(scodes, path);
             auto option = generate_compiler_params();
-            compiler::Compiler(vm->static_data, scodes, option);
+            compiler::Compiler(compiler::main_module, option, vm->static_data)
+                .compile(scodes);
         }
         vm->reload_data();
         vm->run_all();

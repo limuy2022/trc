@@ -1,4 +1,4 @@
-#include <Compiler/compiler_def.h>
+#include <Compiler/compiler_def.hpp>
 
 namespace trc::compiler {
 compiler_option optimize_option { true, true, true };

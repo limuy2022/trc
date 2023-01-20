@@ -2,13 +2,13 @@
  * 虚拟机内置函数定义处
  */
 
-#include <TVM/TRE.h>
-#include <TVM/TVM.h>
-#include <TVM/memory.h>
-#include <base/Error.h>
+#include <TVM/TRE.hpp>
+#include <TVM/TVM.hpp>
+#include <TVM/memory.hpp>
+#include <base/Error.hpp>
 #include <base/memory/objs_pool.hpp>
 #include <cstdio>
-#include <language/error.h>
+#include <language/error.hpp>
 
 namespace trc::TVM_space::builtin {
 void LENGTH(int argc, TVM* vm) {

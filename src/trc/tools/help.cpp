@@ -1,7 +1,7 @@
-﻿#include <base/color.h>
-#include <base/trcdef.h>
+﻿#include <base/color.hpp>
+#include <base/trcdef.hpp>
 #include <cstdio>
-#include <language/language.h>
+#include <language/language.hpp>
 
 namespace trc::tools::tools_out {
 void help() {

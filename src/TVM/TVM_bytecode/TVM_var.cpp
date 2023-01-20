@@ -1,5 +1,5 @@
-﻿#include <TVM/TVM.h>
-#include <TVM/types/trc_string.h>
+﻿#include <TVM/TVM.hpp>
+#include <TVM/types/trc_string.hpp>
 
 namespace trc::TVM_space {
 void TVM::CHANGE_VALUE(bytecode_index_t index) {

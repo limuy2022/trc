@@ -2,14 +2,14 @@
  * 构建ctree文件（编译）
  */
 
-#include <Compiler/Compiler.h>
-#include <TVM/TVM.h>
-#include <base/ctree_loader.h>
-#include <base/utils/filesys.h>
+#include <Compiler/Compiler.hpp>
+#include <TVM/TVM.hpp>
+#include <base/ctree_loader.hpp>
+#include <base/utils/filesys.hpp>
 #include <filesystem>
-#include <generated_params.h>
+#include <generated_params.hpp>
 #include <string>
-#include <tools.h>
+#include <tools.hpp>
 
 namespace trc::tools {
 namespace tools_in {
@@ -17,7 +17,8 @@ namespace tools_in {
         auto option = generate_compiler_params();
         std::string scode;
         utils::readcode(scode, path);
-        compiler::Compiler(vm->static_data, scode, option);
+        compiler::Compiler(compiler::main_module, option, vm->static_data)
+            .compile(scode);
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());
     }

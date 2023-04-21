@@ -1,11 +1,16 @@
-﻿#include <TVM/TRE.hpp>
-#include <TVM/TVM.hpp>
-#include <TVM/lib.hpp>
-#include <TVM/memory.hpp>
+﻿module;
 #include <array>
-#include <base/Error.hpp>
 #include <filesystem>
 #include <language/error.hpp>
+#include <obj_malloc.hpp>
+#include <algorithm>
+module TVM;
+import TRE;
+import lib;
+import TVM.memory;
+import Error;
+import TVMdef;
+import lib;
 
 namespace fs = std::filesystem;
 

@@ -1,22 +1,14 @@
-﻿/**
- * TVM中的字符串类型
- * 注：自己实现的原因：
- * 1.本次实现的string不需要有太多的功能，而标准库中string内容太多，功能太繁杂
- * 2.作为一个类型，需要被gc统一管理，所以自己实现
- *
- * 本次实现的string用法和标准库的差别很大，本次string只为TVM实现
- * 另外，trc_string类并不提供对char和char*进行操作的函数，基本仅支持trc_string本身
- */
-
-#include <TVM/TRE.hpp>
-#include <TVM/TVMdef.hpp>
-#include <TVM/memory.hpp>
-#include <TVM/types/trc_flong.hpp>
-#include <TVM/types/trc_string.hpp>
-#include <base/io.hpp>
-#include <base/trcdef.hpp>
-#include <cstdio>
+module;
+#include <cstdlib>
 #include <cstring>
+#include <string>
+#include <obj_malloc.hpp>
+module trc_string;
+import TVMdef;
+import TRE;
+import io;
+import TVM.memory;
+import trcdef;
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;

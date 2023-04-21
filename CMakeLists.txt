@@ -48,7 +48,6 @@ if("${TRC_BUILD_TYPE}" STREQUAL "Test")
 	endif()
 endif()
 # 分自己编写的代码和第三方库两部分构建，避免编译参数互相干扰
-add_subdirectory(third_party)
 add_subdirectory(src)
 add_subdirectory(language)
 

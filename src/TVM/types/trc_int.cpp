@@ -1,9 +1,15 @@
-﻿#include <TVM/TRE.hpp>
-#include <TVM/memory.hpp>
-#include <TVM/types/trc_int.hpp>
-#include <cinttypes>
-#include <cmath>
+module;
 #include <cstdio>
+#include <cstdint>
+#include <obj_malloc.hpp>
+#include <cmath>
+#include <string>
+#include <cinttypes>
+module trc_int;
+import TVM.memory;
+import TVMdef;
+import TRE;
+import trcdef;
 
 namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;

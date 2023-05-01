@@ -1,7 +1,10 @@
-﻿#include <TVM/TVM.hpp>
-#include <TVM/built_in_func.hpp>
-#include <TVM/func.hpp>
-#include <base/trcdef.hpp>
+﻿module;
+#include <unreach.hpp>
+module TVM;
+import built_in_func;
+import func;
+import trcdef;
+import TVMdef;
 
 namespace trc::TVM_space {
 void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
@@ -52,7 +55,7 @@ void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
         break;
     }
     default: {
-        NOREACH(
+        UNREACH(
             "there is not a builin function %hu to call", builtin_func_name);
     }
     }

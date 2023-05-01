@@ -4,17 +4,28 @@
  * Author  :   李沐阳
  */
 
-#include <TVM/memory.hpp>
-#include <base/color.hpp>
-#include <base/memory/memory.hpp>
+#include <cmdparser.hpp>
 #include <cstring>
-#include <gflags/gflags.h>
 #include <language/language.hpp>
 #include <platform.hpp>
-#include <tools.hpp>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
+import TVM.memory;
+import color;
+import memory;
+import generated_params;
+import trcdef;
+import brun;
+import build;
+import dis;
+import generated_params;
+import help;
+import run;
+import style;
+import tdb;
+import tools.token;
+import tshell;
 
 namespace trc {
 /**
@@ -79,10 +90,11 @@ int main(int argc, char* argv[]) {
     /* 内存初始化*/
     trc::memory::init_mem();
     /* 初始化命令行解析器*/
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
-    /* 设置命令行参数*/
-    trc::tools::argv = argv;
     trc::tools::argc = argc;
+    trc::tools::argv = argv;
+    cli::Parser parser(argc, argv);
+    trc::tools::parser = &parser;
+    trc::tools::init_parser();
     if (argc == 1) {
         // 不指定模式，没有参数，默认为交互模式
         trc::tools::tools_out::tshell();

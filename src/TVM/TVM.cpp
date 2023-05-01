@@ -1,11 +1,14 @@
-﻿#include <TVM/TVM.hpp>
-#include <TVM/func.hpp>
-#include <TVM/memory.hpp>
-#include <base/trcdef.hpp>
+module;
+#include <stack>
+#include <string>
 #include <utility>
+#include <unreach.hpp>
+module TVM;
+import TVM.memory;
+import func;
+import TVMdef;
 
 namespace trc::TVM_space {
-
 TVM::TVM(std::string name)
     : name(std::move(name)) {
     // 初始化TVM
@@ -163,7 +166,7 @@ void TVM::run_bycode(const TVM_bytecode* bycode) {
         break;
     }
     default: {
-        NOREACH("Unsupport bytecode!%d", int(bycode->bycode));
+        UNREACH("Unsupport bytecode!%d", int(bycode->bycode));
     }
     }
 }

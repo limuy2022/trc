@@ -1,8 +1,11 @@
-﻿#include <TVM/TVM.hpp>
-#include <TVM/types/trc_string.hpp>
-#include <base/Error.hpp>
-#include <base/trcdef.hpp>
+﻿module;
 #include <language/error.hpp>
+module TVM;
+import trc_string;
+import Error;
+import trcdef;
+import TRE;
+import TVMdef;
 
 namespace trc::TVM_space {
 void TVM::EQUAL() {
@@ -10,8 +13,8 @@ void TVM::EQUAL() {
     auto tmp = top()->operator==(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror,
-            "==", type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            "==", TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -21,8 +24,8 @@ void TVM::UNEQUAL() {
     auto tmp = top()->operator!=(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror,
-            "!=", type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            "!=", TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -32,8 +35,8 @@ void TVM::GREATER_EQUAL() {
     auto tmp = top()->operator>=(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror,
-            ">=", type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            ">=", TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -43,8 +46,8 @@ void TVM::LESS_EQUAL() {
     auto tmp = top()->operator<=(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror,
-            "<=", type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            "<=", TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -54,8 +57,8 @@ void TVM::LESS() {
     auto tmp = top()->operator<(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "<",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -65,8 +68,8 @@ void TVM::GREATER() {
     auto tmp = top()->operator>(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, ">",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }

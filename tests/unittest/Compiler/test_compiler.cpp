@@ -37,12 +37,12 @@ void compiler_env_set::SetUp() {
  */
 static void bytecode_check(
     const TVM_space::struct_codes& expect, TVM_space::TVM* vm) {
-    for(auto i:expect) {
-        std::cerr << (int)i.bycode<<' '<<i.index<<std::endl;
+    for (auto i : expect) {
+        std::cerr << (int)i.bycode << ' ' << i.index << std::endl;
     }
-    std::cerr <<"\n\n";
-    for(auto i:vm->static_data.byte_codes) {
-        std::cerr << (int)i.bycode<<' '<<i.index<<std::endl;
+    std::cerr << "\n\n";
+    for (auto i : vm->static_data.byte_codes) {
+        std::cerr << (int)i.bycode << ' ' << i.index << std::endl;
     }
     for (size_t i = 0, n = expect.size(); i < n; ++i) {
         EXPECT_EQ(expect[i].bycode, vm->static_data.byte_codes[i].bycode)

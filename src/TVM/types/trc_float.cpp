@@ -1,8 +1,15 @@
-#include <TVM/TRE.hpp>
-#include <TVM/memory.hpp>
-#include <TVM/types/trc_float.hpp>
-#include <TVM/types/trc_int.hpp>
+module;
+#include <cstdio>
+#include <obj_malloc.hpp>
 #include <cmath>
+#include <string>
+module trc_float;
+import TVMdef;
+import trcdef;
+import TRE;
+import TVM.memory;
+import trc_int;
+import trc_string;
 
 namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_float::type = RUN_TYPE_TICK::float_T;

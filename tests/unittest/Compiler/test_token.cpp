@@ -30,7 +30,8 @@ protected:
             actual_data = lexer->get_token();
             ASSERT_NE(actual_data.tick, token_ticks::END_OF_TOKENS);
             EXPECT_EQ(expect.tick, actual_data.tick)
-                << "expect:"<<(int)expect.tick << " actual:" << (int)actual_data.tick;
+                << "expect:" << (int)expect.tick
+                << " actual:" << (int)actual_data.tick;
             EXPECT_EQ(expect.data, actual_data.data);
         }
         actual_data = lexer->get_token();

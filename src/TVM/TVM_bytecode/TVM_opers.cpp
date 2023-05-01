@@ -1,5 +1,9 @@
-﻿#include <TVM/TRE.hpp>
-#include <TVM/TVM.hpp>
+﻿module;
+#include <language/error.hpp>
+module TVM;
+import TRE;
+import trcdef;
+import Error;
 
 namespace trc::TVM_space {
 void TVM::ADD() {
@@ -7,8 +11,8 @@ void TVM::ADD() {
     auto tmp = top()->operator+(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "+",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -18,8 +22,8 @@ void TVM::SUB() {
     auto tmp = top()->operator-(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "-",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -29,8 +33,8 @@ void TVM::MUL() {
     auto tmp = top()->operator*(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "*",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -40,8 +44,8 @@ void TVM::DIV() {
     auto tmp = top()->operator/(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "/",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -51,8 +55,8 @@ void TVM::ZDIV() {
     auto tmp = top()->zdiv(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "//",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -62,8 +66,8 @@ void TVM::POW() {
     auto tmp = top()->pow_(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "**",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }
@@ -73,8 +77,8 @@ void TVM::MOD() {
     auto tmp = top()->operator%(secondv);
     if (tmp == nullptr) {
         error_report(error::OperatorError, language::error::operatorerror, "%",
-            type_int::int_name[int(top()->gettype())],
-            type_int::int_name[int(secondv->gettype())]);
+            TVM_share::int_name[int(top()->gettype())],
+            TVM_share::int_name[int(secondv->gettype())]);
     }
     top() = tmp;
 }

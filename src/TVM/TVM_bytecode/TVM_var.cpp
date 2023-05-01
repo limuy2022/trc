@@ -1,5 +1,10 @@
-﻿#include <TVM/TVM.hpp>
-#include <TVM/types/trc_string.hpp>
+﻿/**
+ * @brief 变量相关的指令
+ */
+
+module TVM;
+import trc_string;
+import TVMdef;
 
 namespace trc::TVM_space {
 void TVM::CHANGE_VALUE(bytecode_index_t index) {

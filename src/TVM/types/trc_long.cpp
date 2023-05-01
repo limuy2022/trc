@@ -1,19 +1,17 @@
-﻿/**
- * 大整数运算
- * 在此详细描述一下使用的技术，在高精度的基础上使用了位压的技术，
- * 将多位存在一个数位里，可以简单理解为1000进制，10000进制等
- * 这样可以减少非常多的运算
- */
-
-#include <TVM/TRE.hpp>
-#include <TVM/memory.hpp>
-#include <TVM/types/trc_long.hpp>
-#include <base/utils/data.hpp>
-#include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
+module;
 #include <string>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+#include <unreach.hpp>
+#include <obj_malloc.hpp>
+module trc_long;
+import TVM.memory;
+import TRE;
+import data;
+import TVMdef;
+import trcdef;
+import TVM.memory;
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
@@ -78,7 +76,7 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    NOREACH("big num can't cal the used size.used:%zu\nsize:%zu", used, size);
+    UNREACH("big num can't cal the used size.used:%zu\nsize:%zu", used, size);
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {

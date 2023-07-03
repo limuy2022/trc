@@ -1,6 +1,4 @@
-﻿#include <platform.hpp>
-
-#ifdef WINDOWS_PLAT
+﻿#ifdef _WIN32
 #define EXPORT __declspec(dllexport)
 #else
 #define EXPORT

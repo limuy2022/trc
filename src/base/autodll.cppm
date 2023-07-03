@@ -8,14 +8,13 @@
 module;
 #include <cstring>
 #include <language/error.hpp>
-#include <platform.hpp>
 #include <string>
-#ifdef LINUX_PLAT
+#ifdef __linux__
 #include <filesystem>
 #endif
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
 #include <windows.h>
-#elif defined(LINUX_PLAT)
+#elif defined(__linux__)
 #include <dlfcn.h>
 #endif
 export module autodll;
@@ -23,9 +22,9 @@ import Error;
 
 namespace trc::autodll {
 // 定义加载出的动态链接库的储存类型
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
 typedef HINSTANCE dll_t;
-#elif defined(LINUX_PLAT)
+#elif defined(__linux__)
 typedef void* dll_t;
 #endif
 
@@ -54,7 +53,7 @@ export void* dllfuncload(dll_t dll, const char* funcname);
  */
 export char* redirect_to_platform(const std::string& name);
 
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
 dll_t dllopen(const char* dllname) {
     dll_t dll_ = LoadLibrary(dllname);
     if (dll_ == nullptr) {
@@ -84,7 +83,7 @@ char* redirect_to_platform(const std::string& name) {
     return res;
 }
 
-#elif defined(LINUX_PLAT)
+#elif defined(__linux__)
 namespace fs = std::filesystem;
 dll_t dllopen(const char* dllname) {
     dll_t dll_ = dlopen(dllname, RTLD_LAZY);

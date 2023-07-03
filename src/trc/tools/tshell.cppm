@@ -4,7 +4,6 @@
  */
 
 module;
-#include <csetjmp>
 #include <cstdio>
 #include <string>
 export module tshell;
@@ -70,11 +69,9 @@ namespace tools::tools_out {
         auto vm = new TVM_space::TVM;
         // tshell报错但不终止程序
         error::error_env::quit = false;
-        // 解析命令行参数
-        auto option = generate_compiler_params();
         // 先传入空代码获取对象
         compiler::Compiler info_saver(
-            compiler::main_module, option, vm->static_data);
+            compiler::main_module, tools::compilerOption, vm->static_data);
         for (;;) {
             printf("%s", "\ntshell>");
             free(code);
@@ -85,10 +82,12 @@ namespace tools::tools_out {
             }
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
-            if (!setjmp(error::error_env::error_back_place)) {
+            try{
                 info_saver.compile(code);
                 vm->reload_data();
                 vm->run_all();
+            } catch(error::error_env::vm_run_error) {
+
             }
             // 重新还原行号
             info_saver.compiler_data.error.reset_line();

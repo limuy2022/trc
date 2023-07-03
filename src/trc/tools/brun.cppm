@@ -9,6 +9,7 @@ export module brun;
 import TVM;
 import build;
 import generated_params;
+import cmdparser;
 
 export namespace trc::tools {
 namespace tools_in {
@@ -25,9 +26,8 @@ namespace tools_out {
      */
     void brun() {
         auto vm = new TVM_space::TVM;
-        char * argv;
-        while((argv=default_argv_parser.next()) != nullptr) {
-            tools_in::_brun(vm, argv);
+        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+            tools_in::_brun(vm, tools::argv[i]);
         }
         delete vm;
     }

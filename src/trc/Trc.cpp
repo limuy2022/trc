@@ -4,10 +4,8 @@
  * Author  :   李沐阳
  */
 
-#include <cmdparser.hpp>
 #include <cstring>
 #include <language/language.hpp>
-#include <platform.hpp>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
@@ -35,13 +33,6 @@ static inline void show_error(const char* mode) {
     color::red("Trc:\"%s\"%s", mode, language::trc::mode_not_found);
 }
 
-/**
- * @brief 输出版本号，version命令行参数对应的函数
- */
-static void showversion() {
-    color::green("Version %s\n", def::version);
-}
-
 // 命令函数的接口类型
 typedef void (*argv_func_tools)();
 
@@ -49,7 +40,7 @@ struct {
     const char* name;
     argv_func_tools tool_func;
 } cmd_tool[] = { { "tdb", tools::tools_out::tdb },
-    { "help", tools::tools_out::help }, { "version", showversion },
+    { "help", tools::tools_out::help },
     { "run", tools::tools_out::run }, { "token", tools::tools_out::out_token },
     { "dis", tools::tools_out::dis }, { "brun", tools::tools_out::brun },
     { "build", tools::tools_out::build },
@@ -59,8 +50,8 @@ struct {
  * @brief 查找对应工具并运行
  * @param mode 对应工具
  */
-static inline void find_mode_to_run(char* mode) {
-    for (auto i : cmd_tool) {
+static inline void find_mode_to_run(const char* mode) {
+    for (const auto& i : cmd_tool) {
         if (!strcmp(mode, i.name)) {
             // 匹配上了
             i.tool_func();
@@ -83,24 +74,24 @@ int main(int argc, char* argv[]) {
     // 初始化地域化设置
     language::locale_init();
 /*控制台初始化*/
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
     trc::color::console_init();
 #endif
 #ifndef UNITTEST
     /* 内存初始化*/
     trc::memory::init_mem();
+    // record the tool name
+    auto toolname = argv[1];
     /* 初始化命令行解析器*/
     trc::tools::argc = argc;
     trc::tools::argv = argv;
-    cli::Parser parser(argc, argv);
-    trc::tools::parser = &parser;
-    trc::tools::init_parser();
+    trc::tools::argv_lex();
     if (argc == 1) {
         // 不指定模式，没有参数，默认为交互模式
         trc::tools::tools_out::tshell();
     } else {
         // 指定模式，匹配调用模式
-        trc::find_mode_to_run(argv[1]);
+        trc::find_mode_to_run(toolname);
     }
 #else
     ::testing::GTEST_FLAG(output) = "xml:unittest.xml";

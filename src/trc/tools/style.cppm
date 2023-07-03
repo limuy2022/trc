@@ -9,6 +9,7 @@ import TVM_data;
 import compiler_def;
 import Compiler;
 import generated_params;
+import cmdparser;
 
 namespace trc::tools {
 static TVM_space::TVM_static_data vm;
@@ -22,12 +23,11 @@ namespace tools_out {
      * @brief 格式化代码文件
      */
     export void style() {
-        char * argv;
-        while((argv=default_argv_parser.next()) != nullptr) {
+        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
             std::string filedata;
-            utils::readcode(filedata, argv);
+            utils::readcode(filedata, argv[i]);
             // 覆盖掉该文件的所有内容
-            FILE* file = fopen(argv, "w");
+            FILE* file = fopen(argv[i], "w");
             fclose(file);
         }
     }

@@ -12,6 +12,7 @@ import TVM_data;
 import Compiler;
 import compiler_def;
 import generated_params;
+import cmdparser;
 
 // token标记映射到名称，便于输出
 // todo:从最新的token进行更新
@@ -108,9 +109,8 @@ namespace tools_in {
 
 namespace tools_out {
     export void out_token() {
-        char * argv;
-        while((argv=default_argv_parser.next()) != nullptr) {
-            tools_in::_out_token(argv);
+        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+            tools_in::_out_token(tools::argv[i]);
         }
     }
 }

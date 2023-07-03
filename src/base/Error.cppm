@@ -1,5 +1,4 @@
 ﻿module;
-#include <csetjmp>
 #include <language/error.hpp>
 #include <string>
 export module Error;
@@ -13,8 +12,8 @@ export namespace trc::error {
 namespace error_env {
     // 是否终止程序
     bool quit = true;
-    // 当quit被设置为false时，会跳转到该地址
-    jmp_buf error_back_place;
+
+    class vm_run_error:public std::exception{};
 }
 
 // 错误，增强可读性
@@ -73,7 +72,7 @@ void send_error_detail(error_type name, const std::string& module_name,
         exit(EXIT_FAILURE);
     }
     // 跳转到执行的地方
-    longjmp(error_env::error_back_place, 1);
+    throw error_env::vm_run_error();
 }
 
 template <typename... argv_t>

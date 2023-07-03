@@ -11,6 +11,7 @@ import TVM;
 import ctree_loader;
 import filesys;
 import generated_params;
+import cmdparser;
 
 export namespace trc::tools {
 namespace tools_in {
@@ -22,8 +23,7 @@ namespace tools_in {
             /*是源文件*/
             std::string scodes;
             utils::readcode(scodes, path);
-            auto option = generate_compiler_params();
-            compiler::Compiler(compiler::main_module, option, vm->static_data)
+            compiler::Compiler(compiler::main_module, tools::compilerOption, vm->static_data)
                 .compile(scodes);
         }
         vm->reload_data();
@@ -34,7 +34,7 @@ namespace tools_in {
 namespace tools_out {
     void run() {
         auto vm = new TVM_space::TVM;
-        for (int i = 2; i < argc; ++i) {
+        for (int i = cmdparser::optind + 1; i < argc; ++i) {
             tools_in::_run(vm, argv[i]);
         }
         delete vm;

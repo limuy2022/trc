@@ -4,8 +4,7 @@
 
 module;
 #include <cstdio>
-#include <platform.hpp>
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
 #include <windows.h>
 #endif
 export module color;
@@ -21,7 +20,7 @@ export module color;
 typedef const char* color_type;
 
 namespace trc::color {
-#ifdef WINDOWS_PLAT
+#ifdef _WIN32
 /**
  * @brief 初始化控制台，设置控制台为ANSI模式
  */

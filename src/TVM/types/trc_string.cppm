@@ -16,7 +16,6 @@ export module trc_string;
 import TVMdef;
 import base;
 import trcdef;
-import trc_flong;
 
 export namespace trc::TVM_space::types {
 class trc_string : public trcobj {

@@ -3,54 +3,65 @@
  */
 
 module;
-#include <cmdparser.hpp>
+#include <cstdlib>
 export module generated_params;
 import Compiler;
 import compiler_def;
+import cmdparser;
+import color;
+import trcdef;
 
-export namespace trc::tools {
-cli::Parser* parser = nullptr;
-char**argv;
-int argc;
+namespace trc::tools {
+export char**argv;
+export int argc;
 
-void init_parser() {
+bool gen_number_table = true;
+bool optimize = false;
+bool const_fold = true;
+
+export compiler::compiler_option compilerOption;
+
+export void argv_lex() {
     // 这里是编译器参数
-    // 是否优化
-    parser->set_optional<bool>("o", "optimize", false,
-        "Controls whether optimization code is generated.");
-    // 是否生成行号表
-    parser->set_optional<bool>(
-        "nt", "noline_number_table", false, "Controls whether a line number.");
-    // 是否进行常量折叠
-    parser->set_optional<bool>("nf", "no_const_fold", false,
-        "Controls whether optimization includes costant fold.");
-}
-
-/**
- * @brief 生成编译器参数
- */
-compiler::compiler_option generate_compiler_params() {
-    // 取反是为了更符合使用习惯
-    return compiler::compiler_option { !parser->get<bool>("nt"),
-        parser->get<bool>("o"), !parser->get<bool>("nf") };
-}
-
-/**
- * @brief 该文件用于按顺序获取非-xxx参数
- */
-class argv_parser{
-public:
-    /**
-     * @return nullptr代表解析到尽头
-     */
-    char* next() {
-        if(index >= argc) {
-            return nullptr;
+    int opt = 0;
+    cmdparser::option long_options[] = {
+        // 是否生成行号表
+        {"noline_number_table", cmdparser::no_argument, nullptr, 't'},
+        // 是否进行常量折叠
+        {"no_const_fold", cmdparser::no_argument, nullptr, 'f'},
+        // 是否优化
+        {"optimize", cmdparser::no_argument, nullptr, 'o'},
+        // version
+        {"version", cmdparser::no_argument, nullptr, 'v'},
+        {0,0,0,0}
+    };
+    while((opt = cmdparser::getopt_long(argc, argv, "vo", long_options, nullptr)) != -1){
+        switch(opt) {
+        case 'o':{
+            optimize = true;
+            break;
         }
-        return argv[index++];
+        case 'f':{
+            const_fold = false;
+            break;
+        }
+        case 't':{
+            gen_number_table = false;
+            break;
+        }
+        case 'v':{
+            color::green("Version %s\n", def::version);
+            exit(0);
+        }
+        default:{
+            color::red("Trc:Option lex failed!\n");
+            exit(1);
+        }
+        }
     }
-private:
-    // 直接指向trc xxx后的参数
-    int index = 2;
-}default_argv_parser;
+    // genarate compiler option
+    compilerOption.optimize = optimize;
+    compilerOption.const_fold = const_fold;
+    compilerOption.number_table = gen_number_table;
+}
 }

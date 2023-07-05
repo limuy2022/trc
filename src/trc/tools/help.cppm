@@ -5,8 +5,8 @@
 export module help;
 import color;
 import trcdef;
-import generated_params;
 import cmdparser;
+import basic_def;
 
 static void output_optimze_msg() {
     puts("  --optimize,-o:optimize the code.");

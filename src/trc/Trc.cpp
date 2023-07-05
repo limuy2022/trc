@@ -5,6 +5,7 @@
  */
 
 #include <cstring>
+#include <iostream>
 #include <language/language.hpp>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
@@ -17,13 +18,14 @@ import trcdef;
 import brun;
 import build;
 import dis;
-import generated_params;
+import cmdparser;
 import help;
 import run;
 import style;
 import tdb;
 import tools.token;
 import tshell;
+import basic_def;
 
 namespace trc {
 /**
@@ -80,18 +82,16 @@ int main(int argc, char* argv[]) {
 #ifndef UNITTEST
     /* 内存初始化*/
     trc::memory::init_mem();
-    // record the tool name
-    auto toolname = argv[1];
     /* 初始化命令行解析器*/
     trc::tools::argc = argc;
     trc::tools::argv = argv;
     trc::tools::argv_lex();
-    if (argc == 1) {
+    if (trc::cmdparser::optind >= argc) {
         // 不指定模式，没有参数，默认为交互模式
         trc::tools::tools_out::tshell();
     } else {
         // 指定模式，匹配调用模式
-        trc::find_mode_to_run(toolname);
+        trc::find_mode_to_run(argv[trc::cmdparser::optind]);
     }
 #else
     ::testing::GTEST_FLAG(output) = "xml:unittest.xml";

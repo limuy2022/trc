@@ -10,6 +10,7 @@ import TVM;
 import build;
 import generated_params;
 import cmdparser;
+import basic_def;
 
 export namespace trc::tools {
 namespace tools_in {

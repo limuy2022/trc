@@ -13,6 +13,7 @@ import filesys;
 import TVM;
 import generated_params;
 import cmdparser;
+import basic_def;
 
 namespace trc::tools {
 namespace tools_in {
@@ -85,7 +86,7 @@ namespace tools_in {
 namespace tools_out {
     export void dis() {
         auto vm = new TVM_space::TVM;
-        for (int i = cmdparser::optind + 1; i < argc; ++i) {
+        for (int i = cmdparser::optind + 1; i < tools::argc; ++i) {
             tools_in::_dis(vm, argv[i]);
         }
         delete vm;

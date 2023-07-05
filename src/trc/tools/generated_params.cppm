@@ -10,11 +10,10 @@ import compiler_def;
 import cmdparser;
 import color;
 import trcdef;
+import help;
+import basic_def;
 
 namespace trc::tools {
-export char**argv;
-export int argc;
-
 bool gen_number_table = true;
 bool optimize = false;
 bool const_fold = true;
@@ -23,7 +22,7 @@ export compiler::compiler_option compilerOption;
 
 export void argv_lex() {
     // 这里是编译器参数
-    int opt = 0;
+    int opt;
     cmdparser::option long_options[] = {
         // 是否生成行号表
         {"noline_number_table", cmdparser::no_argument, nullptr, 't'},
@@ -33,9 +32,11 @@ export void argv_lex() {
         {"optimize", cmdparser::no_argument, nullptr, 'o'},
         // version
         {"version", cmdparser::no_argument, nullptr, 'v'},
+        // help
+        {"help", cmdparser::no_argument, nullptr, 'h'},
         {0,0,0,0}
     };
-    while((opt = cmdparser::getopt_long(argc, argv, "vo", long_options, nullptr)) != -1){
+    while((opt = cmdparser::getopt_long(argc, argv, "voh", long_options, nullptr)) != -1){
         switch(opt) {
         case 'o':{
             optimize = true;
@@ -51,6 +52,10 @@ export void argv_lex() {
         }
         case 'v':{
             color::green("Version %s\n", def::version);
+            exit(0);
+        }
+        case 'h':{
+            tools_out::help();
             exit(0);
         }
         default:{

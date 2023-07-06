@@ -1,9 +1,9 @@
-# 编译器编译过程
+# Compilation
 
-源码 --->
+raw code --->
 
-划分为token --->
+token --->
 
-构建语法树 --->
+grammar(don't genarate actually) --->
 
-遍历语法树生成指令集
+genarate opcode

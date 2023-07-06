@@ -1,29 +1,24 @@
-# Trc系统架构
+# Trc sysytem structure
 
-### 程序入口：trc.exe
+### enter：trc
 
-### TVM:TVM.dll
+### Virtual Machine:TVM
 
-### 编译器:Compiler.dll
+### Compiler
 
-### 底层基础：base.dll
+### basic tools:base
 
-### 语言模块:language.dll等
+### language modules:chinese,english and so on
 
-### 具体关系
-
+### relation
 
 -----------------------------------
-
-             trc.exe
+             trc
 -----------------------------------
-     Compiler.dll | TVM.dll
+     Compiler | TVM
 -----------------------------------
-            TVMbase.dll
+             base
 -----------------------------------
-             base.dll
------------------------------------
-        langauge.dll
+        langauge
 -----------------------------------
 
-### 依赖关系

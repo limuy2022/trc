@@ -2,13 +2,14 @@
  * 编译器测试
  */
 
-#include <Compiler/Compiler.hpp>
-#include <Compiler/compiler_def.hpp>
-#include <TVM/TVM.hpp>
-#include <TVM/memory.hpp>
-#include <base/utils/data.hpp>
 #include <gtest/gtest.h>
 #include <vector>
+import Compiler;
+import compiler_def;
+import TVM;
+import TVM.memory;
+import data;
+import TVMdef;
 
 using namespace trc::TVM_space;
 using namespace trc;

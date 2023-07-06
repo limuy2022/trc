@@ -1,6 +1,6 @@
-﻿#include <base/memory/objs_pool.hpp>
-#include <gtest/gtest.h>
-#include <test_new_del.hpp>
+﻿#include <gtest/gtest.h>
+import objs_pool;
+import test_new_del;
 
 using namespace trc;
 

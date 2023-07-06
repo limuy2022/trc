@@ -7,17 +7,17 @@
  *
  */
 
-#include <base/utils/filesys.hpp>
-#include <filesys_tools.hpp>
-#include <gtest/gtest.h>
 #include <list>
 #include <string>
+#include <gtest/gtest.h>
+import filesys;
+import filesys_tools;
 
 using namespace trc;
 
 static void test_readfile(const char* path, const char* expect) {
     std::string filedata;
-    utils::readcode(filedata, redefine_path(path));
+    utils::readcode(filedata, tools::redefine_path(path));
     EXPECT_STREQ(filedata.c_str(), expect);
 }
 
@@ -38,12 +38,12 @@ TEST(filesys, readfile) {
     // 测试读取不存在文件
     EXPECT_EQ(1,
         utils::readcode_with_code(
-            filedata, redefine_path("filesys/readfile/failtoread")));
+            filedata, tools::redefine_path("filesys/readfile/failtoread")));
     // 测试成功读取文件
     filedata.clear();
     EXPECT_EQ(0,
         utils::readcode_with_code(
-            filedata, redefine_path("filesys/readfile/readenglish.in")));
+            filedata, tools::redefine_path("filesys/readfile/readenglish.in")));
     // 测试读取超大文件
     std::string expect_big_data;
     char basestr[] = "pppppppppppp\n";

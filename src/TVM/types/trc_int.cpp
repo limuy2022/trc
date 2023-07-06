@@ -1,6 +1,5 @@
 module;
 #include <cstdio>
-#include <cstdint>
 #include <obj_malloc.hpp>
 #include <cmath>
 #include <string>

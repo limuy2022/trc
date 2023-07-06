@@ -1,6 +1,7 @@
-﻿#include <base/utils/bytes.hpp>
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include <vector>
+import bytes;
+import trcdef;
 
 using namespace trc;
 

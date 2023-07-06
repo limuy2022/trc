@@ -1,11 +1,11 @@
-﻿#include <base/trcdef.hpp>
-#include <base/utils/data.hpp>
-#include <base/utils/filesys.hpp>
-#include <deque>
+﻿#include <deque>
 #include <gtest/gtest.h>
 #include <list>
 #include <map>
 #include <vector>
+import trcdef;
+import data;
+import filesys;
 
 using namespace trc;
 

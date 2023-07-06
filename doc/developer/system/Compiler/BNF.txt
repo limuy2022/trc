@@ -1,4 +1,3 @@
-# 简单的BNF文法表示
 item -> expr | func_call | value
 sentence -> id = item
 sentence -> id := item

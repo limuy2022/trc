@@ -1,21 +1,21 @@
-# Trc定义的内置错误
+# Basic error of Trc
 
-| 名称                  |      解释 |
-|:--------------------|--------:|
-| NameError           |   未定义错误 |
-| SyntaxError         |    语法错误 |
-| ValueError          |     值错误 |
-| VersionError        |   版本号错误 |
-| OpenFileError       |  打开文件错误 |
-| ModuleNotFoundError | 模块不存在错误 |
-| ArgumentError       |    参数错误 |
-| ZeroDivError        |    除零错误 |
-| TypeError           |    类型错误 |
-| RunError            |    运行错误 |
-| AssertError         |    断言错误 |
-| IndexError          |    索引错误 |
-| KeyError            |     键错误 |
-| MemoryError         |    内存错误 |
-| SystemError         |    系统错误 |
-| OperatorError       |    运算错误 |
-| RedefinedError      |  重复定义错误 |
+| 名称                  |                                                                              解释 |
+|:--------------------|--------------------------------------------------------------------------------:|
+| NameError           |                                                                    undefined id |
+| SyntaxError         |                                                                 syntax is wrong |
+| ValueError          |                                                                 value is wrrong |
+| VersionError        |                                                  version is too high to execute |
+| OpenFileError       |                                                opening file has something wrong |
+| ModuleNotFoundError |                                                          cannot find the module |
+| ArgumentError       |                                                               argument is wrong |
+| ZeroDivError        |                                                        zero cannot be a divisor |
+| TypeError           |                                                                   type is wrong |
+| RunError            | something wrong has happened when program is running but cannot find the reason |
+| AssertError         |                                                              assert got "false" |
+| IndexError          |                                                           index is out of range |
+| KeyError            |                                                                    key is wrong |
+| MemoryError         |                                                              all memory is used |
+| SystemError         |                                                       sysytem has some mistakes |
+| OperatorError       |                                                operator is used for wrong types |
+| RedefinedError      |                                                                   redefine a id |

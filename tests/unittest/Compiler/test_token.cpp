@@ -7,11 +7,12 @@
  *
  */
 
-#include <Compiler/compiler_def.hpp>
-#include <Compiler/token.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
+import compiler_def;
+import token;
+import TVM_data;
 
 using namespace trc::compiler;
 
@@ -49,7 +50,7 @@ protected:
         check(a);
     }
 
-    TVM_static_data vm {};
+    trc::TVM_space::TVM_static_data vm {};
 
     compiler_public_data* compiler_data {};
 

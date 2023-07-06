@@ -1,5 +1,5 @@
-# 常见的问题
+# Common Questions
 
-## Q:Windows 7/Windows XP等低于Windows 10版本的系统无法输出有颜色的字体并在输出原本应该带有颜色的字体时可能带有乱码
+## Q:Windows 7/Windows XP and platforms that is lower than Windows 10 cannot print info with colors and even print wrong characters
 
-## A:该项目的颜色字体输出是通过ANSI转义字符序列实现的，此项功能在Windows上，通过启用Windows 10的新增功能，虚拟终端来实现，所以低于Windows 10以下无法正常使用。对于该问题并没有良好的解决方案，该项目并不会主动适配不受支持的操作系统，但除该功能外，核心功能并不受到影响
+## A:Color info is printed by using ANSI feature，ANSI on Windows is open by enabling virtual terminal(windows 10 added)，so os that is lower than Windows 10 cannot use this feature.We don't have a good solution for this，because trc won't support os this is ended support.Bur expect this feature,other core features won't be affected.

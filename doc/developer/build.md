@@ -1,58 +1,31 @@
-# 如何构建该项目
+# How to compile the project
 
-### 注：目前cmake因为模块支持的原因，暂时无法被用于编译该项目
 
-### 注：要求编译器必须支持c++20标准，尤其是完整的模块支持，建议获取最新的编译器来参与编译
+### notice：require a compiler that is support c++ 20 standard,especially module support.Advice getting the newest compiler to compile.
 
-采用cmake或xmake编译程序，需要安装cmake或xmake
+ Use cmake or xmake to compile project，should install cmake or xmake
 
-| 项目支持编译器(几乎支持了所有的主流编译器) |
-|:-----------------------|
-| msvc(vs)               |
-| gcc(有mingw支持)          |
-| clang                  |
+Network is required.Because this project uses xrepo to download packages.
 
-| 项目支持平台 |
-|:------------------|
-| windows           |
-| linux(有wsl2支持)    |
-| macos(github action测试)|
+| Support Compiler(almost suppout all the popular compilers) |
+|:-----------------------------------------------------------|
+| msvc(vs)                                                   |
+| gcc(has mingw support)                                     |
+| clang                                                      |
 
-注：如果编译器不满足上述要求仍然可以编译，
-但操作系统不满足就会直接报错，无法编译
+| support OS platforms      |
+|:--------------------------|
+| windows                   |
+| linux(has wsl2 support)   |
+| macos(github action test) |
 
-## 操作
+Notice：if compiler don't support we can try compiling.But if OS don't support,we will stop compiling directly.
 
-注:由于该项目的linux和windows操作差不多，故没有加以区分
+## what to do
 
-### 编译并安装发行版
+Notice:This project compiling on different OS are similar
 
-```
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make
-make install
-```
-
-或
-
-```
-xmake
-xmake install
-```
-
-### 启动单元测试
-
-```
-mkdir unittest
-cd unittest
-cmake .. -DTRC_BUILD_TYPE=Test -DCMAKE_BUILD_TYPE=Release
-make
-../bin/unittest
-```
-
-或
+### Compile and install(include unittest)
 
 ```
 xmake

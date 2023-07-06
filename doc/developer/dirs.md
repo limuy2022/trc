@@ -1,33 +1,29 @@
-# 各个目录功能说明
+# each dir's usage
 
-doc:帮助与说明文档
+doc:help
 	
-	doc/developer:开发者目录，包含便于二次开发的信息
+	doc/developer:developer doc，include infomation that is used to help to develop
 
-	doc/html:代码接口和结构文档
+	doc/use:trc usage
 
-	doc/update:更新日志
+tests:test cases，also good for studying
 
-	doc/use:使用方法
+	tests/black_test:black tests
 
-tests:测试用例，也是学习的好样例
+	tests/unittest:unit test
 
-	tests/black_test:黑盒测试
+bin:trc bin
 
-	tests/unittest:单元测试
+language:the language supports of trc
 
-bin:编译后的可执行文件
+src:source code
 
-language:国际化trc的各种语言
+	src/include:header files
 
-src:源文件
+	src/Compiler:compiler
 
-	src/include:头文件
+	src/base:basic tools system
 
-	src/Compiler:编译器
+	src/trc:cmd tools and main function
 
-	src/base:基础工具系统
-
-	src/trc:命令行工具和启动程序
-
-	src/TVM:执行字节码的虚拟机
+	src/TVM:virtaul machine that is used for running trc code

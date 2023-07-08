@@ -24,7 +24,8 @@ namespace tools_in {
     void _build(TVM_space::TVM* vm, const std::string& path) {
         std::string scode;
         utils::readcode(scode, path);
-        compiler::Compiler(compiler::main_module, tools::compilerOption, vm->static_data)
+        compiler::Compiler(
+            compiler::main_module, tools::compilerOption, vm->static_data)
             .compile(scode);
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());

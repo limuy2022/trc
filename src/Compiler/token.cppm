@@ -3,8 +3,8 @@
 #include <language/error.hpp>
 #include <stack>
 #include <string>
-#include <vector>
 #include <unreach.hpp>
+#include <vector>
 export module token;
 import compiler_def;
 import trc_flong;

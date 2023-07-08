@@ -114,7 +114,8 @@ namespace builtin {
      * @brief 获取数据类型
      */
     void TYPE(int argc, TVM* vm) {
-        vm->top() = MALLOCSTRING(TVM_share::int_name[(int)vm->top()->gettype()]);
+        vm->top()
+            = MALLOCSTRING(TVM_share::int_name[(int)vm->top()->gettype()]);
     }
 }
 }

@@ -1,9 +1,9 @@
 ﻿module;
+#include <algorithm>
 #include <array>
 #include <filesystem>
 #include <language/error.hpp>
 #include <obj_malloc.hpp>
-#include <algorithm>
 module TVM;
 import TRE;
 import lib;

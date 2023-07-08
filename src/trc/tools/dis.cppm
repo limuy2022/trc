@@ -76,7 +76,8 @@ namespace tools_in {
         else {
             std::string codes;
             utils::readcode(codes, file_path);
-            compiler::Compiler(compiler::main_module, tools::compilerOption, vm->static_data)
+            compiler::Compiler(
+                compiler::main_module, tools::compilerOption, vm->static_data)
                 .compile(codes);
         }
         out(*vm, file_path);

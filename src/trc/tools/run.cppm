@@ -24,7 +24,8 @@ namespace tools_in {
             /*是源文件*/
             std::string scodes;
             utils::readcode(scodes, path);
-            compiler::Compiler(compiler::main_module, tools::compilerOption, vm->static_data)
+            compiler::Compiler(
+                compiler::main_module, tools::compilerOption, vm->static_data)
                 .compile(scodes);
         }
         vm->reload_data();

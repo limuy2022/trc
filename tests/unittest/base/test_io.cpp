@@ -2,11 +2,11 @@
  * 测试自己封装的io库
  */
 
+#include <cstdio>
+#include <cstdlib>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include <cstdio>
-#include <cstdlib>
 import io;
 import filesys_tools;
 
@@ -14,7 +14,8 @@ using namespace trc;
 
 static void check_readstr(
     const char* path, const std::vector<const char*>& expectstr) {
-    FILE* file = tools::fopen_with_check(tools::redefine_path(path).c_str(), "r");
+    FILE* file
+        = tools::fopen_with_check(tools::redefine_path(path).c_str(), "r");
     char* raw_str;
     // -1是为了避开最后一个false(eof)值
     for (size_t i = 0, n = expectstr.size(); i < n - 1; ++i) {

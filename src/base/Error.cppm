@@ -13,7 +13,7 @@ namespace error_env {
     // 是否终止程序
     bool quit = true;
 
-    class vm_run_error:public std::exception{};
+    class vm_run_error : public std::exception { };
 }
 
 // 错误，增强可读性

@@ -1,8 +1,8 @@
 module;
 #include <cstdlib>
 #include <cstring>
-#include <string>
 #include <obj_malloc.hpp>
+#include <string>
 module trc_string;
 import TVMdef;
 import TRE;

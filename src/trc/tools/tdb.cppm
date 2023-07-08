@@ -89,7 +89,8 @@ namespace tdb {
     static void debug(const std::string& code) {
         char* instruction = nullptr;
         TVM_space::free_TVM(vm);
-        compiler::Compiler(compiler::main_module, tools::compilerOption, vm->static_data)
+        compiler::Compiler(
+            compiler::main_module, tools::compilerOption, vm->static_data)
             .compile(code);
         vm->reload_data();
         // 用于输出代码行信息

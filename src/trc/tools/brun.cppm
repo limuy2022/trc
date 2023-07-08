@@ -27,7 +27,7 @@ namespace tools_out {
      */
     void brun() {
         auto vm = new TVM_space::TVM;
-        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+        for (int i = cmdparser::optind + 1; i < tools::argc; ++i) {
             tools_in::_brun(vm, tools::argv[i]);
         }
         delete vm;

@@ -82,13 +82,11 @@ namespace tools::tools_out {
             }
             vm->static_data.byte_codes.clear();
             // 设置好报错时返回到的地址
-            try{
+            try {
                 info_saver.compile(code);
                 vm->reload_data();
                 vm->run_all();
-            } catch(error::error_env::vm_run_error) {
-
-            }
+            } catch (error::error_env::vm_run_error) { }
             // 重新还原行号
             info_saver.compiler_data.error.reset_line();
         }

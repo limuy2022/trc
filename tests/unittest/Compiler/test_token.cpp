@@ -77,27 +77,36 @@ TEST_F(token_test_env, oper_lex_2) {
     test_tokens("2+ 1",
         { { token_ticks::INT_VALUE, 2 }, { token_ticks::ADD, 0 },
             { token_ticks::INT_VALUE, 1 } });
+    EXPECT_EQ(vm.const_i[2], 2);
+    EXPECT_EQ(vm.const_i[1], 1);
 }
 
 TEST_F(token_test_env, oper_lex_3) {
     test_tokens("1+4",
         { { token_ticks::INT_VALUE, 1 }, { token_ticks::ADD, 0 },
             { token_ticks::INT_VALUE, 2 } });
+    EXPECT_EQ(vm.const_i[1], 1);
+    EXPECT_EQ(vm.const_i[2], 4);
 }
 
 TEST_F(token_test_env, oper_lex_4) {
     test_tokens("1+1.0",
         { { token_ticks::INT_VALUE, 1 }, { token_ticks::ADD, 0 },
             { token_ticks::FLOAT_VALUE, 0 } });
+    EXPECT_EQ(vm.const_i[1], 1);
+    EXPECT_EQ(vm.const_f[0], 1.0);
 }
 
 TEST_F(token_test_env, oper_lex_5) {
-    test_tokens("-+*/7.0+1-0",
+    test_tokens("-+*/7.19+1-0",
         { { token_ticks::SUB, 0 }, { token_ticks::ADD, 0 },
             { token_ticks::MUL, 0 }, { token_ticks::DIV, 0 },
             { token_ticks::FLOAT_VALUE, 0 }, { token_ticks::ADD, 0 },
             { token_ticks::INT_VALUE, 1 }, { token_ticks::SUB, 0 },
             { token_ticks::INT_VALUE, 0 } });
+    EXPECT_EQ(vm.const_f[0], 7.19);
+    EXPECT_EQ(vm.const_i[1], 1);
+    EXPECT_EQ(vm.const_i[0], 0);
 }
 
 // 测试条件表达式符号解析
@@ -107,6 +116,8 @@ TEST_F(token_test_env, condit_lex) {
             { token_ticks::GREATER, 0 }, { token_ticks::UNEQUAL, 0 },
             { token_ticks::GREATER_EQUAL, 0 }, { token_ticks::EQUAL, 0 },
             { token_ticks::FLOAT_VALUE, 0 } });
+    EXPECT_EQ(vm.const_i[1], 1);
+    EXPECT_EQ(vm.const_f[0], 1.8);
 }
 
 // 等式赋值解析
@@ -117,13 +128,19 @@ TEST_F(token_test_env, as_lex_1) {
             { token_ticks::INT_VALUE, 1 }, { token_ticks::END_OF_LINE, 0 },
             { token_ticks::NAME, 1 }, { token_ticks::STORE, 0 },
             { token_ticks::INT_VALUE, 2 } } });
+    EXPECT_EQ(vm.const_i[1], 1);
+    EXPECT_EQ(vm.const_i[2], 2);
 }
 
 TEST_F(token_test_env, as_lex_2) {
-    test_tokens("a=input()",
+    test_tokens("a=input()\na=1",
         { { { token_ticks::NAME, 0 }, { token_ticks::ASSIGN, 0 },
             { token_ticks::NAME, 1 }, { token_ticks::LEFT_SMALL_BRACE, 0 },
-            { token_ticks::RIGHT_SMALL_BRACE, 0 } } });
+            { token_ticks::RIGHT_SMALL_BRACE, 0 }, {token_ticks::END_OF_LINE, 0},
+            { token_ticks::NAME, 0},
+            { token_ticks::ASSIGN, 0},
+            { token_ticks::INT_VALUE, 1} } });
+    EXPECT_EQ(vm.const_i[1], 1);
 }
 
 // 测试括号解析
@@ -196,6 +213,9 @@ TEST_F(token_test_env, float_int_lex_1) {
         { { token_ticks::FLOAT_VALUE, 0 }, { token_ticks::ADD, 0 },
             { token_ticks::FLOAT_VALUE, 1 }, { token_ticks::SUB, 0 },
             { token_ticks::INT_VALUE, 1 } });
+    EXPECT_EQ(vm.const_f[0], 1.90);
+    EXPECT_EQ(vm.const_f[1], 3.98);
+    EXPECT_EQ(vm.const_i[1], 1);
 }
 
 TEST_F(token_test_env, float_int_lex_2) {
@@ -213,6 +233,7 @@ TEST_F(token_test_env, float_int_lex_4) {
         { { token_ticks::FLOAT_VALUE, 0 }, { token_ticks::ADD, 0 },
             { token_ticks::INT_VALUE, 1 } });
     EXPECT_EQ(vm.const_f[0], 124.231);
+    EXPECT_EQ(vm.const_i[1], 1);
 }
 
 TEST_F(token_test_env, float_int_lex_5) {

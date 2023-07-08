@@ -1,9 +1,16 @@
 # How to compile the project
 
+### First
 
-### notice：require a compiler that is support c++ 20 standard,especially module support.Advice getting the newest compiler to compile.
+You can run this python script to install toolchain, build and install Trc and run unittest(just for Linux and Windows user)
+```
+cd script
+python3 easy.py
+```
 
- Use cmake or xmake to compile project，should install cmake or xmake
+### notice：require a compiler that is support c++ 23 standard,especially module support.Advice getting the newest compiler to compile.
+
+Use cmake or xmake to compile project，should install cmake or xmake
 
 Network is required.Because this project uses xrepo to download packages.
 
@@ -25,9 +32,16 @@ Notice：if compiler don't support we can try compiling.But if OS don't support,
 
 Notice:This project compiling on different OS are similar
 
-### Compile and install(include unittest)
+### Compile and install
 
 ```
 xmake
 xmake install
+```
+
+### Unittest
+
+```
+xmake unittest
+xmake run unittest
 ```

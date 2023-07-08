@@ -25,13 +25,17 @@ static void argvs_output() {
 }
 
 namespace {
-const char* build_msg = "build [file name]:Build a tree file.Turn it from tree to ctree.";
+const char* build_msg
+    = "build [file name]:Build a tree file.Turn it from tree to ctree.";
 const char* run_msg = "run [file name]:Run a tree file or a ctree file.";
-const char* help_msg = "help [instruction name]:Print the help message of this instruction.";
-const char* dis_msg = "dis [file name]:Discompile a ctree file/a tree file to vm's opcode";
+const char* help_msg
+    = "help [instruction name]:Print the help message of this instruction.";
+const char* dis_msg
+    = "dis [file name]:Discompile a ctree file/a tree file to vm's opcode";
 const char* brun_msg = "brun [file name]:Build a file and run it";
 const char* token_msg = "token [file name]:Turn a tree file to tokens";
-const char* style_msg = "style [file name/dir name]:Format a tree file/all tree files in the direction";
+const char* style_msg = "style [file name/dir name]:Format a tree file/all "
+                        "tree files in the direction";
 }
 
 namespace trc::tools::tools_out {
@@ -39,7 +43,7 @@ namespace trc::tools::tools_out {
  * @brief Trc命令行操作帮助文档
  */
 export void help() {
-    if(tools::argc == 2) {
+    if (tools::argc == 2) {
         // output common msg
         puts(language::help::help_msg);
         color::green("\nVersion %s\n", def::version);
@@ -55,39 +59,42 @@ export void help() {
         puts(style_msg);
         return;
     }
-    for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
-        if(!strcmp(tools::argv[i], "run")) {
+    for (int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+        if (!strcmp(tools::argv[i], "run")) {
             puts(run_msg);
             argvs_output();
             output_line_table_msg();
             output_optimze_msg();
             output_const_fold_msg();
-        } else if(!strcmp(tools::argv[i], "brun")) {
+        } else if (!strcmp(tools::argv[i], "brun")) {
             puts(brun_msg);
             argvs_output();
             output_optimze_msg();
             output_line_table_msg();
             output_const_fold_msg();
-        } else if(!strcmp(tools::argv[i], "style")) {
+        } else if (!strcmp(tools::argv[i], "style")) {
             puts(style_msg);
-        } else if(!strcmp(tools::argv[i], "build")) {
+        } else if (!strcmp(tools::argv[i], "build")) {
             puts(build_msg);
             argvs_output();
             output_optimze_msg();
             output_line_table_msg();
             output_const_fold_msg();
-        } else if(!strcmp(tools::argv[i], "help")) {
+        } else if (!strcmp(tools::argv[i], "help")) {
             puts(help_msg);
-        } else if(!strcmp(tools::argv[i], "dis")) {
+        } else if (!strcmp(tools::argv[i], "dis")) {
             puts(dis_msg);
             argvs_output();
-            puts("Notice:If you use it discompile a tree file.There are some options:");
+            puts("Notice:If you use it discompile a tree file.There are some "
+                 "options:");
             output_optimze_msg();
             output_const_fold_msg();
-        } else if(!strcmp(tools::argv[i], "token")) {
+        } else if (!strcmp(tools::argv[i], "token")) {
             puts(token_msg);
         } else {
-            color::red("The tool \"%s\" is not found.Please check your input.\n", tools::argv[i]);
+            color::red(
+                "The tool \"%s\" is not found.Please check your input.\n",
+                tools::argv[i]);
         }
         putchar('\n');
     }

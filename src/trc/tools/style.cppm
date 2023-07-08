@@ -24,7 +24,7 @@ namespace tools_out {
      * @brief 格式化代码文件
      */
     export void style() {
-        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+        for (int i = cmdparser::optind + 1; i < tools::argc; ++i) {
             std::string filedata;
             utils::readcode(filedata, argv[i]);
             // 覆盖掉该文件的所有内容

@@ -110,7 +110,7 @@ namespace tools_in {
 
 namespace tools_out {
     export void out_token() {
-        for(int i = cmdparser::optind + 1; i < tools::argc; ++i) {
+        for (int i = cmdparser::optind + 1; i < tools::argc; ++i) {
             tools_in::_out_token(tools::argv[i]);
         }
     }

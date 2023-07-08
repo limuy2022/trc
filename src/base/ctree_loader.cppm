@@ -6,12 +6,12 @@
 
 module;
 #include <bit>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <language/error.hpp>
 #include <string>
 #include <vector>
-#include <cstdint>
 export module ctree_loader;
 import TVM;
 import func;

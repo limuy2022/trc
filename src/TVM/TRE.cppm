@@ -25,8 +25,8 @@ namespace TVM_share {
     // 整型缓存
     types::trc_int int_cache[INT_CACHE_LEN];
 
-    const char* int_name[] = { "int", "string", "float", "long int",
-            "long float", "map", "list" };
+    const char* int_name[]
+        = { "int", "string", "float", "long int", "long float", "map", "list" };
 
     /**
      * @brief

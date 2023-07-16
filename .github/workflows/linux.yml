@@ -18,7 +18,7 @@ jobs:
       - name: setup xmake
         uses: xmake-io/github-action-setup-xmake@v1
       - name: Update compiler
-        run: sudo apt-get upgrade -y
+        run: sudo apt-get update&&sudo apt-get upgrade -y
       - name: Build
         # Build your program with the given configuration
         run: xmake build --all -y

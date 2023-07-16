@@ -1,7 +1,7 @@
 set_project("Trc")
 set_version("0.2")
 
-set_languages("c++23", "c17")
+set_languages("c++20", "c17")
 set_targetdir("bin")
 
 add_includedirs("src/include")

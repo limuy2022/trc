@@ -1,8 +1,8 @@
 ﻿module;
-#include <language/error.hpp>
 #include <string>
 export module Error;
 import trcdef;
+import language;
 
 export namespace trc::error {
 /**

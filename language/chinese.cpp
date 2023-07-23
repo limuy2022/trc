@@ -2,10 +2,10 @@
  * 中文，作为dll插件提供不同语言
  */
 
+module;
 #include <clocale>
 #include <cstdio>
-#include <language/error.hpp>
-#include <language/language.hpp>
+module language;
 
 namespace language {
 namespace error {

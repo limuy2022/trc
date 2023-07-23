@@ -1,12 +1,13 @@
 module;
 #include <stack>
 #include <string>
-#include <unreach.hpp>
 #include <utility>
+#include <format>
 module TVM;
 import TVM.memory;
 import func;
 import TVMdef;
+import unreach;
 
 namespace trc::TVM_space {
 TVM::TVM(std::string name)
@@ -166,7 +167,7 @@ void TVM::run_bycode(const TVM_bytecode* bycode) {
         break;
     }
     default: {
-        UNREACH("Unsupport bytecode!%d", int(bycode->bycode));
+        unreach(std::format("Unsupport bytecode!{}", int(bycode->bycode)));
     }
     }
 }

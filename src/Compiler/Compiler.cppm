@@ -5,7 +5,6 @@
  */
 
 module;
-#include <language/error.hpp>
 #include <limits>
 #include <string>
 #include <vector>
@@ -18,6 +17,7 @@ import TVM_data;
 import Error;
 import trcdef;
 import TVMdef;
+import language;
 
 #define LINE_NUM compiler_data.error.get_line()
 

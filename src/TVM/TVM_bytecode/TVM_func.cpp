@@ -1,6 +1,7 @@
 ﻿module;
-#include <unreach.hpp>
+#include <format>
 module TVM;
+import unreach;
 import built_in_func;
 import func;
 import trcdef;
@@ -55,8 +56,7 @@ void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
         break;
     }
     default: {
-        UNREACH(
-            "there is not a builin function %hu to call", builtin_func_name);
+        unreach(std::format("there is not a builin function {} to call", (short)builtin_func_name));
     }
     }
 }

@@ -6,7 +6,6 @@
 
 #include <cstring>
 #include <iostream>
-#include <language/language.hpp>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
@@ -26,6 +25,7 @@ import tdb;
 import tools.token;
 import tshell;
 import basic_def;
+import language;
 
 namespace trc {
 /**

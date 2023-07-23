@@ -1,12 +1,12 @@
 ﻿module;
 #include <cstdio>
 #include <cstring>
-#include <language/language.hpp>
 export module help;
 import color;
 import trcdef;
 import cmdparser;
 import basic_def;
+import language;
 
 static void output_optimze_msg() {
     puts("  --optimize,-o:optimize the code.");

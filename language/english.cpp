@@ -2,10 +2,10 @@
  * 英文的语句
  */
 
+module;
 #include <clocale>
 #include <cstdio>
-#include <language/error.hpp>
-#include <language/language.hpp>
+module language;
 
 namespace language {
 namespace error {

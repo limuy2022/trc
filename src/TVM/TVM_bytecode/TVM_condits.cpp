@@ -1,11 +1,11 @@
 ﻿module;
-#include <language/error.hpp>
 module TVM;
 import trc_string;
 import Error;
 import trcdef;
 import TRE;
 import TVMdef;
+import language;
 
 namespace trc::TVM_space {
 void TVM::EQUAL() {

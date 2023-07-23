@@ -10,9 +10,9 @@
 module;
 #include <cstdio>
 #include <cstdlib>
-#include <language/error.hpp>
 export module io;
 import Error;
+import language;
 
 const size_t mem_init_size = 15;
 const size_t mem_realloc_size = 20;

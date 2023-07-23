@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <array>
 #include <filesystem>
-#include <language/error.hpp>
 #include <obj_malloc.hpp>
 module TVM;
 import TRE;
@@ -11,6 +10,7 @@ import TVM.memory;
 import Error;
 import TVMdef;
 import lib;
+import language;
 
 namespace fs = std::filesystem;
 

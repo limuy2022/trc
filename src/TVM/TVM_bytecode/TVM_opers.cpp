@@ -1,9 +1,9 @@
 ﻿module;
-#include <language/error.hpp>
 module TVM;
 import TRE;
 import trcdef;
 import Error;
+import language;
 
 namespace trc::TVM_space {
 void TVM::ADD() {

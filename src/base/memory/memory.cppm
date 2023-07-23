@@ -4,10 +4,10 @@
  */
 
 module;
-#include <language/error.hpp>
 #include <new>
 export module memory;
 import Error;
+import language;
 
 namespace trc::memory {
 /**

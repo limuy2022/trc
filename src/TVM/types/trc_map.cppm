@@ -5,7 +5,6 @@
 
 module;
 #include <cstdlib>
-#include <language/error.hpp>
 export module trc_map;
 import TVMdef;
 import base;
@@ -15,6 +14,7 @@ import trc_float;
 import trc_int;
 import trc_string;
 import Error;
+import language;
 
 // 哈希表大小
 #define MAP_MIN_SIZE 50

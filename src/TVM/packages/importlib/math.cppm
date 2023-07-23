@@ -9,4 +9,7 @@ export module math;
 import lib;
 import trcdef;
 
-namespace trc::TVM_space::cpp_libs { }
+namespace trc::TVM_space::cpp_libs::math {
+const double pi = 3.14159265;
+
+}

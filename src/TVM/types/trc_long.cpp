@@ -4,7 +4,7 @@ module;
 #include <cstring>
 #include <obj_malloc.hpp>
 #include <string>
-#include <unreach.hpp>
+#include <format>
 module trc_long;
 import TVM.memory;
 import TRE;
@@ -12,6 +12,7 @@ import data;
 import TVMdef;
 import trcdef;
 import TVM.memory;
+import unreach;
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
@@ -76,7 +77,7 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    UNREACH("big num can't cal the used size.used:%zu\nsize:%zu", used, size);
+    unreach(std::format("big num can't cal the used size.used:{}\nsize:{}", used, size));
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {

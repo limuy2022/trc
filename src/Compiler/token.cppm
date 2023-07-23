@@ -1,15 +1,16 @@
 ﻿module;
 #include <cstring>
-#include <language/error.hpp>
 #include <stack>
 #include <string>
-#include <unreach.hpp>
 #include <vector>
+#include <format>
 export module token;
 import compiler_def;
 import trc_flong;
 import trc_long;
 import Error;
+import language;
+import unreach;
 
 export namespace trc::compiler {
 // token的标识
@@ -295,7 +296,7 @@ token token_lex::lex_int_float() {
         break;
     }
     default: {
-        UNREACH("Another token tick %zu", tick_for_res);
+        unreach(std::format("Another token tick {}", (size_t)tick_for_res));
     }
     }
     result.tick = tick_for_res;

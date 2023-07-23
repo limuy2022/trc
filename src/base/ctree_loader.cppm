@@ -9,7 +9,6 @@ module;
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <language/error.hpp>
 #include <string>
 #include <vector>
 export module ctree_loader;
@@ -20,6 +19,7 @@ import bytes;
 import trcdef;
 import TVMdef;
 import TVM_data;
+import language;
 
 // 开头标识文件是否为ctree文件的标识，魔数
 static uint16_t MAGIC_VALUE = 0xACFD;

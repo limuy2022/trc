@@ -9,7 +9,6 @@ module;
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
-#include <language/language.hpp>
 #include <string>
 #include <vector>
 export module tdb;
@@ -21,6 +20,7 @@ import filesys;
 import generated_params;
 import trcdef;
 import TVM.memory;
+import language;
 
 namespace trc {
 namespace tdb {

@@ -5,7 +5,6 @@
 module;
 #include <cstdio>
 #include <cstdlib>
-#include <language/error.hpp>
 #include <obj_malloc.hpp>
 export module built_in_func;
 import TRE;
@@ -16,6 +15,7 @@ import objs_pool;
 import trc_int;
 import trc_string;
 import trcdef;
+import language;
 
 export namespace trc::TVM_space {
 namespace builtin {

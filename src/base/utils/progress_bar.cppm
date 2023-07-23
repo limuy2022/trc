@@ -4,10 +4,11 @@
 
 module;
 #include <cstdio>
-#include <unreach.hpp>
+#include <format>
 export module progress_bar;
 import trcdef;
 import data;
+import unreach;
 
 namespace trc::utils {
 /**
@@ -55,8 +56,8 @@ progress_bar::progress_bar(
 void progress_bar::next() {
     if (now_progress > total_steps) {
         // 到达此处说明代码出现错误
-        UNREACH("The progress %u has exceeded the total progress %u",
-            now_progress, total_steps);
+        unreach(std::format("The progress {} has exceeded the total progress {}",
+            now_progress, total_steps));
     }
     now_progress++;
 }

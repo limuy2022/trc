@@ -13,7 +13,7 @@ add_rules("plugin.compile_commands.autoupdate")
 
 target("Trc")
     set_kind("binary")
-    add_files("src/**.cpp", "src/**.cppm")
+    add_files("src/**.cpp", "src/**.cppm", "language/**.cppm")
     add_subdirs("language")
     add_deps("language")
 

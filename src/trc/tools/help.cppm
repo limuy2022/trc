@@ -1,6 +1,7 @@
 ﻿module;
 #include <cstdio>
 #include <cstring>
+#include <format>
 export module help;
 import color;
 import trcdef;
@@ -46,9 +47,9 @@ export void help() {
     if (tools::argc == 2) {
         // output common msg
         puts(language::help::help_msg);
-        color::green("\nVersion %s\n", def::version);
-        color::green("github repo:%s\n", def::repo_github);
-        color::green("gitee repo:%s\n", def::repo_gitee);
+        color::green(std::format("\nVersion {}\n", def::version));
+        color::green(std::format("github repo:{}\n", def::repo_github));
+        color::green(std::format("gitee repo:{}\n", def::repo_gitee));
         puts("\nThere are the tools(all tools not only support one file):\n");
         puts(build_msg);
         puts(run_msg);
@@ -92,9 +93,9 @@ export void help() {
         } else if (!strcmp(tools::argv[i], "token")) {
             puts(token_msg);
         } else {
-            color::red(
-                "The tool \"%s\" is not found.Please check your input.\n",
-                tools::argv[i]);
+            color::red(std::format(
+                "The tool \"{}\" is not found.Please check your input.\n",
+                tools::argv[i]));
         }
         putchar('\n');
     }

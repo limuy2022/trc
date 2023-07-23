@@ -1,9 +1,10 @@
 ﻿module;
+#include <cassert>
 #include <cstring>
+#include <format>
 #include <stack>
 #include <string>
 #include <vector>
-#include <format>
 export module token;
 import compiler_def;
 import trc_flong;
@@ -109,16 +110,19 @@ public:
     /**
      * @brief 退回并储存一个token
      */
-    void unget_token(token token_data);
+    void unget_token();
 
     compiler_public_data& compiler_data;
 
 private:
-    token back_token;
-    bool has_back_token = false;
+    std::vector<token> tokenlist;
+
+    int id = 0;
 
     // 指向当前正在解析的字符
-    const char* char_ptr {};
+    const char* char_ptr = nullptr;
+
+    token lexinteral();
 
     // 判断是否解析到了终点
     [[nodiscard]] bool end_of_lex() const noexcept;
@@ -533,22 +537,27 @@ token token_lex::lex_others() {
     return result;
 }
 
-void token_lex::unget_token(token token_data) {
-    if (token_data.tick == token_ticks::END_OF_LINE) {
+void token_lex::unget_token() {
+    if(id == 0) {
+        unreach("token list out of range");
+    }
+    id--;
+    if (tokenlist[id].tick == token_ticks::END_OF_LINE) {
         compiler_data.error.sub_line();
     }
-    back_token = token_data;
-    has_back_token = true;
 }
 
 token token_lex::get_token() {
-    if (has_back_token) {
-        has_back_token = false;
-        if (back_token.tick == token_ticks::END_OF_LINE) {
+    if (tokenlist[id].tick == token_ticks::END_OF_LINE) {
             compiler_data.error.add_line();
-        }
-        return back_token;
+    } 
+    if(id + 1 >= tokenlist.size()) {
+        unreach("token list out of range");
     }
+    return tokenlist[id++];
+}
+
+token token_lex::lexinteral() {
     if (*char_ptr == '#') {
         /*忽略注释*/
         while (!end_of_lex()) {
@@ -592,15 +601,23 @@ token_lex::token_lex(compiler_public_data& compiler_data)
 
 void token_lex::set_code(const std::string& code) {
     char_ptr = code.c_str();
-}
-
-token_lex::~token_lex() {
+    tokenlist.clear();
+    while(1) {
+        auto i = get_token();
+        tokenlist.push_back(i);
+        if(i.tick == token_ticks::END_OF_TOKENS) {
+            break;
+        }
+    }
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
         char error_tmp[] = { check_brace.top(), '\0' };
         compiler_data.error.send_error_module(error::SyntaxError,
             language::error::syntaxerror_unmatched_char, error_tmp);
     }
+}
+
+token_lex::~token_lex() {
     compiler_data.error.reset_line();
 }
 }

@@ -1,8 +1,8 @@
 module;
+#include <format>
 #include <stack>
 #include <string>
 #include <utility>
-#include <format>
 module TVM;
 import TVM.memory;
 import func;
@@ -13,7 +13,7 @@ namespace trc::TVM_space {
 TVM::TVM(std::string name)
     : name(std::move(name)) {
     // 初始化TVM
-    TVM_space::init_mem();
+    init_mem();
 }
 
 void TVM::reload_data() {

@@ -136,10 +136,9 @@ TEST_F(token_test_env, as_lex_2) {
     test_tokens("a=input()\na=1",
         { { { token_ticks::NAME, 0 }, { token_ticks::ASSIGN, 0 },
             { token_ticks::NAME, 1 }, { token_ticks::LEFT_SMALL_BRACE, 0 },
-            { token_ticks::RIGHT_SMALL_BRACE, 0 }, {token_ticks::END_OF_LINE, 0},
-            { token_ticks::NAME, 0},
-            { token_ticks::ASSIGN, 0},
-            { token_ticks::INT_VALUE, 1} } });
+            { token_ticks::RIGHT_SMALL_BRACE, 0 },
+            { token_ticks::END_OF_LINE, 0 }, { token_ticks::NAME, 0 },
+            { token_ticks::ASSIGN, 0 }, { token_ticks::INT_VALUE, 1 } } });
     EXPECT_EQ(vm.const_i[1], 1);
 }
 

@@ -15,6 +15,7 @@ import trc_int;
 import trc_string;
 import Error;
 import language;
+import unreach;
 
 // 哈希表大小
 #define MAP_MIN_SIZE 50
@@ -136,6 +137,8 @@ size_t trc_map::hash_func(def::OBJ value) const {
     } else if (tag == RUN_TYPE_TICK::float_T) {
         return int(((def::FLOATOBJ)value)->value) % length;
     }
+    unreach("map's hash func met a unexpected type");
+    return 0;
 }
 
 def::OBJ& trc_map::get_value(const def::OBJ key_) const {

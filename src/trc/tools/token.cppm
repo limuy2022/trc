@@ -14,6 +14,9 @@ import compiler_def;
 import generated_params;
 import cmdparser;
 import basic_def;
+import compile_env;
+import color;
+import help;
 
 // token标记映射到名称，便于输出
 // todo:从最新的token进行更新

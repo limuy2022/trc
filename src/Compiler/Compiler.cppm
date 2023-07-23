@@ -18,6 +18,7 @@ import Error;
 import trcdef;
 import TVMdef;
 import language;
+import unreach;
 
 #define LINE_NUM compiler_data.error.get_line()
 
@@ -81,13 +82,15 @@ private:
 
     bool sentence();
 
-    void argv();
+    bool argv();
 
     bool value();
 
     bool func_call();
 
     bool factor();
+
+    bool left_value(bool error_report = false);
 
     /**
      * @brief 用于解析运算符表达式
@@ -214,8 +217,13 @@ bool Compiler::id(bool error_report) {
     }
     return true;
 failed:
-    token_.unget_token(t);
+    token_.unget_token();
     return false;
+}
+
+bool Compiler::left_value(bool error_report) {
+    // 匹配到ID
+    return func_call() || id(true);
 }
 
 Compiler::Compiler(const std::string& module_name,
@@ -237,7 +245,7 @@ void Compiler::compile(const std::string& codes) {
     compiler_data.vm.compress_memory();
 }
 
-void Compiler::argv() {
+bool Compiler::argv() {
     do {
         value();
         if (get_next_token_tick() != token_ticks::COMMA) {
@@ -245,6 +253,7 @@ void Compiler::argv() {
         }
         token_.get_token();
     } while (true);
+    return true;
 }
 
 bool Compiler::const_value() {
@@ -278,7 +287,7 @@ bool Compiler::const_value() {
         return true;
     }
     default: {
-        token_.unget_token(data_token);
+        token_.unget_token();
         return false;
     }
     }
@@ -308,7 +317,7 @@ bool Compiler::sentence() {
         case token_ticks::ASSIGN: {
             // 变量赋值
             token_.get_token();
-            item(true);
+            id(true);
             auto index_argv = local->get_index_of_var(now.data, true);
             if (local == &infoenv) {
                 // 全局环境
@@ -322,7 +331,7 @@ bool Compiler::sentence() {
         case token_ticks::STORE: {
             // 变量定义
             token_.get_token();
-            item(true);
+            id(true);
             auto index_argv = local->add_var(now.data);
             if (local == &infoenv) {
                 // 全局环境
@@ -372,7 +381,7 @@ bool Compiler::value() {
 }
 
 bool Compiler::factor() {
-    if (value()) {
+    if (item(false)) {
         return true;
     }
     return match(token_ticks::LEFT_SMALL_BRACE) && expr()
@@ -395,6 +404,7 @@ bool Compiler::term(bool first_call) {
             return false;
         }
         add_opcode(bytecode, 0);
+        return true;
     } else {
         return factor();
     }
@@ -412,6 +422,7 @@ bool Compiler::expr(bool first_call) {
             return false;
         }
         add_opcode(bytecode, 0);
+        return true;
     } else {
         return term();
     }
@@ -424,6 +435,7 @@ bool Compiler::func_call() {
     match(token_ticks::LEFT_SMALL_BRACE);
     argv();
     match(token_ticks::RIGHT_SMALL_BRACE);
+    return true;
 }
 
 bool Compiler::item(bool error_reoprt) {
@@ -433,7 +445,7 @@ bool Compiler::item(bool error_reoprt) {
 bool Compiler::match(token_ticks tick) {
     token res = token_.get_token();
     if (res.tick != tick) {
-        token_.unget_token(res);
+        token_.unget_token();
         return false;
     }
     return true;
@@ -442,7 +454,7 @@ bool Compiler::match(token_ticks tick) {
 token_ticks Compiler::get_next_token_tick() {
     token next_tmp = token_.get_token();
     auto nexttick = next_tmp.tick;
-    token_.unget_token(next_tmp);
+    token_.unget_token();
     return nexttick;
 }
 }

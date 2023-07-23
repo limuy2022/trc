@@ -2,9 +2,8 @@ module;
 #include <cassert>
 #include <cmath>
 #include <cstring>
-#include <obj_malloc.hpp>
-#include <string>
 #include <format>
+#include <string>
 module trc_long;
 import TVM.memory;
 import TRE;
@@ -13,6 +12,7 @@ import TVMdef;
 import trcdef;
 import TVM.memory;
 import unreach;
+import object;
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
@@ -77,7 +77,8 @@ void trc_long::cal_used_size() {
             return;
         }
     }
-    unreach(std::format("big num can't cal the used size.used:{}\nsize:{}", used, size));
+    unreach(std::format(
+        "big num can't cal the used size.used:{}\nsize:{}", used, size));
 }
 
 trc_long& trc_long::operator=(def::OBJ a) {
@@ -92,7 +93,7 @@ trc_long& trc_long::operator=(def::OBJ a) {
 def::OBJ trc_long::operator+(def::OBJ b) {
     auto a = (def::LONGOBJ)(b);
     // +1不是因为符号位，而是因为可能会进位
-    auto* res = MALLOCLONG((std::max)(a->used, used) + 1);
+    auto* res = global_objs_pool->MALLOCLONG((std::max)(a->used, used) + 1);
     memcpy(res->value, value, used * sizeof(bit_type));
     for (size_t i = 1; i <= a->used; ++i) {
         res->value[i] += a->value[i];
@@ -114,7 +115,7 @@ def::OBJ trc_long::operator+(def::OBJ b) {
 
 def::OBJ trc_long::operator-(def::OBJ b) {
     auto a = (def::LONGOBJ)(b);
-    auto* res = MALLOCLONG((std::max)(a->used, used));
+    auto* res = global_objs_pool->MALLOCLONG((std::max)(a->used, used));
     memcpy(res->value, value, used * sizeof(bit_type));
     for (size_t i = 0; i < a->used; ++i) {
         res->value[i] -= a->value[i];
@@ -136,7 +137,7 @@ def::OBJ trc_long::operator-(def::OBJ b) {
 
 def::OBJ trc_long::operator*(def::OBJ b) {
     auto v = (def::LONGOBJ)(b);
-    auto res = MALLOCLONG(v->used + used - 1);
+    auto res = global_objs_pool->MALLOCLONG(v->used + used - 1);
     for (size_t i = 1; i < used; ++i) {
         for (size_t j = 1; j < v->used; ++j) {
             size_t bit = i + j - 1;
@@ -163,38 +164,38 @@ void trc_long::putline(FILE* out) {
         fputc('-', out);
     }
     // 第一位不用补零，单独输出
-    fprintf(out, "%lld", value[used - 1]);
+    fprintf(out, "%lu", value[used - 1]);
     // 位压需要计算少了多少个零
     for (size_t i = used - 2; i > 0; --i) {
         for (unsigned int j = 1, zero_bit = bitopt - utils::len(value[i]);
              j < zero_bit; ++j) {
             fputc('0', out);
         }
-        fprintf(out, "%lld", value[i]);
+        fprintf(out, "%lu", value[i]);
     }
 }
 
 def::OBJ trc_long::operator/(def::OBJ) {
     // TODO
-    def::LONGOBJ res = MALLOCLONG();
+    def::LONGOBJ res = global_objs_pool->MALLOCLONG();
     return res;
 }
 
 def::OBJ trc_long::operator%(def::OBJ) {
     // TODO
-    def::LONGOBJ res = MALLOCLONG();
+    def::LONGOBJ res = global_objs_pool->MALLOCLONG();
     return res;
 }
 
 def::OBJ trc_long::pow_(def::OBJ) {
     // TODO
-    def::LONGOBJ res = MALLOCLONG();
+    def::LONGOBJ res = global_objs_pool->MALLOCLONG();
     return res;
 }
 
 def::OBJ trc_long::zdiv(def::OBJ) {
     // TODO
-    def::LONGOBJ res = MALLOCLONG();
+    def::LONGOBJ res = global_objs_pool->MALLOCLONG();
     return res;
 }
 
@@ -308,12 +309,12 @@ def::OBJ trc_long::to_string() {
     std::string tmp(value + 1, value + size);
     if (value[0])
         tmp = '-' + tmp;
-    auto res = MALLOCSTRING(tmp);
+    auto res = global_objs_pool->MALLOCSTRING(tmp);
     return res;
 }
 
 def::OBJ trc_long::to_float() {
-    def::FLONGOBJ res = MALLOCFLONG();
+    def::FLONGOBJ res = global_objs_pool->MALLOCFLONG();
     return res;
 }
 

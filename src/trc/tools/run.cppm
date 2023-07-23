@@ -13,6 +13,12 @@ import filesys;
 import generated_params;
 import cmdparser;
 import basic_def;
+import compile_env;
+import compiler_def;
+import token;
+import data;
+import help;
+import color;
 
 export namespace trc::tools {
 namespace tools_in {

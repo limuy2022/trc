@@ -14,6 +14,11 @@ import TVM;
 import generated_params;
 import cmdparser;
 import basic_def;
+import compiler_def;
+import token;
+import compile_env;
+import help;
+import color;
 
 namespace trc::tools {
 namespace tools_in {

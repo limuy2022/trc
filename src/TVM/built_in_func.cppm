@@ -5,7 +5,6 @@
 module;
 #include <cstdio>
 #include <cstdlib>
-#include <obj_malloc.hpp>
 export module built_in_func;
 import TRE;
 import TVM;
@@ -75,7 +74,7 @@ namespace builtin {
         for (int i = 0; i < argc; ++i) {
             ((def::STRINGOBJ)vm->pop())->putline(stdout);
         }
-        def::STRINGOBJ strtmp = MALLOCSTRING();
+        def::STRINGOBJ strtmp = global_objs_pool->MALLOCSTRING();
         strtmp->in(stdin);
         vm->push(strtmp);
     }
@@ -115,7 +114,7 @@ namespace builtin {
      */
     void TYPE(int argc, TVM* vm) {
         vm->top()
-            = MALLOCSTRING(TVM_share::int_name[(int)vm->top()->gettype()]);
+            = global_objs_pool->MALLOCSTRING(TVM_share::int_name[(int)vm->top()->gettype()]);
     }
 }
 }

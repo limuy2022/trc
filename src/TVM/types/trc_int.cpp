@@ -2,13 +2,13 @@ module;
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>
-#include <obj_malloc.hpp>
 #include <string>
 module trc_int;
 import TVM.memory;
 import TVMdef;
 import TRE;
 import trcdef;
+import object;
 
 namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_int::type = RUN_TYPE_TICK::int_T;
@@ -67,33 +67,33 @@ def::INTOBJ trc_int::operator>=(def::OBJ value_i) {
 }
 
 def::OBJ trc_int::operator+(def::OBJ value_i) {
-    return MALLOCINT(value + ((def::INTOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCINT(value + ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator-(def::OBJ value_i) {
-    return MALLOCINT(value - ((def::INTOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCINT(value - ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator*(def::OBJ value_i) {
-    return MALLOCINT(value * ((def::INTOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCINT(value * ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::operator/(def::OBJ value_i) {
     int second = ((def::INTOBJ)(value_i))->value;
-    return (second ? MALLOCINT(value / second) : nullptr);
+    return (second ? global_objs_pool->MALLOCINT(value / second) : nullptr);
 }
 
 def::OBJ trc_int::operator%(def::OBJ value_i) {
-    return MALLOCINT(value % ((def::INTOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCINT(value % ((def::INTOBJ)(value_i))->value);
 }
 
 def::OBJ trc_int::pow_(def::OBJ value_i) {
-    return MALLOCINT(
+    return global_objs_pool->MALLOCINT(
         (int)pow((double)value, (double)(((def::INTOBJ)(value_i))->value)));
 }
 
 def::OBJ trc_int::zdiv(def::OBJ value_i) {
-    return MALLOCINT(value / ((def::INTOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCINT(value / ((def::INTOBJ)(value_i))->value);
 }
 
 def::INTOBJ trc_int::operator!() {
@@ -111,11 +111,11 @@ def::INTOBJ trc_int::operator||(def::OBJ value_i) {
 }
 
 def::OBJ trc_int::to_string() {
-    return MALLOCSTRING(std::to_string(value).c_str());
+    return global_objs_pool->MALLOCSTRING(std::to_string(value).c_str());
 }
 
 def::OBJ trc_int::to_float() {
-    return MALLOCFLOAT((double)value);
+    return global_objs_pool->MALLOCFLOAT((double)value);
 }
 
 def::OBJ trc_int::to_bool() {

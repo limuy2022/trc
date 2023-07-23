@@ -13,6 +13,11 @@ import Error;
 import io;
 import generated_params;
 import trcdef;
+import compile_env;
+import compiler_def;
+import token;
+import color;
+import help;
 
 /**
  * @brief 判断是否为新的语句块开始

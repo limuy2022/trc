@@ -4,14 +4,21 @@
 
 module;
 #include <cstdlib>
+#include <format>
 export module generated_params;
 import Compiler;
+import compile_env;
 import compiler_def;
 import cmdparser;
 import color;
 import trcdef;
 import help;
 import basic_def;
+import token;
+import trc_flong;
+import trc_long;
+import data;
+import unreach;
 
 namespace trc::tools {
 bool gen_number_table = true;
@@ -51,7 +58,7 @@ export void argv_lex() {
             break;
         }
         case 'v': {
-            color::green("Version %s\n", def::version);
+            color::green(std::format("Version {}\n", def::version));
             exit(0);
         }
         case 'h': {

@@ -11,6 +11,16 @@ import build;
 import generated_params;
 import cmdparser;
 import basic_def;
+import compiler_def;
+import token;
+import data;
+import unreach;
+import color;
+import help;
+import compile_env;
+import Compiler;
+import ctree_loader;
+import filesys;
 
 export namespace trc::tools {
 namespace tools_in {

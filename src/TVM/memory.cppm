@@ -24,6 +24,31 @@ export struct objs_pool_TVM {
     memory::objs_pool<types::trc_string> str_pool;
     memory::objs_pool<types::trc_long> long_pool;
     memory::objs_pool<types::trc_flong> flong_pool;
+
+    template<typename ...T>
+    types::trc_int* MALLOCINT(const T&...argv) {
+        return int_pool.trcmalloc(argv...);
+    }
+
+    template<typename ...T>
+    types::trc_float* MALLOCFLOAT(const T&...argv) {
+        return float_pool.trcmalloc(argv...);
+    }
+
+    template<typename ...T>
+    types::trc_string* MALLOCSTRING(const T&...argv) {
+        return str_pool.trcmalloc(argv...);
+    }
+
+    template<typename ...T>
+    types::trc_long* MALLOCLONG(const T&...argv) {
+        return long_pool.trcmalloc(argv...);
+    }
+
+    template<typename ...T>
+    types::trc_flong* MALLOCFLONG(const T&...argv) {
+        return flong_pool.trcmalloc(argv...);
+    }
 }* global_objs_pool;
 
 /**

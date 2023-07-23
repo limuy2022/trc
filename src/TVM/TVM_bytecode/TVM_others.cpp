@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <array>
 #include <filesystem>
-#include <obj_malloc.hpp>
 module TVM;
 import TRE;
 import lib;
@@ -24,22 +23,22 @@ void TVM::LOAD_INT(bytecode_index_t index) {
         push(&TVM_share::int_cache[value - INT_CACHE_BEGIN]);
         return;
     }
-    push(MALLOCINT(value));
+    push(global_objs_pool->MALLOCINT(value));
 }
 
 void TVM::LOAD_MAP(bytecode_index_t argc) {
 }
 
 void TVM::LOAD_FLOAT(bytecode_index_t index) {
-    push(MALLOCFLOAT(static_data.const_f[index]));
+    push(global_objs_pool->MALLOCFLOAT(static_data.const_f[index]));
 }
 
 void TVM::LOAD_STRING(bytecode_index_t index) {
-    push(MALLOCSTRING(static_data.const_s[index]));
+    push(global_objs_pool->MALLOCSTRING(static_data.const_s[index]));
 }
 
 void TVM::LOAD_LONG(bytecode_index_t index) {
-    push(MALLOCLONG(static_data.const_long[index]));
+    push(global_objs_pool->MALLOCLONG(static_data.const_long[index]));
 }
 
 void TVM::LOAD_ARRAY(bytecode_index_t index) {
@@ -55,7 +54,7 @@ void TVM::GOTO(bytecode_index_t index) {
  * @details
  * 如果路径不正确将路径转换成正确的，否则报错
  */
-static void fix_path(const std::string& path) {
+[[maybe_unused]] static void fix_path(const std::string& path) {
     if (fs::is_regular_file(path)) {
         return;
     }

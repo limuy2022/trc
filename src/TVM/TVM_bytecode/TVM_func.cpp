@@ -56,7 +56,8 @@ void TVM::CALL_BUILTIN(bytecode_index_t builtin_func_name) {
         break;
     }
     default: {
-        unreach(std::format("there is not a builin function {} to call", (short)builtin_func_name));
+        unreach(std::format("there is not a builin function {} to call",
+            (short)builtin_func_name));
     }
     }
 }

@@ -1,7 +1,6 @@
 module;
 #include <cstdlib>
 #include <cstring>
-#include <obj_malloc.hpp>
 #include <string>
 module trc_string;
 import TVMdef;
@@ -9,6 +8,7 @@ import TRE;
 import io;
 import TVM.memory;
 import trcdef;
+import object;
 
 namespace trc::TVM_space::types {
 using namespace TVM_share;
@@ -55,7 +55,7 @@ trc_string& trc_string::operator=(const trc_string& value_i) {
 }
 
 def::OBJ trc_string::operator+(def::OBJ value_i) {
-    def::STRINGOBJ tmp = MALLOCSTRING(*this);
+    def::STRINGOBJ tmp = global_objs_pool->MALLOCSTRING(*this);
     *tmp += value_i;
     return tmp;
 }
@@ -121,11 +121,11 @@ const char* trc_string::c_str() const {
 }
 
 def::OBJ trc_string::to_float() {
-    return MALLOCFLOAT(atof(value));
+    return global_objs_pool->MALLOCFLOAT(atof(value));
 }
 
 def::OBJ trc_string::to_int() {
-    return MALLOCINT(atoi(value));
+    return global_objs_pool->MALLOCINT(atoi(value));
 }
 
 RUN_TYPE_TICK trc_string::gettype() {
@@ -137,7 +137,7 @@ def::OBJ trc_string::operator*(def::OBJ value_i) {
         return nullptr;
     }
     int tmp = ((def::INTOBJ)(value_i))->value;
-    auto res = MALLOCSTRING();
+    auto res = global_objs_pool->MALLOCSTRING();
     res->set_realloc(char_num * tmp);
     for (int i = 0; i < tmp; ++i) {
         strcat(res->value, value);

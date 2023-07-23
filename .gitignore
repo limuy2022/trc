@@ -8,13 +8,14 @@
 build/
 out/
 bin/
+cmake_third_party/
+Testing/
 CMakeFiles/
 .ninja_deps
 .ninja_log
 build.ninja
 cmake_install.cmake
 CMakeCache.txt
-CMakeLists.txt
 Makefile
 rules.ninja
 compile_commands.json

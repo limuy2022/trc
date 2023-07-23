@@ -1,4 +1,5 @@
 item -> expr | func_call | value
+left_value -> id | func_call
 sentence -> id = item
 sentence -> id := item
 func_call -> id(argv)
@@ -6,7 +7,7 @@ argv -> argv,value | value
 
 expr -> expr + term | expr - term | term
 term -> term * factor | term / factor | term ** factor | term % factor | factor
-factor -> value | (expr)
+factor -> item | (expr)
 
 const_value -> string | int | float
 value -> const_value | id
@@ -20,3 +21,4 @@ whilesentence -> while item {
 sentnece -> ifsentence | whilesentence
 sentence -> assert argv
 sentence -> goto int
+sentence -> func_call

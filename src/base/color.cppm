@@ -4,6 +4,7 @@
 
 module;
 #include <cstdio>
+#include <string>
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -45,17 +46,15 @@ public:
      * @brief 输出
      * @details 像使用printf一样使用它
      */
-    template <typename... argvs>
-    void operator()(const char* fmt, const argvs&... data) const;
+    void operator()(const std::string& output_msg) const;
 
 private:
     color_type color;
 };
 
-template <typename... argvs>
-void color_st::operator()(const char* fmt, const argvs&... data) const {
+void color_st::operator()(const std::string& output_msg) const {
     printf("%s", this->color);
-    printf(fmt, data...);
+    printf("%s", output_msg.c_str());
     printf("%s", CLOSE_COLOR);
 }
 

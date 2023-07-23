@@ -1,42 +1,41 @@
 # Trc
 
-## Trc是一个基于栈的编程语言
+## Trc is a stack-based programming language
 
-Trc是一个功能强大，工具链完善，容易上手的解释型语言，易于学习和使用，并且也容易被其他c++项目使用。
+Trc's syntax is easy,and have full toolchain.It is easy to learn modern c++ and compiler,too.
 
-## 语言
+## language
 
-完全由C++编写,采用全新的c++20标准，并且完全使用模块(module)特性
+100% C++
 
-## 目标
+Using c++ 20 standard and use module feature
 
-#### Python的简洁
+## Goal
 
-#### Java的速度
+#### as easy as Python
 
-#### lua的体积
+#### as fast as Java
 
-## 项目站点
+#### as small as lua
+
+## project website
 
 [Gitee](https://gitee.com/li-muyangangel/trc.git)
 [GitHub](https://github.com/limuy2022/trc.git)
 
-## 具体文档说明请参考
+## All docs reference
 
-[所有文档](doc)
+[All docs](doc)
 
-## 快速使用
-#### 由于Linux系统兼容性过低，所以请参考下一章自行编译安装
-#### windows请直接使用编译好的二进制文件或参考下一章的编译教程
+## How to compile
 
-## 如何编译此项目
-[编译指南](doc/developer/build.md)
+[Compilation guide](doc/developer/build.md)
 
-## 更改语言
+## International
 
-trc支持多种语言，支持方式是用相应的动态链接库文件覆盖掉原有的language文件即可
+trc support many languages，the way to change language is that uses the language's dynamic linked library to replace the original language library
 
-## 简单例子
+## Simple examples
 
 ### hello world
 
@@ -44,7 +43,7 @@ trc支持多种语言，支持方式是用相应的动态链接库文件覆盖�
 println("hello world!")
 ```
 
-### 求1到n中的偶数
+### calculate even numbers from 1 to n
 
 ```
 a := int(input())
@@ -56,7 +55,7 @@ while a > 0 {
 }
 ```
 
-### 大整数运算
+### Big num calculation
 
 ```
 a := 1231234561234
@@ -70,19 +69,18 @@ del "c"
 println(a * b)
 ```
 
-### 更多例子请参考
+[more example](tests/black_test/program)
 
-[更多例子](tests/black_test/program)
+## Contact author
 
-## 联系作者
-
-微信:angelgel2020
+Wechat:angelgel2020
 
 QQ:3570249647
 
-## 引用的开源软件
-| 库名         | 用途     |
-|:-----------|:-------|
-| googletest | 单元测试框架 |
+## Referenced Open-source software
 
-在此向开源软件的作者表示感谢！
+| Library         |Usage     |
+|:-----------|:-------|
+| googletest | Uniitest |
+
+Express my thanks to Open-source software contributors!

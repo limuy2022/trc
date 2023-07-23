@@ -11,6 +11,9 @@ import Compiler;
 import generated_params;
 import cmdparser;
 import basic_def;
+import compile_env;
+import color;
+import help;
 
 namespace trc::tools {
 static TVM_space::TVM_static_data vm;

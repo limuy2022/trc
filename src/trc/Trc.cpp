@@ -5,14 +5,14 @@
  */
 
 #include <cstring>
-#include <iostream>
+#include <format>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
+import generated_params;
 import TVM.memory;
 import color;
 import memory;
-import generated_params;
 import trcdef;
 import brun;
 import build;
@@ -26,13 +26,25 @@ import tools.token;
 import tshell;
 import basic_def;
 import language;
+import token;
+import data;
+import unreach;
+import color;
+import help;
+import compile_env;
+import Compiler;
+import ctree_loader;
+import filesys;
+import code_loader;
+import io;
 
 namespace trc {
 /**
  * @brief 报出找不到模式错误
  */
 static inline void show_error(const char* mode) {
-    color::red("Trc:\"%s\"%s", mode, language::trc::mode_not_found);
+    color::red(
+        std::format("Trc:\"{}\"{}", mode, language::trc::mode_not_found));
 }
 
 // 命令函数的接口类型
@@ -50,8 +62,9 @@ struct {
 /**
  * @brief 查找对应工具并运行
  * @param mode 对应工具
+ * unittest时不会被使用
  */
-static inline void find_mode_to_run(const char* mode) {
+[[maybe_unused]] static inline void find_mode_to_run(const char* mode) {
     for (const auto& i : cmd_tool) {
         if (!strcmp(mode, i.name)) {
             // 匹配上了

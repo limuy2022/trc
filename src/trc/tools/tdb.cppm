@@ -21,6 +21,14 @@ import generated_params;
 import trcdef;
 import TVM.memory;
 import language;
+import compile_env;
+import compiler_def;
+import token;
+import unreach;
+import cmdparser;
+import color;
+import help;
+import basic_def;
 
 namespace trc {
 namespace tdb {

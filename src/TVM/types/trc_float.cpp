@@ -1,7 +1,6 @@
 module;
 #include <cmath>
 #include <cstdio>
-#include <obj_malloc.hpp>
 #include <string>
 module trc_float;
 import TVMdef;
@@ -10,6 +9,7 @@ import TRE;
 import TVM.memory;
 import trc_int;
 import trc_string;
+import object;
 
 namespace trc::TVM_space::types {
 const RUN_TYPE_TICK trc_float::type = RUN_TYPE_TICK::float_T;
@@ -57,32 +57,32 @@ def::INTOBJ trc_float::operator>=(def::OBJ value_i) {
 }
 
 def::OBJ trc_float::operator+(def::OBJ value_i) {
-    return MALLOCFLOAT(value + ((def::FLOATOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCFLOAT(value + ((def::FLOATOBJ)(value_i))->value);
 }
 
 def::OBJ trc_float::operator-(def::OBJ value_i) {
-    return MALLOCFLOAT(value - ((def::FLOATOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCFLOAT(value - ((def::FLOATOBJ)(value_i))->value);
 }
 
 def::OBJ trc_float::operator*(def::OBJ value_i) {
-    return MALLOCFLOAT(value * ((def::FLOATOBJ)(value_i))->value);
+    return global_objs_pool->MALLOCFLOAT(value * ((def::FLOATOBJ)(value_i))->value);
 }
 
 def::OBJ trc_float::operator/(def::OBJ value_i) {
     double second = ((def::FLOATOBJ)(value_i))->value;
-    return second != 0 ? MALLOCFLOAT(value / second) : nullptr;
+    return second != 0 ? global_objs_pool->MALLOCFLOAT(value / second) : nullptr;
 }
 
 def::OBJ trc_float::operator%(def::OBJ value_i) {
-    return MALLOCFLOAT(fmod(value, ((def::FLOATOBJ)(value_i))->value));
+    return global_objs_pool->MALLOCFLOAT(fmod(value, ((def::FLOATOBJ)(value_i))->value));
 }
 
 def::OBJ trc_float::pow_(def::OBJ value_i) {
-    return MALLOCFLOAT(pow(value, ((def::FLOATOBJ)(value_i))->value));
+    return global_objs_pool->MALLOCFLOAT(pow(value, ((def::FLOATOBJ)(value_i))->value));
 }
 
 def::OBJ trc_float::zdiv(def::OBJ value_i) {
-    return MALLOCFLOAT((int)(value / ((def::FLOATOBJ)(value_i))->value));
+    return global_objs_pool->MALLOCFLOAT((int)(value / ((def::FLOATOBJ)(value_i))->value));
 }
 
 def::INTOBJ trc_float::operator!() {

@@ -10,7 +10,7 @@ import Error;
 import TVM_data;
 
 export namespace trc::compiler {
-typedef error::error_module compiler_error;
+using compiler_error = error::error_module;
 
 /**
  * @brief 编译器的参数

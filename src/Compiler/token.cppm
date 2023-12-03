@@ -1,10 +1,10 @@
 ﻿module;
-#include <cassert>
 #include <cstring>
 #include <format>
 #include <stack>
 #include <string>
 #include <vector>
+#include <fstream>
 export module token;
 import compiler_def;
 import trc_flong;
@@ -12,6 +12,8 @@ import trc_long;
 import Error;
 import language;
 import unreach;
+
+constexpr size_t buffersize = 4028;
 
 export namespace trc::compiler {
 // token的标识
@@ -85,15 +87,72 @@ struct token {
     size_t data = 0;
 };
 
+class buffer_ctrl {
+private:
+    /**
+     * @brief 装载缓冲区并指向它
+     * @param buf
+     */
+    void setbuf(std::array<char, buffersize + 1>& buf) {
+        char_ptr = buf.data();
+        auto readsz = fread(buf.data(), buffersize, sizeof(std::remove_reference_t<decltype(buf)>::value_type), file);
+        buf[readsz] = 0;
+    }
+
+public:
+    // char buffer,prevent compiler from reading a large file and storing it in memory
+    std::array<char, buffersize + 1> buffer1, buffer2;
+    FILE* file;
+    bool end = false;
+
+    // 指向当前正在解析的字符
+    const char* char_ptr = nullptr;
+
+    buffer_ctrl(FILE* file):file(file) {
+        setbuf(buffer1);
+    }
+
+    /**
+     * @brief read next char from buffer
+     * @return next char
+     */
+    int nextchar() {
+        if(end) {
+            return EOF;
+        }
+        char ret = *char_ptr;
+        char_ptr++;
+        if(*char_ptr == 0) {
+            if(char_ptr == &buffer1.back()) {
+                setbuf(buffer2);
+            } else if(char_ptr == &buffer2.back()) {
+                setbuf(buffer1);
+            } else {
+                end = true;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @brief get the char now
+     * @return
+     */
+    int readchar() const {
+        if(end) {
+            return EOF;
+        }
+        return *char_ptr;
+    }
+};
+
 /**
  * @brief
  * 这是一个将字符串转换成token流按行输出的类
  */
 class token_lex {
 public:
-    explicit token_lex(compiler_public_data& compiler_data);
-
-    void set_code(const std::string& code);
+    explicit token_lex(compiler_public_data& compiler_data, FILE* file);
 
     ~token_lex();
 
@@ -110,19 +169,19 @@ public:
     /**
      * @brief 退回并储存一个token
      */
-    void unget_token();
+    void unget_token(token t);
 
     compiler_public_data& compiler_data;
 
 private:
-    std::vector<token> tokenlist;
+    std::stack<token> tokenback;
 
     int id = 0;
 
-    // 指向当前正在解析的字符
-    const char* char_ptr = nullptr;
+    buffer_ctrl buf;
 
     token lexinteral();
+
 
     // 判断是否解析到了终点
     [[nodiscard]] bool end_of_lex() const noexcept;
@@ -171,31 +230,25 @@ private:
 
 token token_lex::lex_string() {
     // 略过当前"符号
-    char string_begin = *char_ptr;
-    ++char_ptr;
-    const char* start = char_ptr;
-    while (*char_ptr != string_begin) {
-        // 读入下一个符号
-        if (*char_ptr == '\\') {
-            char_ptr++;
-        }
+    char string_begin = buf.readchar();
+    buf.nextchar();
+    std::string str;
+    // 使用自定义的函数方便处理换行符，消除字符的移动
+    while(true) {
         if (end_of_lex()) {
             // 读到文件末尾了，说明字符串解析错误
             compiler_data.error.send_error_module(
                 error::SyntaxError, language::error::syntaxerror_lexstring);
         }
-        ++char_ptr;
-    }
-    ptrdiff_t str_len = char_ptr - start;
-    std::string str;
-    str.reserve(str_len);
-    // 使用自定义的函数方便处理换行符，消除字符的移动
-    for (char* i = const_cast<char*>(start); i != char_ptr; ++i) {
-        if (*i == '\\') {
+        char tmp = buf.nextchar();
+        if(tmp == string_begin) {
+            break;
+        }
+        if (tmp == '\\') {
             // 转义符
-            ++i;
+            tmp = buf.nextchar();
             // 读出真实符号并匹配转为真实符号
-            switch (*i) {
+            switch (tmp) {
             case 'r': {
                 str += '\r';
                 break;
@@ -246,37 +299,31 @@ token token_lex::lex_string() {
             }
             }
         } else {
-            str += *i;
+            str += tmp;
         }
     }
-    // 略过字符串终结符
-    ++char_ptr;
     return token { token_ticks::STRING_VALUE,
         compiler_data.const_string.add(str) };
 }
 
 token token_lex::lex_int_float() {
-    const char* start = char_ptr;
     token_ticks tick_for_res = token_ticks::INT_VALUE;
-    do {
-        if (!isdigit(*char_ptr)) {
-            if (*char_ptr == '.') {
-                // 小数点，开启调整类型为浮点数
-                tick_for_res = token_ticks::FLOAT_VALUE;
-            } else if (*char_ptr != '_') {
-                break;
-            }
-        }
-        ++char_ptr;
-    } while (!end_of_lex());
     token result;
-    ptrdiff_t res_len = char_ptr - start;
     std::string str;
-    str.reserve(res_len);
-    for (char* i = const_cast<char*>(start); i != char_ptr; ++i) {
-        if (*i != '_') {
+    size_t res_len = 0;
+    while (!end_of_lex()) {
+        char c = buf.nextchar();
+        if (c == '.') {
+            // 小数点，开启调整类型为浮点数
+            tick_for_res = token_ticks::FLOAT_VALUE;
+        } else if (c == '_') {
             // 忽略数字中间的下划线，例如123_456
-            str += *i;
+            continue;
+        } else if(isdigit(c)) {
+            str += c;
+            ++res_len;
+        } else {
+            break;
         }
     }
     // 尝试纠正为长整型和长浮点型
@@ -286,7 +333,7 @@ token token_lex::lex_int_float() {
             // todo
             tick_for_res = token_ticks::LONG_FLOAT_VALUE;
         } else {
-            result.data = compiler_data.const_float.add(atof(str.c_str()));
+            result.data = compiler_data.const_float.add(strtod(str.c_str(), nullptr));
         }
         break;
     }
@@ -308,7 +355,8 @@ token token_lex::lex_int_float() {
 }
 
 bool token_lex::end_of_lex() const noexcept {
-    return *char_ptr == '\n' || *char_ptr == '\0';
+    char c = buf.readchar();
+    return c == '\n' || c == '\0';
 }
 
 #define CREATE_KEYWORD(str, tick)                                              \
@@ -339,21 +387,24 @@ struct {
 #undef CREATE_KEYWORD
 
 token token_lex::lex_english() {
-    const char* start = char_ptr;
+    std::string tmp;
     do {
-        ++char_ptr;
-    } while ((is_english(*char_ptr) || isdigit(*char_ptr)) && !end_of_lex());
-    size_t len = char_ptr - start;
+        char c = buf.readchar();
+        if((!is_english(c) && !isdigit(c)) || end_of_lex()) {
+            break;
+        }
+        buf.nextchar();
+        tmp += c;
+    } while (true);
     for (const auto& keyword : keywords_) {
-        if (keyword.len == len && !strncmp(start, keyword.str, len)) {
+        if (keyword.len == tmp.length() && tmp == keyword.str) {
             // 传入空串是因为能在此被匹配的，都可以用token_ticks表达含义，不需要储存具体信息
             return token { keyword.tick };
         }
     }
-    auto tmp = std::string(start, len);
     // 啥关键字都不是，只能是名称了
     return token { token_ticks::NAME,
-        compiler_data.const_name.add(std::string(start, len)) };
+        compiler_data.const_name.add(tmp) };
 }
 
 token_ticks token_lex::get_binary_ticks(
@@ -537,24 +588,24 @@ token token_lex::lex_others() {
     return result;
 }
 
-void token_lex::unget_token() {
-    if(id == 0) {
-        unreach("token list out of range");
-    }
-    id--;
-    if (tokenlist[id].tick == token_ticks::END_OF_LINE) {
+void token_lex::unget_token(token t) {
+    if (t.tick == token_ticks::END_OF_LINE) {
         compiler_data.error.sub_line();
     }
+    tokenback.push(t);
 }
 
 token token_lex::get_token() {
-    if (tokenlist[id].tick == token_ticks::END_OF_LINE) {
-            compiler_data.error.add_line();
-    } 
-    if(id + 1 >= tokenlist.size()) {
-        unreach("token list out of range");
+    if(!tokenback.empty()) {
+        auto ret = tokenback.top();
+        tokenback.pop();
+        return ret;
     }
-    return tokenlist[id++];
+    auto t = lexinteral();
+    if (t.tick == token_ticks::END_OF_LINE) {
+            compiler_data.error.add_line();
+    }
+    return t;
 }
 
 token token_lex::lexinteral() {
@@ -595,29 +646,17 @@ token token_lex::lexinteral() {
     return lex_others();
 }
 
-token_lex::token_lex(compiler_public_data& compiler_data)
-    : compiler_data(compiler_data) {
+token_lex::token_lex(compiler_public_data& compiler_data, FILE* file)
+    : compiler_data(compiler_data), buf(file) {
 }
 
-void token_lex::set_code(const std::string& code) {
-    char_ptr = code.c_str();
-    tokenlist.clear();
-    while(1) {
-        auto i = get_token();
-        tokenlist.push_back(i);
-        if(i.tick == token_ticks::END_OF_TOKENS) {
-            break;
-        }
-    }
+token_lex::~token_lex() {
+    compiler_data.error.reset_line();
     // 最后判断括号栈是否为空，如果不为空，说明括号未完全匹配，报错
     if (!check_brace.empty()) {
         char error_tmp[] = { check_brace.top(), '\0' };
         compiler_data.error.send_error_module(error::SyntaxError,
             language::error::syntaxerror_unmatched_char, error_tmp);
     }
-}
-
-token_lex::~token_lex() {
-    compiler_data.error.reset_line();
 }
 }

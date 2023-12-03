@@ -47,7 +47,8 @@ xmake unittest
 xmake run unittest
 ```
 
-if you use cmake,you should first download [googletest](https://github.com/google/googletest)(because cmake don't have a package manager),and place it in dir ```cmake_third_party```,then run:
+if you use cmake,you should first download [googletest](https://github.com/google/googletest)(because cmake don't have a package manager),and place it in dir ```cmake_third_party```,then run
+or you can use the script ```update_requirement.py``` to download and update the requirements:
 
 ```
 cmake . -GNinja

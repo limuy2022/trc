@@ -8,7 +8,7 @@ module;
 export module func_loader;
 
 namespace trc::loader {
-export std::array<const char*, 11> num_func = {
+export std::array num_func = {
     "exit",
     "print",
     "println",

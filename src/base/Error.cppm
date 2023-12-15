@@ -58,11 +58,15 @@ void output_error_msg(error_type error_name, const argv_t&... ap) {
     fputc('\n', stderr);
 }
 
-template <typename... argv_t>
-void send_error_detail(error_type name, const std::string& module_name,
-    size_t line_index, const argv_t&... ap) {
-    fprintf(stderr, "\n%s%s\n%s%zu:\n", language::error::error_from,
-        module_name.c_str(), language::error::error_in_line, line_index);
+template <bool compiling, typename... argv_t>
+void send_error_interal(error_type name, const std::string& module_name,
+    const std::string&postion_info, const argv_t&... ap) {
+    if constexpr (compiling) {
+        fprintf(stderr, "\n%s%s\n", language::error::error_from, postion_info.c_str());
+    } else {
+        fprintf(stderr, "\n%s%s\n%s%s:\n", language::error::error_from,
+        module_name.c_str(), language::error::error_in_line, postion_info.c_str());
+    }
     // 输出错误名
     fprintf(stderr, "%s", language::error::error_map[name]);
     output_error_msg(name, ap...);
@@ -77,47 +81,6 @@ void send_error_detail(error_type name, const std::string& module_name,
 
 template <typename... argv_t>
 void send_error(error_type error_name, const argv_t&... argv) {
-    send_error_detail(error_name, "__main__", 0, argv...);
+    send_error_interal<false>(error_name, "__main__", "0", argv...);
 }
-
-/**
- * @brief 关于模块报错的异常封装
- * @details 包含模块名和当前行数
- */
-class error_module {
-public:
-    // 模块的名字
-    const std::string name;
-
-    explicit error_module(std::string name)
-        : name(std::move(name)) {
-    }
-    /**
-     * @brief 报出错误
-     */
-    template <typename... P>
-    void send_error_module(error_type errorn, const P&... argv) {
-        send_error_detail(errorn, name, line, argv...);
-    }
-
-    [[nodiscard]] line_t get_line() const {
-        return line;
-    }
-
-    void add_line() {
-        line++;
-    }
-
-    void sub_line() {
-        line--;
-    }
-
-    void reset_line() {
-        line = 1;
-    }
-
-private:
-    // 当前操作的行号
-    line_t line = 1;
-};
 }

@@ -5,9 +5,10 @@
 
 module;
 #include <cstdio>
+#include <sstream>
 #include <string>
+#include <compiler.hpp>
 export module tshell;
-import Compiler;
 import TVM;
 import Error;
 import io;
@@ -15,7 +16,6 @@ import generated_params;
 import trcdef;
 import compile_env;
 import compiler_def;
-import token;
 import color;
 import help;
 
@@ -40,14 +40,13 @@ namespace trc {
  * @param res 语句块储存
  */
 static void get_block(std::string& res) {
-    char* temp = nullptr;
     int break_num = 1;
     for (;;) {
+        std::string temp;
         for (int i = 0; i <= break_num; ++i)
             printf("%s", "    ");
         printf("->");
-        free(temp);
-        io::readstr(temp, stdin);
+        std::getline(std::cin, temp);
         res += temp;
         res += '\n';
         if (is_block(temp)) {
@@ -59,8 +58,9 @@ static void get_block(std::string& res) {
             }
         }
     }
-    free(temp);
 }
+
+
 
 namespace tools::tools_out {
     /**
@@ -69,33 +69,27 @@ namespace tools::tools_out {
     export void tshell() {
         printf("Trc %s\n\n", def::version);
 
-        char* code = nullptr;
-
         auto vm = new TVM_space::TVM;
         // tshell报错但不终止程序
         error::error_env::quit = false;
-        // 先传入空代码获取对象
-        compiler::Compiler info_saver(
-            compiler::main_module, tools::compilerOption, vm->static_data);
         for (;;) {
             printf("%s", "\ntshell>");
-            free(code);
-            io::readstr(code, stdin);
-            std::string code_str(code);
-            if (is_block(code)) {
+            auto tmpf = tmpfile();
+            std::string code_str;
+            std::getline(std::cin, code_str);
+            if (is_block(code_str)) {
                 get_block(code_str);
             }
+            fprintf(tmpf, "%s", code_str.c_str());
+            rewind(tmpf);
             vm->static_data.byte_codes.clear();
-            // 设置好报错时返回到的地址
             try {
-                info_saver.compile(code);
+                compiler::compiler().parse(tools::compilerOption, "tshell", tmpf, &vm->static_data);
                 vm->reload_data();
                 vm->run_all();
             } catch (error::error_env::vm_run_error) { }
-            // 重新还原行号
-            info_saver.compiler_data.error.reset_line();
+            fclose(tmpf);
         }
-        // 该地不需要释放内存的原因是退出只可能是ctrl+c或者exit函数，而退出后会由操作系统回收内存
     }
 }
 }

@@ -4,14 +4,14 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
+#include "parser.tab.hpp"
 export module compiler_def;
 import TVM;
 import Error;
 import TVM_data;
 
 export namespace trc::compiler {
-using compiler_error = error::error_module;
-
 /**
  * @brief 编译器的参数
  */
@@ -81,21 +81,19 @@ public:
  */
 class compiler_public_data {
 public:
-    compiler_public_data(const std::string& module_name,
-        const compiler_option& option, TVM_space::TVM_static_data& vm)
-        : error(module_name)
-        , option(option)
+    compiler_public_data(const compiler_option& option, TVM_space::TVM_static_data& vm, yy::location& location)
+        : option(option)
         , vm(vm)
         , const_int(vm.const_i)
         , const_float(vm.const_f)
         , const_string(vm.const_s)
         , const_long_int(vm.const_long)
-        , const_name(name_list) {
+        , const_name(name_list)
+        , loc(location) {
         // 添加true,false,null常量
         const_int.add(0);
         const_int.add(1);
     }
-    compiler_error error;
     const compiler_option& option;
     TVM_space::TVM_static_data& vm;
     constant_pool_controller<int> const_int;
@@ -103,6 +101,18 @@ public:
     std::vector<std::string> name_list;
     constant_pool_controller<std::string> const_string, const_long_int,
         const_name;
+    yy::location& loc;
+
+    /**
+     * @brief 报出错误
+     */
+    template <typename... P>
+    void send_error(error::error_type errorn, const P&... argv) {
+        //todo:optimize it
+        std::stringstream ss;
+        ss << loc;
+        error::send_error_interal<true>(errorn, ss.str(), argv...);
+    }
 };
 
 // 实例化几个常用的编译参数

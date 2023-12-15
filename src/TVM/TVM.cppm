@@ -75,8 +75,8 @@ public:
      */
     template <typename... P>
     void error_report(error::error_type error, const P&... argv) {
-        error::send_error_detail(
-            error, name, static_data.line_number_table[run_index] + 1, argv...);
+        error::send_error_interal<false>(
+            error, name, std::to_string(static_data.line_number_table[run_index] + 1), argv...);
     }
 
     /**

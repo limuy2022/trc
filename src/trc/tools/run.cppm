@@ -5,8 +5,8 @@
 module;
 #include <string>
 #include <vector>
+#include <compiler.hpp>
 export module run;
-import Compiler;
 import TVM;
 import ctree_loader;
 import filesys;
@@ -15,7 +15,6 @@ import cmdparser;
 import basic_def;
 import compile_env;
 import compiler_def;
-import token;
 import data;
 import help;
 import color;
@@ -28,11 +27,7 @@ namespace tools_in {
             loader::loader_ctree(vm, path);
         } else {
             /*是源文件*/
-            std::string scodes;
-            utils::readcode(scodes, path);
-            compiler::Compiler(
-                compiler::main_module, tools::compilerOption, vm->static_data)
-                .compile(scodes);
+            compiler::compiler().parse(tools::compilerOption, path, &vm->static_data);
         }
         vm->reload_data();
         vm->run_all();

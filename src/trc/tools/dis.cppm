@@ -5,8 +5,8 @@
 module;
 #include <cstdio>
 #include <string>
+#include <compiler.hpp>
 export module dis;
-import Compiler;
 import code_loader;
 import ctree_loader;
 import filesys;
@@ -15,7 +15,6 @@ import generated_params;
 import cmdparser;
 import basic_def;
 import compiler_def;
-import token;
 import compile_env;
 import help;
 import color;
@@ -79,11 +78,9 @@ namespace tools_in {
         if (loader::is_magic(file_path))
             loader::loader_ctree(vm, file_path);
         else {
-            std::string codes;
-            utils::readcode(codes, file_path);
-            compiler::Compiler(
-                compiler::main_module, tools::compilerOption, vm->static_data)
-                .compile(codes);
+            compiler::compiler()
+                .parse(tools::compilerOption, file_path, 
+                &vm->static_data);
         }
         out(*vm, file_path);
     }

@@ -11,8 +11,8 @@ module;
 #include <cstring>
 #include <string>
 #include <vector>
+#include <compiler.hpp>
 export module tdb;
-import Compiler;
 import TVM;
 import memory;
 import io;
@@ -23,7 +23,6 @@ import TVM.memory;
 import language;
 import compile_env;
 import compiler_def;
-import token;
 import unreach;
 import cmdparser;
 import color;
@@ -94,14 +93,15 @@ namespace tdb {
      * @brief 启动调试
      * @param code 代码
      */
-    static void debug(const std::string& code) {
+    static void debug(const std::string& file_path) {
         char* instruction = nullptr;
         TVM_space::free_TVM(vm);
-        compiler::Compiler(
-            compiler::main_module, tools::compilerOption, vm->static_data)
-            .compile(code);
+        compiler::compiler()
+            .parse(tools::compilerOption, file_path, &vm->static_data);
         vm->reload_data();
         // 用于输出代码行信息
+        std::string code;
+        utils::readcode(code, file_path);
         const std::vector<std::string>& out_data = cutlines(code);
         size_t n = out_data.size();
         // 指向当前执行的代码
@@ -156,8 +156,7 @@ namespace tools::tools_out {
             io::readstr(file_path, stdin);
             if (!strcmp(file_path, "exit"))
                 break;
-            utils::readcode(tmp, file_path);
-            tdb::debug(tmp);
+            tdb::debug(file_path);
         }
         delete tdb::vm;
         free(file_path);

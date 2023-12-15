@@ -8,6 +8,7 @@
 build/
 out/
 bin/
+bison/
 cmake_third_party/
 Testing/
 CMakeFiles/
@@ -21,6 +22,9 @@ rules.ninja
 compile_commands.json
 #clangd缓存
 .cache/
+
+#for rust
+target/
 
 *.aps
 *.ctree
@@ -36,6 +40,10 @@ testlog.log
 *.a
 *.exp
 *.pdb
+token.cpp
+parser.cpp
+parser.hpp
+location.hh
 
 # 单元测试中的临时输出文件
 *.out

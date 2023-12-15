@@ -5,8 +5,8 @@
 module;
 #include <cstdlib>
 #include <format>
+#include <compiler.hpp>
 export module generated_params;
-import Compiler;
 import compile_env;
 import compiler_def;
 import cmdparser;
@@ -14,7 +14,6 @@ import color;
 import trcdef;
 import help;
 import basic_def;
-import token;
 import trc_flong;
 import trc_long;
 import data;

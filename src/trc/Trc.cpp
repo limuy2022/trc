@@ -14,7 +14,6 @@ import TVM.memory;
 import color;
 import memory;
 import trcdef;
-import brun;
 import build;
 import dis;
 import cmdparser;
@@ -53,7 +52,7 @@ struct {
 } cmd_tool[] = { { "tdb", tools::tools_out::tdb },
     { "help", tools::tools_out::help }, { "run", tools::tools_out::run },
     { "token", tools::tools_out::out_token }, { "dis", tools::tools_out::dis },
-    { "brun", tools::tools_out::brun }, { "build", tools::tools_out::build },
+    { "build", tools::tools_out::build },
     { "style", tools::tools_out::style } };
 
 /**

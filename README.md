@@ -10,6 +10,10 @@ Trc's syntax is easy,and have full toolchain.It is easy to learn modern c++ and 
 
 Using c++ 20 standard and use module feature
 
+But here is a developing ```rust``` instance now!
+
+in directory ```rust```
+
 ## Goal
 
 #### as easy as Python

@@ -2,12 +2,10 @@
 #include <cstdio>
 #include <string>
 export module style;
-import token;
 import filesys;
 import base;
 import TVM_data;
 import compiler_def;
-import Compiler;
 import generated_params;
 import cmdparser;
 import basic_def;
@@ -16,10 +14,6 @@ import color;
 import help;
 
 namespace trc::tools {
-static TVM_space::TVM_static_data vm;
-static compiler::compiler_public_data shared_data(
-    compiler::main_module, { true, false, true }, vm);
-
 namespace tools_in { }
 
 namespace tools_out {

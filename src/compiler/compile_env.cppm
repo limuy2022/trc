@@ -4,6 +4,7 @@
 module;
 #include <limits>
 #include <vector>
+#include "parser.tab.hpp"
 export module compile_env;
 import compiler_def;
 import TVMdef;
@@ -95,7 +96,7 @@ size_t module_compile_env::get_index_of_function(size_t name) {
             return i;
         }
     }
-    compiler_data.error.send_error_module(error::NameError,
+    compiler_data.send_error(error::NameError,
         language::error::nameerror, compiler_data.const_name.ref[name].c_str());
     return 0;
 }
@@ -103,7 +104,7 @@ size_t module_compile_env::get_index_of_function(size_t name) {
 void module_compile_env::add_function(size_t name) {
     for (auto function : functions) {
         if (function == name) {
-            compiler_data.error.send_error_module(error::RedefinedError,
+            compiler_data.send_error(error::RedefinedError,
                 language::error::funcredefinederror,
                 compiler_data.const_name.ref[name].c_str());
         }
@@ -120,7 +121,7 @@ size_t basic_compile_env::get_index_of_var(size_t name, bool report_error) {
     }
     if (report_error) {
         // 并不在当前符号表,报错
-        compiler_data.error.send_error_module(error::NameError,
+        compiler_data.send_error(error::NameError,
             language::error::nameerror,
             compiler_data.const_name.ref[name].c_str());
     }
@@ -131,7 +132,7 @@ size_t basic_compile_env::add_var(size_t name) {
     for (auto i : var_names_list) {
         if (i == name) {
             // 报错
-            compiler_data.error.send_error_module(error::RedefinedError,
+            compiler_data.send_error(error::RedefinedError,
                 language::error::varredefinederror,
                 compiler_data.const_name.ref[name].c_str());
         }

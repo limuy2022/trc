@@ -113,8 +113,8 @@ namespace builtin {
      * @brief 获取数据类型
      */
     void TYPE(int argc, TVM* vm) {
-        vm->top()
-            = global_objs_pool->MALLOCSTRING(TVM_share::int_name[(int)vm->top()->gettype()]);
+        vm->top() = global_objs_pool->MALLOCSTRING(
+            TVM_share::int_name[(int)vm->top()->gettype()]);
     }
 }
 }

@@ -13,13 +13,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 
 add_subdirectory("cmake_third_party/googletest")
-include_directories("cmake_third_party/googletest/googletest/include")
+include_directories("cmake_third_party/googletest/googletest/include", "include")
 
 add_library(language_module)
 target_sources(language_module
-        PUBLIC
-        FILE_SET CXX_MODULES FILES
-        language/language.cppm
+    PUBLIC
+    FILE_SET CXX_MODULES FILES
+    language/language.cppm
 )
 
 message("${LANGUAGE_SOURCES}")
@@ -42,9 +42,9 @@ message(${CPP_SOURCES})
 add_library(foo)
 
 target_sources(foo
-        PUBLIC
-        FILE_SET CXX_MODULES FILES
-        ${CPPMSOURCES}
+    PUBLIC
+    FILE_SET CXX_MODULES FILES
+    ${CPPMSOURCES}
 )
 
 add_executable(Trc ${CPP_SOURCES})
@@ -58,10 +58,10 @@ file(GLOB_RECURSE TEST_MODULE_SOURCES "tests/unittest/*.cppm")
 add_library(testmodulefiles)
 
 target_sources(testmodulefiles
-       PUBLIC
-       FILE_SET CXX_MODULES FILES
-       ${CPPMSOURCES}
-       ${TEST_MODULE_SOURCES}
+    PUBLIC
+    FILE_SET CXX_MODULES FILES
+    ${CPPMSOURCES}
+    ${TEST_MODULE_SOURCES}
 )
 
 add_executable(unittest
@@ -70,3 +70,12 @@ add_executable(unittest
 )
 target_compile_definitions(unittest PRIVATE "UNITTEST")
 target_link_libraries(unittest testmodulefiles language gtest)
+add_dependencies(Trc flex bison)
+add_dependencies(unittest flex bison)
+
+add_custom_target(flex
+    command flex -o ${PROJECT_SOURCE_DIR}/src/compiler/token.cpp ${PROJECT_SOURCE_DIR}/src/compiler/token.ll
+)
+add_custom_target(bison
+    command bison -o ${PROJECT_SOURCE_DIR}/src/compiler/parser.cpp ${PROJECT_SOURCE_DIR}/src/compiler/parser.yy
+)

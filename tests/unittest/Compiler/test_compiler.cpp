@@ -39,8 +39,9 @@ void compiler_env_set::SetUp() {
 static void bytecode_check(
     const TVM_space::struct_codes& expect, TVM_space::TVM* vm) {
     for (size_t i = 0, n = expect.size(); i < n; ++i) {
-        EXPECT_EQ(int(expect[i].bycode), int(vm->static_data.byte_codes[i].bycode))
-            << "index:"<<i ;
+        EXPECT_EQ(
+            int(expect[i].bycode), int(vm->static_data.byte_codes[i].bycode))
+            << "index:" << i;
         EXPECT_EQ(expect[i].index, vm->static_data.byte_codes[i].index);
     }
     ASSERT_EQ(expect.size(), vm->static_data.byte_codes.size());

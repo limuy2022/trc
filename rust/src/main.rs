@@ -1,14 +1,18 @@
 pub mod tools;
 pub mod compiler;
+pub mod base;
 
-use std::io;
-use rand::Rng;
-use std::cmp::Ordering;
-use std::env;
 use std::env::args;
+use std::process::exit;
 
 fn main() {
-    let mode = args().nth(1).expect("a mode isn't given");
+    let mode:String = match args().nth(1) {
+        Some(tr) => tr,
+        _ => {
+            println!("A mode isn't given.");
+            exit(0);
+        },
+    };
     if mode == "build" {
         tools::compile();
     } else if mode == "run" {

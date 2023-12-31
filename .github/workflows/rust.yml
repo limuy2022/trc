@@ -16,9 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: CD
-      run: cd rust
     - name: Build
-      run: cargo build --verbose
+      run: cd rust&&cargo build
     - name: Run tests
-      run: cargo test --verbose
+      run: cd rust&&cargo test

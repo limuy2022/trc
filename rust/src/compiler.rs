@@ -1,32 +1,32 @@
 mod token;
 
-use std::io;
 use std::collections::hash_set;
+use std::io;
 
-pub struct ConstPool {
+pub struct ValuePool {
     const_ints: hash_set::HashSet<i32>,
 }
 
-impl ConstPool {
+impl ValuePool {
     fn new() -> Self {
-        ConstPool {
+        Self {
             const_ints: hash_set::HashSet::new(),
         }
     }
 }
 
-pub struct Compiler<T:io::Read> {
-    input:T,
+pub struct Compiler<T: io::Read> {
+    input: T,
     line: usize,
-    const_pool: ConstPool
+    const_pool: ValuePool,
 }
 
-impl<T:io::Read> Compiler<T> {
+impl<T: io::Read> Compiler<T> {
     fn new(f: T) -> Self {
         Compiler {
-            input:f,
-            line:1,
-            const_pool: ConstPool::new(),
+            input: f,
+            line: 1,
+            const_pool: ValuePool::new(),
         }
     }
 }

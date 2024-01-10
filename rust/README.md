@@ -11,3 +11,13 @@ So this is just an experimental project and I will keep develop c++ version and 
 Like other common rust project.Just use ```cargo build```
 
 Running tests is like other rust project,too.Just ```cargo test```
+
+## How to use
+
+[Trc user Guide](docs/usage.md)
+
+## Provide translation for this project
+
+The project use GNU Gettext lib tool to provide I18N(Internationalization) and L10N(localiation) support for the Trc.
+
+If you want to help us to add more translation,please see [Trc translation Guide](docs/developer/translation.md)

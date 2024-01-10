@@ -25,9 +25,9 @@ pub fn kmp(main_string:&str, pattern:&str) -> usize {
 /// ```
 /// let next = kmp_next("ababab");
 /// ```
-pub fn kmp_next(pattern:&str) -> Vec<usize> {
+pub fn kmp_next(pattern:&str) -> Vec<i64> {
     let mut j:i64 = -1;
-    let mut ret: Vec<usize> = vec![0];
+    let mut ret: Vec<i64> = vec![-1];
     let pattern:Vec<char> = pattern.chars().collect();
     // 从1开始匹配是因为第零个不需要匹配
     for i in 1..pattern.len() {
@@ -37,7 +37,7 @@ pub fn kmp_next(pattern:&str) -> Vec<usize> {
         if pattern[(j + 1) as usize ] == pattern[i] {
             j += 1;
         }
-        ret.push(j as usize);
+        ret.push(j);
     }
     ret
 }

@@ -22,6 +22,7 @@ rules.ninja
 compile_commands.json
 #clangd缓存
 .cache/
+lib/
 
 #for rust
 target/

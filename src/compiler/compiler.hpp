@@ -1,6 +1,5 @@
 #pragma once
 
-#include "parser.tab.hpp"
 #include <string>
 
 namespace trc::TVM_space {
@@ -29,7 +28,6 @@ public:
     // Whether to generate scanner debug traces.
     bool trace_scanning = false;
     // The token's location used by the scanner.
-    yy::location location;
 
 private:
     FILE* open_file(const std::string& file);
@@ -38,7 +36,3 @@ private:
 };
 }
 
-// Give Flex the prototype of yylex we want ...
-#define YY_DECL yy::parser::symbol_type yylex(trc::compiler::compiler& drv)
-// ... and declare it for the parser's sake.
-YY_DECL;

@@ -6,6 +6,8 @@
 
 #include <cstring>
 #include <format>
+#include <libintl.h>
+#include <clocale>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
@@ -24,7 +26,6 @@ import tdb;
 import tools.token;
 import tshell;
 import basic_def;
-import language;
 import data;
 import color;
 import help;
@@ -82,7 +83,9 @@ static inline void quit_mem() {
 int main(int argc, char* argv[]) {
     // 初始化系统
     // 初始化地域化设置
-    language::locale_init();
+    std::setlocale(LC_ALL, "");
+    bindtextdomain("trans", "locales");
+    textdomain("trans");
 /*控制台初始化*/
 #ifdef _WIN32
     trc::color::console_init();

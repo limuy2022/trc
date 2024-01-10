@@ -12,15 +12,15 @@ Using c++ 20 standard and use module feature
 
 But here is a developing ```rust``` instance now!
 
-in directory ```rust```
+[rust_trc](rust/)
 
 ## Goal
 
-#### as easy as Python
+**as easy as Python**
 
-#### as fast as Java
+**as fast as Java**
 
-#### as small as lua
+**as small as lua**
 
 ## project website
 
@@ -43,13 +43,13 @@ trc support many languages，the way to change language is that uses the languag
 
 ### hello world
 
-```
+```go
 println("hello world!")
 ```
 
 ### calculate even numbers from 1 to n
 
-```
+```go
 a := int(input())
 while a > 0 {
     if a %2 == 0{
@@ -61,7 +61,7 @@ while a > 0 {
 
 ### Big num calculation
 
-```
+```go
 a := 1231234561234
 b := a
 println(a)
@@ -85,6 +85,6 @@ QQ:3570249647
 
 | Library         |Usage     |
 |:-----------|:-------|
-| googletest | Uniitest |
+| googletest | Unittest |
 
 Express my thanks to Open-source software contributors!

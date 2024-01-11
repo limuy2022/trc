@@ -28,10 +28,10 @@ struct Token {
     data: Data,
 }
 
-struct TokenLex<'code, T: io::Read> {
+struct TokenLex<'code> {
     code: &'code str,
     pos: CharIndices<'code>,
-    compiler_data: &'code mut Compiler<T>,
+    compiler_data: &'code mut Compiler,
 }
 
 impl Token {
@@ -46,15 +46,15 @@ impl Token {
     }
 }
 
-impl<T: io::Read> Iterator for TokenLex<'_, T> {
+impl Iterator for TokenLex<'_> {
     type Item = Token;
     fn next(&mut self) -> Option<Self::Item> {
         self.next_token()
     }
 }
 
-impl<T: io::Read> TokenLex<'_, T> {
-    fn new<'a>(code: &'a str, compiler_data: &'a mut Compiler<T>) -> TokenLex<'a, T> {
+impl TokenLex<'_> {
+    fn new<'a>(code: &'a str, compiler_data: &'a mut Compiler) -> TokenLex<'a> {
         TokenLex {
             code,
             pos: code.char_indices(),
@@ -168,7 +168,7 @@ impl<T: io::Read> TokenLex<'_, T> {
 mod tests {
     use super::*;
 
-    fn check<T: io::Read>(tokenlex: &mut TokenLex<T>, expected_res: Vec<Token>) {
+    fn check<T: io::Read>(tokenlex: &mut TokenLex, expected_res: Vec<Token>) {
         for i in expected_res {
             assert_eq!(i, tokenlex.next().unwrap());
         }

@@ -1,5 +1,6 @@
 enum ErrorType {
     SyntaxError,
+    OperatorError
 }
 
 pub struct ErrorInfo {
@@ -14,4 +15,14 @@ impl ErrorInfo {
             errot_type: ErrorType::SyntaxError,
         }
     }
+}
+
+pub trait ErrorContent {
+    fn get_module_name(&self) -> &str;
+
+    fn get_line(&self) -> usize;
+}
+
+pub fn report_error(content:impl ErrorContent, info:ErrorInfo) {
+
 }

@@ -18,7 +18,15 @@ impl ConstPool {
 }
 
 pub struct DynaData {
-    
+    obj_stack: Vec<Box<dyn types::TrcObj>>
+}
+
+impl DynaData {
+    pub fn new() -> Self {
+        Self {
+            obj_stack: Vec::new(),
+        }
+    }
 }
 
 pub struct Inst {
@@ -29,6 +37,7 @@ pub struct Inst {
 pub struct Vm {
     constpool: ConstPool,
     inst: Vec<Inst>,
+    dynadata: DynaData,
     pc:usize
 }
 
@@ -55,7 +64,8 @@ impl Vm {
         Self {
             constpool: ConstPool::new(),
             inst: Vec::new(),
-            pc:0
+            pc:0,
+            dynadata: DynaData::new()
         }
     }
 
@@ -63,6 +73,12 @@ impl Vm {
         while self.pc < self.inst.len() {
             match self.inst[self.pc].opcode {
                 Opcode::Add => {
+                    
+                },
+                Opcode::Div => {
+
+                },
+                Opcode::Gt => {
                     
                 }
                 _ => {

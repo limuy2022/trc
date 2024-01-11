@@ -1,9 +1,14 @@
 mod data_structure;
 mod trcfloat;
 mod trcint;
-mod trcobj;
 mod trcstr;
 
-trait TrcObj {
-    
+pub trait TrcObj {
+    fn output(&self) {
+
+    }
+
+    fn add(&self, _: Box<dyn TrcObj>) -> Box<dyn TrcObj> {
+        panic!("Un");
+    }
 }

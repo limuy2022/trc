@@ -3,6 +3,20 @@ mod token;
 use std::collections::hash_set;
 use std::io;
 
+pub struct Option {
+    optimize:bool,
+    file: String
+}
+
+impl Option {
+    pub fn new(optimize:bool, file: String) -> Self {
+        Option {
+            optimize,
+            file
+        }
+    }
+}
+
 pub struct ValuePool {
     const_ints: hash_set::HashSet<i32>,
 }

@@ -1,2 +1,6 @@
-msgid "test"
-msgstr "草"
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Welcome to tshell.Type help() to get more infomation"
+msgstr "欢迎使用tshell。输入help()获取更多信息"

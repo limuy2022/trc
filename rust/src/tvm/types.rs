@@ -3,3 +3,7 @@ mod trcfloat;
 mod trcint;
 mod trcobj;
 mod trcstr;
+
+trait TrcObj {
+    
+}

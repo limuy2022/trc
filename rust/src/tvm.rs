@@ -17,6 +17,10 @@ impl ConstPool {
     }
 }
 
+pub struct DynaData {
+    
+}
+
 pub struct Inst {
     opcode: Opcode,
     operand: i32,
@@ -25,6 +29,7 @@ pub struct Inst {
 pub struct Vm {
     constpool: ConstPool,
     inst: Vec<Inst>,
+    pc:usize
 }
 
 enum Opcode {
@@ -50,8 +55,21 @@ impl Vm {
         Self {
             constpool: ConstPool::new(),
             inst: Vec::new(),
+            pc:0
         }
     }
 
-    pub fn run(&mut self) {}
+    pub fn run(&mut self) {
+        while self.pc < self.inst.len() {
+            match self.inst[self.pc].opcode {
+                Opcode::Add => {
+                    
+                }
+                _ => {
+                    panic!("unknown opcode");
+                }
+            }
+            self.pc += 1;
+        }
+    }
 }

@@ -1,10 +1,16 @@
-mod types;
 mod algo;
+mod function;
+mod types;
+
+use crate::{
+    base::error::ErrorContent,
+    cfg,
+};
 
 pub struct ConstPool {
-    intpool: Vec<i32>,
-    stringpool: Vec<String>,
-    floatpool: Vec<f64>,
+    pub intpool: Vec<i64>,
+    pub stringpool: Vec<String>,
+    pub floatpool: Vec<f64>,
 }
 
 impl ConstPool {
@@ -17,14 +23,16 @@ impl ConstPool {
     }
 }
 
-pub struct DynaData {
-    obj_stack: Vec<Box<dyn types::TrcObj>>
+pub struct DynaData<'a> {
+    obj_stack: Vec<Box<dyn types::TrcObj>>,
+    frames_stack: Vec<function::Frame<'a>>,
 }
 
-impl DynaData {
+impl<'a> DynaData<'a> {
     pub fn new() -> Self {
         Self {
             obj_stack: Vec::new(),
+            frames_stack: vec![],
         }
     }
 }
@@ -34,11 +42,45 @@ pub struct Inst {
     operand: i32,
 }
 
-pub struct Vm {
+pub struct Vm<'a> {
     constpool: ConstPool,
     inst: Vec<Inst>,
-    dynadata: DynaData,
-    pc:usize
+    funcs: Vec<function::Func>,
+    run_contnet: Content,
+    dynadata: DynaData<'a>,
+    pc: usize,
+}
+
+struct Content {
+    module_name: String,
+    line_pos: usize,
+}
+
+impl ErrorContent for Content {
+    fn get_module_name(&self) -> &str {
+        &self.module_name
+    }
+
+    fn get_line(&self) -> usize {
+        self.line_pos
+    }
+}
+
+impl Content {
+    fn new(module_name: &str) -> Self {
+        Content {
+            module_name: String::from(module_name),
+            line_pos: 0,
+        }
+    }
+
+    fn add_line(&mut self) {
+        self.line_pos += 1;
+    }
+
+    fn del_line(&mut self) {
+        self.line_pos -= 1;
+    }
 }
 
 enum Opcode {
@@ -56,16 +98,23 @@ enum Opcode {
     And,
     Or,
     Not,
+    // change the option code index
     Goto,
+    // return from a function
+    PopFrame,
+    // create a frame to hold the function
+    NewFrame,
 }
 
-impl Vm {
+impl<'a> Vm<'a> {
     pub fn new() -> Self {
         Self {
             constpool: ConstPool::new(),
             inst: Vec::new(),
-            pc:0,
-            dynadata: DynaData::new()
+            pc: 0,
+            funcs: vec![],
+            dynadata: DynaData::new(),
+            run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
         }
     }
 
@@ -73,13 +122,15 @@ impl Vm {
         while self.pc < self.inst.len() {
             match self.inst[self.pc].opcode {
                 Opcode::Add => {
-                    
-                },
-                Opcode::Div => {
-
-                },
-                Opcode::Gt => {
-                    
+                    let t1 = self.dynadata.obj_stack.pop();
+                    let t2 = self.dynadata.obj_stack.pop();
+                    if t1.is_none() || t2.is_none() {}
+                }
+                Opcode::Div => {}
+                Opcode::Gt => {}
+                Opcode::NewFrame => {}
+                Opcode::PopFrame => {
+                    self.dynadata.frames_stack.pop();
                 }
                 _ => {
                     panic!("unknown opcode");

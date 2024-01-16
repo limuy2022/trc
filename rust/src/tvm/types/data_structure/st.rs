@@ -1,3 +1,1 @@
-pub struct StTable {
-
-}
+pub struct StTable {}

@@ -1,9 +1,10 @@
 pub mod base;
+pub mod cfg;
 pub mod compiler;
 pub mod tools;
 pub mod tvm;
 
-use clap::{self, Subcommand, Parser};
+use clap::{self, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[command(author="limuy", version="0.1", about, long_about = None)]
@@ -17,21 +18,19 @@ struct Args {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    build {
-        optimize: bool
-    },
-    tshell {}
+    build { optimize: bool },
+    tshell {},
 }
 
 pub fn run() {
     let cli = Args::parse();
     match cli.mode {
-        Commands::build { optimize:opt } => {
+        Commands::build { optimize: opt } => {
             for i in cli.files {
-                tools::compile(compiler::Option::new(opt, i));
+                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)));
             }
-        },
-        Commands::tshell {  } => {
+        }
+        Commands::tshell {} => {
             tools::tshell::tshell();
         }
     };

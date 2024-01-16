@@ -1,6 +1,4 @@
-pub struct HashMap {
-    
-}
+pub struct HashMap {}
 
 impl HashMap {
     pub fn new() -> HashMap {

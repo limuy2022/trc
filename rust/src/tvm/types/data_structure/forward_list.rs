@@ -1,10 +1,10 @@
 pub struct ForwardList {
-    sz: usize    
+    sz: usize,
 }
 
 impl ForwardList {
     pub fn new() -> Self {
-        Self {sz:0}
+        Self { sz: 0 }
     }
 
     pub fn size(&self) -> usize {
@@ -15,4 +15,3 @@ impl ForwardList {
         self.size() == 0
     }
 }
-

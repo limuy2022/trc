@@ -1,15 +1,16 @@
 //! the read execute print loop for trc
 
-use gettextrs::gettext;
 use colored::*;
+use gettextrs::gettext;
 use std::io::{self, Write};
 
-fn get_block() {
-
-}
+fn get_block() {}
 
 pub fn tshell() {
-    println!("{}\n\n", gettext("Welcome to tshell.Type help() to get more infomation").bold());
+    println!(
+        "{}\n\n",
+        gettext("Welcome to tshell.Type help() to get more infomation").bold()
+    );
     loop {
         print!("tshell>");
         io::stdout().flush().unwrap();

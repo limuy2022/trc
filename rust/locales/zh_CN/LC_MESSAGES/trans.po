@@ -1,2 +1,18 @@
-msgid "test"
-msgstr "草"
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Welcome to tshell.Type help() to get more infomation"
+msgstr "欢迎使用tshell。输入help()获取更多信息"
+
+msgid "SyntaxError"
+msgstr "语法错误"
+
+msgid "OperatorError"
+msgstr "操作符错误"
+
+msgid "this string should be ended with {}"
+msgstr "这个字符串应当以{}结束"
+
+msgid "operator {} is not supported for type {}"
+msgstr "操作符{}不支持类型{}"

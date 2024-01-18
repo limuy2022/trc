@@ -36,6 +36,16 @@ The next is the string value. To make you to write strings more easily:
 |'hello_world'|another method that equals to "hello world"|
 |"""hello world"""|this method is for code across multiple lines|
 
+There are also many easape char in the string:
+
+|escape char|meaning|
+|:---|:---|
+|\t|tab|
+|\n|new line|
+|\\\\|\|
+|\'|'|
+|\"|"|
+
 If you add ```r``` or ```R``` in front of the string.Trc will treat it as a raw string.
 Yes.These rules are from Python.I love its grammar rules
 
@@ -99,4 +109,18 @@ if 1 == 1 {
 } else {
 
 }
+```
+
+## the comments of Trc
+
+Trc support two kinds of comments
+
+the first is use ```#```,from ```#``` to the end of the line belongs to the comment
+
+the second is use ```/**/```,this kind can cross the line,like:
+
+```cpp
+/*
+hello world!
+*/
 ```

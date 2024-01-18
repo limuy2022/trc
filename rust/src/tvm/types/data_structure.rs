@@ -1,6 +1,7 @@
 mod ac;
 mod deque;
 mod fenwick;
+mod forward_list;
 mod hash_map;
 mod list;
 mod map;

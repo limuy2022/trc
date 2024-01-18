@@ -55,7 +55,7 @@ impl AcAutomaton {
                 // 正常的ac自动机会将剩余的失配部分也指向失配指针
                 // 但是这个字符集被设计为无限大，可以容纳unicode的ac自动机，所以不能这么做
                 // 会在匹配时顺着向上找失配指针
-                self.states[*val].fail =  if self.states[self.states[u].fail].next.contains_key(&c) {
+                self.states[*val].fail = if self.states[self.states[u].fail].next.contains_key(&c) {
                     self.states[self.states[u].fail].next[&c]
                 } else {
                     0
@@ -72,9 +72,7 @@ impl AcAutomaton {
     /// ac.search("world", 2);
     /// let ans = ac.get_ans();
     /// ````
-    fn search(&self, pattern: &str, id:u32) {
-        
-    }
+    fn search(&self, pattern: &str, id: u32) {}
 
     fn get_ans(&self) -> HashMap<u32, usize> {
         HashMap::new()
@@ -87,6 +85,5 @@ mod tests {
     #[test]
     fn ac_automaton1() {
         let mut ac = AcAutomaton::new();
-
     }
 }

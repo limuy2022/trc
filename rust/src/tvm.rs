@@ -1,9 +1,13 @@
 mod algo;
 mod function;
 mod types;
+mod def;
+
+use clap::error;
+use gettextrs::gettext;
 
 use crate::{
-    base::error::ErrorContent,
+    base::error::{ErrorContent, report_error, ErrorInfo, VM_DATA_NUMBER, VM_ERROR},
     cfg,
 };
 
@@ -88,6 +92,7 @@ enum Opcode {
     Sub,
     Mul,
     Div,
+    ExtraDiv,
     Mod,
     Eq,
     Ne,
@@ -104,6 +109,30 @@ enum Opcode {
     PopFrame,
     // create a frame to hold the function
     NewFrame,
+    // Load a int from const pool
+    LoadInt
+}
+
+/// reduce the duplicate code to solve the operator running
+macro_rules! OP {
+    ($trait_used:ident, $sself:expr) => {{
+        let t1 = $sself.dynadata.obj_stack.pop();
+        let t2 = $sself.dynadata.obj_stack.pop();
+        if t1.is_none() || t2.is_none() {
+            report_error(&$sself.run_contnet, ErrorInfo::new(gettext!(VM_DATA_NUMBER, 2), VM_ERROR));
+        }
+        let t1 = t1.unwrap();
+        let t2 = t2.unwrap();
+        let ret = t1.$trait_used(t2);
+        match ret {
+            Err(e) => {
+                report_error(&$sself.run_contnet, e);
+            },
+            Ok(t) => {
+                $sself.dynadata.obj_stack.push(t);
+            }
+        }
+    }};
 }
 
 impl<'a> Vm<'a> {
@@ -121,13 +150,20 @@ impl<'a> Vm<'a> {
     pub fn run(&mut self) {
         while self.pc < self.inst.len() {
             match self.inst[self.pc].opcode {
-                Opcode::Add => {
-                    let t1 = self.dynadata.obj_stack.pop();
-                    let t2 = self.dynadata.obj_stack.pop();
-                    if t1.is_none() || t2.is_none() {}
-                }
-                Opcode::Div => {}
-                Opcode::Gt => {}
+                Opcode::Add => OP!(add, self),
+                Opcode::Sub => OP!(sub, self),
+                Opcode::Mul => OP!(mul, self),
+                Opcode::Div => OP!(div, self),
+                Opcode::ExtraDiv => OP!(extra_div, self),
+                Opcode::Mod => OP!(modd, self),
+                Opcode::Gt => OP!(gt, self),
+                Opcode::Lt => OP!(lt, self),
+                Opcode::Ge => OP!(ge, self),
+                Opcode::Le => OP!(le, self),
+                Opcode::Eq => OP!(eq, self),
+                Opcode::Ne => OP!(ne, self),
+                Opcode::And => OP!(and, self),
+                Opcode::Or => OP!(or, self),
                 Opcode::NewFrame => {}
                 Opcode::PopFrame => {
                     self.dynadata.frames_stack.pop();

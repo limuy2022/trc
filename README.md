@@ -2,7 +2,7 @@
 
 ## Trc is a stack-based programming language
 
-Trc's syntax is easy,and have full toolchain.It is easy to learn modern c++ and compiler,too.
+Trc's syntax is easy,and have full toolchain. It is easy to learn modern c++ and compiler,too.
 
 ## language
 
@@ -80,6 +80,8 @@ println(a * b)
 Wechat:angelgel2020
 
 QQ:3570249647
+
+email: ```limuyang202011@163.com```
 
 ## Referenced Open-source software
 

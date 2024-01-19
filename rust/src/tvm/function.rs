@@ -1,3 +1,5 @@
+use super::types::TrcObj;
+
 pub struct Func {
     name: String,
 }

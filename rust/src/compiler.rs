@@ -216,7 +216,6 @@ impl TokenIo for FileSource {
 pub struct Compiler {
     // to support read from stdin and file
     input: Box<dyn TokenIo>,
-    line: usize,
     const_pool: ValuePool,
     option: Option,
     content: Content,
@@ -229,7 +228,6 @@ impl Compiler {
                 let f = std::fs::File::open(filename);
                 Compiler {
                     input: Box::new(FileSource::new(f.unwrap())),
-                    line: 1,
                     const_pool: ValuePool::new(),
                     option,
                     content: Content::new(cfg::MAIN_MODULE_NAME),
@@ -244,7 +242,6 @@ impl Compiler {
     fn new_string_compiler(option: Option, source: &str) -> Self {
         Compiler {
             input: Box::new(StringSource::new(String::from(source))),
-            line: 1,
             const_pool: ValuePool::new(),
             option,
             content: Content::new(cfg::MAIN_MODULE_NAME),

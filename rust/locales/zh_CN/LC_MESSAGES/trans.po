@@ -22,3 +22,12 @@ msgstr "操作符{}不支持类型{}"
 
 msgid "The number of data of vm stack is not correct, should have {} data"
 msgstr "虚拟机栈中数据数量不正确,期望有{}个数据"
+
+msgid "{} is unmatched"
+msgstr "{}未匹配"
+
+msgid "ZeroDivisionError"
+msgstr "除零错误"
+
+msgid "{} is divided by zero"
+msgstr "{}被零除"

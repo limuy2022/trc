@@ -1,7 +1,6 @@
+use super::{Compiler, Content, INT_VAL_POOL_ZERO};
+use crate::base::error::{self, report_error, ErrorContent, ErrorInfo};
 use gettextrs::gettext;
-
-use crate::base::error;
-use super::{Compiler, INT_VAL_POOL_ZERO};
 
 #[derive(PartialEq, Debug)]
 enum TokenType {
@@ -72,6 +71,7 @@ enum TokenType {
     GREATER_EQUAL,
     // !
     NOT,
+    END_OF_LINE
 }
 
 #[derive(PartialEq, Debug)]
@@ -86,8 +86,21 @@ pub struct Token {
     data: Data,
 }
 
+struct BraceRecord {
+    c: char,
+    line: usize,
+}
+
+impl BraceRecord {
+    fn new(c: char, line: usize) -> BraceRecord {
+        BraceRecord { c, line }
+    }
+}
+
 pub struct TokenLex<'code> {
     compiler_data: &'code mut Compiler,
+    braces_check: Vec<BraceRecord>,
+    unget_token: Vec<Token>
 }
 
 impl Token {
@@ -113,67 +126,131 @@ macro_rules! binary_symbol {
     ($a:expr, $b:expr, $binary_sym:expr, $sself:expr) => {{
         let c = $sself.compiler_data.input.read();
         if c == $binary_sym {
-            return Token::new($b, None)
+            return Token::new($b, None);
         }
         $sself.compiler_data.input.unread(c);
         Token::new($a, None)
-    }}
+    }};
 }
 
 macro_rules! self_symbol {
-($sym:expr, $self_sym:expr, $sself:expr) =>
-    {{
+    ($sym:expr, $self_sym:expr, $sself:expr) => {{
         binary_symbol!($sym, $self_sym, '=', $sself)
-    }}
+    }};
 }
 
 macro_rules! double_symbol {
-    ($before_sym:expr, $before_self_sym:expr, $matched_sym:expr, $matched_self_sym:expr, matched_char:expr, $sself:expr) => {
-        {
-            let c = $sself.compiler_data.input.read();
-            if c == $matched_char {
-                return self_symbol!($matched_sym, $matched_self_sym, self)
-            }
-            self.compiler_data.input.unread(c);
-            return self_symbol!($before_sym, $before_self_sym, self);
+    ($before_sym:expr, $before_self_sym:expr, $matched_sym:expr, $matched_self_sym:expr, matched_char:expr, $sself:expr) => {{
+        let c = $sself.compiler_data.input.read();
+        if c == $matched_char {
+            return self_symbol!($matched_sym, $matched_self_sym, self);
         }
-    };
+        self.compiler_data.input.unread(c);
+        return self_symbol!($before_sym, $before_self_sym, self);
+    }};
+}
+
+macro_rules! check_braces_match {
+    ($sself:expr, $brace_record:expr, $($front_brace:expr => $after_brace:expr),*) => {{
+        match $brace_record.c {
+            $(
+                $front_brace => {
+                    if $brace_record.c != $after_brace {
+                        report_error(
+                            &Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line),
+                            ErrorInfo::new(
+                                gettext!(error::UNMATCHED_BRACE, $brace_record.c),
+                                error::SYNTAX_ERROR,
+                            ),
+                        );
+                    }
+                },
+            )*
+            _ => {
+                panic!("unmatched {}", $brace_record.c)
+            }
+        }
+    }}
 }
 
 impl TokenLex<'_> {
     pub fn new<'a>(compiler_data: &'a mut Compiler) -> TokenLex<'a> {
-        TokenLex { compiler_data }
+        TokenLex {
+            compiler_data,
+            braces_check: vec![],
+            unget_token: vec![]
+        }
+    }
+
+    fn check_braces_stack(&mut self, c: char) {
+        let top = self.braces_check.pop();
+        match top {
+            None => {
+                report_error(
+                    &self.compiler_data.content,
+                    ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), error::SYNTAX_ERROR),
+                );
+            }
+            Some(c) => {
+                check_braces_match!(self, c, 
+                    '{' => '}',
+                    '[' => ']',
+                    '(' => ')'
+                );
+            }
+        }
     }
 
     fn lex_symbol(&mut self, c: char) -> Token {
         match c {
             '.' => Token::new(TokenType::DOT, None),
             ',' => Token::new(TokenType::COMMA, None),
-            '{' => Token::new(TokenType::LEFT_BIG_BRACE, None),
-            '}' => Token::new(TokenType::RIGHT_BIG_BRACE, None),
-            '[' => Token::new(TokenType::LEFT_MIDDLE_BRACE, None),
-            ']' => Token::new(TokenType::RIGHT_MIDDLE_BRACE, None),
-            '(' => Token::new(TokenType::LEFT_SMALL_BRACE, None),
-            ')' => Token::new(TokenType::RIGHT_SMALL_BRACE, None),
+            '{' => {
+                self.braces_check
+                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                Token::new(TokenType::LEFT_BIG_BRACE, None)
+            },
+            '}' => {
+                self.check_braces_stack(c);
+                Token::new(TokenType::RIGHT_BIG_BRACE, None)
+            },
+            '[' => {
+                self.braces_check
+                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                Token::new(TokenType::LEFT_MIDDLE_BRACE, None)
+            },
+            ']' => {
+                self.check_braces_stack(c);
+                Token::new(TokenType::RIGHT_MIDDLE_BRACE, None)
+            },
+            '(' => {
+                self.braces_check
+                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                Token::new(TokenType::LEFT_SMALL_BRACE, None)
+            }
+            ')' => {
+                self.check_braces_stack(c);
+                Token::new(TokenType::RIGHT_SMALL_BRACE, None)
+            },
             '+' => self_symbol!(TokenType::ADD, TokenType::SELF_ADD, self),
             '-' => self_symbol!(TokenType::SUB, TokenType::SELF_SUB, self),
             '*' => {
                 let c = self.compiler_data.input.read();
                 if c == '*' {
-                    return self_symbol!(TokenType::POWER, TokenType::SELF_POWER, self)
+                    return self_symbol!(TokenType::POWER, TokenType::SELF_POWER, self);
                 }
                 self.compiler_data.input.unread(c);
                 return self_symbol!(TokenType::MUL, TokenType::SELF_MUL, self);
-            },
+            }
             '%' => self_symbol!(TokenType::MOD, TokenType::SELF_MOD, self),
             '/' => {
                 let c = self.compiler_data.input.read();
                 if c == '=' {
-                    return Token::new(TokenType::SELF_DIV, None)
+                    return Token::new(TokenType::SELF_DIV, None);
                 }
                 self.compiler_data.input.unread(c);
                 Token::new(TokenType::DIV, None)
-            },
+            }
             '=' => binary_symbol!(TokenType::ASSIGN, TokenType::EQUAL, '=', self),
             '!' => binary_symbol!(TokenType::NOT, TokenType::UNEQUAL, '=', self),
             '>' => binary_symbol!(TokenType::GREATER, TokenType::GREATER_EQUAL, '=', self),
@@ -230,7 +307,11 @@ impl TokenLex<'_> {
         }
         Token::new(
             TokenType::INT_VALUE,
-            Some(Data::Ind(self.compiler_data.const_pool.add_int(s.parse().expect("wrong string to int")))),
+            Some(Data::Ind(
+                self.compiler_data
+                    .const_pool
+                    .add_int(s.parse().expect("wrong string to int")),
+            )),
         )
     }
 
@@ -264,10 +345,20 @@ impl TokenLex<'_> {
                 );
             }
         }
-        Token::new(TokenType::STRING_VALUE, Some(Data::Ind(self.compiler_data.const_pool.add_string(s))))
+        Token::new(
+            TokenType::STRING_VALUE,
+            Some(Data::Ind(self.compiler_data.const_pool.add_string(s))),
+        )
     }
 
     fn next_token(&mut self) -> Option<Token> {
+        if !self.unget_token.is_empty() {
+            let tmp = self.unget_token.pop().unwrap();
+            if tmp.tp == TokenType::END_OF_LINE {
+                self.compiler_data.content.add_line();
+            }
+            return Some(tmp);
+        }
         let mut presecnt_lex = self.compiler_data.input.read();
         loop {
             match presecnt_lex {
@@ -293,6 +384,26 @@ impl TokenLex<'_> {
             return Some(self.lex_str(presecnt_lex));
         }
         Some(self.lex_symbol(presecnt_lex))
+    }
+
+    fn next_back(&mut self, t:Token) {
+        if t.tp == TokenType::END_OF_LINE {
+            self.compiler_data.content.del_line();
+        }
+        self.unget_token.push(t);
+    }
+}
+
+impl Drop for TokenLex<'_> {
+    fn drop(&mut self) {
+        // check the braces stack
+        if !self.braces_check.is_empty() {
+            let unmatch_char = self.braces_check.pop().unwrap();
+            error::report_error(
+                &Content::new_line(&self.compiler_data.content.module_name, unmatch_char.line),
+                ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, unmatch_char.c), error::SYNTAX_ERROR),
+            )
+        }
     }
 }
 
@@ -345,9 +456,7 @@ mod tests {
             r#":{}[]()+=%=//= // /=** *=*"#,
         );
         let mut t = TokenLex::new(&mut env);
-        let res = vec![
-            Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))
-        ];
+        let res = vec![Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))];
         check(&mut t, res);
     }
 
@@ -357,9 +466,7 @@ mod tests {
             Option::new(false, InputSource::StringInternal),
             r#""s"'sd''sdscdcdfvf'"depkd"''"\n\t"'ttt\tt'"#,
         );
-        let res = vec![
-            Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))
-        ];
+        let res = vec![Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))];
     }
 
     #[test]

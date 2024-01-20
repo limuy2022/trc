@@ -61,11 +61,26 @@ macro_rules! impl_oper {
 }
 
 #[macro_export]
+/// use tvm::types::batch_impl_opers;
+/// batch_impl_opers!(
+/// add => +, "+", TrcInt, TrcInt,
+/// sub => -, "-", TrcInt, TrcInt,
+/// mul => *, "*", TrcInt, TrcInt
+/// );
 macro_rules! batch_impl_opers {
     ($($trait_oper_fn_name:ident => $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident),*) => {
         $(
             impl_oper!($trait_oper_fn_name, $oper, $error_oper_name, $self_type, $newtype);
         )*
+    };
+}
+
+#[macro_export]
+macro_rules! impl_single_oper {
+    ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
+        fn $trait_oper_fn_name(&self) -> TypeError {
+            Ok(Box::new($newtype::new($oper self.value)))
+        }
     };
 }
 
@@ -87,8 +102,19 @@ pub trait TrcObj: Downcast + std::fmt::Display {
         le => "<=",
         and => "and",
         or => "or",
-        power => "**"
+        power => "**",
+        bit_and => "&",
+        bit_or => "|",
+        xor => "~"
     );
+
+    fn not(&self) -> TypeError {
+        unsupported_operator!("not", self)
+    }
+
+    fn bit_not(&self) -> TypeError {
+        unsupported_operator!("xor", self)
+    }
 
     fn get_type_name(&self) -> &str;
 }

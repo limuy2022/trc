@@ -13,10 +13,10 @@ pub const UNMATCHED_BRACE: &str = "{} is unmatched";
 pub const OPERATOR_IS_NOT_SUPPORT: &str = "operator {} is not supported for type {}";
 pub const VM_DATA_NUMBER: &str =
     "The number of data of vm stack is not correct, should have {} data";
-pub const ZERO_DIV:&str = "{} is divided by zero";
+pub const ZERO_DIV: &str = "{} is divided by zero";
 
 /// maybe useful when you want to use [should_panic]
-pub static SHOULD_PANIC:bool = false;
+pub static SHOULD_PANIC: bool = false;
 
 pub struct ErrorInfo {
     pub message: String,
@@ -46,7 +46,7 @@ pub fn report_error(content: &impl ErrorContent, info: ErrorInfo) {
     eprintln!("In module {}", content.get_module_name());
     eprintln!("{}:{}", gettext(info.errot_type), info.message);
     if SHOULD_PANIC {
-        panic!("SHOULD PANIC var which is used to panic when error is reported is set")    
+        panic!("SHOULD PANIC var which is used to panic when error is reported is set")
     }
     exit(EXIT_FAILURE);
 }

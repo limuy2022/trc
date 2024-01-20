@@ -11,6 +11,8 @@ use crate::{
     cfg,
 };
 
+use self::types::trcint::TrcInt;
+
 pub struct ConstPool {
     pub intpool: Vec<i64>,
     pub stringpool: Vec<String>,
@@ -43,7 +45,7 @@ impl<'a> DynaData<'a> {
 
 pub struct Inst {
     opcode: Opcode,
-    operand: i32,
+    operand: usize,
 }
 
 pub struct Vm<'a> {
@@ -104,6 +106,10 @@ enum Opcode {
     And,
     Or,
     Not,
+    Xor,
+    BitNot,
+    BitAnd,
+    BitOr,
     // change the option code index
     Goto,
     // return from a function
@@ -115,7 +121,7 @@ enum Opcode {
 }
 
 /// reduce the duplicate code to solve the operator running
-macro_rules! OP {
+macro_rules! binary_opcode {
     ($trait_used:ident, $sself:expr) => {{
         let t1 = $sself.dynadata.obj_stack.pop();
         let t2 = $sself.dynadata.obj_stack.pop();
@@ -128,6 +134,28 @@ macro_rules! OP {
         let t1 = t1.unwrap();
         let t2 = t2.unwrap();
         let ret = t1.$trait_used(t2);
+        match ret {
+            Err(e) => {
+                report_error(&$sself.run_contnet, e);
+            }
+            Ok(t) => {
+                $sself.dynadata.obj_stack.push(t);
+            }
+        }
+    }};
+}
+
+macro_rules! unary_opcode {
+    ($trait_used:ident, $sself:expr) => {{
+        let t1 = $sself.dynadata.obj_stack.pop();
+        if t1.is_none() {
+            report_error(
+                &$sself.run_contnet,
+                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 1), VM_ERROR),
+            );
+        }
+        let t1 = t1.unwrap();
+        let ret = t1.$trait_used();
         match ret {
             Err(e) => {
                 report_error(&$sself.run_contnet, e);
@@ -154,28 +182,39 @@ impl<'a> Vm<'a> {
     pub fn run(&mut self) {
         while self.pc < self.inst.len() {
             match self.inst[self.pc].opcode {
-                Opcode::Add => OP!(add, self),
-                Opcode::Sub => OP!(sub, self),
-                Opcode::Mul => OP!(mul, self),
-                Opcode::Div => OP!(div, self),
-                Opcode::ExtraDiv => OP!(extra_div, self),
-                Opcode::Mod => OP!(modd, self),
-                Opcode::Gt => OP!(gt, self),
-                Opcode::Lt => OP!(lt, self),
-                Opcode::Ge => OP!(ge, self),
-                Opcode::Le => OP!(le, self),
-                Opcode::Eq => OP!(eq, self),
-                Opcode::Ne => OP!(ne, self),
-                Opcode::And => OP!(and, self),
-                Opcode::Or => OP!(or, self),
-                Opcode::Power => OP!(power, self),
+                Opcode::Add => binary_opcode!(add, self),
+                Opcode::Sub => binary_opcode!(sub, self),
+                Opcode::Mul => binary_opcode!(mul, self),
+                Opcode::Div => binary_opcode!(div, self),
+                Opcode::ExtraDiv => binary_opcode!(extra_div, self),
+                Opcode::Mod => binary_opcode!(modd, self),
+                Opcode::Gt => binary_opcode!(gt, self),
+                Opcode::Lt => binary_opcode!(lt, self),
+                Opcode::Ge => binary_opcode!(ge, self),
+                Opcode::Le => binary_opcode!(le, self),
+                Opcode::Eq => binary_opcode!(eq, self),
+                Opcode::Ne => binary_opcode!(ne, self),
+                Opcode::And => binary_opcode!(and, self),
+                Opcode::Or => binary_opcode!(or, self),
+                Opcode::Power => binary_opcode!(power, self),
+                Opcode::Not => unary_opcode!(not, self),
+                Opcode::Xor => binary_opcode!(xor, self),
                 Opcode::NewFrame => {}
                 Opcode::PopFrame => {
                     self.dynadata.frames_stack.pop();
                 }
-                _ => {
-                    panic!("unknown opcode");
+                Opcode::Goto => {
+                    self.pc = self.inst[self.pc].operand;
                 }
+                Opcode::LoadInt => {
+                    // self.dynadata.obj_stack.push(self.constpool(self.inst[self.pc].u));
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(
+                        self.constpool.intpool[self.inst[self.pc].operand],
+                    )));
+                }
+                Opcode::BitAnd => binary_opcode!(bit_and, self),
+                Opcode::BitOr => binary_opcode!(bit_or, self),
+                Opcode::BitNot => unary_opcode!(bit_not, self),
             }
             self.pc += 1;
         }

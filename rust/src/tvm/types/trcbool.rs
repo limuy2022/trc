@@ -1,6 +1,9 @@
+use super::{TrcObj, TypeError};
+use crate::base::error::{ErrorInfo, OPERATOR_ERROR, OPERATOR_IS_NOT_SUPPORT};
+use crate::{batch_impl_opers, impl_oper, impl_single_oper};
+use gettextrs::gettext;
 use std::fmt::Display;
 
-use super::TrcObj;
 pub struct TrcBool {
     pub value: bool,
 }
@@ -10,7 +13,11 @@ impl TrcObj for TrcBool {
         "bool"
     }
 
-
+    impl_single_oper!(not, !, "not", TrcBool, TrcBool);
+    batch_impl_opers!(
+        and => &&, "and", TrcBool, TrcBool,
+        or => ||, "or", TrcBool, TrcBool
+    );
 }
 
 impl Display for TrcBool {
@@ -25,8 +32,6 @@ impl Display for TrcBool {
 
 impl TrcBool {
     pub fn new(value: bool) -> TrcBool {
-        Self {
-            value
-        }
+        Self { value }
     }
 }

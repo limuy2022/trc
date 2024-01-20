@@ -71,7 +71,7 @@ enum TokenType {
     GREATER_EQUAL,
     // !
     NOT,
-    END_OF_LINE
+    END_OF_LINE,
 }
 
 #[derive(PartialEq, Debug)]
@@ -100,7 +100,7 @@ impl BraceRecord {
 pub struct TokenLex<'code> {
     compiler_data: &'code mut Compiler,
     braces_check: Vec<BraceRecord>,
-    unget_token: Vec<Token>
+    unget_token: Vec<Token>,
 }
 
 impl Token {
@@ -178,7 +178,7 @@ impl TokenLex<'_> {
         TokenLex {
             compiler_data,
             braces_check: vec![],
-            unget_token: vec![]
+            unget_token: vec![],
         }
     }
 
@@ -192,7 +192,7 @@ impl TokenLex<'_> {
                 );
             }
             Some(c) => {
-                check_braces_match!(self, c, 
+                check_braces_match!(self, c,
                     '{' => '}',
                     '[' => ']',
                     '(' => ')'
@@ -209,20 +209,20 @@ impl TokenLex<'_> {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
                 Token::new(TokenType::LEFT_BIG_BRACE, None)
-            },
+            }
             '}' => {
                 self.check_braces_stack(c);
                 Token::new(TokenType::RIGHT_BIG_BRACE, None)
-            },
+            }
             '[' => {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
                 Token::new(TokenType::LEFT_MIDDLE_BRACE, None)
-            },
+            }
             ']' => {
                 self.check_braces_stack(c);
                 Token::new(TokenType::RIGHT_MIDDLE_BRACE, None)
-            },
+            }
             '(' => {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
@@ -231,7 +231,7 @@ impl TokenLex<'_> {
             ')' => {
                 self.check_braces_stack(c);
                 Token::new(TokenType::RIGHT_SMALL_BRACE, None)
-            },
+            }
             '+' => self_symbol!(TokenType::ADD, TokenType::SELF_ADD, self),
             '-' => self_symbol!(TokenType::SUB, TokenType::SELF_SUB, self),
             '*' => {
@@ -386,7 +386,7 @@ impl TokenLex<'_> {
         Some(self.lex_symbol(presecnt_lex))
     }
 
-    fn next_back(&mut self, t:Token) {
+    fn next_back(&mut self, t: Token) {
         if t.tp == TokenType::END_OF_LINE {
             self.compiler_data.content.del_line();
         }
@@ -401,7 +401,10 @@ impl Drop for TokenLex<'_> {
             let unmatch_char = self.braces_check.pop().unwrap();
             error::report_error(
                 &Content::new_line(&self.compiler_data.content.module_name, unmatch_char.line),
-                ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, unmatch_char.c), error::SYNTAX_ERROR),
+                ErrorInfo::new(
+                    gettext!(error::UNMATCHED_BRACE, unmatch_char.c),
+                    error::SYNTAX_ERROR,
+                ),
             )
         }
     }

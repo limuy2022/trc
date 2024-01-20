@@ -3,7 +3,7 @@ use std::fmt::Display;
 use super::TrcObj;
 
 pub struct TrcStr {
-    value: String
+    value: String,
 }
 
 impl TrcObj for TrcStr {
@@ -14,6 +14,6 @@ impl TrcObj for TrcStr {
 
 impl Display for TrcStr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)   
+        write!(f, "{}", self.value)
     }
 }

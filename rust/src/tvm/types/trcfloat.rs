@@ -3,14 +3,12 @@ use std::fmt::Display;
 use super::TrcObj;
 
 pub struct TrcFloat {
-    pub value:f64
+    pub value: f64,
 }
 
 impl TrcFloat {
     pub fn new(value: f64) -> TrcFloat {
-        Self {
-            value
-        }
+        Self { value }
     }
 }
 
@@ -22,6 +20,6 @@ impl TrcObj for TrcFloat {
 
 impl Display for TrcFloat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)   
+        write!(f, "{}", self.value)
     }
 }

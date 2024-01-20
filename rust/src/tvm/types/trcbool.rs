@@ -1,11 +1,10 @@
 use super::TrcObj;
-
-pub struct TrcStr {
+pub struct TrcBool {
 
 }
 
-impl TrcObj for TrcStr {
+impl TrcObj for TrcBool {
     fn get_type_name(&self) -> &str {
-        "str"
+        "bool"
     }
 }

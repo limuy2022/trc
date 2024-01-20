@@ -45,12 +45,23 @@ impl Content {
         }
     }
 
+    pub fn new_line(module_name: &str, line: usize) -> Self {
+        Self {
+            module_name: String::from(module_name),
+            line,
+        }
+    }
+
     pub fn add_line(&mut self) {
         self.line += 1;
     }
 
     pub fn del_line(&mut self) {
         self.line -= 1;
+    }
+
+    pub fn set_line(&mut self, line: usize) {
+        self.line = line;
     }
 }
 
@@ -65,51 +76,48 @@ impl Option {
 
 #[derive(Hash, Eq, PartialEq)]
 pub struct Float {
-    front:i32,
-    back:i32
+    front: i32,
+    back: i32,
 }
 
 impl Float {
-    fn new(front:i32, back:i32) -> Self {
-        Self {
-            front,
-            back
-        }
+    fn new(front: i32, back: i32) -> Self {
+        Self { front, back }
     }
 }
 
 pub struct ValuePool {
     const_ints: hash_map::HashMap<i64, usize>,
     const_strings: hash_map::HashMap<String, usize>,
-    const_floats: hash_map::HashMap<Float, usize>
+    const_floats: hash_map::HashMap<Float, usize>,
 }
 
-const INT_VAL_POOL_ZERO:usize = 0;
-const INT_VAL_POOL_ONE:usize = 1;
+const INT_VAL_POOL_ZERO: usize = 0;
+const INT_VAL_POOL_ONE: usize = 1;
 
 impl ValuePool {
     fn new() -> Self {
         let mut ret = Self {
             const_ints: hash_map::HashMap::new(),
             const_floats: hash_map::HashMap::new(),
-            const_strings: hash_map::HashMap::new()
+            const_strings: hash_map::HashMap::new(),
         };
         ret.add_int(0);
         ret.add_int(1);
         ret
     }
 
-    fn add_int(&mut self, val:i64) -> usize {
+    fn add_int(&mut self, val: i64) -> usize {
         let len_tmp = self.const_ints.len();
         *self.const_ints.entry(val).or_insert(len_tmp)
     }
 
-    fn add_string(&mut self, val:String) -> usize {
+    fn add_string(&mut self, val: String) -> usize {
         let len_tmp = self.const_strings.len();
         *self.const_strings.entry(val).or_insert(len_tmp)
     }
 
-    fn add_float(&mut self, val:Float) -> usize {
+    fn add_float(&mut self, val: Float) -> usize {
         let len_tmp = self.const_floats.len();
         *self.const_floats.entry(val).or_insert(len_tmp)
     }
@@ -145,6 +153,10 @@ impl StringSource {
 impl TokenIo for StringSource {
     fn unread(&mut self, c: char) {
         self.pos -= self.prev_size;
+        // check if match the right char
+        if cfg!(debug_assertions) {
+            assert_eq!(self.text[self.pos..].chars().next().unwrap(), c);
+        }
     }
 
     fn read(&mut self) -> char {

@@ -5,10 +5,10 @@ mod ast;
 mod token;
 
 use self::token::TokenLex;
-use crate::base::error;
+use crate::base::codegen::{ConstPool, StaticData};
+use crate::base::error::{self, RunResult};
 use crate::cfg;
-use crate::tvm::ConstPool;
-use std::collections::hash_map;
+use std::collections::{hash_map, HashMap};
 use std::io::BufRead;
 use std::{fs, io, vec};
 
@@ -76,22 +76,46 @@ impl Option {
     }
 }
 
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Float {
-    front: i32,
-    back: i32,
+    front: u32,
+    back: u32,
 }
 
 impl Float {
-    fn new(front: i32, back: i32) -> Self {
+    fn new(front: u32, back: u32) -> Self {
         Self { front, back }
+    }
+
+    fn get_len(mut tmp: u32) -> u8 {
+        if tmp == 0 {
+            return 1;
+        }
+        let ret: u8 = 0;
+        while tmp != 0 {
+            tmp /= 10;
+        }
+        ret
+    }
+
+    pub fn to_float(&self) -> f64 {
+        let len = Self::get_len(self.back);
+        let mut float_part = self.back as f64;
+        for _ in 0..len {
+            float_part /= 10.0;
+        }
+        self.front as f64 + float_part
     }
 }
 
+type Pool<T> = hash_map::HashMap<T, usize>;
+
 pub struct ValuePool {
-    const_ints: hash_map::HashMap<i64, usize>,
-    const_strings: hash_map::HashMap<String, usize>,
-    const_floats: hash_map::HashMap<Float, usize>,
+    const_ints: Pool<i64>,
+    const_strings: Pool<String>,
+    const_floats: Pool<Float>,
+    name_pool: Pool<String>,
+    const_big_int: Pool<String>,
 }
 
 const INT_VAL_POOL_ZERO: usize = 0;
@@ -100,9 +124,11 @@ const INT_VAL_POOL_ONE: usize = 1;
 impl ValuePool {
     fn new() -> Self {
         let mut ret = Self {
-            const_ints: hash_map::HashMap::new(),
-            const_floats: hash_map::HashMap::new(),
-            const_strings: hash_map::HashMap::new(),
+            const_ints: HashMap::new(),
+            const_floats: HashMap::new(),
+            const_strings: HashMap::new(),
+            name_pool: HashMap::new(),
+            const_big_int: HashMap::new(),
         };
         ret.add_int(0);
         ret.add_int(1);
@@ -114,14 +140,22 @@ impl ValuePool {
         *self.const_ints.entry(val).or_insert(len_tmp)
     }
 
+    fn string_get(pool: &mut Pool<String>, str: String) -> usize {
+        let len_tmp = pool.len();
+        *pool.entry(str).or_insert(len_tmp)
+    }
+
     fn add_string(&mut self, val: String) -> usize {
-        let len_tmp = self.const_strings.len();
-        *self.const_strings.entry(val).or_insert(len_tmp)
+        Self::string_get(&mut self.const_strings, val)
     }
 
     fn add_float(&mut self, val: Float) -> usize {
         let len_tmp = self.const_floats.len();
         *self.const_floats.entry(val).or_insert(len_tmp)
+    }
+
+    fn add_id(&mut self, val: String) -> usize {
+        Self::string_get(&mut self.name_pool, val)
     }
 
     fn store_val_to_vm(&mut self) -> ConstPool {
@@ -130,7 +164,6 @@ impl ValuePool {
         for i in &self.const_ints {
             ret.intpool[*i.1] = *i.0;
         }
-
         ret
     }
 }
@@ -152,8 +185,22 @@ impl StringSource {
     }
 }
 
+impl Iterator for StringSource {
+    type Item = char;
+
+    fn next(&mut self) -> std::option::Option<Self::Item> {
+        match self.read() {
+            '\0' => None,
+            other => Some(other),
+        }
+    }
+}
+
 impl TokenIo for StringSource {
     fn unread(&mut self, c: char) {
+        if c == '\0' {
+            return;
+        }
         self.pos -= self.prev_size;
         // check if match the right char
         if cfg!(debug_assertions) {
@@ -175,7 +222,7 @@ impl TokenIo for StringSource {
     }
 }
 
-trait TokenIo {
+trait TokenIo: Iterator {
     fn unread(&mut self, c: char);
 
     fn read(&mut self) -> char;
@@ -192,11 +239,29 @@ impl FileSource {
     pub fn new(f: fs::File) -> Self {
         let buf = io::BufReader::new(f);
         let s = String::new();
-        FileSource {
+        let mut ret = FileSource {
             back: vec![],
             buf,
             input_pos: 0,
             s,
+        };
+        ret.init_new_line();
+        ret
+    }
+
+    fn init_new_line(&mut self) {
+        self.s.clear();
+        self.buf.read_line(&mut self.s).unwrap();
+        self.input_pos = 0;
+    }
+}
+
+impl Iterator for FileSource {
+    type Item = char;
+    fn next(&mut self) -> std::option::Option<Self::Item> {
+        match self.read() {
+            '\0' => None,
+            other => Some(other),
         }
     }
 }
@@ -214,9 +279,10 @@ impl TokenIo for FileSource {
             let mut input_pos = self.s[self.input_pos..].chars();
             match input_pos.next() {
                 None => {
-                    self.s.clear();
-                    self.buf.read_line(&mut self.s).unwrap();
-                    self.input_pos = 0;
+                    self.init_new_line();
+                    if self.s.is_empty() {
+                        return '\0';
+                    }
                 }
                 Some(c) => {
                     self.input_pos += c.len_utf8();
@@ -229,7 +295,7 @@ impl TokenIo for FileSource {
 
 pub struct Compiler {
     // to support read from stdin and file
-    input: Box<dyn TokenIo>,
+    input: Box<dyn TokenIo<Item = char>>,
     const_pool: ValuePool,
     option: Option,
     content: Content,
@@ -262,8 +328,62 @@ impl Compiler {
         }
     }
 
-    pub fn lex(&mut self) {
+    pub fn lex(&mut self) -> RunResult<()> {
         let token_lexer = TokenLex::new(self);
-        let ast_builder = ast::AstBuilder::new(token_lexer);
+        let mut ast_builder = ast::AstBuilder::new(token_lexer);
+        ast_builder.generate_code()?;
+        Ok(())
+    }
+}
+
+mod tests {
+    use super::*;
+    use std::fs::{read_to_string, File};
+
+    fn check_read(reader: &mut impl TokenIo<Item = char>, s: &str) {
+        let mut iter = s.chars();
+        for i in reader {
+            assert_eq!(i, iter.next().unwrap());
+        }
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn test_string_literal() {
+        let source = "source\np";
+        let mut t = StringSource::new(String::from(source));
+        let mut tmp: Vec<char> = vec![t.read(), t.read()];
+        tmp.reverse();
+        for i in &tmp {
+            t.unread(*i);
+        }
+        check_read(&mut t, source)
+    }
+
+    #[test]
+    fn test_file_read() {
+        let test_file_path = "tests/testdata/compiler/compiler1.txt";
+        let source = read_to_string(test_file_path).expect("please run in root dir");
+        let mut t = FileSource::new(File::open(test_file_path).expect("please run in root dir"));
+        let mut tmp: Vec<char> = vec![t.read(), t.read()];
+        tmp.reverse();
+        for i in &tmp {
+            t.unread(*i);
+        }
+        check_read(&mut t, &source)
+    }
+
+    #[test]
+    fn test_value_pool() {
+        let mut pool = ValuePool::new();
+        assert_eq!(pool.add_int(7), 2);
+        assert_eq!(pool.add_int(1), INT_VAL_POOL_ONE);
+        assert_eq!(pool.add_int(0), INT_VAL_POOL_ZERO);
+        assert_eq!(pool.add_float(Float::new(9, 0)), 0);
+        assert_eq!(pool.add_float(Float::new(9, 0)), 0);
+        assert_eq!(pool.add_float(Float::new(9, 5)), 1);
+        assert_eq!(pool.add_string(String::from("value")), 0);
+        assert_eq!(pool.add_string(String::from("value")), 0);
+        assert_eq!(pool.add_string(String::from("vale")), 1);
     }
 }

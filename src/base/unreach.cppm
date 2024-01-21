@@ -1,10 +1,11 @@
 module;
 #include <cstdio>
 #include <cstdlib>
+#include <libintl.h>
 #include <source_location>
 #include <string>
 export module unreach;
-import language;
+import error;
 
 namespace trc {
 export void unreach(const std::string& error_msg,
@@ -13,7 +14,7 @@ export void unreach(const std::string& error_msg,
         "%s\nFatal error in function \"%s\" file %s line "
         "%u\n%s",
         error_msg.c_str(), source_info.function_name(), source_info.file_name(),
-        source_info.line(), language::error::noreach);
+        source_info.line(), gettext(error::noreach));
     exit(EXIT_FAILURE);
 }
 }

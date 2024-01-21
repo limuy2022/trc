@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd script
+python3 gen_locales.py
+cd ../rust
+cargo fmt
+cd script
+python3 gen_locales.py

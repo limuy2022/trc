@@ -18,19 +18,19 @@ struct Args {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    build { optimize: bool },
-    tshell {},
+    Build { optimize: bool },
+    Tshell {},
 }
 
 pub fn run() {
     let cli = Args::parse();
     match cli.mode {
-        Commands::build { optimize: opt } => {
+        Commands::Build { optimize: opt } => {
             for i in cli.files {
                 tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)));
             }
         }
-        Commands::tshell {} => {
+        Commands::Tshell {} => {
             tools::tshell::tshell();
         }
     };

@@ -1,14 +1,4 @@
-use super::types::TrcObj;
-
-pub struct Func {
-    name: String,
-}
-
-impl Func {
-    fn new(name: String) -> Self {
-        Self { name }
-    }
-}
+use crate::base::func;
 
 /// A content structure which hold the running info of the function
 pub struct Frame<'a> {
@@ -16,7 +6,7 @@ pub struct Frame<'a> {
 }
 
 impl<'a> Frame<'a> {
-    fn new(func: &'a Func) -> Self {
+    fn new(func: &'a func::Func) -> Self {
         Self { name: &func.name }
     }
 }

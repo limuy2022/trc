@@ -12,8 +12,7 @@ module;
 #include <cstdlib>
 #include <sstream>
 export module io;
-import Error;
-import language;
+import error;
 
 const size_t mem_init_size = 15;
 const size_t mem_realloc_size = 20;

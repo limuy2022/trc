@@ -1,10 +1,10 @@
 ﻿module;
 #include <cctype>
 #include <limits>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <sstream>
 export module compiler_def;
 import TVM;
 import Error;
@@ -80,7 +80,8 @@ public:
  */
 class compiler_public_data {
 public:
-    compiler_public_data(const compiler_option& option, TVM_space::TVM_static_data& vm)
+    compiler_public_data(
+        const compiler_option& option, TVM_space::TVM_static_data& vm)
         : option(option)
         , vm(vm)
         , const_int(vm.const_i)
@@ -105,7 +106,7 @@ public:
      */
     template <typename... P>
     void send_error(error::error_type errorn, const P&... argv) {
-        //todo:optimize it
+        // todo:optimize it
         std::stringstream ss;
         error::send_error_interal<true>(errorn, ss.str(), argv...);
     }

@@ -1,3 +1,3 @@
-struct state {}
+struct State {}
 
 pub struct Trie {}

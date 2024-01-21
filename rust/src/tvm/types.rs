@@ -3,6 +3,7 @@ use downcast_rs::{impl_downcast, Downcast};
 use gettextrs::gettext;
 
 pub mod data_structure;
+pub mod trcbigint;
 pub mod trcbool;
 pub mod trcfloat;
 pub mod trcint;
@@ -16,7 +17,7 @@ macro_rules! unsupported_operator {
                 $operator_name,
                 $sself.get_type_name()
             ),
-            error::SYNTAX_ERROR,
+            gettext(error::SYNTAX_ERROR),
         ))
     };
 }
@@ -40,7 +41,7 @@ macro_rules! impl_oper {
                     Ok(Box::new($newtype::new($oper(self.value, v.value)$whether_throw_error)))
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), OPERATOR_ERROR))
+                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }
@@ -53,7 +54,7 @@ macro_rules! impl_oper {
                     Ok(Box::new($newtype::new(self.value $oper v.value)))
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), OPERATOR_ERROR))
+                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }

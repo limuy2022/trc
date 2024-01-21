@@ -6,6 +6,7 @@ pub const SYNTAX_ERROR: &str = "SyntaxError";
 pub const OPERATOR_ERROR: &str = "OperatorError";
 pub const VM_ERROR: &str = "VmError";
 pub const ZERO_DIVSION_ERROR: &str = "ZeroDivisionError";
+pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
@@ -14,18 +15,23 @@ pub const VM_DATA_NUMBER: &str =
     "The number of data of vm stack is not correct, should have {} data";
 pub const VM_FRAME_EMPTY: &str = "frame stack is empty.But running a pop frame opcode";
 pub const ZERO_DIV: &str = "{} is divided by zero";
+pub const PREFIX_FOR_FLOAT: &str = "Prefix {} can be used for float";
+pub const FLOAT_OVER_FLOW: &str = "Float {} is too large to store";
+pub const UNEXPECTED_TOKEN: &str = "token {} is not expected";
+pub const ERROR_IN_LINE: &str = "Error in line {}";
+pub const IN_MODULE: &str = "In module {}";
 
 #[derive(Debug)]
 pub struct ErrorInfo {
     pub message: String,
-    errot_type: &'static str,
+    error_type: String,
 }
 
 impl ErrorInfo {
-    pub fn new(message: String, error_type: &'static str) -> ErrorInfo {
+    pub fn new(message: String, error_type: String) -> ErrorInfo {
         ErrorInfo {
             message,
-            errot_type: error_type,
+            error_type,
         }
     }
 }
@@ -50,12 +56,12 @@ impl Display for RuntimeError {
     /// but you should translate the error messgae by caller
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = format!(
-            r#"Error in line {}
-In module {}
+            r#"{}
+{}
 {}:{}"#,
-            self.content.get_line(),
-            self.content.get_module_name(),
-            gettext(self.info.errot_type),
+            gettext!(ERROR_IN_LINE, self.content.get_line()),
+            gettext!(IN_MODULE, self.content.get_module_name()),
+            gettext(self.info.error_type.clone()),
             self.info.message
         );
         write!(f, "{}", s)
@@ -67,3 +73,5 @@ impl RuntimeError {
         RuntimeError { content, info }
     }
 }
+
+pub type RunResult<T> = Result<T, RuntimeError>;

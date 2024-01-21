@@ -45,6 +45,7 @@ There are also many easape char in the string:
 |\\\\|\|
 |\'|'|
 |\"|"|
+|\0|the tick of the end of the string|
 
 If you add ```r``` or ```R``` in front of the string.Trc will treat it as a raw string.
 Yes.These rules are from Python.I love its grammar rules
@@ -137,6 +138,13 @@ the second is use ```/**/```,this kind can cross the line,like:
 hello world!
 */
 ```
+
+## the var of trc
+
+First,we support the UTF-8 with your var name.So you can define your var like this:
+```go
+你好:=90
+``` 
 
 ## Data structures for Trc
 

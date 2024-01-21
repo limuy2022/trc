@@ -7,7 +7,6 @@ module;
 #include <cstdio>
 #include <sstream>
 #include <string>
-#include <compiler.hpp>
 export module tshell;
 import TVM;
 import Error;
@@ -18,6 +17,7 @@ import compile_env;
 import compiler_def;
 import color;
 import help;
+import compiler;
 
 /**
  * @brief 判断是否为新的语句块开始
@@ -60,8 +60,6 @@ static void get_block(std::string& res) {
     }
 }
 
-
-
 namespace tools::tools_out {
     /**
      * @brief trc的交互式终端界面
@@ -84,7 +82,8 @@ namespace tools::tools_out {
             rewind(tmpf);
             vm->static_data.byte_codes.clear();
             try {
-                compiler::compiler().parse(tools::compilerOption, "tshell", tmpf, &vm->static_data);
+                compiler::compiler().parse(
+                    tools::compilerOption, "tshell", tmpf, &vm->static_data);
                 vm->reload_data();
                 vm->run_all();
             } catch (error::error_env::vm_run_error) { }

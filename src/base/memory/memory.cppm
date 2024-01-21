@@ -6,8 +6,7 @@
 module;
 #include <new>
 export module memory;
-import Error;
-import language;
+import error;
 
 namespace trc::memory {
 /**

@@ -72,7 +72,7 @@ impl AcAutomaton {
     /// ac.search("world", 2);
     /// let ans = ac.get_ans();
     /// ````
-    fn search(&self, pattern: &str, id: u32) {}
+    fn search(&self, _pattern: &str, _id: u32) {}
 
     fn get_ans(&self) -> HashMap<u32, usize> {
         HashMap::new()
@@ -84,6 +84,6 @@ mod tests {
     use super::*;
     #[test]
     fn ac_automaton1() {
-        let mut ac = AcAutomaton::new();
+        let ac = AcAutomaton::new();
     }
 }

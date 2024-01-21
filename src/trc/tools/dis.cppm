@@ -5,7 +5,6 @@
 module;
 #include <cstdio>
 #include <string>
-#include <compiler.hpp>
 export module dis;
 import code_loader;
 import ctree_loader;
@@ -18,6 +17,7 @@ import compiler_def;
 import compile_env;
 import help;
 import color;
+import compiler;
 
 namespace trc::tools {
 namespace tools_in {
@@ -78,9 +78,8 @@ namespace tools_in {
         if (loader::is_magic(file_path))
             loader::loader_ctree(vm, file_path);
         else {
-            compiler::compiler()
-                .parse(tools::compilerOption, file_path, 
-                &vm->static_data);
+            compiler::compiler().parse(
+                tools::compilerOption, file_path, &vm->static_data);
         }
         out(*vm, file_path);
     }

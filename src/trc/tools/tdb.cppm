@@ -11,7 +11,6 @@ module;
 #include <cstring>
 #include <string>
 #include <vector>
-#include <compiler.hpp>
 export module tdb;
 import TVM;
 import memory;
@@ -28,6 +27,7 @@ import cmdparser;
 import color;
 import help;
 import basic_def;
+import compiler;
 
 namespace trc {
 namespace tdb {
@@ -96,8 +96,8 @@ namespace tdb {
     static void debug(const std::string& file_path) {
         char* instruction = nullptr;
         TVM_space::free_TVM(vm);
-        compiler::compiler()
-            .parse(tools::compilerOption, file_path, &vm->static_data);
+        compiler::compiler().parse(
+            tools::compilerOption, file_path, &vm->static_data);
         vm->reload_data();
         // 用于输出代码行信息
         std::string code;

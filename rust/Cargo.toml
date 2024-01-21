@@ -17,4 +17,7 @@ gettext-rs = "0.7.0"
 colored = "2.1.0"
 downcast-rs = "1.2.0"
 lazy_static = "1.4.0"
-anyhow = "1.0.79"
+num-bigint = "0.4.4"
+
+[profile.release]
+panic = "abort"

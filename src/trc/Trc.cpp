@@ -4,10 +4,10 @@
  * Author  :   李沐阳
  */
 
+#include <clocale>
 #include <cstring>
 #include <format>
 #include <libintl.h>
-#include <clocale>
 #ifdef UNITTEST
 #include <gtest/gtest.h>
 #endif
@@ -50,9 +50,8 @@ struct {
     const char* name;
     argv_func_tools tool_func;
 } cmd_tool[] = { { "tdb", tools::tools_out::tdb },
-    { "help", tools::tools_out::help }, { "run", tools::tools_out::run }
-    , { "dis", tools::tools_out::dis },
-    { "build", tools::tools_out::build },
+    { "help", tools::tools_out::help }, { "run", tools::tools_out::run },
+    { "dis", tools::tools_out::dis }, { "build", tools::tools_out::build },
     { "style", tools::tools_out::style } };
 
 /**

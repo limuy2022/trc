@@ -23,21 +23,30 @@ impl TrcInt {
 
 fn extra_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
-        return Err(ErrorInfo::new(gettext!(ZERO_DIV, a), ZERO_DIVSION_ERROR));
+        return Err(ErrorInfo::new(
+            gettext!(ZERO_DIV, a),
+            gettext(ZERO_DIVSION_ERROR),
+        ));
     }
     Ok(a / b)
 }
 
 fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
     if b == 0 {
-        return Err(ErrorInfo::new(gettext!(ZERO_DIV, a), ZERO_DIVSION_ERROR));
+        return Err(ErrorInfo::new(
+            gettext!(ZERO_DIV, a),
+            gettext(ZERO_DIVSION_ERROR),
+        ));
     }
     Ok(a as f64 / b as f64)
 }
 
 fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
-        return Err(ErrorInfo::new(gettext!(ZERO_DIV, a), ZERO_DIVSION_ERROR));
+        return Err(ErrorInfo::new(
+            gettext!(ZERO_DIV, a),
+            gettext(ZERO_DIVSION_ERROR),
+        ));
     }
     Ok(a % b)
 }

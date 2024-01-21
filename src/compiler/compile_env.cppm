@@ -94,8 +94,8 @@ size_t module_compile_env::get_index_of_function(size_t name) {
             return i;
         }
     }
-    compiler_data.send_error(error::NameError,
-        language::error::nameerror, compiler_data.const_name.ref[name].c_str());
+    compiler_data.send_error(error::NameError, language::error::nameerror,
+        compiler_data.const_name.ref[name].c_str());
     return 0;
 }
 
@@ -119,8 +119,7 @@ size_t basic_compile_env::get_index_of_var(size_t name, bool report_error) {
     }
     if (report_error) {
         // 并不在当前符号表,报错
-        compiler_data.send_error(error::NameError,
-            language::error::nameerror,
+        compiler_data.send_error(error::NameError, language::error::nameerror,
             compiler_data.const_name.ref[name].c_str());
     }
     return unsave;

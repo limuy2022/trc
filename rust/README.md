@@ -11,6 +11,7 @@ So this is just an experimental project and I will keep develop c++ version and 
 Like other common rust project.Just use ```cargo build```
 
 Running tests is like other rust project,too.Just ```cargo test```
+But in order to read test data file,please run in the root dir.
 
 ## How to use
 

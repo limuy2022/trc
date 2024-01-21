@@ -14,8 +14,10 @@ public:
     compiler();
 
     // Run the parser on file F.  Return 0 on success.
-    int parse(const compiler_option& option, const std::string& f, TVM_space::TVM_static_data* vm);
-    int parse(const compiler_option& option, const std::string&filename, FILE* f, TVM_space::TVM_static_data* vm);
+    int parse(const compiler_option& option, const std::string& f,
+        TVM_space::TVM_static_data* vm);
+    int parse(const compiler_option& option, const std::string& filename,
+        FILE* f, TVM_space::TVM_static_data* vm);
     // Whether to generate parser debug traces.
     bool trace_parsing = false;
 
@@ -37,15 +39,14 @@ private:
 namespace trc::compiler {
 compiler::compiler() = default;
 
-int compiler::parse(const compiler_option& option, const std::string& f, TVM_space::TVM_static_data* vm) {
-
+int compiler::parse(const compiler_option& option, const std::string& f,
+    TVM_space::TVM_static_data* vm) {
 }
 
-int compiler::parse(const compiler_option& option, const std::string&filename,  FILE* f, TVM_space::TVM_static_data* vm) {
-
+int compiler::parse(const compiler_option& option, const std::string& filename,
+    FILE* f, TVM_space::TVM_static_data* vm) {
 }
 
 FILE* compiler::open_file(const std::string& file) {
-
 }
 }

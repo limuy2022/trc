@@ -1,4 +1,3 @@
-
 msgid "NamaError"
 msgstr "名字错误:"
 
@@ -47,11 +46,11 @@ msgstr "运算符错误:"
 msgid "RedefinedError"
 msgstr "重定义错误:" 
 
-msgid "Error from "
-msgstr "错误来自"
+msgid "Error from {}"
+msgstr "错误来自{}"
 
-msgid "Error in line"
-msgstr "错误发生在行"
+msgid "Error in line {}"
+msgstr "错误发生在行{}"
 
 msgid "Name \"%s\" is not defined."
 msgstr "名字\"%s\"没有被定义."
@@ -68,7 +67,7 @@ msgstr "无法从操作系统中申请内存."
 msgid "\"%s\" division by zero."
 msgstr "\"%s\"被零除"
 
-msgid "Could't find \"%\s\" module."
+msgid "Could't find \"{}\" module."
 msgstr "无法找到\"%s\"模块."
 
 msgid "Key \"%s\" is not defined."
@@ -77,11 +76,11 @@ msgstr "键\"%s\"未定义"
 msgid "%s is out of %s"
 msgstr "%超出了%的范围"
 
-msgid "\"%s\" could not be \"%s\"""
+msgid "\"%s\" could not be \"%s\""
 msgstr "\"%s\"不能被转换为\"%s\""
 
-msgid "Couldn't use %s for types:%s and %s"
-msgstr "不能使用运算符\"%s\"对于类型:%s and %s"
+msgid "Couldn't use {} for types:{} and {}"
+msgstr "不能使用运算符\"{}\"对于类型:{}和{}"
 
 msgid "Function %s is redefined"
 msgstr "函数%s被重定义"
@@ -95,17 +94,17 @@ msgstr "%s需要%s个参数."
 msgid "Number %s is incorrect."
 msgstr "数字%s不正确."
 
-msgid "The string isn't end with \" or \'"
-msgstr "这个字符串不以\"或\'结尾"
+msgid "The string isn't end with \" or '"
+msgstr "这个字符串不以\"或'结尾"
 
 msgid "%s is not be expected."
 msgstr "%s是不被期待的"
 
-msgid "%s is excepted."
-msgstr "%s是被期待的.";
+msgid "{} is excepted."
+msgstr "{}是被期待的."
 
 msgid "Comments should end with */"
-msgstr "多行注释应当以*/结尾";
+msgstr "多行注释应当以*/结尾"
 
 msgid "Escape character %s is not defined."
 msgstr "转义字符%s未定义."
@@ -126,37 +125,34 @@ msgid "Dll %s was not found"
 msgstr "找不到dll\"%s\""
 
 
-msgid "The program executed code that should not have been executed.Please
-report the problem to the Github repository."
-msgstr "这个项目运行了不应该被运行的代码
-.请将这个问题报告给github仓库";
+msgid "The program executed code that should not have been executed.Please report the problem to the Github repository."
+msgstr "这个项目运行了不应该被运行的代码.请将这个问题报告给github仓库"
 
-msgid "Trc:\"%s\" is not a ctree file.Because its 
-magic number is error\n"
-msgstr "Trc:\"%s\"不是一个ctree文件.因为它的魔数不正确.\n"
+msgid "Trc:\"{}\" is not a ctree file.Because its magic number is error\n"
+msgstr "Trc:\"{}\"不是一个ctree文件.因为它的魔数不正确.\n"
 
-msgid "Trc is a stack programming language. This 
-project implements most of the modern 
-programming language basics, provides a perfect 
-tool chain, which is suitable for working 
-scripts or embedded in your projects, and helps 
+msgid "Trc is a stack programming language. This \
+project implements most of the modern \
+programming language basics, provides a perfect \
+tool chain, which is suitable for working \
+scripts or embedded in your projects, and helps \
 to learn how to compile. "
-msgstr "Trc是一门基于栈的编程语言。这个项目实现
-了大部分现代编程语言的功能，提供了一个完
-善的工具链。它很方便被嵌入到你的项目中或
+msgstr "Trc是一门基于栈的编程语言。这个项目实现\
+了大部分现代编程语言的功能，提供了一个完\
+善的工具链。它很方便被嵌入到你的项目中或\
 者作为工作脚本，也可以帮助你去学习编译原理."
 
 msgid "mode is not defined.\n"
-msgstr "模式没有被定义\n";
+msgstr "模式没有被定义\n"
 
 msgid "var"
 msgstr "变量"
 
 msgid " is not defined.\n"
-msgstr "没有被定义"
+msgstr "没有被定义.\n"
 
-msgid "Trc debugger is running.You can read 'doc/use/TDB.md' to find the help."
-msgstr "trc的调试器正在运行.你可以阅读'doc/
+msgid "Trc debugger is running.You can read 'doc/use/TDB.md' to find the help.\n"
+msgstr "trc的调试器正在运行.你可以阅读'doc/\
 use/TDB.md'以寻找帮助.\n"
 
 msgid "instruction"

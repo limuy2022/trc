@@ -5,7 +5,6 @@
 module;
 #include <filesystem>
 #include <string>
-#include <compiler.hpp>
 export module build;
 import TVM;
 import ctree_loader;
@@ -19,6 +18,7 @@ import unreach;
 import color;
 import help;
 import compile_env;
+import compiler;
 
 export namespace trc::tools {
 namespace tools_in {
@@ -28,7 +28,8 @@ namespace tools_in {
      * @param path 文件的路径
      */
     void _build(TVM_space::TVM* vm, const std::string& path) {
-        compiler::compiler().parse(tools::compilerOption, path, &vm->static_data);
+        compiler::compiler().parse(
+            tools::compilerOption, path, &vm->static_data);
         loader::save_ctree(
             vm, fs::path(path).replace_extension(".ctree").string());
     }

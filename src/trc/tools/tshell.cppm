@@ -7,7 +7,6 @@ module;
 #include <cstdio>
 #include <sstream>
 #include <string>
-#include <compiler.hpp>
 export module tshell;
 import TVM;
 import Error;
@@ -18,6 +17,7 @@ import compile_env;
 import compiler_def;
 import color;
 import help;
+import compiler;
 
 /**
  * @brief 判断是否为新的语句块开始

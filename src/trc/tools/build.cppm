@@ -5,7 +5,6 @@
 module;
 #include <filesystem>
 #include <string>
-#include <compiler.hpp>
 export module build;
 import TVM;
 import ctree_loader;
@@ -19,6 +18,7 @@ import unreach;
 import color;
 import help;
 import compile_env;
+import compiler;
 
 export namespace trc::tools {
 namespace tools_in {

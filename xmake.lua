@@ -13,12 +13,10 @@ add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
 add_rules("plugin.compile_commands.autoupdate")
 add_cxxflags("-Wno-read-modules-implicitly", "-Wno-unused-but-set-variable")
 add_includedirs("src/compiler")
-add_rules("lex", "yacc")
 
 target("Trc")
     set_kind("binary")
-    add_files("src/**.cpp", "src/**.cppm", "language/**.cppm")
-    add_files("src/**.ll", "src/**.yy")
+    add_files("src/**.cpp", "src/**.cppm")
 
 target("unittest")
     set_kind("binary")

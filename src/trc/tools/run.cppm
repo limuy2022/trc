@@ -5,7 +5,6 @@
 module;
 #include <string>
 #include <vector>
-#include <compiler.hpp>
 export module run;
 import TVM;
 import ctree_loader;
@@ -18,6 +17,7 @@ import compiler_def;
 import data;
 import help;
 import color;
+import compiler;
 
 export namespace trc::tools {
 namespace tools_in {

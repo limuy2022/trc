@@ -5,7 +5,6 @@
 module;
 #include <cstdio>
 #include <string>
-#include <compiler.hpp>
 export module dis;
 import code_loader;
 import ctree_loader;
@@ -18,6 +17,7 @@ import compiler_def;
 import compile_env;
 import help;
 import color;
+import compiler;
 
 namespace trc::tools {
 namespace tools_in {

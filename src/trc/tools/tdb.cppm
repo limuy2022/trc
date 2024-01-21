@@ -11,7 +11,6 @@ module;
 #include <cstring>
 #include <string>
 #include <vector>
-#include <compiler.hpp>
 export module tdb;
 import TVM;
 import memory;
@@ -28,6 +27,7 @@ import cmdparser;
 import color;
 import help;
 import basic_def;
+import compiler;
 
 namespace trc {
 namespace tdb {

@@ -5,7 +5,6 @@
 module;
 #include <cstdlib>
 #include <format>
-#include <compiler.hpp>
 export module generated_params;
 import compile_env;
 import compiler_def;
@@ -18,6 +17,7 @@ import trc_flong;
 import trc_long;
 import data;
 import unreach;
+import compiler;
 
 namespace trc::tools {
 bool gen_number_table = true;

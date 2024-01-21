@@ -1,77 +1,77 @@
 use super::{Compiler, Content, INT_VAL_POOL_ZERO};
-use crate::base::error::{self, report_error, ErrorContent, ErrorInfo};
+use crate::base::error::{self, ErrorContent, ErrorInfo, RuntimeError};
 use gettextrs::gettext;
 
 #[derive(PartialEq, Debug)]
 enum TokenType {
     // .
-    DOT,
+    Dot,
     // ,
-    COMMA,
+    Comma,
     // {
-    LEFT_BIG_BRACE,
+    LeftBigBrace,
     // }
-    RIGHT_BIG_BRACE,
+    RightBigBrace,
     // [
-    LEFT_MIDDLE_BRACE,
+    LeftMiddleBrace,
     // ]
-    RIGHT_MIDDLE_BRACE,
+    RightMiddleBrace,
     // (
-    LEFT_SMALL_BRACE,
+    LeftSmallBrace,
     // )
-    RIGHT_SMALL_BRACE,
+    RightSmallBrace,
     // +
-    ADD,
+    Add,
     // -
-    SUB,
+    Sub,
     // *
-    MUL,
+    Mul,
     // /
-    DIV,
+    Div,
     // %
-    MOD,
+    Mod,
     // //
-    EXACT_DIVISION,
+    ExactDivision,
     // +=
-    SELF_ADD,
+    SelfAdd,
     // -=
-    SELF_SUB,
+    SelfSub,
     // *=
-    SELF_MUL,
+    SelfMul,
     // /=
-    SELF_DIV,
+    SelfDiv,
     // //=
-    SELF_EXTRA_DIV,
+    SelfExtraDiv,
     // %=
-    SELF_MOD,
+    SelfMod,
     // **
-    POWER,
+    Power,
     // **=
-    SELF_POWER,
-    INT_VALUE,
-    STRING_VALUE,
-    FLOAT_VALUE,
-    LONG_INT_VALUE,
-    LONG_FLOAT_VALUE,
+    SelfPower,
+    IntValue,
+    StringValue,
+    FloatValue,
+    LongIntValue,
+    LongFloatValue,
     // =
-    ASSIGN,
+    Assign,
     // :=
-    STORE,
+    Store,
     // ==
-    EQUAL,
+    Equal,
     // !=
-    UNEQUAL,
+    NotEqual,
     // >
-    GREATER,
+    Greater,
     // <
-    LESS,
+    Less,
     // <=
-    LESS_EQUAL,
+    LessEqual,
     // >=
-    GREATER_EQUAL,
+    GreaterEqual,
     // !
-    NOT,
-    END_OF_LINE,
+    Not,
+    EndOfLine,
 }
 
 #[derive(PartialEq, Debug)]
@@ -115,21 +115,15 @@ impl Token {
     }
 }
 
-impl Iterator for TokenLex<'_> {
-    type Item = Token;
-    fn next(&mut self) -> Option<Self::Item> {
-        self.next_token()
-    }
-}
-
 macro_rules! binary_symbol {
     ($a:expr, $b:expr, $binary_sym:expr, $sself:expr) => {{
         let c = $sself.compiler_data.input.read();
         if c == $binary_sym {
-            return Token::new($b, None);
+            Token::new($b, None)
+        } else {
+            $sself.compiler_data.input.unread(c);
+            Token::new($a, None)
         }
-        $sself.compiler_data.input.unread(c);
-        Token::new($a, None)
     }};
 }
 
@@ -156,13 +150,13 @@ macro_rules! check_braces_match {
             $(
                 $front_brace => {
                     if $brace_record.c != $after_brace {
-                        report_error(
-                            &Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line),
+                        return Err(error::RuntimeError::new(
+                            Box::new(Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line)),
                             ErrorInfo::new(
                                 gettext!(error::UNMATCHED_BRACE, $brace_record.c),
                                 error::SYNTAX_ERROR,
                             ),
-                        );
+                        ));
                     }
                 },
             )*
@@ -182,14 +176,14 @@ impl TokenLex<'_> {
         }
     }
 
-    fn check_braces_stack(&mut self, c: char) {
+    fn check_braces_stack(&mut self, c: char) -> Result<(), RuntimeError> {
         let top = self.braces_check.pop();
         match top {
             None => {
-                report_error(
-                    &self.compiler_data.content,
+                return Err(RuntimeError::new(
+                    Box::new(self.compiler_data.content.clone()),
                     ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), error::SYNTAX_ERROR),
-                );
+                ));
             }
             Some(c) => {
                 check_braces_match!(self, c,
@@ -197,66 +191,69 @@ impl TokenLex<'_> {
                     '[' => ']',
                     '(' => ')'
                 );
+                Ok(())
             }
         }
     }
 
-    fn lex_symbol(&mut self, c: char) -> Token {
-        match c {
-            '.' => Token::new(TokenType::DOT, None),
-            ',' => Token::new(TokenType::COMMA, None),
+    fn lex_symbol(&mut self, c: char) -> anyhow::Result<Token> {
+        Ok(match c {
+            '.' => Token::new(TokenType::Dot, None),
+            ',' => Token::new(TokenType::Comma, None),
             '{' => {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
-                Token::new(TokenType::LEFT_BIG_BRACE, None)
+                Token::new(TokenType::LeftBigBrace, None)
             }
             '}' => {
-                self.check_braces_stack(c);
-                Token::new(TokenType::RIGHT_BIG_BRACE, None)
+                self.check_braces_stack(c)?;
+                Token::new(TokenType::RightBigBrace, None)
             }
             '[' => {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
-                Token::new(TokenType::LEFT_MIDDLE_BRACE, None)
+                Token::new(TokenType::LeftMiddleBrace, None)
             }
             ']' => {
-                self.check_braces_stack(c);
-                Token::new(TokenType::RIGHT_MIDDLE_BRACE, None)
+                self.check_braces_stack(c)?;
+                Token::new(TokenType::RightMiddleBrace, None)
             }
             '(' => {
                 self.braces_check
                     .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
-                Token::new(TokenType::LEFT_SMALL_BRACE, None)
+                Token::new(TokenType::LeftSmallBrace, None)
             }
             ')' => {
-                self.check_braces_stack(c);
-                Token::new(TokenType::RIGHT_SMALL_BRACE, None)
+                self.check_braces_stack(c)?;
+                Token::new(TokenType::RightSmallBrace, None)
             }
-            '+' => self_symbol!(TokenType::ADD, TokenType::SELF_ADD, self),
-            '-' => self_symbol!(TokenType::SUB, TokenType::SELF_SUB, self),
+            '+' => self_symbol!(TokenType::Add, TokenType::SelfAdd, self),
+            '-' => self_symbol!(TokenType::Sub, TokenType::SelfSub, self),
             '*' => {
                 let c = self.compiler_data.input.read();
                 if c == '*' {
-                    return self_symbol!(TokenType::POWER, TokenType::SELF_POWER, self);
+                    self_symbol!(TokenType::Power, TokenType::SelfPower, self)
+                } else {
+                    self.compiler_data.input.unread(c);
+                    self_symbol!(TokenType::Mul, TokenType::SelfMul, self)
                 }
-                self.compiler_data.input.unread(c);
-                return self_symbol!(TokenType::MUL, TokenType::SELF_MUL, self);
             }
-            '%' => self_symbol!(TokenType::MOD, TokenType::SELF_MOD, self),
+            '%' => self_symbol!(TokenType::Mod, TokenType::SelfMod, self),
             '/' => {
                 let c = self.compiler_data.input.read();
                 if c == '=' {
-                    return Token::new(TokenType::SELF_DIV, None);
+                    Token::new(TokenType::SelfDiv, None)
+                } else {
+                    self.compiler_data.input.unread(c);
+                    Token::new(TokenType::Div, None)
                 }
-                self.compiler_data.input.unread(c);
-                Token::new(TokenType::DIV, None)
             }
-            '=' => binary_symbol!(TokenType::ASSIGN, TokenType::EQUAL, '=', self),
-            '!' => binary_symbol!(TokenType::NOT, TokenType::UNEQUAL, '=', self),
-            '>' => binary_symbol!(TokenType::GREATER, TokenType::GREATER_EQUAL, '=', self),
-            '<' => binary_symbol!(TokenType::LESS, TokenType::LESS_EQUAL, '=', self),
+            '=' => binary_symbol!(TokenType::Assign, TokenType::Equal, '=', self),
+            '!' => binary_symbol!(TokenType::Not, TokenType::NotEqual, '=', self),
+            '>' => binary_symbol!(TokenType::Greater, TokenType::GreaterEqual, '=', self),
+            '<' => binary_symbol!(TokenType::Less, TokenType::LessEqual, '=', self),
             _ => panic!("Not a symbol.Compiler error"),
-        }
+        })
     }
 
     fn lex_num(&mut self, c: char) -> Token {
@@ -269,7 +266,7 @@ impl TokenLex<'_> {
             presecnt_lex = self.compiler_data.input.read();
             match presecnt_lex {
                 '\0' => {
-                    return Token::new(TokenType::INT_VALUE, Some(Data::Ind(INT_VAL_POOL_ZERO)));
+                    return Token::new(TokenType::IntValue, Some(Data::Ind(INT_VAL_POOL_ZERO)));
                 }
                 _ => match presecnt_lex {
                     'x' | 'X' => {
@@ -306,7 +303,7 @@ impl TokenLex<'_> {
             }
         }
         Token::new(
-            TokenType::INT_VALUE,
+            TokenType::IntValue,
             Some(Data::Ind(
                 self.compiler_data
                     .const_pool
@@ -315,7 +312,7 @@ impl TokenLex<'_> {
         )
     }
 
-    fn lex_str(&mut self, start_char: char) -> Token {
+    fn lex_str(&mut self, start_char: char) -> anyhow::Result<Token> {
         let mut s = String::new();
         let mut c = self.compiler_data.input.read();
         while c != start_char {
@@ -336,8 +333,8 @@ impl TokenLex<'_> {
             s.push(c);
             c = self.compiler_data.input.read();
             if c == '\0' {
-                error::report_error(
-                    &self.compiler_data.content,
+                error::RuntimeError::new(
+                    Box::new(self.compiler_data.content.clone()),
                     error::ErrorInfo::new(
                         gettext!(error::STRING_WITHOUT_END, start_char),
                         error::SYNTAX_ERROR,
@@ -345,25 +342,25 @@ impl TokenLex<'_> {
                 );
             }
         }
-        Token::new(
-            TokenType::STRING_VALUE,
+        Ok(Token::new(
+            TokenType::StringValue,
             Some(Data::Ind(self.compiler_data.const_pool.add_string(s))),
-        )
+        ))
     }
 
-    fn next_token(&mut self) -> Option<Token> {
+    fn next_token(&mut self) -> anyhow::Result<Option<Token>> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
-            if tmp.tp == TokenType::END_OF_LINE {
+            if tmp.tp == TokenType::EndOfLine {
                 self.compiler_data.content.add_line();
             }
-            return Some(tmp);
+            return Ok(Some(tmp));
         }
         let mut presecnt_lex = self.compiler_data.input.read();
         loop {
             match presecnt_lex {
                 '\0' => {
-                    return None;
+                    return Ok(None);
                 }
                 c => match c {
                     '\t' | ' ' => {
@@ -378,35 +375,42 @@ impl TokenLex<'_> {
             presecnt_lex = self.compiler_data.input.read();
         }
         if presecnt_lex.is_digit(10) {
-            return Some(self.lex_num(presecnt_lex));
+            return Ok(Some(self.lex_num(presecnt_lex)));
         }
         if presecnt_lex == '\'' || presecnt_lex == '"' {
-            return Some(self.lex_str(presecnt_lex));
+            return Ok(Some(self.lex_str(presecnt_lex)?));
         }
-        Some(self.lex_symbol(presecnt_lex))
+        Ok(Some(self.lex_symbol(presecnt_lex)?))
     }
 
     fn next_back(&mut self, t: Token) {
-        if t.tp == TokenType::END_OF_LINE {
+        if t.tp == TokenType::EndOfLine {
             self.compiler_data.content.del_line();
         }
         self.unget_token.push(t);
+    }
+
+    pub fn check(&mut self) -> Result<(), RuntimeError> {
+        if !self.braces_check.is_empty() {
+            let unmatch_char = self.braces_check.pop().unwrap();
+            return Err(error::RuntimeError::new(
+                Box::new(Content::new_line(
+                    &self.compiler_data.content.module_name,
+                    unmatch_char.line,
+                )),
+                ErrorInfo::new(
+                    gettext!(error::UNMATCHED_BRACE, unmatch_char.c),
+                    error::SYNTAX_ERROR,
+                ),
+            ));
+        }
+        Ok(())
     }
 }
 
 impl Drop for TokenLex<'_> {
     fn drop(&mut self) {
         // check the braces stack
-        if !self.braces_check.is_empty() {
-            let unmatch_char = self.braces_check.pop().unwrap();
-            error::report_error(
-                &Content::new_line(&self.compiler_data.content.module_name, unmatch_char.line),
-                ErrorInfo::new(
-                    gettext!(error::UNMATCHED_BRACE, unmatch_char.c),
-                    error::SYNTAX_ERROR,
-                ),
-            )
-        }
     }
 }
 
@@ -418,9 +422,9 @@ mod tests {
 
     fn check(tokenlex: &mut TokenLex, expected_res: Vec<Token>) {
         for i in expected_res {
-            assert_eq!(i, tokenlex.next().unwrap());
+            assert_eq!(i, tokenlex.next_token().unwrap().unwrap());
         }
-        assert_eq!(None, tokenlex.next());
+        assert_eq!(None, tokenlex.next_token().unwrap());
     }
 
     #[test]
@@ -428,26 +432,26 @@ mod tests {
         let mut env = Compiler::new_string_compiler(
             Option::new(false, InputSource::StringInternal),
             r#",,.,100
-
-
-        123.9 232_304904
-        0b011
-        0x2aA4
-        0o2434 0 0"#,
+        
+        
+                123.9 232_304904
+                0b011
+                0x2aA4
+                0o2434 0 0"#,
         );
         let mut t = TokenLex::new(&mut env);
         let res = vec![
-            Token::new(TokenType::COMMA, None),
-            Token::new(TokenType::COMMA, None),
-            Token::new(TokenType::DOT, None),
-            Token::new(TokenType::COMMA, None),
-            Token::new(TokenType::FLOAT_VALUE, Some(Data::Ind(0))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(1))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(2))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(3))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(4))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(INT_VAL_POOL_ZERO))),
-            Token::new(TokenType::INT_VALUE, Some(Data::Ind(INT_VAL_POOL_ZERO))),
+            Token::new(TokenType::Comma, None),
+            Token::new(TokenType::Comma, None),
+            Token::new(TokenType::Dot, None),
+            Token::new(TokenType::Comma, None),
+            Token::new(TokenType::FloatValue, Some(Data::Ind(0))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(1))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(2))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(3))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(4))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(INT_VAL_POOL_ZERO))),
+            Token::new(TokenType::IntValue, Some(Data::Ind(INT_VAL_POOL_ZERO))),
         ];
         check(&mut t, res);
     }
@@ -459,17 +463,16 @@ mod tests {
             r#":{}[]()+=%=//= // /=** *=*"#,
         );
         let mut t = TokenLex::new(&mut env);
-        let res = vec![Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))];
+        let res = vec![Token::new(TokenType::StringValue, Some(Data::Ind(0)))];
         check(&mut t, res);
     }
-
     #[test]
     fn test_string_lex() {
         let mut env = Compiler::new_string_compiler(
             Option::new(false, InputSource::StringInternal),
             r#""s"'sd''sdscdcdfvf'"depkd"''"\n\t"'ttt\tt'"#,
         );
-        let res = vec![Token::new(TokenType::STRING_VALUE, Some(Data::Ind(0)))];
+        let res = vec![Token::new(TokenType::StringValue, Some(Data::Ind(0)))];
     }
 
     #[test]
@@ -482,7 +485,8 @@ mod tests {
             Option::new(false, InputSource::StringInternal),
             r#"0xtghhy 0b231"#,
         );
-        let t = TokenLex::new(&mut env);
-        for _ in t {}
+        let mut t = TokenLex::new(&mut env);
+        t.next_token().unwrap();
+        t.next_token().unwrap();
     }
 }

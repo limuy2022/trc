@@ -31,3 +31,6 @@ msgstr "除零错误"
 
 msgid "{} is divided by zero"
 msgstr "{}被零除"
+
+msgid "frame stack is empty.But running a pop frame opcode"
+msgstr "帧栈为空，但运行了pop frame指令"

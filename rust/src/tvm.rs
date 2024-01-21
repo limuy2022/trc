@@ -1,13 +1,15 @@
 mod algo;
 mod def;
 mod function;
+mod gc;
 mod types;
 
-use clap::error;
 use gettextrs::gettext;
 
 use crate::{
-    base::error::{report_error, ErrorContent, ErrorInfo, VM_DATA_NUMBER, VM_ERROR},
+    base::error::{
+        ErrorContent, ErrorInfo, RuntimeError, VM_DATA_NUMBER, VM_ERROR, VM_FRAME_EMPTY,
+    },
     cfg,
 };
 
@@ -57,6 +59,7 @@ pub struct Vm<'a> {
     pc: usize,
 }
 
+#[derive(Debug, Clone)]
 struct Content {
     module_name: String,
     line_pos: usize,
@@ -126,17 +129,17 @@ macro_rules! binary_opcode {
         let t1 = $sself.dynadata.obj_stack.pop();
         let t2 = $sself.dynadata.obj_stack.pop();
         if t1.is_none() || t2.is_none() {
-            report_error(
-                &$sself.run_contnet,
+            return Err(RuntimeError::new(
+                Box::new($sself.run_contnet.clone()),
                 ErrorInfo::new(gettext!(VM_DATA_NUMBER, 2), VM_ERROR),
-            );
+            ));
         }
         let t1 = t1.unwrap();
         let t2 = t2.unwrap();
         let ret = t1.$trait_used(t2);
         match ret {
             Err(e) => {
-                report_error(&$sself.run_contnet, e);
+                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
             }
             Ok(t) => {
                 $sself.dynadata.obj_stack.push(t);
@@ -149,16 +152,16 @@ macro_rules! unary_opcode {
     ($trait_used:ident, $sself:expr) => {{
         let t1 = $sself.dynadata.obj_stack.pop();
         if t1.is_none() {
-            report_error(
-                &$sself.run_contnet,
+            return Err(RuntimeError::new(
+                Box::new($sself.run_contnet.clone()),
                 ErrorInfo::new(gettext!(VM_DATA_NUMBER, 1), VM_ERROR),
-            );
+            ));
         }
         let t1 = t1.unwrap();
         let ret = t1.$trait_used();
         match ret {
             Err(e) => {
-                report_error(&$sself.run_contnet, e);
+                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
             }
             Ok(t) => {
                 $sself.dynadata.obj_stack.push(t);
@@ -179,7 +182,7 @@ impl<'a> Vm<'a> {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<(), RuntimeError> {
         while self.pc < self.inst.len() {
             match self.inst[self.pc].opcode {
                 Opcode::Add => binary_opcode!(add, self),
@@ -201,13 +204,18 @@ impl<'a> Vm<'a> {
                 Opcode::Xor => binary_opcode!(xor, self),
                 Opcode::NewFrame => {}
                 Opcode::PopFrame => {
-                    self.dynadata.frames_stack.pop();
+                    let ret = self.dynadata.frames_stack.pop();
+                    if let None = ret {
+                        return Err(RuntimeError::new(
+                            Box::new(self.run_contnet.clone()),
+                            ErrorInfo::new(gettext(VM_FRAME_EMPTY), VM_ERROR),
+                        ));
+                    }
                 }
                 Opcode::Goto => {
                     self.pc = self.inst[self.pc].operand;
                 }
                 Opcode::LoadInt => {
-                    // self.dynadata.obj_stack.push(self.constpool(self.inst[self.pc].u));
                     self.dynadata.obj_stack.push(Box::new(TrcInt::new(
                         self.constpool.intpool[self.inst[self.pc].operand],
                     )));
@@ -218,5 +226,6 @@ impl<'a> Vm<'a> {
             }
             self.pc += 1;
         }
+        Ok(())
     }
 }

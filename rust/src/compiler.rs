@@ -22,6 +22,7 @@ pub struct Option {
     inputsource: InputSource,
 }
 
+#[derive(Debug, Clone)]
 pub struct Content {
     module_name: String,
     line: usize,

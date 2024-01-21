@@ -1,16 +1,14 @@
-#pragma once
-
+module;
 #include <string>
+export module compiler;
+import Error;
+import compiler_def;
 
 namespace trc::TVM_space {
-    class TVM_static_data;
+class TVM_static_data;
 }
 
 namespace trc::compiler {
-class compiler_public_data;
-
-class compiler_option;
-
 class compiler {
 public:
     compiler();
@@ -36,3 +34,18 @@ private:
 };
 }
 
+namespace trc::compiler {
+compiler::compiler() = default;
+
+int compiler::parse(const compiler_option& option, const std::string& f, TVM_space::TVM_static_data* vm) {
+
+}
+
+int compiler::parse(const compiler_option& option, const std::string&filename,  FILE* f, TVM_space::TVM_static_data* vm) {
+
+}
+
+FILE* compiler::open_file(const std::string& file) {
+
+}
+}

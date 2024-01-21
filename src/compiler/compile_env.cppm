@@ -4,12 +4,10 @@
 module;
 #include <limits>
 #include <vector>
-#include "parser.tab.hpp"
 export module compile_env;
 import compiler_def;
 import TVMdef;
 import Error;
-import language;
 
 export namespace trc::compiler {
 // size_t最大值，代表不存在

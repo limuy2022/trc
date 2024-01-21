@@ -20,7 +20,8 @@ file(GLOB_RECURSE CPP_SOURCES "src/*.cpp")
 
 message(${CPP_SOURCES})
 
-add_library(foo)
+add_library(foo
+        src/compiler/compiler.cppm)
 
 target_sources(foo
     PUBLIC

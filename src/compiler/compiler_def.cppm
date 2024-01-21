@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <vector>
 #include <sstream>
-#include "parser.tab.hpp"
 export module compiler_def;
 import TVM;
 import Error;
@@ -81,15 +80,14 @@ public:
  */
 class compiler_public_data {
 public:
-    compiler_public_data(const compiler_option& option, TVM_space::TVM_static_data& vm, yy::location& location)
+    compiler_public_data(const compiler_option& option, TVM_space::TVM_static_data& vm)
         : option(option)
         , vm(vm)
         , const_int(vm.const_i)
         , const_float(vm.const_f)
         , const_string(vm.const_s)
         , const_long_int(vm.const_long)
-        , const_name(name_list)
-        , loc(location) {
+        , const_name(name_list) {
         // 添加true,false,null常量
         const_int.add(0);
         const_int.add(1);
@@ -101,7 +99,6 @@ public:
     std::vector<std::string> name_list;
     constant_pool_controller<std::string> const_string, const_long_int,
         const_name;
-    yy::location& loc;
 
     /**
      * @brief 报出错误
@@ -110,7 +107,6 @@ public:
     void send_error(error::error_type errorn, const P&... argv) {
         //todo:optimize it
         std::stringstream ss;
-        ss << loc;
         error::send_error_interal<true>(errorn, ss.str(), argv...);
     }
 };

@@ -23,13 +23,12 @@ import help;
 import run;
 import style;
 import tdb;
-import tools.token;
 import tshell;
 import basic_def;
 import data;
 import color;
 import help;
-import Compiler;
+import compiler;
 import ctree_loader;
 import filesys;
 import code_loader;
@@ -51,8 +50,8 @@ struct {
     const char* name;
     argv_func_tools tool_func;
 } cmd_tool[] = { { "tdb", tools::tools_out::tdb },
-    { "help", tools::tools_out::help }, { "run", tools::tools_out::run },
-    { "token", tools::tools_out::out_token }, { "dis", tools::tools_out::dis },
+    { "help", tools::tools_out::help }, { "run", tools::tools_out::run }
+    , { "dis", tools::tools_out::dis },
     { "build", tools::tools_out::build },
     { "style", tools::tools_out::style } };
 

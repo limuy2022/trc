@@ -31,7 +31,21 @@ enum TokenType {
     // %
     Mod,
     // //
-    ExactDivision,
+    ExactDiv,
+    // ~
+    BitNot,
+    // <<
+    BitLeftShift,
+    // >>
+    BitRightShift,
+    // &
+    BitAnd,
+    // |
+    BitOr,
+    // ^
+    Xor,
+    // **
+    Power,
     // +=
     SelfAdd,
     // -=
@@ -44,10 +58,20 @@ enum TokenType {
     SelfExtraDiv,
     // %=
     SelfMod,
-    // **
-    Power,
     // **=
     SelfPower,
+    // ~=
+    SelfBitNot,
+    // <<=
+    SelfBitLeftShift,
+    // >>=
+    SelfBitRightShift,
+    // &=
+    SelfBitAnd,
+    // |=
+    SelfBitOr,
+    // ^=
+    SelfXor,
     IntValue,
     StringValue,
     FloatValue,
@@ -71,6 +95,10 @@ enum TokenType {
     GreaterEqual,
     // !
     Not,
+    // ||
+    Or,
+    // &&
+    And,
     EndOfLine,
 }
 
@@ -134,13 +162,14 @@ macro_rules! self_symbol {
 }
 
 macro_rules! double_symbol {
-    ($before_sym:expr, $before_self_sym:expr, $matched_sym:expr, $matched_self_sym:expr, matched_char:expr, $sself:expr) => {{
+    ($before_sym:expr, $before_self_sym:expr, $matched_sym:expr, $matched_self_sym:expr, $matched_char:expr, $sself:expr) => {{
         let c = $sself.compiler_data.input.read();
         if c == $matched_char {
-            return self_symbol!($matched_sym, $matched_self_sym, self);
+            self_symbol!($matched_sym, $matched_self_sym, $sself)
+        } else {
+            $sself.compiler_data.input.unread(c);
+            self_symbol!($before_sym, $before_self_sym, $sself)
         }
-        self.compiler_data.input.unread(c);
-        return self_symbol!($before_sym, $before_self_sym, self);
     }};
 }
 
@@ -229,29 +258,32 @@ impl TokenLex<'_> {
             }
             '+' => self_symbol!(TokenType::Add, TokenType::SelfAdd, self),
             '-' => self_symbol!(TokenType::Sub, TokenType::SelfSub, self),
-            '*' => {
-                let c = self.compiler_data.input.read();
-                if c == '*' {
-                    self_symbol!(TokenType::Power, TokenType::SelfPower, self)
-                } else {
-                    self.compiler_data.input.unread(c);
-                    self_symbol!(TokenType::Mul, TokenType::SelfMul, self)
-                }
-            }
+            '*' => double_symbol!(
+                TokenType::Mul,
+                TokenType::SelfMul,
+                TokenType::Power,
+                TokenType::SelfPower,
+                '*',
+                self
+            ),
             '%' => self_symbol!(TokenType::Mod, TokenType::SelfMod, self),
-            '/' => {
-                let c = self.compiler_data.input.read();
-                if c == '=' {
-                    Token::new(TokenType::SelfDiv, None)
-                } else {
-                    self.compiler_data.input.unread(c);
-                    Token::new(TokenType::Div, None)
-                }
-            }
+            '/' => double_symbol!(
+                TokenType::Div,
+                TokenType::SelfDiv,
+                TokenType::ExactDiv,
+                TokenType::SelfExtraDiv,
+                '/',
+                self
+            ),
             '=' => binary_symbol!(TokenType::Assign, TokenType::Equal, '=', self),
             '!' => binary_symbol!(TokenType::Not, TokenType::NotEqual, '=', self),
             '>' => binary_symbol!(TokenType::Greater, TokenType::GreaterEqual, '=', self),
             '<' => binary_symbol!(TokenType::Less, TokenType::LessEqual, '=', self),
+            '~' => Token::new(TokenType::BitNot, None),
+            '^' => Token::new(TokenType::Xor, None),
+            '|' => {
+                binary_symbol!(TokenType::Or, TokenType::BitOr, '|', self)
+            }
             _ => panic!("Not a symbol.Compiler error"),
         })
     }

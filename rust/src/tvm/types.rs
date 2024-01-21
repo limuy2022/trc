@@ -105,7 +105,9 @@ pub trait TrcObj: Downcast + std::fmt::Display {
         power => "**",
         bit_and => "&",
         bit_or => "|",
-        xor => "~"
+        xor => "~",
+        bit_left_shift => "<<",
+        bit_right_shift => ">>"
     );
 
     fn not(&self) -> TypeError {

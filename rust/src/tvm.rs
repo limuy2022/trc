@@ -113,6 +113,8 @@ enum Opcode {
     BitNot,
     BitAnd,
     BitOr,
+    BitLeftShift,
+    BitRightShift,
     // change the option code index
     Goto,
     // return from a function
@@ -223,6 +225,8 @@ impl<'a> Vm<'a> {
                 Opcode::BitAnd => binary_opcode!(bit_and, self),
                 Opcode::BitOr => binary_opcode!(bit_or, self),
                 Opcode::BitNot => unary_opcode!(bit_not, self),
+                Opcode::BitLeftShift => binary_opcode!(bit_left_shift, self),
+                Opcode::BitRightShift => binary_opcode!(bit_right_shift, self),
             }
             self.pc += 1;
         }

@@ -71,7 +71,9 @@ impl TrcObj for TrcInt {
         sub => -, "-", TrcInt, TrcInt,
         mul => *, "*", TrcInt, TrcInt,
         bit_and => &, "&", TrcInt, TrcInt,
-        bit_or => |, "|", TrcInt, TrcInt
+        bit_or => |, "|", TrcInt, TrcInt,
+        bit_left_shift => <<, "<<", TrcInt, TrcInt,
+        bit_right_shift => >>, ">>", TrcInt, TrcInt
     );
 
     impl_oper!(div, div_int, "/", TrcInt, TrcFloat, ?);

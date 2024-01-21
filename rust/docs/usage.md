@@ -82,6 +82,19 @@ Here are the operator support
 |>>|bit right shift|
 |!|not|
 
+Obviously,operators like ```+=``` is supported,too.
+
+But,something should be noticed is that you cannot use logical operators for ```int``` or anything else,just for bool.
+
+So,code like this cannot be compiled successfully:
+
+```rust
+a := 1
+if a {
+    println(a)
+}
+```
+
 Ok,just like others language,but there is an important difference.
 you cannot use the different types of values to calaulate
 
@@ -124,3 +137,17 @@ the second is use ```/**/```,this kind can cross the line,like:
 hello world!
 */
 ```
+
+## Data structures for Trc
+
+Std lib provide many kinds of data structures for Trc.Here is the list:
+
+|Structure|
+|:---|
+|St table|
+|suffix automaton|
+|ac automaton|
+|list|
+|forward list|
+|stack|
+|deque|

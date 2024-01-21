@@ -1,6 +1,7 @@
 //! reference iterator:https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin
 //! reference float hash map:https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o
 
+mod ast;
 mod token;
 
 use self::token::TokenLex;
@@ -235,7 +236,7 @@ pub struct Compiler {
 }
 
 impl Compiler {
-    fn new(option: Option) -> Self {
+    pub fn new(option: Option) -> Self {
         match option.inputsource {
             InputSource::File(ref filename) => {
                 let f = std::fs::File::open(filename);
@@ -252,7 +253,7 @@ impl Compiler {
         }
     }
 
-    fn new_string_compiler(option: Option, source: &str) -> Self {
+    pub fn new_string_compiler(option: Option, source: &str) -> Self {
         Compiler {
             input: Box::new(StringSource::new(String::from(source))),
             const_pool: ValuePool::new(),
@@ -261,7 +262,8 @@ impl Compiler {
         }
     }
 
-    fn lex(&mut self) {
+    pub fn lex(&mut self) {
         let token_lexer = TokenLex::new(self);
+        let ast_builder = ast::AstBuilder::new(token_lexer);
     }
 }

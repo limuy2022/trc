@@ -1,8 +1,0 @@
-# 测试语句块：while
-
-a := 78
-
-while a > 0 {
-	println(a)
-	a = a - 1
-}

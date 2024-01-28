@@ -1,3 +1,0 @@
-# 测试模块导入错误
-# 输出：ModuleNotFoundError
-import "app"

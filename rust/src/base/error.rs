@@ -7,6 +7,7 @@ pub const OPERATOR_ERROR: &str = "OperatorError";
 pub const VM_ERROR: &str = "VmError";
 pub const ZERO_DIVSION_ERROR: &str = "ZeroDivisionError";
 pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
+pub const SYMBOL_ERROR: &str = "SymbolError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
@@ -20,6 +21,8 @@ pub const FLOAT_OVER_FLOW: &str = "Float {} is too large to store";
 pub const UNEXPECTED_TOKEN: &str = "token {} is not expected";
 pub const ERROR_IN_LINE: &str = "Error in line {}";
 pub const IN_MODULE: &str = "In module {}";
+pub const SYMBOL_NOT_FOUND: &str = "Symbol {} not found";
+pub const SYMBOL_REDEFINED: &str = "Symbol {} redefined";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

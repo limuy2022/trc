@@ -7,7 +7,12 @@ pub mod tvm;
 use clap::{self, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
-#[command(author="limuy", version="0.1", about, long_about = None)]
+#[command(
+    author = "limuy",
+    version = "0.1",
+    about = "A powerful programming language",
+    long_about = "This programming language is powerful, effective, safe, easy-to-learn"
+)]
 #[command(propagate_version = true)]
 struct Args {
     #[command(subcommand)]

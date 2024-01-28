@@ -1,7 +1,8 @@
-//! reference iterator:https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin
-//! reference float hash map:https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o
+//! reference iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
+//! reference float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
 
 mod ast;
+pub mod scope;
 mod token;
 
 use self::token::TokenLex;
@@ -76,7 +77,7 @@ impl Option {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct Float {
     front: u32,
     back: u32,
@@ -116,10 +117,29 @@ pub struct ValuePool {
     const_floats: Pool<Float>,
     name_pool: Pool<String>,
     const_big_int: Pool<String>,
+    id_int: Vec<i64>,
+    id_float: Vec<Float>,
+    id_str: Vec<String>,
+    id_name: Vec<String>,
 }
 
 const INT_VAL_POOL_ZERO: usize = 0;
 const INT_VAL_POOL_ONE: usize = 1;
+
+macro_rules! gen_add_funcs {
+    ($($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)),*) => {
+        $(
+            fn $func_name(&mut self, val: $type) -> usize {
+                let len_tmp = self.$const_pool.len();
+                let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
+                if len_tmp != self.$const_pool.len() {
+                    self.$id_pool.push(val);
+                }
+                ret
+            }
+        )*
+    };
+}
 
 impl ValuePool {
     fn new() -> Self {
@@ -129,34 +149,22 @@ impl ValuePool {
             const_strings: HashMap::new(),
             name_pool: HashMap::new(),
             const_big_int: HashMap::new(),
+            id_int: vec![],
+            id_float: vec![],
+            id_str: vec![],
+            id_name: vec![],
         };
         ret.add_int(0);
         ret.add_int(1);
         ret
     }
 
-    fn add_int(&mut self, val: i64) -> usize {
-        let len_tmp = self.const_ints.len();
-        *self.const_ints.entry(val).or_insert(len_tmp)
-    }
-
-    fn string_get(pool: &mut Pool<String>, str: String) -> usize {
-        let len_tmp = pool.len();
-        *pool.entry(str).or_insert(len_tmp)
-    }
-
-    fn add_string(&mut self, val: String) -> usize {
-        Self::string_get(&mut self.const_strings, val)
-    }
-
-    fn add_float(&mut self, val: Float) -> usize {
-        let len_tmp = self.const_floats.len();
-        *self.const_floats.entry(val).or_insert(len_tmp)
-    }
-
-    fn add_id(&mut self, val: String) -> usize {
-        Self::string_get(&mut self.name_pool, val)
-    }
+    gen_add_funcs!(
+        add_int => (const_ints, id_int, i64),
+        add_float => (const_floats, id_float, Float),
+        add_string => (const_strings, id_str, String),
+        add_id => (name_pool, id_name, String)
+    );
 
     fn store_val_to_vm(&mut self) -> ConstPool {
         let mut ret = ConstPool::new();
@@ -385,5 +393,8 @@ mod tests {
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("vale")), 1);
+        assert_eq!(pool.id_int[0], 0);
+        assert_eq!(pool.id_float[0], Float::new(9, 0));
+        assert_eq!(pool.id_str[1], "vale");
     }
 }

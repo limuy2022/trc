@@ -4,17 +4,12 @@ mod function;
 mod gc;
 mod types;
 
-use crate::base::codegen::{self, StaticData};
-use gettextrs::gettext;
-
-use crate::{
-    base::error::{
-        ErrorContent, ErrorInfo, RuntimeError, VM_DATA_NUMBER, VM_ERROR, VM_FRAME_EMPTY,
-    },
-    cfg,
-};
-
+use self::types::trcfloat::TrcFloat;
 use self::types::trcint::TrcInt;
+use self::types::trcstr::TrcStr;
+use crate::base::codegen::{self, StaticData};
+use crate::{base::error::*, cfg};
+use gettextrs::gettext;
 
 pub struct DynaData<'a> {
     obj_stack: Vec<Box<dyn types::TrcObj>>,
@@ -130,7 +125,6 @@ impl<'a> Vm<'a> {
     pub fn new_init(static_data: StaticData) -> Self {
         Self {
             pc: 0,
-
             dynadata: DynaData::new(),
             run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
             static_data,
@@ -180,6 +174,21 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::BitNot => unary_opcode!(bit_not, self),
                 codegen::Opcode::BitLeftShift => binary_opcode!(bit_left_shift, self),
                 codegen::Opcode::BitRightShift => binary_opcode!(bit_right_shift, self),
+                codegen::Opcode::LoadLocal => {}
+                codegen::Opcode::StoreLocal => {}
+                codegen::Opcode::LoadString => {
+                    self.dynadata.obj_stack.push(Box::new(TrcStr::new(
+                        &self.static_data.constpool.stringpool
+                            [self.static_data.inst[self.pc].operand],
+                    )));
+                }
+                codegen::Opcode::LoadFloat => {
+                    self.dynadata.obj_stack.push(Box::new(TrcFloat::new(
+                        self.static_data.constpool.floatpool
+                            [self.static_data.inst[self.pc].operand],
+                    )));
+                }
+                codegen::Opcode::LoadBigInt => {}
             }
             self.pc += 1;
         }

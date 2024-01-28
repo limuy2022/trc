@@ -142,9 +142,10 @@ hello world!
 ## the var of trc
 
 First,we support the UTF-8 with your var name.So you can define your var like this:
+
 ```go
 你好:=90
-``` 
+```
 
 ## Data structures for Trc
 

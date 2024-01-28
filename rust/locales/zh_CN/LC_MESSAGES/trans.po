@@ -53,3 +53,13 @@ msgstr "在模块{}中"
 msgid "Error in line {}"
 msgstr "错误在第{}行"
 
+msgid "SymbolError"
+msgstr "符号错误"
+
+msgid "Symbol {} not found"
+msgstr "未找到符号{}"
+
+msgid "Symbol {} redefined"
+msgstr "符号{}重定义"
+
+

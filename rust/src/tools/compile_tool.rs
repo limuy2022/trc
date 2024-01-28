@@ -1,6 +1,5 @@
-use std::process::exit;
-
 use crate::compiler;
+use std::process::exit;
 
 pub fn compile(opt: compiler::Option) {
     let mut compiler = compiler::Compiler::new(opt);

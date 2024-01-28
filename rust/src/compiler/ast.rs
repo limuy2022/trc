@@ -30,7 +30,22 @@ impl<'a> AstBuilder<'a> {
 
     fn statement(&mut self, mut t: Token) -> RunResult<()> {
         match t.tp {
-            super::token::TokenType::ID => {}
+            super::token::TokenType::ID => {
+                t = self.token_lexer.next_token()?;
+                match t.tp {
+                    super::token::TokenType::Assign => {}
+                    super::token::TokenType::Store => {}
+                    _ => {
+                        return Err(RuntimeError::new(
+                            Box::new(self.token_lexer.compiler_data.content.clone()),
+                            ErrorInfo::new(
+                                gettextrs::gettext(SYNTAX_ERROR),
+                                gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                            ),
+                        ))
+                    }
+                }
+            }
             _ => {
                 return Err(RuntimeError::new(
                     Box::new(self.token_lexer.compiler_data.content.clone()),
@@ -47,15 +62,12 @@ impl<'a> AstBuilder<'a> {
     pub fn generate_code(&mut self) -> RunResult<()> {
         loop {
             let token = self.token_lexer.next_token()?;
-            match token {
-                Some(token) => {
-                    self.statement(token)?;
-                }
-                None => {
-                    return Ok(());
-                }
+            if token.tp == super::token::TokenType::EndOfFile {
+                break;
             }
+            self.statement(token)?;
         }
+        return Ok(());
     }
 }
 

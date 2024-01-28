@@ -119,6 +119,7 @@ pub enum TokenType {
     Match,
     Func,
     EndOfLine,
+    EndOfFile,
 }
 
 impl Display for TokenType {
@@ -184,7 +185,8 @@ impl Display for TokenType {
             TokenType::Class => res = "class".to_string(),
             TokenType::Match => res = "match".to_string(),
             TokenType::Func => res = "func".to_string(),
-            TokenType::EndOfLine => res = "end of line".to_string(),
+            TokenType::EndOfLine => res = "EOL".to_string(),
+            TokenType::EndOfFile => res = "EOF".to_string(),
         }
         write!(f, "{}", res)
     }
@@ -665,20 +667,20 @@ impl TokenLex<'_> {
         ))
     }
 
-    pub fn next_token(&mut self) -> error::RunResult<Option<Token>> {
+    pub fn next_token(&mut self) -> error::RunResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
             if tmp.tp == TokenType::EndOfLine {
                 self.compiler_data.content.add_line();
             }
-            return Ok(Some(tmp));
+            return Ok(tmp);
         }
         let mut presecnt_lex;
         loop {
             presecnt_lex = self.compiler_data.input.read();
             match presecnt_lex {
                 '\0' => {
-                    return Ok(None);
+                    return Ok(Token::new(TokenType::EndOfFile, None));
                 }
                 '\t' | ' ' => {
                     continue;
@@ -690,15 +692,15 @@ impl TokenLex<'_> {
             }
         }
         if presecnt_lex.is_digit(10) {
-            return Ok(Some(self.lex_num(presecnt_lex)?));
+            return Ok(self.lex_num(presecnt_lex)?);
         }
         if Self::is_string_begin(presecnt_lex) {
-            return Ok(Some(self.lex_str(presecnt_lex)?));
+            return Ok(self.lex_str(presecnt_lex)?);
         }
         if Self::check_whether_symbol(presecnt_lex) {
-            return Ok(Some(self.lex_symbol(presecnt_lex)?));
+            return Ok(self.lex_symbol(presecnt_lex)?);
         }
-        Ok(Some(self.lex_id(presecnt_lex)?))
+        Ok(self.lex_id(presecnt_lex)?)
     }
 
     fn next_back(&mut self, t: Token) {
@@ -789,9 +791,9 @@ mod tests {
 
     fn check(tokenlex: &mut TokenLex, expected_res: Vec<Token>) {
         for i in expected_res {
-            assert_eq!(i, tokenlex.next_token().unwrap().unwrap());
+            assert_eq!(i, tokenlex.next_token().unwrap());
         }
-        assert_eq!(None, tokenlex.next_token().unwrap());
+        assert_eq!(TokenType::EndOfFile, tokenlex.next_token().unwrap().tp);
         tokenlex.check().unwrap();
     }
 
@@ -980,10 +982,10 @@ mod tests {
     #[test]
     fn test_next_back() {
         gen_test_token_env!(r#":()"#, t);
-        let tmp = t.next_token().unwrap().unwrap();
+        let tmp = t.next_token().unwrap();
         assert_eq!(tmp.tp, TokenType::Colon);
         t.next_back(tmp);
-        assert_eq!(t.next_token().unwrap().unwrap().tp, TokenType::Colon);
+        assert_eq!(t.next_token().unwrap().tp, TokenType::Colon);
         check(
             &mut t,
             vec![

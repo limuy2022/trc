@@ -62,4 +62,6 @@ msgstr "未找到符号{}"
 msgid "Symbol {} redefined"
 msgstr "符号{}重定义"
 
+msgid "Only support Linux.Users on other platforms should update program by hand"
+msgstr "仅支持在linux上直接更新文件.其他操作系统用户请自行更新程序"
 

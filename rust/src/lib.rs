@@ -5,6 +5,7 @@ pub mod tools;
 pub mod tvm;
 
 use clap::{self, Parser, Subcommand};
+use std::error::Error;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -25,9 +26,10 @@ struct Args {
 enum Commands {
     Build { optimize: bool },
     Tshell {},
+    Update {},
 }
 
-pub fn run() {
+pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
     match cli.mode {
         Commands::Build { optimize: opt } => {
@@ -38,5 +40,12 @@ pub fn run() {
         Commands::Tshell {} => {
             tools::tshell::tshell();
         }
+        Commands::Update {} => match tools::update::update() {
+            Err(e) => {
+                println!("{}", e);
+            }
+            Ok(_) => {}
+        },
     };
+    Ok(())
 }

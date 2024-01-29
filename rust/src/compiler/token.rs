@@ -1,10 +1,14 @@
 use super::{Compiler, Content, Float, INT_VAL_POOL_ZERO};
 use crate::{
-    base::error::{
-        self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW, NUMBER_OVER_FLOW,
-        PREFIX_FOR_FLOAT, SYNTAX_ERROR,
+    base::{
+        error::{
+            self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW,
+            NUMBER_OVER_FLOW, PREFIX_FOR_FLOAT, SYNTAX_ERROR,
+        },
+        utils::get_bit_num,
     },
     cfg::FLOAT_OVER_FLOW_LIMIT,
+    hash_map,
 };
 use gettextrs::gettext;
 use lazy_static::lazy_static;
@@ -117,6 +121,7 @@ pub enum TokenType {
     Else,
     Class,
     Match,
+    // func
     Func,
     EndOfLine,
     EndOfFile,
@@ -244,19 +249,6 @@ macro_rules! check_braces_match {
     }}
 }
 
-macro_rules! hash_map {
-    ($($key:expr => $val:expr),*) => {
-        {
-            use std::collections::hash_map::HashMap;
-            let mut ret = HashMap::new();
-            $(
-                ret.insert($key, $val);
-            )*
-            ret
-        }
-    };
-}
-
 lazy_static! {
     static ref KEYWORDS: HashMap<String, TokenType> = hash_map![
         String::from("while") => TokenType::While,
@@ -267,11 +259,16 @@ lazy_static! {
         String::from("func") => TokenType::Func,
         String::from("match") => TokenType::Match
     ];
+    static ref RADIX_TO_PREFIX: HashMap<usize, &'static str> = hash_map![
+        2 => "0b",
+        8 => "0o",
+        16 => "0x"
+    ];
 }
 
 enum NumValue {
-    Integer(String),
-    Float(String, String),
+    Integer(i64),
+    FloatVal(Float),
 }
 
 impl TokenLex<'_> {
@@ -460,37 +457,37 @@ impl TokenLex<'_> {
     fn lex_int_float(&mut self, mut c: char) -> RunResult<NumValue> {
         // the radix of result
         let mut radix = 10;
-        let mut prefix = String::new();
         if c == '0' {
             // check the radix
             c = self.compiler_data.input.read();
             match c {
                 'x' | 'X' => {
-                    prefix = String::from("0x");
                     radix = 16;
                 }
                 'b' | 'B' => {
-                    prefix = String::from("0b");
                     radix = 2;
                 }
                 'o' | 'O' => {
-                    prefix = String::from("0o");
                     radix = 8;
                 }
                 _ => {
                     self.compiler_data.input.unread(c);
-                    return Ok(NumValue::Integer(String::from("0")));
+                    return Ok(NumValue::Integer(0));
                 }
             }
             c = self.compiler_data.input.read();
         }
-        let intpart = format!("{prefix}{}", self.lex_num_integer(c, radix));
+        let intpart = format!("{}", self.lex_num_integer(c, radix));
+        c = self.compiler_data.input.read();
         if c == '.' {
             // float can be used with prefix
-            if !prefix.is_empty() {
+            if radix != 10 {
                 return Err(RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(gettext!(PREFIX_FOR_FLOAT, prefix), gettext(SYNTAX_ERROR)),
+                    ErrorInfo::new(
+                        gettext!(PREFIX_FOR_FLOAT, RADIX_TO_PREFIX[&(radix as usize)]),
+                        gettext(SYNTAX_ERROR),
+                    ),
                 ));
             }
             // float mode
@@ -506,28 +503,40 @@ impl TokenLex<'_> {
                     ),
                 ));
             }
-            return Ok(NumValue::Float(intpart, float_part));
+            return Ok(NumValue::FloatVal(Float::new(
+                i64::from_str_radix(&intpart, radix).unwrap(),
+                i64::from_str_radix(&float_part, radix).unwrap(),
+                Self::cal_zero(&float_part),
+            )));
         } else {
             self.compiler_data.input.unread(c);
         }
-        Ok(NumValue::Integer(intpart))
+        Ok(NumValue::Integer(
+            i64::from_str_radix(&intpart, radix).unwrap(),
+        ))
     }
 
     fn turn_to_token(&mut self, val: NumValue) -> Token {
         match val {
-            NumValue::Float(v1, v2) => Token::new(
+            NumValue::FloatVal(v) => Token::new(
                 TokenType::FloatValue,
-                Some(
-                    self.compiler_data
-                        .const_pool
-                        .add_float(Float::new(v1.parse().unwrap(), v2.parse().unwrap())),
-                ),
+                Some(self.compiler_data.const_pool.add_float(v)),
             ),
             NumValue::Integer(it) => Token::new(
                 TokenType::IntValue,
-                Some(self.compiler_data.const_pool.add_int(it.parse().unwrap())),
+                Some(self.compiler_data.const_pool.add_int(it)),
             ),
         }
+    }
+
+    fn cal_zero(s: &str) -> usize {
+        let mut zero = 0;
+        for i in s.chars() {
+            if i == '0' {
+                zero += 1;
+            }
+        }
+        return zero;
     }
 
     fn lex_num(&mut self, mut c: char) -> RunResult<Token> {
@@ -535,91 +544,86 @@ impl TokenLex<'_> {
         c = self.compiler_data.input.read();
         if c == 'e' || c == 'E' {
             c = self.compiler_data.input.read();
-            let mut up: i32 = self.lex_num_integer(c, 10).parse().unwrap();
+            let mut up_flag: i64 = 1;
+            if c == '+' {
+                c = self.compiler_data.input.read();
+            } else if c == '-' {
+                up_flag = -1;
+                c = self.compiler_data.input.read();
+            }
+            let mut up: i64 = self.lex_num_integer(c, 10).parse().unwrap();
+            up *= up_flag;
             match tmp {
                 NumValue::Integer(mut it) => {
                     if up >= 0 {
                         // 保留int身份
-                        for i in 0..up {
-                            it.push('0');
+                        for _ in 0..up {
+                            it *= 10;
                         }
                         return Ok(Token::new(
                             TokenType::IntValue,
-                            Some(self.compiler_data.const_pool.add_int(it.parse().unwrap())),
+                            Some(self.compiler_data.const_pool.add_int(it)),
                         ));
                     } else {
                         // 负数次，升级为float
                         let mut float_part = String::new();
                         up = -up;
-                        for i in 0..up {
-                            let tmp = it.pop();
-                            match tmp {
-                                None => {
-                                    float_part.insert(0, '0');
-                                }
-                                Some(c) => {
-                                    float_part.insert(0, c);
-                                }
+                        for _ in 0..up {
+                            if it == 0 {
+                                float_part.insert(0, '0');
+                            } else {
+                                float_part = (it % 10).to_string() + &float_part;
+                                it /= 10;
                             }
-                        }
-                        if it.is_empty() {
-                            it = String::from("0");
                         }
                         return Ok(Token::new(
                             TokenType::FloatValue,
                             Some(self.compiler_data.const_pool.add_float(Float::new(
-                                it.parse().unwrap(),
+                                it,
                                 float_part.parse().unwrap(),
+                                Self::cal_zero(&float_part),
                             ))),
                         ));
                     }
                 }
-                NumValue::Float(mut v1, mut v2) => {
+                NumValue::FloatVal(mut v) => {
                     if up >= 0 {
-                        for i in 0..up {
-                            if v2.is_empty() {
-                                v1.push('0');
+                        let mut s = v.back.to_string();
+                        for _ in 0..up {
+                            if s.is_empty() {
+                                v.front *= 10;
                             } else {
-                                let tmp = v2.remove(0);
-                                v1.push(tmp);
+                                v.front *= 10;
+                                v.front += s.remove(0) as i64 - '0' as i64;
                             }
                         }
-                        if v2.is_empty() {
-                            v2 = String::from("0");
+                        if s.is_empty() {
+                            v = Float::new(v.front, 0, 0);
+                        } else {
+                            v.zero = Self::cal_zero(&s);
+                            v.back = s.parse().unwrap();
                         }
                         return Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(
-                                self.compiler_data.const_pool.add_float(Float::new(
-                                    v1.parse().unwrap(),
-                                    v2.parse().unwrap(),
-                                )),
-                            ),
+                            Some(self.compiler_data.const_pool.add_float(v)),
                         ));
                     } else {
                         up = -up;
-                        for i in 0..up {
-                            let tmp = v1.pop();
-                            match tmp {
-                                Some(c) => {
-                                    v2.insert(0, c);
-                                }
-                                None => {
-                                    v2.insert(0, '0');
-                                }
+                        let mut s = String::new();
+                        for _ in 0..up {
+                            if v.front == 0 {
+                                v.zero += 1;
+                            } else {
+                                s = (v.front % 10).to_string() + &s;
+                                v.front /= 10;
                             }
                         }
-                        if v1.is_empty() {
-                            v1 = String::from('0');
-                        }
+                        s += &v.back.to_string();
+                        v.zero += Self::cal_zero(&s);
+                        v.back = s.parse().unwrap();
                         return Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(
-                                self.compiler_data.const_pool.add_float(Float::new(
-                                    v1.parse().unwrap(),
-                                    v2.parse().unwrap(),
-                                )),
-                            ),
+                            Some(self.compiler_data.const_pool.add_float(v)),
                         ));
                     }
                 }
@@ -703,7 +707,7 @@ impl TokenLex<'_> {
         Ok(self.lex_id(presecnt_lex)?)
     }
 
-    fn next_back(&mut self, t: Token) {
+    pub fn next_back(&mut self, t: Token) {
         if t.tp == TokenType::EndOfLine {
             self.compiler_data.content.del_line();
         }
@@ -774,7 +778,7 @@ impl Drop for TokenLex<'_> {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashSet, hash::Hash};
+    use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
     use super::*;
     use crate::compiler::{Float, InputSource, Option, Pool, INT_VAL_POOL_ONE};
@@ -800,7 +804,7 @@ mod tests {
     /// check const pool
     fn check_pool<T>(v: Vec<T>, pool_be_checked: &Pool<T>)
     where
-        T: Eq + Hash + Clone,
+        T: Eq + Hash + Clone + Display + Debug,
     {
         let mut testpool: HashSet<T> = HashSet::new();
         for i in &v {
@@ -808,7 +812,13 @@ mod tests {
         }
         assert_eq!(testpool.len(), pool_be_checked.len());
         for i in &testpool {
-            assert!(pool_be_checked.contains_key(i));
+            assert!(
+                pool_be_checked.contains_key(i),
+                "{} not in pool.{:?} is expected pool\n{:?} is checked pool",
+                i,
+                testpool,
+                pool_be_checked
+            );
         }
     }
 
@@ -821,7 +831,7 @@ mod tests {
         123.9 232_304904
         0b011
         0x2aA4
-        0o2434 0 0 1e3.8 1e9 1.2e1 8e-1"#,
+        0o2434 0 0 1e9 1.2e1 8e-1 18E-4 1.7e-2 1.98e2"#,
             t
         );
         check(
@@ -831,29 +841,34 @@ mod tests {
                 Token::new(TokenType::Comma, None),
                 Token::new(TokenType::Dot, None),
                 Token::new(TokenType::Comma, None),
-                Token::new(TokenType::FloatValue, Some(0)),
-                Token::new(TokenType::IntValue, Some(1)),
                 Token::new(TokenType::IntValue, Some(2)),
+                Token::new(TokenType::FloatValue, Some(0)),
                 Token::new(TokenType::IntValue, Some(3)),
                 Token::new(TokenType::IntValue, Some(4)),
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
-                Token::new(TokenType::FloatValue, Some(1)),
                 Token::new(TokenType::IntValue, Some(5)),
+                Token::new(TokenType::IntValue, Some(6)),
+                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
+                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
+                Token::new(TokenType::IntValue, Some(7)),
+                Token::new(TokenType::FloatValue, Some(1)),
                 Token::new(TokenType::FloatValue, Some(2)),
                 Token::new(TokenType::FloatValue, Some(3)),
+                Token::new(TokenType::FloatValue, Some(4)),
+                Token::new(TokenType::FloatValue, Some(5)),
             ],
         );
         check_pool(
-            vec![100, 232_304904, 0b011, 0x2aA4, 0, 1],
+            vec![100, 232_304904, 0b011, 0x2aA4, 0o2434, 0, 1, 1e9 as i64],
             &t.compiler_data.const_pool.const_ints,
         );
         check_pool(
             vec![
-                Float::new(123, 9),
-                Float::new(1, 2),
-                Float::new(1000, 8),
-                Float::new(0, 8),
+                Float::new(123, 9, 0),
+                Float::new(12, 0, 0),
+                Float::new(0, 8, 0),
+                Float::new(0, 18, 2),
+                Float::new(0, 17, 1),
+                Float::new(198, 0, 0),
             ],
             &t.compiler_data.const_pool.const_floats,
         );
@@ -972,7 +987,7 @@ mod tests {
                 Token::new(TokenType::ID, Some(0)),
             ],
         );
-        check_pool(vec![0xabc], &t.compiler_data.const_pool.const_ints);
+        check_pool(vec![0xabc, 0, 1], &t.compiler_data.const_pool.const_ints);
         check_pool(
             vec![String::from("hds")],
             &t.compiler_data.const_pool.name_pool,

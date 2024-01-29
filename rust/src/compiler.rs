@@ -10,6 +10,7 @@ use crate::base::codegen::{ConstPool, StaticData};
 use crate::base::error::{self, RunResult};
 use crate::cfg;
 use std::collections::{hash_map, HashMap};
+use std::fmt::Display;
 use std::io::BufRead;
 use std::{fs, io, vec};
 
@@ -79,16 +80,17 @@ impl Option {
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct Float {
-    front: u32,
-    back: u32,
+    front: i64,
+    back: i64,
+    zero: usize,
 }
 
 impl Float {
-    fn new(front: u32, back: u32) -> Self {
-        Self { front, back }
+    fn new(front: i64, back: i64, zero: usize) -> Self {
+        Self { front, back, zero }
     }
 
-    fn get_len(mut tmp: u32) -> u8 {
+    fn get_len(mut tmp: i64) -> u8 {
         if tmp == 0 {
             return 1;
         }
@@ -106,6 +108,12 @@ impl Float {
             float_part /= 10.0;
         }
         self.front as f64 + float_part
+    }
+}
+
+impl Display for Float {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -387,14 +395,14 @@ mod tests {
         assert_eq!(pool.add_int(7), 2);
         assert_eq!(pool.add_int(1), INT_VAL_POOL_ONE);
         assert_eq!(pool.add_int(0), INT_VAL_POOL_ZERO);
-        assert_eq!(pool.add_float(Float::new(9, 0)), 0);
-        assert_eq!(pool.add_float(Float::new(9, 0)), 0);
-        assert_eq!(pool.add_float(Float::new(9, 5)), 1);
+        assert_eq!(pool.add_float(Float::new(9, 0, 0)), 0);
+        assert_eq!(pool.add_float(Float::new(9, 0, 0)), 0);
+        assert_eq!(pool.add_float(Float::new(9, 5, 0)), 1);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("vale")), 1);
         assert_eq!(pool.id_int[0], 0);
-        assert_eq!(pool.id_float[0], Float::new(9, 0));
+        assert_eq!(pool.id_float[0], Float::new(9, 0, 0));
         assert_eq!(pool.id_str[1], "vale");
     }
 }

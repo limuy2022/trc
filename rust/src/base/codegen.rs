@@ -2,7 +2,7 @@ use super::func;
 use core::cmp::max;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Opcode {
     Add,
     Sub,
@@ -44,6 +44,10 @@ pub enum Opcode {
     LoadLocal,
     // Store a local var
     StoreLocal,
+    // Do Nothing
+    Empty,
+    // a = -a
+    SelfNegative,
 }
 
 impl Display for Opcode {
@@ -68,6 +72,9 @@ impl ConstPool {
     }
 }
 
+pub const NO_ARG: usize = 0;
+
+#[derive(Debug, PartialEq)]
 pub struct Inst {
     pub opcode: Opcode,
     pub operand: usize,

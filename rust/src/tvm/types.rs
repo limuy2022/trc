@@ -101,8 +101,8 @@ pub trait TrcObj: Downcast + std::fmt::Display {
         ne => "!=",
         ge => ">=",
         le => "<=",
-        and => "and",
-        or => "or",
+        and => "&&",
+        or => "||",
         power => "**",
         bit_and => "&",
         bit_or => "|",
@@ -112,11 +112,15 @@ pub trait TrcObj: Downcast + std::fmt::Display {
     );
 
     fn not(&self) -> TypeError {
-        unsupported_operator!("not", self)
+        unsupported_operator!("!", self)
     }
 
     fn bit_not(&self) -> TypeError {
-        unsupported_operator!("xor", self)
+        unsupported_operator!("~", self)
+    }
+
+    fn self_negative(&self) -> TypeError {
+        unsupported_operator!("-", self)
     }
 
     fn get_type_name(&self) -> &str;

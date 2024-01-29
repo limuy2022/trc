@@ -68,8 +68,8 @@ impl Content {
 /// reduce the duplicate code to solve the operator running
 macro_rules! binary_opcode {
     ($trait_used:ident, $sself:expr) => {{
-        let t1 = $sself.dynadata.obj_stack.pop();
         let t2 = $sself.dynadata.obj_stack.pop();
+        let t1 = $sself.dynadata.obj_stack.pop();
         if t1.is_none() || t2.is_none() {
             return Err(RuntimeError::new(
                 Box::new($sself.run_contnet.clone()),
@@ -189,6 +189,10 @@ impl<'a> Vm<'a> {
                     )));
                 }
                 codegen::Opcode::LoadBigInt => {}
+                codegen::Opcode::Empty => {}
+                codegen::Opcode::SelfNegative => {
+                    unary_opcode!(self_negative, self);
+                }
             }
             self.pc += 1;
         }

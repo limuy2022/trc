@@ -90,4 +90,5 @@ impl TrcObj for TrcInt {
     impl_oper!(modd, mod_int, "%", TrcInt, TrcInt, ?);
     impl_oper!(power, power_int, "**", TrcInt, TrcInt,,);
     impl_single_oper!(bit_not, !, "~", TrcInt, TrcInt);
+    impl_single_oper!(self_negative, -, "-", TrcInt, TrcInt);
 }

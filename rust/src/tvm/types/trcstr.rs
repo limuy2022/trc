@@ -17,3 +17,11 @@ impl Display for TrcStr {
         write!(f, "{}", self.value)
     }
 }
+
+impl TrcStr {
+    pub fn new(value: &str) -> Self {
+        Self {
+            value: value.to_string(),
+        }
+    }
+}

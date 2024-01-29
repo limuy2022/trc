@@ -1,5 +1,0 @@
-# 测试输入函数
-
-a := input("请输入：")
-println(a)
-print(input("请再次输入："))

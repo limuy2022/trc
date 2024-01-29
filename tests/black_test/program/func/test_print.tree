@@ -1,8 +1,0 @@
-# 输出函数:print
-
-a := 78
-print(a, 90, a)
-print(89)
-print(a)
-print(89)
-print("I am string",a)

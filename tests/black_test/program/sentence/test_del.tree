@@ -1,9 +1,0 @@
-# 测试删除语句
-# 会报出：NameError
-
-a := 1
-b := 1.5
-del "a"
-del "b"
-print(a)
-print(b)

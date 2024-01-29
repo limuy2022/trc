@@ -17,4 +17,9 @@ gettext-rs = "0.7.0"
 colored = "2.1.0"
 downcast-rs = "1.2.0"
 lazy_static = "1.4.0"
-anyhow = "1.0.79"
+num-bigint = "0.4.4"
+reqwest = {version = "0.11.23", features=["json", "multipart"]}
+tokio = {version = "1.35.1", features = ["full"]}
+
+[profile.release]
+panic = "abort"

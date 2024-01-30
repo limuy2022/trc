@@ -1,52 +1,80 @@
 use gettextrs::gettext;
-use std::process::exit;
-
-const EXIT_FAILURE: i32 = 1;
+use std::error::Error;
+use std::fmt::{Debug, Display};
 
 pub const SYNTAX_ERROR: &str = "SyntaxError";
 pub const OPERATOR_ERROR: &str = "OperatorError";
 pub const VM_ERROR: &str = "VmError";
 pub const ZERO_DIVSION_ERROR: &str = "ZeroDivisionError";
+pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
+pub const SYMBOL_ERROR: &str = "SymbolError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
 pub const OPERATOR_IS_NOT_SUPPORT: &str = "operator {} is not supported for type {}";
 pub const VM_DATA_NUMBER: &str =
     "The number of data of vm stack is not correct, should have {} data";
-pub const ZERO_DIV:&str = "{} is divided by zero";
+pub const VM_FRAME_EMPTY: &str = "frame stack is empty.But running a pop frame opcode";
+pub const ZERO_DIV: &str = "{} is divided by zero";
+pub const PREFIX_FOR_FLOAT: &str = "Prefix {} can be used for float";
+pub const FLOAT_OVER_FLOW: &str = "Float {} is too large to store";
+pub const UNEXPECTED_TOKEN: &str = "token {} is not expected";
+pub const ERROR_IN_LINE: &str = "Error in line {}";
+pub const IN_MODULE: &str = "In module {}";
+pub const SYMBOL_NOT_FOUND: &str = "Symbol {} not found";
+pub const SYMBOL_REDEFINED: &str = "Symbol {} redefined";
 
-/// maybe useful when you want to use [should_panic]
-pub static SHOULD_PANIC:bool = false;
-
+#[derive(Debug)]
 pub struct ErrorInfo {
     pub message: String,
-    errot_type: &'static str,
+    error_type: String,
 }
 
 impl ErrorInfo {
-    pub fn new(message: String, error_type: &'static str) -> ErrorInfo {
+    pub fn new(message: String, error_type: String) -> ErrorInfo {
         ErrorInfo {
             message,
-            errot_type: error_type,
+            error_type,
         }
     }
 }
 
-pub trait ErrorContent {
+pub trait ErrorContent: Debug + Send + Sync {
     fn get_module_name(&self) -> &str;
 
     fn get_line(&self) -> usize;
 }
 
-/// report error in vm or compiler
-/// we will translate the error type to gettextrs
-/// but you should translate the error messgae by caller
-pub fn report_error(content: &impl ErrorContent, info: ErrorInfo) {
-    eprintln!("Error in line {}", content.get_line());
-    eprintln!("In module {}", content.get_module_name());
-    eprintln!("{}:{}", gettext(info.errot_type), info.message);
-    if SHOULD_PANIC {
-        panic!("SHOULD PANIC var which is used to panic when error is reported is set")    
-    }
-    exit(EXIT_FAILURE);
+#[derive(Debug)]
+pub struct RuntimeError {
+    content: Box<dyn ErrorContent>,
+    info: ErrorInfo,
 }
+
+impl Error for RuntimeError {}
+
+impl Display for RuntimeError {
+    /// report error in vm or compiler
+    /// we will translate the error type to gettextrs
+    /// but you should translate the error messgae by caller
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = format!(
+            r#"{}
+{}
+{}:{}"#,
+            gettext!(ERROR_IN_LINE, self.content.get_line()),
+            gettext!(IN_MODULE, self.content.get_module_name()),
+            gettext(self.info.error_type.clone()),
+            self.info.message
+        );
+        write!(f, "{}", s)
+    }
+}
+
+impl RuntimeError {
+    pub fn new(content: Box<dyn ErrorContent>, info: ErrorInfo) -> RuntimeError {
+        RuntimeError { content, info }
+    }
+}
+
+pub type RunResult<T> = Result<T, RuntimeError>;

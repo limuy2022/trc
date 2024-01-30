@@ -31,3 +31,37 @@ msgstr "除零错误"
 
 msgid "{} is divided by zero"
 msgstr "{}被零除"
+
+msgid "frame stack is empty.But running a pop frame opcode"
+msgstr "帧栈为空,但运行了pop frame指令"
+
+msgid "Prefix {} can be used for float"
+msgstr "前缀{}不能对浮点数使用"
+
+msgid "NumberOverFlowError"
+msgstr "数值溢出错误"
+
+msgid "Float {} is too large to store"
+msgstr "浮点数{}超过了储存范围"
+
+msgid "token {} is not expected"
+msgstr "token{}不是被期望的"
+
+msgid "In module {}"
+msgstr "在模块{}中"
+
+msgid "Error in line {}"
+msgstr "错误在第{}行"
+
+msgid "SymbolError"
+msgstr "符号错误"
+
+msgid "Symbol {} not found"
+msgstr "未找到符号{}"
+
+msgid "Symbol {} redefined"
+msgstr "符号{}重定义"
+
+msgid "Only support Linux.Users on other platforms should update program by hand"
+msgstr "仅支持在linux上直接更新文件.其他操作系统用户请自行更新程序"
+

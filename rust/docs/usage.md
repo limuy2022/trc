@@ -45,6 +45,7 @@ There are also many easape char in the string:
 |\\\\|\|
 |\'|'|
 |\"|"|
+|\0|the tick of the end of the string|
 
 If you add ```r``` or ```R``` in front of the string.Trc will treat it as a raw string.
 Yes.These rules are from Python.I love its grammar rules
@@ -81,6 +82,19 @@ Here are the operator support
 |<<|bit left shift|
 |>>|bit right shift|
 |!|not|
+
+Obviously,operators like ```+=``` is supported,too.
+
+But,something should be noticed is that you cannot use logical operators for ```int``` or anything else,just for bool.
+
+So,code like this cannot be compiled successfully:
+
+```rust
+a := 1
+if a {
+    println(a)
+}
+```
 
 Ok,just like others language,but there is an important difference.
 you cannot use the different types of values to calaulate
@@ -124,3 +138,25 @@ the second is use ```/**/```,this kind can cross the line,like:
 hello world!
 */
 ```
+
+## the var of trc
+
+First,we support the UTF-8 with your var name.So you can define your var like this:
+
+```go
+你好:=90
+```
+
+## Data structures for Trc
+
+Std lib provide many kinds of data structures for Trc.Here is the list:
+
+|Structure|
+|:---|
+|St table|
+|suffix automaton|
+|ac automaton|
+|list|
+|forward list|
+|stack|
+|deque|

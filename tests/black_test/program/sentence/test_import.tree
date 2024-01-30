@@ -1,6 +1,0 @@
-# 测试模块导入自动执行特征
-
-import "test_goto"
-
-
-println("I am Module.")

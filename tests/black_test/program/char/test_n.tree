@@ -1,8 +1,0 @@
-# 测试换行符
-
-a:=2
-while a>0 {
-	println("op\nop")
-	print("tree\n")
-	a=a-1
-}

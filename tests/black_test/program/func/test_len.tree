@@ -1,5 +1,0 @@
-# 测试len函数，计算长度
-
-a := 'sterttfg'
-println(len(a))
-println(len("op"))

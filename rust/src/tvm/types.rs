@@ -3,6 +3,7 @@ use downcast_rs::{impl_downcast, Downcast};
 use gettextrs::gettext;
 
 pub mod data_structure;
+pub mod trcbigint;
 pub mod trcbool;
 pub mod trcfloat;
 pub mod trcint;
@@ -16,7 +17,7 @@ macro_rules! unsupported_operator {
                 $operator_name,
                 $sself.get_type_name()
             ),
-            error::SYNTAX_ERROR,
+            gettext(error::SYNTAX_ERROR),
         ))
     };
 }
@@ -40,7 +41,7 @@ macro_rules! impl_oper {
                     Ok(Box::new($newtype::new($oper(self.value, v.value)$whether_throw_error)))
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), OPERATOR_ERROR))
+                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }
@@ -53,7 +54,7 @@ macro_rules! impl_oper {
                     Ok(Box::new($newtype::new(self.value $oper v.value)))
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), OPERATOR_ERROR))
+                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }
@@ -61,11 +62,26 @@ macro_rules! impl_oper {
 }
 
 #[macro_export]
+/// use tvm::types::batch_impl_opers;
+/// batch_impl_opers!(
+/// add => +, "+", TrcInt, TrcInt,
+/// sub => -, "-", TrcInt, TrcInt,
+/// mul => *, "*", TrcInt, TrcInt
+/// );
 macro_rules! batch_impl_opers {
     ($($trait_oper_fn_name:ident => $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident),*) => {
         $(
             impl_oper!($trait_oper_fn_name, $oper, $error_oper_name, $self_type, $newtype);
         )*
+    };
+}
+
+#[macro_export]
+macro_rules! impl_single_oper {
+    ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
+        fn $trait_oper_fn_name(&self) -> TypeError {
+            Ok(Box::new($newtype::new($oper self.value)))
+        }
     };
 }
 
@@ -85,10 +101,27 @@ pub trait TrcObj: Downcast + std::fmt::Display {
         ne => "!=",
         ge => ">=",
         le => "<=",
-        and => "and",
-        or => "or",
-        power => "**"
+        and => "&&",
+        or => "||",
+        power => "**",
+        bit_and => "&",
+        bit_or => "|",
+        xor => "~",
+        bit_left_shift => "<<",
+        bit_right_shift => ">>"
     );
+
+    fn not(&self) -> TypeError {
+        unsupported_operator!("!", self)
+    }
+
+    fn bit_not(&self) -> TypeError {
+        unsupported_operator!("~", self)
+    }
+
+    fn self_negative(&self) -> TypeError {
+        unsupported_operator!("-", self)
+    }
 
     fn get_type_name(&self) -> &str;
 }

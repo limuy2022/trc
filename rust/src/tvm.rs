@@ -1,31 +1,15 @@
 mod algo;
 mod def;
 mod function;
+mod gc;
 mod types;
 
-use clap::error;
+use self::types::trcfloat::TrcFloat;
+use self::types::trcint::TrcInt;
+use self::types::trcstr::TrcStr;
+use crate::base::codegen::{self, StaticData};
+use crate::{base::error::*, cfg};
 use gettextrs::gettext;
-
-use crate::{
-    base::error::{report_error, ErrorContent, ErrorInfo, VM_DATA_NUMBER, VM_ERROR},
-    cfg,
-};
-
-pub struct ConstPool {
-    pub intpool: Vec<i64>,
-    pub stringpool: Vec<String>,
-    pub floatpool: Vec<f64>,
-}
-
-impl ConstPool {
-    pub fn new() -> Self {
-        Self {
-            intpool: Vec::new(),
-            stringpool: Vec::new(),
-            floatpool: Vec::new(),
-        }
-    }
-}
 
 pub struct DynaData<'a> {
     obj_stack: Vec<Box<dyn types::TrcObj>>,
@@ -41,20 +25,14 @@ impl<'a> DynaData<'a> {
     }
 }
 
-pub struct Inst {
-    opcode: Opcode,
-    operand: i32,
-}
-
 pub struct Vm<'a> {
-    constpool: ConstPool,
-    inst: Vec<Inst>,
-    funcs: Vec<function::Func>,
     run_contnet: Content,
     dynadata: DynaData<'a>,
     pc: usize,
+    static_data: StaticData,
 }
 
+#[derive(Debug, Clone)]
 struct Content {
     module_name: String,
     line_pos: usize,
@@ -87,50 +65,45 @@ impl Content {
     }
 }
 
-enum Opcode {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    ExtraDiv,
-    Mod,
-    Power,
-    Eq,
-    Ne,
-    Lt,
-    Le,
-    Gt,
-    Ge,
-    And,
-    Or,
-    Not,
-    // change the option code index
-    Goto,
-    // return from a function
-    PopFrame,
-    // create a frame to hold the function
-    NewFrame,
-    // Load a int from const pool
-    LoadInt,
-}
-
 /// reduce the duplicate code to solve the operator running
-macro_rules! OP {
+macro_rules! binary_opcode {
     ($trait_used:ident, $sself:expr) => {{
-        let t1 = $sself.dynadata.obj_stack.pop();
         let t2 = $sself.dynadata.obj_stack.pop();
+        let t1 = $sself.dynadata.obj_stack.pop();
         if t1.is_none() || t2.is_none() {
-            report_error(
-                &$sself.run_contnet,
-                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 2), VM_ERROR),
-            );
+            return Err(RuntimeError::new(
+                Box::new($sself.run_contnet.clone()),
+                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 2), gettext(VM_ERROR)),
+            ));
         }
         let t1 = t1.unwrap();
         let t2 = t2.unwrap();
         let ret = t1.$trait_used(t2);
         match ret {
             Err(e) => {
-                report_error(&$sself.run_contnet, e);
+                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
+            }
+            Ok(t) => {
+                $sself.dynadata.obj_stack.push(t);
+            }
+        }
+    }};
+}
+
+macro_rules! unary_opcode {
+    ($trait_used:ident, $sself:expr) => {{
+        let t1 = $sself.dynadata.obj_stack.pop();
+        if t1.is_none() {
+            return Err(RuntimeError::new(
+                Box::new($sself.run_contnet.clone()),
+                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 1), gettext(VM_ERROR)),
+            ));
+        }
+        let t1 = t1.unwrap();
+        let ret = t1.$trait_used();
+        match ret {
+            Err(e) => {
+                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
             }
             Ok(t) => {
                 $sself.dynadata.obj_stack.push(t);
@@ -142,42 +115,93 @@ macro_rules! OP {
 impl<'a> Vm<'a> {
     pub fn new() -> Self {
         Self {
-            constpool: ConstPool::new(),
-            inst: Vec::new(),
             pc: 0,
-            funcs: vec![],
             dynadata: DynaData::new(),
             run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
+            static_data: StaticData::new(),
         }
     }
 
-    pub fn run(&mut self) {
-        while self.pc < self.inst.len() {
-            match self.inst[self.pc].opcode {
-                Opcode::Add => OP!(add, self),
-                Opcode::Sub => OP!(sub, self),
-                Opcode::Mul => OP!(mul, self),
-                Opcode::Div => OP!(div, self),
-                Opcode::ExtraDiv => OP!(extra_div, self),
-                Opcode::Mod => OP!(modd, self),
-                Opcode::Gt => OP!(gt, self),
-                Opcode::Lt => OP!(lt, self),
-                Opcode::Ge => OP!(ge, self),
-                Opcode::Le => OP!(le, self),
-                Opcode::Eq => OP!(eq, self),
-                Opcode::Ne => OP!(ne, self),
-                Opcode::And => OP!(and, self),
-                Opcode::Or => OP!(or, self),
-                Opcode::Power => OP!(power, self),
-                Opcode::NewFrame => {}
-                Opcode::PopFrame => {
-                    self.dynadata.frames_stack.pop();
+    pub fn new_init(static_data: StaticData) -> Self {
+        Self {
+            pc: 0,
+            dynadata: DynaData::new(),
+            run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
+            static_data,
+        }
+    }
+
+    pub fn run(&mut self) -> Result<(), RuntimeError> {
+        while self.pc < self.static_data.inst.len() {
+            match self.static_data.inst[self.pc].opcode {
+                codegen::Opcode::Add => binary_opcode!(add, self),
+                codegen::Opcode::Sub => binary_opcode!(sub, self),
+                codegen::Opcode::Mul => binary_opcode!(mul, self),
+                codegen::Opcode::Div => binary_opcode!(div, self),
+                codegen::Opcode::ExtraDiv => binary_opcode!(extra_div, self),
+                codegen::Opcode::Mod => binary_opcode!(modd, self),
+                codegen::Opcode::Gt => binary_opcode!(gt, self),
+                codegen::Opcode::Lt => binary_opcode!(lt, self),
+                codegen::Opcode::Ge => binary_opcode!(ge, self),
+                codegen::Opcode::Le => binary_opcode!(le, self),
+                codegen::Opcode::Eq => binary_opcode!(eq, self),
+                codegen::Opcode::Ne => binary_opcode!(ne, self),
+                codegen::Opcode::And => binary_opcode!(and, self),
+                codegen::Opcode::Or => binary_opcode!(or, self),
+                codegen::Opcode::Power => binary_opcode!(power, self),
+                codegen::Opcode::Not => unary_opcode!(not, self),
+                codegen::Opcode::Xor => binary_opcode!(xor, self),
+                codegen::Opcode::NewFrame => {}
+                codegen::Opcode::PopFrame => {
+                    let ret = self.dynadata.frames_stack.pop();
+                    if let None = ret {
+                        return Err(RuntimeError::new(
+                            Box::new(self.run_contnet.clone()),
+                            ErrorInfo::new(gettext(VM_FRAME_EMPTY), gettext(VM_ERROR)),
+                        ));
+                    }
                 }
-                _ => {
-                    panic!("unknown opcode");
+                codegen::Opcode::Goto => {
+                    self.pc = self.static_data.inst[self.pc].operand;
+                }
+                codegen::Opcode::LoadInt => {
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(
+                        self.static_data.constpool.intpool[self.static_data.inst[self.pc].operand],
+                    )));
+                }
+                codegen::Opcode::BitAnd => binary_opcode!(bit_and, self),
+                codegen::Opcode::BitOr => binary_opcode!(bit_or, self),
+                codegen::Opcode::BitNot => unary_opcode!(bit_not, self),
+                codegen::Opcode::BitLeftShift => binary_opcode!(bit_left_shift, self),
+                codegen::Opcode::BitRightShift => binary_opcode!(bit_right_shift, self),
+                codegen::Opcode::LoadLocal => {}
+                codegen::Opcode::StoreLocal => {}
+                codegen::Opcode::LoadString => {
+                    self.dynadata.obj_stack.push(Box::new(TrcStr::new(
+                        &self.static_data.constpool.stringpool
+                            [self.static_data.inst[self.pc].operand],
+                    )));
+                }
+                codegen::Opcode::LoadFloat => {
+                    self.dynadata.obj_stack.push(Box::new(TrcFloat::new(
+                        self.static_data.constpool.floatpool
+                            [self.static_data.inst[self.pc].operand],
+                    )));
+                }
+                codegen::Opcode::LoadBigInt => {}
+                codegen::Opcode::Empty => {}
+                codegen::Opcode::SelfNegative => {
+                    unary_opcode!(self_negative, self);
                 }
             }
             self.pc += 1;
         }
+        Ok(())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_vm() {}
 }

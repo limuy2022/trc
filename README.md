@@ -1,18 +1,6 @@
-# Trc
+# Trc programming language
 
-## Trc is a stack-based programming language
-
-Trc's syntax is easy,and have full toolchain. It is easy to learn modern c++ and compiler,too.
-
-## language
-
-100% C++
-
-Using c++ 20 standard and use module feature
-
-But here is a developing ```rust``` instance now!
-
-[rust_trc](rust/)
+Trc is a easy-learn programming language.It can be fast,safe and effective.
 
 ## Goal
 
@@ -22,22 +10,22 @@ But here is a developing ```rust``` instance now!
 
 **as small as lua**
 
-## project website
+there are two ways to use it:
 
-[Gitee](https://gitee.com/li-muyangangel/trc.git)
-[GitHub](https://github.com/limuy2022/trc.git)
+[c++ version](./cpp/)
+[rust version](./rust/)
 
-## All docs reference
+They have their own adventages.You can choose by your preference.
 
-[All docs](doc)
+The c++ version is the first version of trc.But after I uograded it to cpp 20 stardand.it bacame hard to compile and develop.And there is a lot of trouble codes and bugs in it.So I want to stop to develop it until the cpp 20 standard is more stable.
 
-## How to compile
+The rust version is the second version of trc.It is under development now.It is designed better.
 
-[Compilation guide](doc/developer/build.md)
+I don't know which will be the main version.Maybe both?
 
 ## International
 
-trc support many languages，the way to change language is that uses the language's dynamic linked library to replace the original language library
+Trc supports many different kinds of languages.We use GNU gettext.So it dont't need change the language by hand.
 
 ## Simple examples
 
@@ -73,7 +61,10 @@ del "c"
 println(a * b)
 ```
 
-[more example](tests/black_test/program)
+## project website
+
+[Gitee](https://gitee.com/li-muyangangel/trc.git)
+[GitHub](https://github.com/limuy2022/trc.git)
 
 ## Contact author
 
@@ -82,11 +73,3 @@ Wechat:angelgel2020
 QQ:3570249647
 
 email: ```limuyang202011@163.com```
-
-## Referenced Open-source software
-
-| Library         |Usage     |
-|:-----------|:-------|
-| googletest | Unittest |
-
-Express my thanks to Open-source software contributors!

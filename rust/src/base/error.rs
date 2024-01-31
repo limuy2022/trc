@@ -8,6 +8,7 @@ pub const VM_ERROR: &str = "VmError";
 pub const ZERO_DIVSION_ERROR: &str = "ZeroDivisionError";
 pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
 pub const SYMBOL_ERROR: &str = "SymbolError";
+pub const TYPE_ERROR: &str = "TypeError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
@@ -23,6 +24,7 @@ pub const ERROR_IN_LINE: &str = "Error in line {}";
 pub const IN_MODULE: &str = "In module {}";
 pub const SYMBOL_NOT_FOUND: &str = "Symbol {} not found";
 pub const SYMBOL_REDEFINED: &str = "Symbol {} redefined";
+pub const TYPE_NOT_THE_SAME: &str = "Type {} and {} are not the same";
 
 #[derive(Debug)]
 pub struct ErrorInfo {
@@ -74,6 +76,49 @@ impl Display for RuntimeError {
 impl RuntimeError {
     pub fn new(content: Box<dyn ErrorContent>, info: ErrorInfo) -> RuntimeError {
         RuntimeError { content, info }
+    }
+}
+
+#[derive(Debug)]
+pub struct LightFakeError {}
+
+impl Error for LightFakeError {}
+
+impl Display for LightFakeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "")
+    }
+}
+
+impl LightFakeError {
+    pub fn new() -> LightFakeError {
+        LightFakeError {}
+    }
+}
+
+pub struct LightFakeContent {}
+
+impl ErrorContent for LightFakeError {
+    fn get_module_name(&self) -> &str {
+        ""
+    }
+    fn get_line(&self) -> usize {
+        0
+    }
+}
+
+impl LightFakeContent {
+    pub fn new() -> LightFakeContent {
+        LightFakeContent {}
+    }
+}
+
+impl From<LightFakeError> for RuntimeError {
+    fn from(_: LightFakeError) -> RuntimeError {
+        RuntimeError::new(
+            Box::new(LightFakeError::new()),
+            ErrorInfo::new("".to_string(), "".to_string()),
+        )
     }
 }
 

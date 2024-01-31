@@ -1,6 +1,6 @@
-use super::scope::SymScope;
 use super::token::TokenType;
-use super::{token::Token, TokenLex};
+use super::TokenLex;
+use super::{scope::*, InputSource};
 use crate::base::codegen::{Inst, Opcode, NO_ARG};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
@@ -13,24 +13,44 @@ pub struct AstBuilder<'a> {
     self_scope: Rc<RefCell<SymScope>>,
 }
 
-#[derive(PartialEq, Debug)]
-enum LexState {
-    Success,
-    Failure,
+type AstError<T> = RunResult<T>;
+
+macro_rules! TryErr {
+    ($istry: expr, $($argvs:expr),*) => {
+        {if $istry {
+            Err(LightFakeError::new().into())
+        } else {
+            Err(RuntimeError::new($($argvs),*))
+        }
+    }
+    };
 }
 
-type AstError = RunResult<LexState>;
-
-macro_rules! Trythrow {
-    ($istry:expr, $($error_info:expr),*) => {
-        {
-        if $istry {
-            Ok(LexState::Failure)
-        } else {
-            Err(RuntimeError::new(
-                $($error_info),*
-            ))
-        }
+macro_rules! TmpExpeFunctionGen {
+    ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
+        fn $tmpfuncname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+            let next_sym = self.token_lexer.next_token()?;
+            match next_sym.tp {
+                $($accepted_token => {
+                    let ty_now = self.$next_item_func(istry)?;
+                    self.staticdata.inst.push(Inst::new($add_opcode, NO_ARG));
+                    let ty_after = self.$tmpfuncname(istry)?;
+                    if let TypeAllowNull::No = ty_after {
+                        return Ok(ty_now);
+                    }
+                    if(ty_now == ty_after) {
+                        return Ok(ty_now);
+                    }
+                    return TryErr!(istry,
+                            Box::new(self.token_lexer.compiler_data.content.clone()),
+                            ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, self.get_type_name(ty_now),
+                                    self.get_type_name(ty_after)), gettextrs::gettext(TYPE_ERROR)))
+                })*
+                _ => {
+                    self.token_lexer.next_back(next_sym);
+                    return Ok(TypeAllowNull::No);
+                }
+            }
         }
     };
 }
@@ -38,24 +58,20 @@ macro_rules! Trythrow {
 /// there are a log of similar operators to be generated
 macro_rules! ExprGen {
     ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
-        fn $tmpfuncname(&mut self, istry: bool) -> AstError {
-            let next_sym = self.token_lexer.next_token()?;
-            match next_sym.tp {
-                $($accepted_token => {
-                    self.$next_item_func(istry)?;
-                    self.staticdata.inst.push(Inst::new($add_opcode, NO_ARG));
-                    self.$tmpfuncname(istry)?;
-                })*
-                _ => {
-                    self.token_lexer.next_back(next_sym);
-                }
+        TmpExpeFunctionGen!($tmpfuncname, $next_item_func, $($accepted_token => $add_opcode),*);
+        fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+            let t1 = self.$next_item_func(istry)?;
+            let t2 = self.$tmpfuncname(istry)?;
+            if let TypeAllowNull::No = t2 {
+                return Ok(t1);
             }
-            Ok(LexState::Success)
-        }
-        fn $funcname(&mut self, istry: bool) -> AstError {
-            self.$next_item_func(istry)?;
-            self.$tmpfuncname(istry)?;
-            Ok(LexState::Success)
+            if t1 != t2 {
+                return TryErr!(istry,
+                        Box::new(self.token_lexer.compiler_data.content.clone()),
+                        ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, self.get_type_name(t1),
+                                self.get_type_name(t2)), gettextrs::gettext(TYPE_ERROR)))
+            }
+            Ok(t1)
         }
     };
 }
@@ -67,6 +83,15 @@ impl<'a> AstBuilder<'a> {
             token_lexer,
             staticdata: StaticData::new(),
             self_scope: root_scope,
+        }
+    }
+
+    fn get_type_name(&self, ty: TypeAllowNull) -> String {
+        match ty {
+            TypeAllowNull::Yes(ty) => {
+                self.token_lexer.compiler_data.const_pool.id_name[ty.name].clone()
+            }
+            TypeAllowNull::No => "null".to_string(),
         }
     }
 
@@ -92,19 +117,19 @@ impl<'a> AstBuilder<'a> {
     ExprGen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
     ExprGen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
 
-    fn while_lex(&mut self, istry: bool) -> AstError {
-        Ok(LexState::Success)
+    fn while_lex(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+        todo!()
     }
 
-    fn for_lex(&mut self, istry: bool) -> AstError {
-        Ok(LexState::Success)
+    fn for_lex(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+        todo!()
     }
 
-    fn generate_block(&mut self, istry: bool) -> AstError {
-        Ok(LexState::Success)
+    fn generate_block(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+        todo!()
     }
 
-    fn check_next_token(&mut self, tp: TokenType) -> AstError {
+    fn check_next_token(&mut self, tp: TokenType) -> AstError<()> {
         let next_sym = self.token_lexer.next_token()?;
         if next_sym.tp != tp {
             return Err(RuntimeError::new(
@@ -115,15 +140,15 @@ impl<'a> AstBuilder<'a> {
                 ),
             ));
         }
-        Ok(LexState::Success)
+        Ok(())
     }
 
-    fn val(&mut self, istry: bool) -> AstError {
+    fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
             let idx = t.data.unwrap();
             if self.self_scope.as_ref().borrow().get_sym_idx(idx).is_none() {
-                return Trythrow!(
+                return TryErr!(
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
@@ -135,13 +160,15 @@ impl<'a> AstBuilder<'a> {
                     )
                 );
             }
-            self.staticdata.inst.push(Inst::new(
-                Opcode::LoadLocal,
-                self.self_scope.as_ref().borrow_mut().insert_sym(idx),
-            ));
+            let varidx = self.self_scope.as_ref().borrow_mut().insert_sym(idx);
+            self.staticdata
+                .inst
+                .push(Inst::new(Opcode::LoadLocal, varidx));
+            let tt = self.self_scope.as_ref().borrow().get_type(varidx);
+            return Ok(TypeAllowNull::Yes(tt));
         } else {
             self.token_lexer.next_back(t.clone());
-            return Trythrow!(
+            return TryErr!(
                 istry,
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
@@ -150,19 +177,11 @@ impl<'a> AstBuilder<'a> {
                 )
             );
         }
-        Ok(LexState::Success)
     }
 
-    fn item(&mut self, istry: bool) -> AstError {
-        match self.val(true) {
-            Err(e) => {
-                return Err(e);
-            }
-            Ok(v) => {
-                if v == LexState::Success {
-                    return Ok(LexState::Success);
-                }
-            }
+    fn item(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+        if let Ok(v) = self.val(true) {
+            return Ok(v);
         }
         let t = self.token_lexer.next_token()?;
         match t.tp {
@@ -170,19 +189,22 @@ impl<'a> AstBuilder<'a> {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadInt, t.data.unwrap()));
+                return Ok(TypeAllowNull::Yes(INT_TYPE.clone()));
             }
             TokenType::FloatValue => {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadFloat, t.data.unwrap()));
+                return Ok(TypeAllowNull::Yes(FLOAT_TYPE.clone()));
             }
             TokenType::StringValue => {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadString, t.data.unwrap()));
+                return Ok(TypeAllowNull::Yes(STR_TYPE.clone()));
             }
             _ => {
-                return Trythrow!(
+                return TryErr!(
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
@@ -192,54 +214,87 @@ impl<'a> AstBuilder<'a> {
                 );
             }
         }
-        Ok(LexState::Success)
     }
 
-    fn factor(&mut self, istry: bool) -> AstError {
+    fn factor(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let next_token = self.token_lexer.next_token()?;
         match next_token.tp {
             TokenType::Sub => {
-                self.factor(istry)?;
+                let ret = self.factor(istry)?;
                 self.staticdata
                     .inst
-                    .push(Inst::new(Opcode::SelfNegative, NO_ARG))
+                    .push(Inst::new(Opcode::SelfNegative, NO_ARG));
+                return Ok(ret);
             }
             TokenType::BitNot => {
-                self.factor(istry)?;
+                let ret = self.factor(istry)?;
                 self.staticdata.inst.push(Inst::new(Opcode::BitNot, NO_ARG));
+                return Ok(ret);
             }
             TokenType::Not => {
-                self.factor(istry)?;
+                let ret = self.factor(istry)?;
                 self.staticdata.inst.push(Inst::new(Opcode::Not, NO_ARG));
+                return Ok(ret);
             }
             TokenType::Add => {
-                self.factor(istry)?;
+                return Ok(self.factor(istry)?);
             }
             TokenType::LeftSmallBrace => {
-                self.expr(istry)?;
+                let ret = self.expr(istry)?;
                 self.check_next_token(TokenType::RightSmallBrace)?;
+                return Ok(ret);
             }
             _ => {
                 self.token_lexer.next_back(next_token);
-                self.item(istry)?;
+                return Ok(self.item(istry)?);
             }
         }
-        Ok(LexState::Success)
     }
 
-    fn def_func(&mut self, istry: bool) -> RunResult<LexState> {
-        Ok(LexState::Success)
+    fn def_func(&mut self, istry: bool) -> AstError<()> {
+        Ok(())
     }
 
-    fn def_class(&mut self, istry: bool) -> RunResult<LexState> {
-        Ok(LexState::Success)
+    fn def_class(&mut self, istry: bool) -> AstError<()> {
+        Ok(())
     }
 
-    fn func_call(&mut self, istry: bool) -> RunResult<LexState> {
-        Ok(LexState::Success)
+    fn func_call(&mut self, istry: bool) -> AstError<()> {
+        Ok(())
     }
 
-    fn statement(&mut self, t: Token) -> RunResult<()> {
+    fn import_module(&mut self, istry: bool) -> AstError<()> {
+        let mut path = self.token_lexer.next_token()?;
+        if path.tp != TokenType::StringValue {
+            return TryErr!(
+                istry,
+                Box::new(self.token_lexer.compiler_data.content.clone()),
+                ErrorInfo::new(
+                    gettext!(UNEXPECTED_TOKEN, path.tp.to_string()),
+                    gettextrs::gettext(SYNTAX_ERROR),
+                )
+            );
+        }
+        let path = std::path::PathBuf::from(
+            self.token_lexer.compiler_data.const_pool.id_str[path.data.unwrap()]
+                .clone()
+                .replace('.', "/"),
+        );
+        // the standard library first
+
+        if let InputSource::File(now_module_path) =
+            self.token_lexer.compiler_data.option.inputsource.clone()
+        {
+            let mut now_module_path = std::path::PathBuf::from(now_module_path);
+            now_module_path.pop();
+            now_module_path = now_module_path.join(path);
+            if now_module_path.exists() {}
+        }
+        Ok(())
+    }
+
+    fn statement(&mut self) -> RunResult<()> {
+        let t = self.token_lexer.next_token()?;
         match t.tp {
             super::token::TokenType::Func => {
                 self.def_func(false)?;
@@ -299,36 +354,37 @@ impl<'a> AstBuilder<'a> {
                             .inst
                             .push(Inst::new(Opcode::StoreLocal, var_idx))
                     }
-                    super::token::TokenType::LeftSmallBrace => {
-                        self.func_call(false)?;
-                    }
                     _ => {
+                        self.token_lexer.next_back(tt.clone());
                         return Err(RuntimeError::new(
                             Box::new(self.token_lexer.compiler_data.content.clone()),
                             ErrorInfo::new(
                                 gettext!(UNEXPECTED_TOKEN, tt.tp.to_string()),
                                 gettextrs::gettext(SYNTAX_ERROR),
                             ),
-                        ))
+                        ));
                     }
                 }
             }
             _ => {}
         }
         self.token_lexer.next_back(t.clone());
-        match self.expr(true) {
-            Ok(_) => {}
-            Err(_) => {
-                return Err(RuntimeError::new(
-                    Box::new(self.token_lexer.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
-                        gettextrs::gettext(SYNTAX_ERROR),
-                    ),
-                ))
+        if let Ok(_) = self.expr(true) {
+            return Ok(());
+        }
+        if let Ok(_) = self.val(false) {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::LeftSmallBrace {
+                // func call
             }
         }
-        Ok(())
+        return Err(RuntimeError::new(
+            Box::new(self.token_lexer.compiler_data.content.clone()),
+            ErrorInfo::new(
+                gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                gettextrs::gettext(SYNTAX_ERROR),
+            ),
+        ));
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
@@ -340,7 +396,8 @@ impl<'a> AstBuilder<'a> {
             if token.tp == super::token::TokenType::EndOfFile {
                 break;
             }
-            self.statement(token)?;
+            self.token_lexer.next_back(token);
+            self.statement()?;
         }
         return Ok(());
     }

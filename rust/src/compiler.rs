@@ -14,7 +14,7 @@ use std::fmt::Display;
 use std::io::BufRead;
 use std::{fs, io, vec};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum InputSource {
     File(String),
     StringInternal,
@@ -133,6 +133,10 @@ pub struct ValuePool {
 
 const INT_VAL_POOL_ZERO: usize = 0;
 const INT_VAL_POOL_ONE: usize = 1;
+const INT_ID_POS: usize = 0;
+const FLOAT_ID_POS: usize = 1;
+const BOOL_ID_POS: usize = 2;
+const STR_ID_POS: usize = 3;
 
 macro_rules! gen_add_funcs {
     ($($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)),*) => {
@@ -164,6 +168,10 @@ impl ValuePool {
         };
         ret.add_int(0);
         ret.add_int(1);
+        ret.add_id("int".to_string());
+        ret.add_id("float".to_string());
+        ret.add_id("bool".to_string());
+        ret.add_id("str".to_string());
         ret
     }
 

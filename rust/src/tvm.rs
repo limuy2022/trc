@@ -2,6 +2,7 @@ mod algo;
 mod def;
 mod function;
 mod gc;
+mod rustlib;
 mod types;
 
 use self::types::trcfloat::TrcFloat;
@@ -194,6 +195,7 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::SelfNegative => {
                     unary_opcode!(self_negative, self);
                 }
+                codegen::Opcode::CallNative => {}
             }
             self.pc += 1;
         }

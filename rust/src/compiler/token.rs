@@ -812,7 +812,10 @@ mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
     use super::*;
-    use crate::compiler::{Float, InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
+    use crate::compiler::{
+        Float, InputSource, Option, Pool, INT_ID_POS, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO,
+        STR_ID_POS,
+    };
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {
@@ -995,16 +998,16 @@ func main() {
                 Token::new(TokenType::Import, None),
                 Token::new(TokenType::StringValue, Some(0)),
                 Token::new(TokenType::Func, None),
-                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::ID, Some(4)),
                 Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::ID, Some(1)),
-                Token::new(TokenType::ID, Some(2)),
+                Token::new(TokenType::ID, Some(INT_ID_POS)),
+                Token::new(TokenType::ID, Some(5)),
                 Token::new(TokenType::RightSmallBrace, None),
                 Token::new(TokenType::Arrow, None),
                 Token::new(TokenType::ID, Some(3)),
                 Token::new(TokenType::LeftBigBrace, None),
                 Token::new(TokenType::If, None),
-                Token::new(TokenType::ID, Some(2)),
+                Token::new(TokenType::ID, Some(5)),
                 Token::new(TokenType::Mod, None),
                 Token::new(TokenType::IntValue, Some(2)),
                 Token::new(TokenType::Equal, None),
@@ -1020,25 +1023,25 @@ func main() {
                 Token::new(TokenType::RightBigBrace, None),
                 Token::new(TokenType::RightBigBrace, None),
                 Token::new(TokenType::Func, None),
-                Token::new(TokenType::ID, Some(4)),
+                Token::new(TokenType::ID, Some(6)),
                 Token::new(TokenType::LeftSmallBrace, None),
                 Token::new(TokenType::RightSmallBrace, None),
                 Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::ID, Some(5)),
+                Token::new(TokenType::ID, Some(7)),
                 Token::new(TokenType::LeftSmallBrace, None),
                 Token::new(TokenType::StringValue, Some(3)),
                 Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::ID, Some(6)),
+                Token::new(TokenType::ID, Some(8)),
                 Token::new(TokenType::Store, None),
-                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::ID, Some(4)),
                 Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::ID, Some(9)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::RightSmallBrace, None),
                 Token::new(TokenType::ID, Some(7)),
                 Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::ID, Some(5)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::ID, Some(6)),
+                Token::new(TokenType::ID, Some(8)),
                 Token::new(TokenType::RightSmallBrace, None),
                 Token::new(TokenType::RightBigBrace, None),
             ],
@@ -1051,11 +1054,11 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::ID, Some(0)),
-                Token::new(TokenType::ID, Some(1)),
-                Token::new(TokenType::ID, Some(2)),
-                Token::new(TokenType::ID, Some(3)),
                 Token::new(TokenType::ID, Some(4)),
+                Token::new(TokenType::ID, Some(5)),
+                Token::new(TokenType::ID, Some(6)),
+                Token::new(TokenType::ID, Some(7)),
+                Token::new(TokenType::ID, Some(8)),
             ],
         );
         check_pool(
@@ -1065,6 +1068,10 @@ func main() {
                 String::from("_fuck"),
                 String::from("天帝abc"),
                 String::from("abc天帝"),
+                "int".to_string(),
+                "float".to_string(),
+                "bool".to_string(),
+                "str".to_string(),
             ],
             &t.compiler_data.const_pool.name_pool,
         );
@@ -1090,12 +1097,18 @@ func main() {
             &mut t,
             vec![
                 Token::new(TokenType::IntValue, Some(2)),
-                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::ID, Some(4)),
             ],
         );
         check_pool(vec![0xabc, 0, 1], &t.compiler_data.const_pool.const_ints);
         check_pool(
-            vec![String::from("hds")],
+            vec![
+                "hds".to_string(),
+                "int".to_string(),
+                "float".to_string(),
+                "bool".to_string(),
+                "str".to_string(),
+            ],
             &t.compiler_data.const_pool.name_pool,
         );
     }

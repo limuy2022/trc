@@ -206,3 +206,17 @@ func add<T>(T a, T b) -> T {
     return a + b;
 }
 ```
+
+## module
+
+You can import by the following ways:
+
+```go
+import "a.b.c"
+```
+
+Or:
+
+```go
+import "a/b/c"
+```

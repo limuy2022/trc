@@ -65,3 +65,9 @@ msgstr "符号{}重定义"
 msgid "Only support Linux.Users on other platforms should update program by hand"
 msgstr "仅支持在linux上直接更新文件.其他操作系统用户请自行更新程序"
 
+msgid "TypeError"
+msgstr "类型错误"
+
+msgid "Type {} and {} are not the same"
+msgstr "类型{}和{}不同"
+

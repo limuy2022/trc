@@ -48,6 +48,8 @@ pub enum Opcode {
     Empty,
     // a = -a
     SelfNegative,
+    // call native func
+    CallNative,
 }
 
 impl Display for Opcode {

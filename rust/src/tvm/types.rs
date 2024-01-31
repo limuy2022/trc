@@ -38,7 +38,7 @@ macro_rules! impl_oper {
         fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> TypeError {
             match other.downcast_ref::<$self_type>() {
                 Some(v) => {
-                    Ok(Box::new($newtype::new($oper(self.value, v.value)$whether_throw_error)))
+                    Ok(Box::new($newtype::new($oper(self.value.clone(), v.value.clone())$whether_throw_error)))
                 },
                 None => {
                     Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))

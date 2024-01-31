@@ -125,6 +125,26 @@ if 1 == 1 {
 }
 ```
 
+```for``` support two kinds
+
+First:
+
+```cpp
+for i := 0; i < 10; i++ {
+    println(i)
+}
+```
+
+Second:
+
+```python
+for i in xxx {
+    println(i)
+}
+```
+
+```xxx``` should be a iterable var
+
 ## the comments of Trc
 
 Trc support two kinds of comments
@@ -147,6 +167,14 @@ First,we support the UTF-8 with your var name.So you can define your var like th
 你好:=90
 ```
 
+the compiler will regard this var as a int var.
+
+Sometimes maybe you want to define the type.Do it like this:
+
+```go
+int a:=90
+```
+
 ## Data structures for Trc
 
 Std lib provide many kinds of data structures for Trc.Here is the list:
@@ -160,3 +188,21 @@ Std lib provide many kinds of data structures for Trc.Here is the list:
 |forward list|
 |stack|
 |deque|
+
+## Function
+
+Define a function like this:
+
+```go
+func add(int a, int b) -> int {
+    return a + b;
+}
+```
+
+Or define a template function:
+
+```go
+func add<T>(T a, T b) -> T {
+    return a + b;
+}
+```

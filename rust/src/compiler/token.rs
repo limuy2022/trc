@@ -1,11 +1,8 @@
-use super::{Compiler, Content, Float, INT_VAL_POOL_ZERO};
+use super::{Compiler, Content, Float};
 use crate::{
-    base::{
-        error::{
-            self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW,
-            NUMBER_OVER_FLOW, PREFIX_FOR_FLOAT, SYNTAX_ERROR,
-        },
-        utils::get_bit_num,
+    base::error::{
+        self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW, NUMBER_OVER_FLOW,
+        PREFIX_FOR_FLOAT, SYNTAX_ERROR,
     },
     cfg::FLOAT_OVER_FLOW_LIMIT,
     hash_map,
@@ -16,6 +13,8 @@ use std::{collections::HashMap, fmt::Display, process::exit};
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum TokenType {
+    // ->
+    Arrow,
     // .
     Dot,
     // ,
@@ -72,8 +71,6 @@ pub enum TokenType {
     SelfMod,
     // **=
     SelfPower,
-    // ~=
-    SelfBitNot,
     // <<=
     SelfBitLeftShift,
     // >>=
@@ -88,6 +85,10 @@ pub enum TokenType {
     StringValue,
     FloatValue,
     LongIntValue,
+    // ||=
+    SelfOr,
+    // &&=
+    SelfAnd,
     // =
     Assign,
     // :=
@@ -121,8 +122,9 @@ pub enum TokenType {
     Else,
     Class,
     Match,
-    // func
     Func,
+    Import,
+    Return,
     EndOfLine,
     EndOfFile,
 }
@@ -159,7 +161,6 @@ impl Display for TokenType {
             TokenType::SelfExactDiv => res = "//=".to_string(),
             TokenType::SelfMod => res = "%=".to_string(),
             TokenType::SelfPower => res = "**=".to_string(),
-            TokenType::SelfBitNot => res = "~=".to_string(),
             TokenType::SelfBitLeftShift => res = "<<=".to_string(),
             TokenType::SelfBitRightShift => res = ">>=".to_string(),
             TokenType::SelfBitAnd => res = "&=".to_string(),
@@ -192,12 +193,17 @@ impl Display for TokenType {
             TokenType::Func => res = "func".to_string(),
             TokenType::EndOfLine => res = "EOL".to_string(),
             TokenType::EndOfFile => res = "EOF".to_string(),
+            TokenType::Import => res = "import".to_string(),
+            TokenType::Arrow => res = "->".to_string(),
+            TokenType::Return => res = "return".to_string(),
+            TokenType::SelfAnd => res = "&&=".to_string(),
+            TokenType::SelfOr => res = "||=".to_string(),
         }
         write!(f, "{}", res)
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Token {
     pub tp: TokenType,
     pub data: Option<usize>,
@@ -251,13 +257,15 @@ macro_rules! check_braces_match {
 
 lazy_static! {
     static ref KEYWORDS: HashMap<String, TokenType> = hash_map![
-        String::from("while") => TokenType::While,
-        String::from("for") => TokenType::For,
-        String::from("if") => TokenType::If,
-        String::from("else") => TokenType::Else,
-        String::from("class") => TokenType::Class,
-        String::from("func") => TokenType::Func,
-        String::from("match") => TokenType::Match
+        "while".to_string() => TokenType::While,
+        "for".to_string() => TokenType::For,
+        "if".to_string() => TokenType::If,
+        "else".to_string() => TokenType::Else,
+        "class".to_string() => TokenType::Class,
+        "func".to_string() => TokenType::Func,
+        "match".to_string() => TokenType::Match,
+        "return".to_string() => TokenType::Return,
+        "import".to_string() => TokenType::Import
     ];
     static ref RADIX_TO_PREFIX: HashMap<usize, &'static str> = hash_map![
         2 => "0b",
@@ -392,7 +400,17 @@ impl TokenLex<'_> {
                 Token::new(TokenType::RightSmallBrace, None)
             }
             '+' => self.self_symbol(TokenType::Add, TokenType::SelfAdd),
-            '-' => self.self_symbol(TokenType::Sub, TokenType::SelfSub),
+            '-' => {
+                let c = self.compiler_data.input.read();
+                if c == '>' {
+                    Token::new(TokenType::Arrow, None)
+                } else if c == '=' {
+                    Token::new(TokenType::SelfSub, None)
+                } else {
+                    self.compiler_data.input.unread(c);
+                    Token::new(TokenType::Sub, None)
+                }
+            }
             '*' => self.double_symbol(
                 TokenType::Mul,
                 TokenType::SelfMul,
@@ -425,10 +443,23 @@ impl TokenLex<'_> {
                 '<',
             ),
             '~' => Token::new(TokenType::BitNot, None),
-            '^' => Token::new(TokenType::Xor, None),
-            '|' => self.binary_symbol(TokenType::Or, TokenType::BitOr, '|'),
-            ':' => Token::new(TokenType::Colon, None),
+            '^' => self.self_symbol(TokenType::Xor, TokenType::SelfXor),
+            ':' => self.binary_symbol(TokenType::Colon, TokenType::Store, '='),
             ';' => Token::new(TokenType::Semicolon, None),
+            '|' => self.double_symbol(
+                TokenType::BitOr,
+                TokenType::SelfBitOr,
+                TokenType::Or,
+                TokenType::SelfOr,
+                '|',
+            ),
+            '&' => self.double_symbol(
+                TokenType::BitAnd,
+                TokenType::SelfBitAnd,
+                TokenType::And,
+                TokenType::SelfAnd,
+                '&',
+            ),
             _ => {
                 panic!("Not a symbol.Compiler error")
             }
@@ -781,7 +812,7 @@ mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
     use super::*;
-    use crate::compiler::{Float, InputSource, Option, Pool, INT_VAL_POOL_ONE};
+    use crate::compiler::{Float, InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {
@@ -937,7 +968,80 @@ mod tests {
     }
 
     #[test]
-    fn test_comprehensive_lex() {}
+    fn test_comprehensive_lex() {
+        gen_test_token_env!(
+            r#"
+import "p"
+func a(int val) -> str {
+    if val % 2 == 0 {
+        return "even"
+    } else {
+        return "odd"
+    }
+}
+func main() {
+    print("hello world")
+    p := a(intinput())
+    print(p)
+}
+        "#,
+            t
+        );
+        check(
+            &mut t,
+            vec![
+                Token::new(TokenType::Import, None),
+                Token::new(TokenType::StringValue, Some(0)),
+                Token::new(TokenType::Func, None),
+                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::ID, Some(1)),
+                Token::new(TokenType::ID, Some(2)),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::Arrow, None),
+                Token::new(TokenType::ID, Some(3)),
+                Token::new(TokenType::LeftBigBrace, None),
+                Token::new(TokenType::If, None),
+                Token::new(TokenType::ID, Some(2)),
+                Token::new(TokenType::Mod, None),
+                Token::new(TokenType::IntValue, Some(2)),
+                Token::new(TokenType::Equal, None),
+                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
+                Token::new(TokenType::LeftBigBrace, None),
+                Token::new(TokenType::Return, None),
+                Token::new(TokenType::StringValue, Some(1)),
+                Token::new(TokenType::RightBigBrace, None),
+                Token::new(TokenType::Else, None),
+                Token::new(TokenType::LeftBigBrace, None),
+                Token::new(TokenType::Return, None),
+                Token::new(TokenType::StringValue, Some(2)),
+                Token::new(TokenType::RightBigBrace, None),
+                Token::new(TokenType::RightBigBrace, None),
+                Token::new(TokenType::Func, None),
+                Token::new(TokenType::ID, Some(4)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::LeftBigBrace, None),
+                Token::new(TokenType::ID, Some(5)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::StringValue, Some(3)),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::ID, Some(6)),
+                Token::new(TokenType::Store, None),
+                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::ID, Some(7)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::ID, Some(5)),
+                Token::new(TokenType::LeftSmallBrace, None),
+                Token::new(TokenType::ID, Some(6)),
+                Token::new(TokenType::RightSmallBrace, None),
+                Token::new(TokenType::RightBigBrace, None),
+            ],
+        );
+    }
 
     #[test]
     fn test_id_lex() {

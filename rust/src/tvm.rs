@@ -178,8 +178,9 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::StoreLocal => {}
                 codegen::Opcode::LoadString => {
                     self.dynadata.obj_stack.push(Box::new(TrcStr::new(
-                        &self.static_data.constpool.stringpool
-                            [self.static_data.inst[self.pc].operand],
+                        self.static_data.constpool.stringpool
+                            [self.static_data.inst[self.pc].operand]
+                            .clone(),
                     )));
                 }
                 codegen::Opcode::LoadFloat => {

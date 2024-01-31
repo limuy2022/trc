@@ -13,6 +13,7 @@ pub struct AstBuilder<'a> {
     self_scope: Rc<RefCell<SymScope>>,
 }
 
+#[derive(PartialEq, Debug)]
 enum LexState {
     Success,
     Failure,
@@ -138,7 +139,43 @@ impl<'a> AstBuilder<'a> {
         Ok(LexState::Success)
     }
 
+    fn val(&mut self, istry: bool) -> AstError {
+        Ok(LexState::Success)
+    }
+
     fn item(&mut self, istry: bool) -> AstError {
+        match self.val(istry) {
+            Err(e) => {
+                return Err(e);
+            }
+            Ok(v) => {
+                if v == LexState::Success {
+                    return Ok(LexState::Success);
+                }
+            }
+        }
+        let t = self.token_lexer.next_token()?;
+        match t.tp {
+            TokenType::IntValue => {
+                self.staticdata
+                    .inst
+                    .push(Inst::new(Opcode::LoadInt, t.data.unwrap()));
+            }
+            TokenType::FloatValue => {
+                self.staticdata
+                    .inst
+                    .push(Inst::new(Opcode::LoadFloat, t.data.unwrap()));
+            }
+            TokenType::StringValue => {
+                self.staticdata
+                    .inst
+                    .push(Inst::new(Opcode::LoadString, t.data.unwrap()));
+            }
+            _ => {
+                panic!("unreachable!")
+            }
+        }
+
         Ok(LexState::Success)
     }
 
@@ -147,6 +184,9 @@ impl<'a> AstBuilder<'a> {
         if next_token.tp == TokenType::LeftSmallBrace {
             self.expr(istry)?;
             self.check_next_token(TokenType::RightSmallBrace)?;
+        } else {
+            self.token_lexer.next_back(next_token);
+            self.item(istry)?;
         }
         Ok(LexState::Success)
     }
@@ -239,6 +279,7 @@ impl<'a> AstBuilder<'a> {
             }
             _ => {}
         }
+        self.token_lexer.next_back(t.clone());
         match self.expr(true) {
             Ok(_) => {}
             Err(_) => {

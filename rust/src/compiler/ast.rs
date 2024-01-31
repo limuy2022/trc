@@ -121,12 +121,23 @@ impl<'a> AstBuilder<'a> {
     fn val(&mut self, istry: bool) -> AstError {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
+            let idx = t.data.unwrap();
+            if self.self_scope.as_ref().borrow().get_sym_idx(idx).is_none() {
+                return Trythrow!(
+                    istry,
+                    Box::new(self.token_lexer.compiler_data.content.clone()),
+                    ErrorInfo::new(
+                        gettext!(
+                            SYMBOL_NOT_FOUND,
+                            self.token_lexer.compiler_data.const_pool.id_name[idx]
+                        ),
+                        gettextrs::gettext(SYMBOL_ERROR),
+                    )
+                );
+            }
             self.staticdata.inst.push(Inst::new(
                 Opcode::LoadLocal,
-                self.self_scope
-                    .as_ref()
-                    .borrow_mut()
-                    .insert_sym(t.data.unwrap()),
+                self.self_scope.as_ref().borrow_mut().insert_sym(idx),
             ));
         } else {
             self.token_lexer.next_back(t.clone());

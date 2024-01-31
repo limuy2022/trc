@@ -337,7 +337,7 @@ impl TokenLex<'_> {
     fn check_whether_symbol(c: char) -> bool {
         match c {
             '.' | ',' | '{' | '}' | '[' | ']' | '(' | ')' | '+' | '-' | '*' | '%' | '/' | '='
-            | '!' | '>' | '<' | '~' | '^' | '|' | ':' | ';' => true,
+            | '!' | '>' | '<' | '~' | '^' | '|' | ':' | ';' | '&' => true,
             _ => false,
         }
     }
@@ -909,7 +909,7 @@ mod tests {
     fn test_symbol_lex() {
         gen_test_token_env!(
             r#":{}[]()+=%=//= // /=** *=*,
-    >><< >>="#,
+    >><< >>=||&&"#,
             t
         );
         check(
@@ -934,6 +934,8 @@ mod tests {
                 Token::new(TokenType::BitRightShift, None),
                 Token::new(TokenType::BitLeftShift, None),
                 Token::new(TokenType::SelfBitRightShift, None),
+                Token::new(TokenType::Or, None),
+                Token::new(TokenType::And, None),
             ],
         );
     }

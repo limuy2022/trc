@@ -44,33 +44,17 @@ macro_rules! ExprGen {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     self.staticdata.inst.push(Inst::new($add_opcode, NO_ARG));
+                    self.$tmpfuncname(istry)?;
                 })*
-                _ => {}
+                _ => {
+                    self.token_lexer.next_back(next_sym);
+                }
             }
             Ok(LexState::Success)
         }
         fn $funcname(&mut self, istry: bool) -> AstError {
             self.$next_item_func(istry)?;
             self.$tmpfuncname(istry)?;
-            Ok(LexState::Success)
-        }
-    };
-}
-
-macro_rules! SignleExprGen {
-    ($funcname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
-        fn $funcname(&mut self, istry: bool) -> AstError {
-            let tmp = self.token_lexer.next_token()?;
-            match tmp.tp {
-                $($accepted_token => {
-                    self.$next_item_func(istry)?;
-                    self.staticdata.inst.push(Inst::new($add_opcode, NO_ARG));
-                })*
-                _ => {
-                    self.token_lexer.next_back(tmp);
-                    self.$next_item_func(istry)?;
-                }
-            }
             Ok(LexState::Success)
         }
     };
@@ -86,30 +70,25 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    ExprGen!(expr11, expr11_, factor, TokenType::Power => Opcode::Power);
-    SignleExprGen!(expr10, expr11, TokenType::Add => Opcode::Empty,
-    TokenType::Sub => Opcode::SelfNegative,
-    TokenType::BitNot => Opcode::BitNot
-    );
-    ExprGen!(expr9, expr9_, expr10, TokenType::Mul => Opcode::Mul,
+    ExprGen!(expr9, expr9_, factor, TokenType::Power => Opcode::Power);
+    ExprGen!(expr8, expr8_, expr9, TokenType::Mul => Opcode::Mul,
     TokenType::Div => Opcode::Div,
     TokenType::Mod => Opcode::Mod,
     TokenType::ExactDiv => Opcode::ExtraDiv);
-    ExprGen!(expr8, expr8_, expr9, TokenType::Add => Opcode::Add,
+    ExprGen!(expr7, expr7_, expr8, TokenType::Add => Opcode::Add,
         TokenType::Sub => Opcode::Sub);
-    ExprGen!(expr7, expr7_, expr8, TokenType::BitLeftShift => Opcode::BitLeftShift,
+    ExprGen!(expr6, expr6_, expr7, TokenType::BitLeftShift => Opcode::BitLeftShift,
         TokenType::BitRightShift => Opcode::BitRightShift);
-    ExprGen!(expr6, expr6_, expr7, TokenType::BitAnd => Opcode::BitAnd);
-    ExprGen!(expr5, expr5_, expr6, TokenType::Xor => Opcode::Xor);
-    ExprGen!(expr4, expr4_, expr5, TokenType::BitOr => Opcode::BitOr);
-    ExprGen!(expr3, expr3_, expr4, TokenType::Equal => Opcode::Eq,
+    ExprGen!(expr5, expr5_, expr6, TokenType::BitAnd => Opcode::BitAnd);
+    ExprGen!(expr4, expr4_, expr5, TokenType::Xor => Opcode::Xor);
+    ExprGen!(expr3, expr3_, expr4, TokenType::BitOr => Opcode::BitOr);
+    ExprGen!(expr2, expr2_, expr3, TokenType::Equal => Opcode::Eq,
         TokenType::NotEqual => Opcode::Ne,
         TokenType::Less => Opcode::Lt,
         TokenType::LessEqual => Opcode::Le,
         TokenType::Greater => Opcode::Gt,
         TokenType::GreaterEqual => Opcode::Ge
     );
-    SignleExprGen!(expr2, expr3, TokenType::Not => Opcode::Not);
     ExprGen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
     ExprGen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
 
@@ -140,11 +119,31 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn val(&mut self, istry: bool) -> AstError {
+        let t = self.token_lexer.next_token()?;
+        if t.tp == TokenType::ID {
+            self.staticdata.inst.push(Inst::new(
+                Opcode::LoadLocal,
+                self.self_scope
+                    .as_ref()
+                    .borrow_mut()
+                    .insert_sym(t.data.unwrap()),
+            ));
+        } else {
+            self.token_lexer.next_back(t.clone());
+            return Trythrow!(
+                istry,
+                Box::new(self.token_lexer.compiler_data.content.clone()),
+                ErrorInfo::new(
+                    gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                    gettextrs::gettext(SYNTAX_ERROR),
+                )
+            );
+        }
         Ok(LexState::Success)
     }
 
     fn item(&mut self, istry: bool) -> AstError {
-        match self.val(istry) {
+        match self.val(true) {
             Err(e) => {
                 return Err(e);
             }
@@ -172,21 +171,47 @@ impl<'a> AstBuilder<'a> {
                     .push(Inst::new(Opcode::LoadString, t.data.unwrap()));
             }
             _ => {
-                panic!("unreachable!")
+                return Trythrow!(
+                    istry,
+                    Box::new(self.token_lexer.compiler_data.content.clone()),
+                    ErrorInfo::new(
+                        gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                        gettextrs::gettext(SYNTAX_ERROR),
+                    )
+                );
             }
         }
-
         Ok(LexState::Success)
     }
 
     fn factor(&mut self, istry: bool) -> AstError {
         let next_token = self.token_lexer.next_token()?;
-        if next_token.tp == TokenType::LeftSmallBrace {
-            self.expr(istry)?;
-            self.check_next_token(TokenType::RightSmallBrace)?;
-        } else {
-            self.token_lexer.next_back(next_token);
-            self.item(istry)?;
+        match next_token.tp {
+            TokenType::Sub => {
+                self.factor(istry)?;
+                self.staticdata
+                    .inst
+                    .push(Inst::new(Opcode::SelfNegative, NO_ARG))
+            }
+            TokenType::BitNot => {
+                self.factor(istry)?;
+                self.staticdata.inst.push(Inst::new(Opcode::BitNot, NO_ARG));
+            }
+            TokenType::Not => {
+                self.factor(istry)?;
+                self.staticdata.inst.push(Inst::new(Opcode::Not, NO_ARG));
+            }
+            TokenType::Add => {
+                self.factor(istry)?;
+            }
+            TokenType::LeftSmallBrace => {
+                self.expr(istry)?;
+                self.check_next_token(TokenType::RightSmallBrace)?;
+            }
+            _ => {
+                self.token_lexer.next_back(next_token);
+                self.item(istry)?;
+            }
         }
         Ok(LexState::Success)
     }
@@ -337,6 +362,63 @@ mod tests {
     fn test_builtin_function_call() {}
 
     #[test]
+    fn test_expr_easy1() {
+        gen_test_env!(r#"(1)"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE)]
+        );
+    }
+
+    #[test]
+    fn test_expr_easy2() {
+        gen_test_env!(r#"5+~6"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::BitNot, NO_ARG),
+                Inst::new(Opcode::Add, NO_ARG)
+            ]
+        );
+    }
+
+    #[test]
+    fn text_expr_easy3() {
+        gen_test_env!(r#"9-8-8"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::Sub, NO_ARG),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::Sub, NO_ARG)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_expr_easy4() {
+        gen_test_env!(r#"(8-9)*7"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::Sub, NO_ARG),
+                Inst::new(Opcode::LoadInt, 4),
+                Inst::new(Opcode::Mul, NO_ARG)
+            ]
+        )
+    }
+
+    #[test]
     fn test_expr() {
         gen_test_env!(r#"1+9-10*7**6"#, t);
         t.generate_code().unwrap();
@@ -352,6 +434,37 @@ mod tests {
                 Inst::new(Opcode::Power, NO_ARG),
                 Inst::new(Opcode::Mul, NO_ARG),
                 Inst::new(Opcode::Sub, NO_ARG),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_expr_final() {
+        gen_test_env!(r#"(1+-2)*3/4**(5**6)==1||7==(8&9)"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::SelfNegative, NO_ARG),
+                Inst::new(Opcode::Add, NO_ARG),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::Mul, NO_ARG),
+                Inst::new(Opcode::LoadInt, 4),
+                Inst::new(Opcode::LoadInt, 5),
+                Inst::new(Opcode::LoadInt, 6),
+                Inst::new(Opcode::Power, NO_ARG),
+                Inst::new(Opcode::Power, NO_ARG),
+                Inst::new(Opcode::Div, NO_ARG),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::Eq, NO_ARG),
+                Inst::new(Opcode::LoadInt, 7),
+                Inst::new(Opcode::LoadInt, 8),
+                Inst::new(Opcode::LoadInt, 9),
+                Inst::new(Opcode::BitAnd, NO_ARG),
+                Inst::new(Opcode::Eq, NO_ARG),
+                Inst::new(Opcode::Or, NO_ARG),
             ]
         );
     }

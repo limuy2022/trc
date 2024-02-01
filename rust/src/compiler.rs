@@ -107,6 +107,9 @@ impl Float {
         for _ in 0..len {
             float_part /= 10.0;
         }
+        for _ in 0..self.zero {
+            float_part /= 10.0;
+        }
         self.front as f64 + float_part
     }
 }
@@ -187,6 +190,15 @@ impl ValuePool {
         ret.intpool.resize(self.const_ints.len(), 0);
         for i in &self.const_ints {
             ret.intpool[*i.1] = *i.0;
+        }
+        ret.floatpool.resize(self.const_floats.len(), 0.0);
+        for i in &self.const_floats {
+            ret.floatpool[*i.1] = i.0.to_float();
+        }
+        ret.stringpool
+            .resize(self.const_strings.len(), "".to_string());
+        for i in &self.const_strings {
+            ret.stringpool[*i.1] = (i.0).clone();
         }
         ret
     }

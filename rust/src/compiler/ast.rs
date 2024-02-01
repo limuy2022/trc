@@ -128,8 +128,8 @@ impl<'a> AstBuilder<'a> {
     ExprGen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
     ExprGen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
 
-    pub fn return_static_data(self) -> StaticData {
-        self.token_lexer.compiler_data.const_pool.store_val_to_vm();
+    pub fn return_static_data(mut self) -> StaticData {
+        self.staticdata.constpool = self.token_lexer.compiler_data.const_pool.store_val_to_vm();
         self.staticdata
     }
 

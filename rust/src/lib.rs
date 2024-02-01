@@ -18,24 +18,35 @@ use std::error::Error;
 struct Args {
     #[command(subcommand)]
     mode: Commands,
-    #[arg()]
-    files: Vec<String>,
 }
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    Build { optimize: bool },
+    Build {
+        #[arg(short, long, default_value_t = false)]
+        optimize: bool,
+        #[arg()]
+        files: Vec<String>,
+    },
     Tshell {},
     Update {},
-    Run { optimize: bool },
+    Run {
+        #[arg(short, long, default_value_t = false)]
+        optimize: bool,
+        #[arg()]
+        files: Vec<String>,
+    },
 }
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
     match cli.mode {
-        Commands::Build { optimize: opt } => {
-            for i in cli.files {
-                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)));
+        Commands::Build {
+            optimize: opt,
+            files: files,
+        } => {
+            for i in files {
+                tools::compile(compiler::Option::new(false, compiler::InputSource::File(i)));
             }
         }
         Commands::Tshell {} => {
@@ -47,9 +58,13 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
             Ok(_) => {}
         },
-        Commands::Run { optimize: opt } => {
-            for i in cli.files {
-                match tools::run::run(compiler::Option::new(opt, compiler::InputSource::File(i))) {
+        Commands::Run {
+            optimize: opt,
+            files: files,
+        } => {
+            for i in files {
+                match tools::run::run(compiler::Option::new(false, compiler::InputSource::File(i)))
+                {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);

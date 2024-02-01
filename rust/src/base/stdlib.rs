@@ -3,18 +3,16 @@ use crate::{
     compiler::scope::{Type, TypeAllowNull},
     tvm::{stdlib::prelude::*, DynaData},
 };
+use downcast_rs::{impl_downcast, Downcast};
 use lazy_static::lazy_static;
 use std::{
     collections::{HashMap, HashSet},
-    sync::Mutex,
+    sync::{Arc, Mutex},
 };
 
-use super::{
-    codegen::{Inst, Opcode},
-    error::{ErrorInfo, RunResult},
-};
+use super::error::{ErrorInfo, RunResult};
 
-type StdlibFunc = fn(DynaData) -> RunResult<()>;
+type StdlibFunc = fn(&mut DynaData) -> RunResult<()>;
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct RustFunction {
@@ -25,10 +23,31 @@ pub struct RustFunction {
     pub return_type: TypeAllowNull,
 }
 
-pub trait FunctionInterface {
+pub trait FunctionClone {
+    fn clone_box(&self) -> Box<dyn FunctionInterface>;
+}
+
+impl<T> FunctionClone for T
+where
+    T: 'static + FunctionInterface + Clone,
+{
+    fn clone_box(&self) -> Box<dyn FunctionInterface> {
+        Box::new(self.clone())
+    }
+}
+
+pub trait FunctionInterface: Downcast + FunctionClone {
     fn check_argvs(&self, argvs: Vec<Type>) -> Result<(), ErrorInfo>;
     fn get_return_type(&self) -> &TypeAllowNull;
 }
+
+impl Clone for Box<dyn FunctionInterface> {
+    fn clone(&self) -> Self {
+        self.clone_box()
+    }
+}
+
+impl_downcast!(FunctionInterface);
 
 impl FunctionInterface for RustFunction {
     fn check_argvs(&self, argvs: Vec<Type>) -> Result<(), ErrorInfo> {
@@ -60,9 +79,7 @@ pub struct RustClass {
     pub functions: HashSet<RustFunction>,
 }
 
-lazy_static! {
-    static ref STD_FUNC_ID: Mutex<usize> = Mutex::new(0);
-}
+pub static mut STD_FUNC_TABLE: Vec<StdlibFunc> = vec![];
 
 impl RustFunction {
     pub fn new(
@@ -71,15 +88,15 @@ impl RustFunction {
         argvs_type: Vec<Type>,
         return_type: TypeAllowNull,
     ) -> RustFunction {
-        let mut lock = STD_FUNC_ID.lock().unwrap();
-        let tmp = *lock;
-        *lock += 1;
-        RustFunction {
-            name,
-            buildin_id: tmp,
-            ptr,
-            return_type,
-            argvs_type,
+        unsafe {
+            STD_FUNC_TABLE.push(ptr);
+            RustFunction {
+                name,
+                buildin_id: STD_FUNC_TABLE.len() - 1,
+                ptr,
+                return_type,
+                argvs_type,
+            }
         }
     }
 }
@@ -87,7 +104,7 @@ impl RustFunction {
 #[derive(Debug, Clone)]
 pub struct StdlibNode {
     pub name: String,
-    pub sons: HashMap<String, StdlibNode>,
+    pub sons: HashMap<String, Arc<Mutex<StdlibNode>>>,
     pub functions: HashSet<RustFunction>,
 }
 
@@ -100,9 +117,9 @@ impl StdlibNode {
         }
     }
 
-    pub fn add_module(&mut self, name: String) -> StdlibNode {
-        let ret = StdlibNode::new(name.clone());
-        self.sons.insert(name, ret.clone());
+    pub fn add_module(&mut self, name: String) -> Arc<Mutex<StdlibNode>> {
+        let ret = Arc::new(Mutex::new(StdlibNode::new(name.clone())));
+        self.sons.insert(name.clone(), ret.clone());
         ret
     }
 
@@ -110,21 +127,22 @@ impl StdlibNode {
         self.functions.insert(name);
     }
 
-    pub fn get_module<T: Iterator<Item = String>>(&self, mut path: T) -> Option<&StdlibNode> {
+    pub fn get_module<T: Iterator<Item = String>>(&self, mut path: T) -> Option<StdlibNode> {
         let item = path.next();
         if item.is_none() {
-            return Some(self);
+            return Some(self.clone());
         }
         let item = item.unwrap();
-        return self.sons.get(&item).unwrap().get_module(path);
+        let lock = self.sons.get(&item).unwrap().lock().unwrap();
+        return lock.get_module(path);
     }
 }
 
 pub fn init() -> StdlibNode {
     // init stdlib
     let mut stdlib = StdlibNode::new("std".to_string());
-    let mut prelude = stdlib.add_module("prelude".to_string());
-    prelude.add_function(RustFunction::new(
+    let prelude = stdlib.add_module("prelude".to_string());
+    prelude.lock().unwrap().add_function(RustFunction::new(
         "print".to_string(),
         tvm_print,
         vec![Type::Any],

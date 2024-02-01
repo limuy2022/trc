@@ -9,6 +9,7 @@ use self::types::trcfloat::TrcFloat;
 use self::types::trcint::TrcInt;
 use self::types::trcstr::TrcStr;
 use crate::base::codegen::{self, StaticData};
+use crate::base::stdlib::STD_FUNC_TABLE;
 use crate::{base::error::*, cfg};
 use gettextrs::gettext;
 
@@ -132,6 +133,10 @@ impl<'a> Vm<'a> {
         }
     }
 
+    pub fn set_static_data(&mut self, static_data: StaticData) {
+        self.static_data = static_data;
+    }
+
     pub fn run(&mut self) -> Result<(), RuntimeError> {
         while self.pc < self.static_data.inst.len() {
             match self.static_data.inst[self.pc].opcode {
@@ -195,7 +200,9 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::SelfNegative => {
                     unary_opcode!(self_negative, self);
                 }
-                codegen::Opcode::CallNative => {}
+                codegen::Opcode::CallNative => unsafe {
+                    STD_FUNC_TABLE[self.static_data.inst[self.pc].operand](&mut self.dynadata)?;
+                },
             }
             self.pc += 1;
         }

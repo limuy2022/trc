@@ -2,6 +2,7 @@ use super::{ValuePool, BOOL_ID_POS, FLOAT_ID_POS, INT_ID_POS, STR_ID_POS};
 use crate::base::error::*;
 use crate::base::stdlib::{FunctionInterface, StdlibNode, STDLIB_LIST};
 use lazy_static::lazy_static;
+use std::borrow::Borrow;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
 lazy_static! {
@@ -18,6 +19,15 @@ lazy_static! {
 pub enum TypeAllowNull {
     Yes(Type),
     No,
+}
+
+impl TypeAllowNull {
+    pub fn unwrap(&self) -> &Type {
+        match self {
+            TypeAllowNull::Yes(t) => t,
+            TypeAllowNull::No => panic!("null"),
+        }
+    }
 }
 
 impl Display for TypeAllowNull {
@@ -181,8 +191,28 @@ impl SymScope {
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
-        for i in &STDLIB_LIST.sons.get("prelude").unwrap().functions {
-            self.add_func(const_pool.name_pool[&i.name], Box::new((*i).clone()));
+        let funcs = &STDLIB_LIST
+            .sons
+            .get("prelude")
+            .unwrap()
+            .lock()
+            .unwrap()
+            .functions;
+        for i in funcs {
+            let idx = self.insert_sym(const_pool.name_pool[&i.name]);
+            self.add_func(idx, Box::new((*i).clone()));
+        }
+    }
+
+    pub fn get_module(&mut self, id: usize) {}
+
+    pub fn get_function(&self, id: usize) -> Option<Box<dyn FunctionInterface>> {
+        match self.funcs.get(&id) {
+            Some(f) => Some(f.clone()),
+            None => match self.prev_scope {
+                Some(ref prev) => return prev.as_ref().borrow().get_function(id),
+                None => None,
+            },
         }
     }
 

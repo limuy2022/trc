@@ -27,6 +27,7 @@ enum Commands {
     Build { optimize: bool },
     Tshell {},
     Update {},
+    Run { optimize: bool },
 }
 
 pub fn run() -> Result<(), Box<dyn Error>> {
@@ -46,6 +47,16 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
             Ok(_) => {}
         },
+        Commands::Run { optimize: opt } => {
+            for i in cli.files {
+                match tools::run::run(compiler::Option::new(opt, compiler::InputSource::File(i))) {
+                    Ok(_) => {}
+                    Err(c) => {
+                        eprintln!("{}", c);
+                    }
+                }
+            }
+        }
     };
     Ok(())
 }

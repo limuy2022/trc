@@ -320,7 +320,7 @@ impl TokenIo for FileSource {
 pub struct Compiler {
     // to support read from stdin and file
     input: Box<dyn TokenIo<Item = char>>,
-    const_pool: ValuePool,
+    pub const_pool: ValuePool,
     option: Option,
     content: Content,
 }
@@ -352,11 +352,11 @@ impl Compiler {
         }
     }
 
-    pub fn lex(&mut self) -> RunResult<()> {
+    pub fn lex(&mut self) -> RunResult<StaticData> {
         let token_lexer = TokenLex::new(self);
         let mut ast_builder = ast::AstBuilder::new(token_lexer);
         ast_builder.generate_code()?;
-        Ok(())
+        Ok(ast_builder.return_static_data())
     }
 }
 

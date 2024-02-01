@@ -2,7 +2,7 @@ use super::token::TokenType;
 use super::TokenLex;
 use super::{scope::*, InputSource};
 use crate::base::codegen::{Inst, Opcode, NO_ARG};
-use crate::base::stdlib::{RustFunction, STDLIB_LIST};
+use crate::base::stdlib::{RustFunction, STDLIB_ROOT};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
 use std::cell::RefCell;
@@ -39,7 +39,10 @@ macro_rules! TmpExpeFunctionGen {
                     if let TypeAllowNull::No = ty_after {
                         return Ok(ty_now);
                     }
-                    if(ty_now == ty_after) {
+                    if let TypeAllowNull::No = ty_now {
+                        return Ok(ty_now)
+                    }
+                    if(ty_now.unwrap().get_id() == ty_after.unwrap().get_id()) {
                         return Ok(ty_now);
                     }
                     return TryErr!(istry,
@@ -66,7 +69,10 @@ macro_rules! ExprGen {
             if let TypeAllowNull::No = t2 {
                 return Ok(t1);
             }
-            if t1 != t2 {
+            if let TypeAllowNull::No = t1 {
+                return Ok(t1);
+            }
+            if t1.unwrap().get_id() != t2.unwrap().get_id() {
                 return TryErr!(istry,
                         Box::new(self.token_lexer.compiler_data.content.clone()),
                         ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, t1,
@@ -86,18 +92,8 @@ impl<'a> AstBuilder<'a> {
             staticdata: StaticData::new(),
             self_scope: root_scope,
         };
-        for i in &STDLIB_LIST
-            .sons
-            .get("prelude")
-            .unwrap()
-            .lock()
-            .unwrap()
-            .functions
-        {
-            ret.token_lexer
-                .compiler_data
-                .const_pool
-                .add_id(i.name.clone());
+        for i in &STDLIB_ROOT.sub_modules.get("prelude").unwrap().functions {
+            ret.token_lexer.compiler_data.const_pool.add_id(i.0.clone());
         }
         ret.self_scope
             .as_ref()
@@ -151,7 +147,7 @@ impl<'a> AstBuilder<'a> {
             return Err(RuntimeError::new(
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, next_sym.tp.to_string()),
+                    gettext!(UNEXPECTED_TOKEN, next_sym.tp),
                     gettextrs::gettext(SYNTAX_ERROR),
                 ),
             ));
@@ -203,7 +199,7 @@ impl<'a> AstBuilder<'a> {
                 self.check_next_token(TokenType::RightSmallBrace)?;
                 let tmp = self.self_scope.borrow();
                 let func_obj = tmp.get_function(idx).unwrap();
-                match func_obj.check_argvs(argv_list) {
+                match func_obj.get_io().check_argvs(argv_list) {
                     Err(e) => {
                         return TryErr!(
                             istry,
@@ -218,7 +214,7 @@ impl<'a> AstBuilder<'a> {
                         .inst
                         .push(Inst::new(Opcode::CallNative, obj.buildin_id));
                 }
-                return Ok((*func_obj.get_return_type()).clone());
+                return Ok((func_obj.get_io().return_type).clone());
             } else {
                 self.token_lexer.next_back(nxt);
                 let varidx = self.self_scope.as_ref().borrow_mut().insert_sym(idx);
@@ -226,7 +222,7 @@ impl<'a> AstBuilder<'a> {
                     .inst
                     .push(Inst::new(Opcode::LoadLocal, varidx));
                 let tt = self.self_scope.as_ref().borrow().get_type(varidx);
-                return Ok(TypeAllowNull::Yes(Type::Common(tt)));
+                return Ok(TypeAllowNull::Yes(tt));
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -234,7 +230,7 @@ impl<'a> AstBuilder<'a> {
                 istry,
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                    gettext!(UNEXPECTED_TOKEN, t.tp),
                     gettextrs::gettext(SYNTAX_ERROR),
                 )
             );
@@ -271,7 +267,7 @@ impl<'a> AstBuilder<'a> {
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                        gettext!(UNEXPECTED_TOKEN, t.tp),
                         gettextrs::gettext(SYNTAX_ERROR),
                     )
                 );
@@ -333,7 +329,7 @@ impl<'a> AstBuilder<'a> {
                 istry,
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, path.tp.to_string()),
+                    gettext!(UNEXPECTED_TOKEN, path.tp),
                     gettextrs::gettext(SYNTAX_ERROR),
                 )
             );
@@ -434,7 +430,7 @@ impl<'a> AstBuilder<'a> {
         return Err(RuntimeError::new(
             Box::new(self.token_lexer.compiler_data.content.clone()),
             ErrorInfo::new(
-                gettext!(UNEXPECTED_TOKEN, t.tp.to_string()),
+                gettext!(UNEXPECTED_TOKEN, t.tp),
                 gettextrs::gettext(SYNTAX_ERROR),
             ),
         ));

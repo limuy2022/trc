@@ -3,7 +3,7 @@
 
 mod ast;
 pub mod scope;
-mod token;
+pub mod token;
 
 use self::token::TokenLex;
 use crate::base::codegen::{ConstPool, StaticData};
@@ -350,7 +350,7 @@ impl Compiler {
                 }
             }
             _ => {
-                panic!("Compiler construct Error, used {:?}", option.inputsource);
+                unreachable!()
             }
         }
     }

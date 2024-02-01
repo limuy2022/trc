@@ -68,48 +68,14 @@ impl Content {
 }
 
 /// reduce the duplicate code to solve the operator running
-macro_rules! binary_opcode {
+macro_rules! operator_opcode {
     ($trait_used:ident, $sself:expr) => {{
-        let t2 = $sself.dynadata.obj_stack.pop();
-        let t1 = $sself.dynadata.obj_stack.pop();
-        if t1.is_none() || t2.is_none() {
-            return Err(RuntimeError::new(
-                Box::new($sself.run_contnet.clone()),
-                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 2), gettext(VM_ERROR)),
-            ));
-        }
-        let t1 = t1.unwrap();
-        let t2 = t2.unwrap();
-        let ret = t1.$trait_used(t2);
+        let ret = types::$trait_used(&mut $sself.dynadata);
         match ret {
             Err(e) => {
                 return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
             }
-            Ok(t) => {
-                $sself.dynadata.obj_stack.push(t);
-            }
-        }
-    }};
-}
-
-macro_rules! unary_opcode {
-    ($trait_used:ident, $sself:expr) => {{
-        let t1 = $sself.dynadata.obj_stack.pop();
-        if t1.is_none() {
-            return Err(RuntimeError::new(
-                Box::new($sself.run_contnet.clone()),
-                ErrorInfo::new(gettext!(VM_DATA_NUMBER, 1), gettext(VM_ERROR)),
-            ));
-        }
-        let t1 = t1.unwrap();
-        let ret = t1.$trait_used();
-        match ret {
-            Err(e) => {
-                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
-            }
-            Ok(t) => {
-                $sself.dynadata.obj_stack.push(t);
-            }
+            Ok(_) => {}
         }
     }};
 }
@@ -140,23 +106,23 @@ impl<'a> Vm<'a> {
     pub fn run(&mut self) -> Result<(), RuntimeError> {
         while self.pc < self.static_data.inst.len() {
             match self.static_data.inst[self.pc].opcode {
-                codegen::Opcode::Add => binary_opcode!(add, self),
-                codegen::Opcode::Sub => binary_opcode!(sub, self),
-                codegen::Opcode::Mul => binary_opcode!(mul, self),
-                codegen::Opcode::Div => binary_opcode!(div, self),
-                codegen::Opcode::ExtraDiv => binary_opcode!(extra_div, self),
-                codegen::Opcode::Mod => binary_opcode!(modd, self),
-                codegen::Opcode::Gt => binary_opcode!(gt, self),
-                codegen::Opcode::Lt => binary_opcode!(lt, self),
-                codegen::Opcode::Ge => binary_opcode!(ge, self),
-                codegen::Opcode::Le => binary_opcode!(le, self),
-                codegen::Opcode::Eq => binary_opcode!(eq, self),
-                codegen::Opcode::Ne => binary_opcode!(ne, self),
-                codegen::Opcode::And => binary_opcode!(and, self),
-                codegen::Opcode::Or => binary_opcode!(or, self),
-                codegen::Opcode::Power => binary_opcode!(power, self),
-                codegen::Opcode::Not => unary_opcode!(not, self),
-                codegen::Opcode::Xor => binary_opcode!(xor, self),
+                codegen::Opcode::Add => operator_opcode!(add, self),
+                codegen::Opcode::Sub => operator_opcode!(sub, self),
+                codegen::Opcode::Mul => operator_opcode!(mul, self),
+                codegen::Opcode::Div => operator_opcode!(div, self),
+                codegen::Opcode::ExtraDiv => operator_opcode!(extra_div, self),
+                codegen::Opcode::Mod => operator_opcode!(modd, self),
+                codegen::Opcode::Gt => operator_opcode!(gt, self),
+                codegen::Opcode::Lt => operator_opcode!(lt, self),
+                codegen::Opcode::Ge => operator_opcode!(ge, self),
+                codegen::Opcode::Le => operator_opcode!(le, self),
+                codegen::Opcode::Eq => operator_opcode!(eq, self),
+                codegen::Opcode::Ne => operator_opcode!(ne, self),
+                codegen::Opcode::And => operator_opcode!(and, self),
+                codegen::Opcode::Or => operator_opcode!(or, self),
+                codegen::Opcode::Power => operator_opcode!(power, self),
+                codegen::Opcode::Not => operator_opcode!(not, self),
+                codegen::Opcode::Xor => operator_opcode!(xor, self),
                 codegen::Opcode::NewFrame => {}
                 codegen::Opcode::PopFrame => {
                     let ret = self.dynadata.frames_stack.pop();
@@ -175,11 +141,11 @@ impl<'a> Vm<'a> {
                         self.static_data.constpool.intpool[self.static_data.inst[self.pc].operand],
                     )));
                 }
-                codegen::Opcode::BitAnd => binary_opcode!(bit_and, self),
-                codegen::Opcode::BitOr => binary_opcode!(bit_or, self),
-                codegen::Opcode::BitNot => unary_opcode!(bit_not, self),
-                codegen::Opcode::BitLeftShift => binary_opcode!(bit_left_shift, self),
-                codegen::Opcode::BitRightShift => binary_opcode!(bit_right_shift, self),
+                codegen::Opcode::BitAnd => operator_opcode!(bit_and, self),
+                codegen::Opcode::BitOr => operator_opcode!(bit_or, self),
+                codegen::Opcode::BitNot => operator_opcode!(bit_not, self),
+                codegen::Opcode::BitLeftShift => operator_opcode!(bit_left_shift, self),
+                codegen::Opcode::BitRightShift => operator_opcode!(bit_right_shift, self),
                 codegen::Opcode::LoadLocal => {}
                 codegen::Opcode::StoreLocal => {}
                 codegen::Opcode::LoadString => {
@@ -198,11 +164,18 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::LoadBigInt => {}
                 codegen::Opcode::Empty => {}
                 codegen::Opcode::SelfNegative => {
-                    unary_opcode!(self_negative, self);
+                    operator_opcode!(self_negative, self);
                 }
-                codegen::Opcode::CallNative => unsafe {
-                    STD_FUNC_TABLE[self.static_data.inst[self.pc].operand](&mut self.dynadata)?;
-                },
+                codegen::Opcode::CallNative => {
+                    match STD_FUNC_TABLE.with(|std| -> RuntimeResult<()> {
+                        std.borrow()[self.static_data.inst[self.pc].operand](&mut self.dynadata)
+                    }) {
+                        Ok(_) => {}
+                        Err(e) => {
+                            return Err(RuntimeError::new(Box::new(self.run_contnet.clone()), e));
+                        }
+                    }
+                }
             }
             self.pc += 1;
         }

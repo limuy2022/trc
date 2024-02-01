@@ -36,10 +36,10 @@ pub struct ErrorInfo {
 }
 
 impl ErrorInfo {
-    pub fn new(message: String, error_type: String) -> ErrorInfo {
+    pub fn new(message: impl Into<String>, error_type: impl Into<String>) -> ErrorInfo {
         ErrorInfo {
-            message,
-            error_type,
+            message: message.into(),
+            error_type: error_type.into(),
         }
     }
 }
@@ -118,11 +118,9 @@ impl LightFakeContent {
 
 impl From<LightFakeError> for RuntimeError {
     fn from(_: LightFakeError) -> RuntimeError {
-        RuntimeError::new(
-            Box::new(LightFakeError::new()),
-            ErrorInfo::new("".to_string(), "".to_string()),
-        )
+        RuntimeError::new(Box::new(LightFakeError::new()), ErrorInfo::new("", ""))
     }
 }
 
 pub type RunResult<T> = Result<T, RuntimeError>;
+pub type RuntimeResult<T> = Result<T, ErrorInfo>;

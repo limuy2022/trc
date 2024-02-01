@@ -1,4 +1,5 @@
-use crate::base::error;
+use crate::base::error::*;
+use crate::tvm::DynaData;
 use downcast_rs::{impl_downcast, Downcast};
 use gettextrs::gettext;
 
@@ -9,24 +10,19 @@ pub mod trcfloat;
 pub mod trcint;
 pub mod trcstr;
 
-macro_rules! unsupported_operator {
-    ($operator_name:expr, $sself:expr) => {
-        Err(error::ErrorInfo::new(
-            gettext!(
-                error::OPERATOR_IS_NOT_SUPPORT,
-                $operator_name,
-                $sself.get_type_name()
-            ),
-            gettext(error::SYNTAX_ERROR),
-        ))
-    };
-}
-
 /// help to generate the same error reporter functions
 macro_rules! batch_unsupported_operators {
     ($($traie_name:ident => $oper_name:expr),*) => {
-        $(fn $traie_name(&self, _ :Box<dyn TrcObj>) -> TypeError {
-            unsupported_operator!($oper_name, self)
+        $(
+        fn $traie_name(&self, _:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
+            return Err(ErrorInfo::new(
+                gettext!(
+                    OPERATOR_IS_NOT_SUPPORT,
+                    $oper_name,
+                    self.get_type_name()
+                ),
+                gettext(SYNTAX_ERROR),
+            ));
         })*
     };
 }
@@ -35,26 +31,26 @@ macro_rules! batch_unsupported_operators {
 macro_rules! impl_oper {
     // for unsupported operator in rust
     ($trait_oper_fn_name:ident, $oper:ident, $error_oper_name:expr, $self_type:ident, $newtype:ident, $whether_throw_error:tt) => {
-        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> TypeError {
+        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
             match other.downcast_ref::<$self_type>() {
                 Some(v) => {
-                    Ok(Box::new($newtype::new($oper(self.value.clone(), v.value.clone())$whether_throw_error)))
+                    return Ok(Box::new($newtype::new($oper(self._value.clone(), v._value.clone())$whether_throw_error)));
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
+                    return Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }
     };
     // for supported operator in rust
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
-        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> TypeError {
+        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
             match other.downcast_ref::<$self_type>() {
                 Some(v) => {
-                    Ok(Box::new($newtype::new(self.value $oper v.value)))
+                    return Ok(Box::new($newtype::new(self._value $oper v._value)));
                 },
                 None => {
-                    Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
+                    return Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
                 }
             }
         }
@@ -62,12 +58,6 @@ macro_rules! impl_oper {
 }
 
 #[macro_export]
-/// use tvm::types::batch_impl_opers;
-/// batch_impl_opers!(
-/// add => +, "+", TrcInt, TrcInt,
-/// sub => -, "-", TrcInt, TrcInt,
-/// mul => *, "*", TrcInt, TrcInt
-/// );
 macro_rules! batch_impl_opers {
     ($($trait_oper_fn_name:ident => $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident),*) => {
         $(
@@ -79,13 +69,41 @@ macro_rules! batch_impl_opers {
 #[macro_export]
 macro_rules! impl_single_oper {
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
-        fn $trait_oper_fn_name(&self) -> TypeError {
-            Ok(Box::new($newtype::new($oper self.value)))
+        fn $trait_oper_fn_name(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+            return Ok(Box::new($newtype::new($oper self._value)));
         }
     };
 }
 
-type TypeError = Result<Box<dyn TrcObj>, error::ErrorInfo>;
+macro_rules! gen_interface {
+    ($funcname:ident, 2) => {
+        pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
+            let t2 = dydata.obj_stack.pop();
+            let t1 = dydata.obj_stack.pop();
+            if t2.is_none() || t1.is_none() {
+                return Err(ErrorInfo::new(
+                    gettext!(VM_DATA_NUMBER, 2),
+                    gettext(VM_ERROR),
+                ));
+            }
+            dydata.obj_stack.push(t1.unwrap().$funcname(t2.unwrap())?);
+            Ok(())
+        }
+    };
+    ($funcname:ident, 1) => {
+        pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
+            let t1 = dydata.obj_stack.pop();
+            if t1.is_none() {
+                return Err(ErrorInfo::new(
+                    gettext!(VM_DATA_NUMBER, 1),
+                    gettext(VM_ERROR),
+                ));
+            }
+            dydata.obj_stack.push(t1.unwrap().$funcname()?);
+            Ok(())
+        }
+    };
+}
 
 pub trait TrcObj: Downcast + std::fmt::Display {
     batch_unsupported_operators!(
@@ -111,19 +129,52 @@ pub trait TrcObj: Downcast + std::fmt::Display {
         bit_right_shift => ">>"
     );
 
-    fn not(&self) -> TypeError {
-        unsupported_operator!("!", self)
+    fn not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+        return Err(ErrorInfo::new(
+            gettext!(OPERATOR_IS_NOT_SUPPORT, "!", self.get_type_name()),
+            gettext(SYNTAX_ERROR),
+        ));
     }
 
-    fn bit_not(&self) -> TypeError {
-        unsupported_operator!("~", self)
+    fn bit_not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+        return Err(ErrorInfo::new(
+            gettext!(OPERATOR_IS_NOT_SUPPORT, "~", self.get_type_name()),
+            gettext(SYNTAX_ERROR),
+        ));
     }
 
-    fn self_negative(&self) -> TypeError {
-        unsupported_operator!("-", self)
+    fn self_negative(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+        return Err(ErrorInfo::new(
+            gettext!(OPERATOR_IS_NOT_SUPPORT, "-", self.get_type_name()),
+            gettext(SYNTAX_ERROR),
+        ));
     }
 
     fn get_type_name(&self) -> &str;
 }
 
 impl_downcast!(TrcObj);
+
+gen_interface!(add, 2);
+gen_interface!(sub, 2);
+gen_interface!(mul, 2);
+gen_interface!(div, 2);
+gen_interface!(extra_div, 2);
+gen_interface!(modd, 2);
+gen_interface!(power, 2);
+gen_interface!(gt, 2);
+gen_interface!(lt, 2);
+gen_interface!(eq, 2);
+gen_interface!(ne, 2);
+gen_interface!(ge, 2);
+gen_interface!(le, 2);
+gen_interface!(and, 2);
+gen_interface!(or, 2);
+gen_interface!(bit_and, 2);
+gen_interface!(bit_or, 2);
+gen_interface!(xor, 2);
+gen_interface!(bit_left_shift, 2);
+gen_interface!(bit_right_shift, 2);
+gen_interface!(self_negative, 1);
+gen_interface!(not, 1);
+gen_interface!(bit_not, 1);

@@ -41,10 +41,7 @@ testlog.log
 *.a
 *.exp
 *.pdb
-token.cpp
-parser.cpp
-parser.hpp
-location.hh
+tmp/
 
 # 单元测试中的临时输出文件
 *.out

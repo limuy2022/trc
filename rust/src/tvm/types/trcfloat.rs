@@ -1,17 +1,28 @@
 use super::TrcObj;
+use crate::base::error::*;
+use crate::base::stdlib::*;
+use crate::compiler::token::TokenType;
+use crate::hash_map;
 use crate::impl_single_oper;
-use crate::tvm::types::TypeError;
-use crate::{base::error::*, batch_impl_opers, impl_oper};
+use crate::{batch_impl_opers, impl_oper};
+use derive::trc_class;
+use derive::trc_method;
 use gettextrs::gettext;
+use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
+#[trc_class]
 pub struct TrcFloat {
-    pub value: f64,
+    _value: f64,
 }
 
 impl TrcFloat {
     pub fn new(value: f64) -> TrcFloat {
-        Self { value }
+        Self { _value: value }
+    }
+
+    fn override_export() -> HashMap<TokenType, IOType> {
+        hash_map![]
     }
 }
 
@@ -25,6 +36,7 @@ fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
     Ok(a / b)
 }
 
+#[trc_method]
 impl TrcObj for TrcFloat {
     fn get_type_name(&self) -> &str {
         "float"
@@ -40,6 +52,6 @@ impl TrcObj for TrcFloat {
 
 impl Display for TrcFloat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "{}", self._value)
     }
 }

@@ -2,7 +2,7 @@ use std::ops::DivAssign;
 
 #[macro_export]
 macro_rules! hash_map {
-    ($($key:expr => $val:expr),*) => {
+    [$($key:expr => $val:expr),*] => {
         {
             use std::collections::hash_map::HashMap;
             let mut ret = HashMap::new();

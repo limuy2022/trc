@@ -1,8 +1,6 @@
 use super::{ValuePool, BOOL_ID_POS, FLOAT_ID_POS, INT_ID_POS, STR_ID_POS};
-use crate::base::error::*;
-use crate::base::stdlib::{FunctionInterface, StdlibNode, STDLIB_LIST};
+use crate::base::stdlib::{ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT};
 use lazy_static::lazy_static;
-use std::borrow::Borrow;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
 lazy_static! {
@@ -15,7 +13,7 @@ lazy_static! {
     ];
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug)]
 pub enum TypeAllowNull {
     Yes(Type),
     No,
@@ -40,19 +38,19 @@ impl Display for TypeAllowNull {
 }
 
 /// Manager of function
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug)]
 pub struct Function {
-    args_type: Vec<Type>,
-    return_type: TypeAllowNull,
+    io: IOType,
     start_address: usize,
+    name: String,
 }
 
 impl Function {
-    pub fn new(return_type: TypeAllowNull, start_address: usize) -> Self {
+    pub fn new(io: IOType, start_address: usize, name: String) -> Self {
         Self {
-            args_type: vec![],
-            return_type,
+            io,
             start_address,
+            name,
         }
     }
 
@@ -60,57 +58,31 @@ impl Function {
 }
 
 impl FunctionInterface for Function {
-    fn check_argvs(&self, argvs: Vec<Type>) -> Result<(), crate::base::error::ErrorInfo> {
-        if argvs.len() != self.args_type.len() {
-            return Err(ErrorInfo::new(
-                gettextrs::gettext!(ARGU_NUMBER, self.args_type.len(), argvs.len()),
-                gettextrs::gettext(ARGUMENT_ERROR),
-            ));
-        }
-        for i in 0..self.args_type.len() {
-            if argvs[i] != self.args_type[i] && self.args_type[i] != Type::Any {
-                return Err(ErrorInfo::new(
-                    gettextrs::gettext!(EXPECT_TYPE, self.args_type[i], argvs[i]),
-                    gettextrs::gettext(ARGUMENT_ERROR),
-                ));
-            }
-        }
-        Ok(())
+    fn get_io(&self) -> &IOType {
+        &self.io
     }
 
-    fn get_return_type(&self) -> &TypeAllowNull {
-        &self.return_type
+    fn get_name(&self) -> &str {
+        &self.name
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug)]
 pub struct Var {
-    ty: Type,
+    pub ty: Box<dyn ClassInterface>,
+    pub name: String,
 }
 
 impl Var {
-    pub fn new(ty: Type) -> Self {
-        Self { ty }
+    pub fn new(ty: Box<dyn ClassInterface>, name: String) -> Self {
+        Self { ty, name }
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Type {
-    Common(CommonType),
-    Any,
-}
-
-impl Display for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Type::Common(t) => write!(f, "{}", t),
-            Type::Any => write!(f, "any"),
-        }
-    }
-}
+pub type Type = Box<dyn ClassInterface>;
 
 /// Manager of type
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug)]
 pub struct CommonType {
     attr: Vec<Var>,
     funcs: Vec<Function>,
@@ -125,12 +97,12 @@ impl Display for CommonType {
 }
 
 impl CommonType {
-    pub fn new(name: usize, origin_name: String) -> Self {
+    pub fn new(name: usize, origin_name: impl Into<String>) -> Self {
         Self {
             attr: vec![],
             funcs: vec![],
             name,
-            origin_name,
+            origin_name: origin_name.into(),
         }
     }
 
@@ -142,22 +114,50 @@ impl CommonType {
         self.funcs.push(f);
     }
 }
+
+impl ClassInterface for CommonType {
+    fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>> {
+        for i in &self.funcs {
+            if i.get_name() == funcname {
+                return Some(Box::new(i.clone()));
+            }
+        }
+        None
+    }
+
+    fn has_attr(&self, attrname: &str) -> Option<Type> {
+        for i in &self.attr {
+            if i.name == attrname {
+                return Some(i.ty.clone());
+            }
+        }
+        None
+    }
+
+    fn get_name(&self) -> &str {
+        &self.origin_name
+    }
+
+    fn get_id(&self) -> usize {
+        self.name
+    }
+}
+
 lazy_static! {
-    pub static ref INT_TYPE: Type = Type::Common(CommonType::new(INT_ID_POS, "int".to_string()));
-    pub static ref FLOAT_TYPE: Type =
-        Type::Common(CommonType::new(FLOAT_ID_POS, "float".to_string()));
-    pub static ref STR_TYPE: Type = Type::Common(CommonType::new(STR_ID_POS, "str".to_string()));
-    pub static ref BOOL_TYPE: Type = Type::Common(CommonType::new(BOOL_ID_POS, "bool".to_string()));
+    pub static ref INT_TYPE: Type = Box::new(CommonType::new(INT_ID_POS, "int"));
+    pub static ref FLOAT_TYPE: Type = Box::new(CommonType::new(FLOAT_ID_POS, "float"));
+    pub static ref STR_TYPE: Type = Box::new(CommonType::new(STR_ID_POS, "str"));
+    pub static ref BOOL_TYPE: Type = Box::new(CommonType::new(BOOL_ID_POS, "bool"));
 }
 
 pub struct SymScope {
     prev_scope: Option<Rc<RefCell<SymScope>>>,
     sym_map: HashMap<usize, usize>,
     scope_sym_id: usize,
-    types: HashMap<usize, CommonType>,
+    types: HashMap<usize, Type>,
     funcs: HashMap<usize, Box<dyn FunctionInterface>>,
     vars: HashMap<usize, Var>,
-    modules: HashMap<usize, &'static StdlibNode>,
+    modules: HashMap<usize, &'static Stdlib>,
 }
 
 impl SymScope {
@@ -175,32 +175,26 @@ impl SymScope {
             Some(prev_scope) => {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
             }
-            None => {
-                ret.add_type(INT_TYPE.clone());
-                ret.add_type(FLOAT_TYPE.clone());
-                ret.add_type(BOOL_TYPE.clone());
-                ret.add_type(STR_TYPE.clone());
-            }
+            None => {}
         }
         ret
     }
 
     /// import the module defined in rust
-    pub fn import_native_module(&mut self, id: usize, stdlib: &'static StdlibNode) {
+    pub fn import_native_module(&mut self, id: usize, stdlib: &'static Stdlib) {
         self.modules.insert(id, stdlib);
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
-        let funcs = &STDLIB_LIST
-            .sons
-            .get("prelude")
-            .unwrap()
-            .lock()
-            .unwrap()
-            .functions;
+        let funcs = &STDLIB_ROOT.sub_modules.get("prelude").unwrap().functions;
         for i in funcs {
-            let idx = self.insert_sym(const_pool.name_pool[&i.name]);
-            self.add_func(idx, Box::new((*i).clone()));
+            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            self.add_func(idx, Box::new((*i.1).clone()));
+        }
+        let types = &STDLIB_ROOT.sub_modules.get("prelude").unwrap().classes;
+        for i in types {
+            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            self.add_type(idx, Box::new((*i.1).clone()));
         }
     }
 
@@ -263,16 +257,11 @@ impl SymScope {
         self.vars.insert(id, v);
     }
 
-    pub fn add_type(&mut self, t: Type) {
-        match t {
-            Type::Common(t) => {
-                self.types.insert(t.name, t);
-            }
-            _ => {}
-        }
+    pub fn add_type(&mut self, id: usize, t: Type) {
+        self.types.insert(id, t);
     }
 
-    pub fn get_type(&self, id: usize) -> CommonType {
+    pub fn get_type(&self, id: usize) -> Type {
         return self.types.get(&id).unwrap().clone();
     }
 

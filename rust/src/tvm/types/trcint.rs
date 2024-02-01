@@ -1,23 +1,28 @@
+use super::trcfloat::TrcFloat;
+use super::TrcObj;
+use crate::base::stdlib::*;
+use crate::compiler::token::TokenType;
+use crate::hash_map;
+use crate::impl_single_oper;
+use crate::{base::error::*, batch_impl_opers, impl_oper};
+use derive::trc_class;
+use derive::trc_method;
+use gettextrs::gettext;
+use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
-use super::trcfloat::TrcFloat;
-use super::{TrcObj, TypeError};
-use crate::impl_single_oper;
-use crate::{
-    base::error::{
-        ErrorInfo, OPERATOR_ERROR, OPERATOR_IS_NOT_SUPPORT, ZERO_DIV, ZERO_DIVSION_ERROR,
-    },
-    batch_impl_opers, impl_oper,
-};
-use gettextrs::gettext;
-
+#[trc_class]
 pub struct TrcInt {
-    pub value: i64,
+    _value: i64,
 }
 
 impl TrcInt {
     pub fn new(value: i64) -> TrcInt {
-        TrcInt { value }
+        TrcInt { _value: value }
+    }
+
+    fn override_export() -> HashMap<TokenType, IOType> {
+        hash_map![]
     }
 }
 
@@ -66,10 +71,11 @@ fn power_int(a: i64, b: i64) -> i64 {
 
 impl Display for TrcInt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "{}", self._value)
     }
 }
 
+#[trc_method]
 impl TrcObj for TrcInt {
     fn get_type_name(&self) -> &str {
         "int"

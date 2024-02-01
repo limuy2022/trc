@@ -2,7 +2,7 @@ mod algo;
 mod def;
 mod function;
 mod gc;
-mod rustlib;
+pub mod stdlib;
 mod types;
 
 use self::types::trcfloat::TrcFloat;

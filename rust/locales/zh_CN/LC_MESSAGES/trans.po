@@ -71,3 +71,12 @@ msgstr "类型错误"
 msgid "Type {} and {} are not the same"
 msgstr "类型{}和{}不同"
 
+msgid "ArgumentError"
+msgstr "参数错误"
+
+msgid "expect {}.But given {}"
+msgstr "期望{}.但是输入{}"
+
+msgid "Expect type {}.But given type {}"
+msgstr "期望类型{}.但是传入类型是{}"
+

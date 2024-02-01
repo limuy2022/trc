@@ -2,6 +2,7 @@ use super::token::TokenType;
 use super::TokenLex;
 use super::{scope::*, InputSource};
 use crate::base::codegen::{Inst, Opcode, NO_ARG};
+use crate::base::stdlib::STDLIB_LIST;
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
 use std::cell::RefCell;
@@ -43,8 +44,8 @@ macro_rules! TmpExpeFunctionGen {
                     }
                     return TryErr!(istry,
                             Box::new(self.token_lexer.compiler_data.content.clone()),
-                            ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, self.get_type_name(ty_now),
-                                    self.get_type_name(ty_after)), gettextrs::gettext(TYPE_ERROR)))
+                            ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, ty_now,
+                                    ty_after), gettextrs::gettext(TYPE_ERROR)))
                 })*
                 _ => {
                     self.token_lexer.next_back(next_sym);
@@ -68,8 +69,8 @@ macro_rules! ExprGen {
             if t1 != t2 {
                 return TryErr!(istry,
                         Box::new(self.token_lexer.compiler_data.content.clone()),
-                        ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, self.get_type_name(t1),
-                                self.get_type_name(t2)), gettextrs::gettext(TYPE_ERROR)))
+                        ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, t1,
+                                t2), gettextrs::gettext(TYPE_ERROR)))
             }
             Ok(t1)
         }
@@ -79,20 +80,23 @@ macro_rules! ExprGen {
 impl<'a> AstBuilder<'a> {
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
-        AstBuilder {
+        // 为root scope添加prelude
+        let mut ret = AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),
             self_scope: root_scope,
+        };
+        for i in &STDLIB_LIST.sons.get("prelude").unwrap().functions {
+            ret.token_lexer
+                .compiler_data
+                .const_pool
+                .add_id(i.name.clone());
         }
-    }
-
-    fn get_type_name(&self, ty: TypeAllowNull) -> String {
-        match ty {
-            TypeAllowNull::Yes(ty) => {
-                self.token_lexer.compiler_data.const_pool.id_name[ty.name].clone()
-            }
-            TypeAllowNull::No => "null".to_string(),
-        }
+        ret.self_scope
+            .as_ref()
+            .borrow_mut()
+            .import_prelude(&ret.token_lexer.compiler_data.const_pool);
+        ret
     }
 
     ExprGen!(expr9, expr9_, factor, TokenType::Power => Opcode::Power);
@@ -165,7 +169,7 @@ impl<'a> AstBuilder<'a> {
                 .inst
                 .push(Inst::new(Opcode::LoadLocal, varidx));
             let tt = self.self_scope.as_ref().borrow().get_type(varidx);
-            return Ok(TypeAllowNull::Yes(tt));
+            return Ok(TypeAllowNull::Yes(Type::Common(tt)));
         } else {
             self.token_lexer.next_back(t.clone());
             return TryErr!(
@@ -281,14 +285,17 @@ impl<'a> AstBuilder<'a> {
                 .replace('.', "/"),
         );
         // the standard library first
-
-        if let InputSource::File(now_module_path) =
-            self.token_lexer.compiler_data.option.inputsource.clone()
-        {
-            let mut now_module_path = std::path::PathBuf::from(now_module_path);
-            now_module_path.pop();
-            now_module_path = now_module_path.join(path);
-            if now_module_path.exists() {}
+        let strpath = path.to_str().unwrap();
+        if strpath.get(0..3) == Some("std") {
+        } else {
+            if let InputSource::File(now_module_path) =
+                self.token_lexer.compiler_data.option.inputsource.clone()
+            {
+                let mut now_module_path = std::path::PathBuf::from(now_module_path);
+                now_module_path.pop();
+                now_module_path = now_module_path.join(path);
+                if now_module_path.exists() {}
+            }
         }
         Ok(())
     }
@@ -371,12 +378,6 @@ impl<'a> AstBuilder<'a> {
         self.token_lexer.next_back(t.clone());
         if let Ok(_) = self.expr(true) {
             return Ok(());
-        }
-        if let Ok(_) = self.val(false) {
-            let t = self.token_lexer.next_token()?;
-            if t.tp == TokenType::LeftSmallBrace {
-                // func call
-            }
         }
         return Err(RuntimeError::new(
             Box::new(self.token_lexer.compiler_data.content.clone()),

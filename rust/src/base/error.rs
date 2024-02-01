@@ -9,6 +9,7 @@ pub const ZERO_DIVSION_ERROR: &str = "ZeroDivisionError";
 pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
 pub const SYMBOL_ERROR: &str = "SymbolError";
 pub const TYPE_ERROR: &str = "TypeError";
+pub const ARGUMENT_ERROR: &str = "ArgumentError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
@@ -25,6 +26,8 @@ pub const IN_MODULE: &str = "In module {}";
 pub const SYMBOL_NOT_FOUND: &str = "Symbol {} not found";
 pub const SYMBOL_REDEFINED: &str = "Symbol {} redefined";
 pub const TYPE_NOT_THE_SAME: &str = "Type {} and {} are not the same";
+pub const ARGU_NUMBER: &str = "expect {}.But given {}";
+pub const EXPECT_TYPE: &str = "Expect type {}.But given type {}";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

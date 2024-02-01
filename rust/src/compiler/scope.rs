@@ -1,7 +1,8 @@
+use super::{ValuePool, BOOL_ID_POS, FLOAT_ID_POS, INT_ID_POS, STR_ID_POS};
+use crate::base::error::*;
+use crate::base::stdlib::{FunctionInterface, StdlibNode, STDLIB_LIST};
 use lazy_static::lazy_static;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
-
-use super::{BOOL_ID_POS, FLOAT_ID_POS, INT_ID_POS, STR_ID_POS};
 
 lazy_static! {
     static ref VAR_TYPE: Vec<String> = vec![
@@ -13,55 +14,113 @@ lazy_static! {
     ];
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeAllowNull {
     Yes(Type),
     No,
 }
 
+impl Display for TypeAllowNull {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TypeAllowNull::Yes(t) => write!(f, "{}", t),
+            TypeAllowNull::No => write!(f, "null"),
+        }
+    }
+}
+
 /// Manager of function
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Function {
-    args_type: Vec<usize>,
+    args_type: Vec<Type>,
     return_type: TypeAllowNull,
+    start_address: usize,
 }
 
 impl Function {
-    pub fn new(return_type: TypeAllowNull) -> Self {
+    pub fn new(return_type: TypeAllowNull, start_address: usize) -> Self {
         Self {
             args_type: vec![],
             return_type,
+            start_address,
         }
     }
 
     pub fn add_argv() {}
 }
 
-#[derive(Clone, Debug, PartialEq)]
+impl FunctionInterface for Function {
+    fn check_argvs(&self, argvs: Vec<Type>) -> Result<(), crate::base::error::ErrorInfo> {
+        if argvs.len() != self.args_type.len() {
+            return Err(ErrorInfo::new(
+                gettextrs::gettext!(ARGU_NUMBER, self.args_type.len(), argvs.len()),
+                gettextrs::gettext(ARGUMENT_ERROR),
+            ));
+        }
+        for i in 0..self.args_type.len() {
+            if argvs[i] != self.args_type[i] && self.args_type[i] != Type::Any {
+                return Err(ErrorInfo::new(
+                    gettextrs::gettext!(EXPECT_TYPE, self.args_type[i], argvs[i]),
+                    gettextrs::gettext(ARGUMENT_ERROR),
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    fn get_return_type(&self) -> &TypeAllowNull {
+        &self.return_type
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Var {
-    ty: Function,
+    ty: Type,
 }
 
 impl Var {
-    pub fn new(ty: Function) -> Self {
+    pub fn new(ty: Type) -> Self {
         Self { ty }
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum Type {
+    Common(CommonType),
+    Any,
+}
+
+impl Display for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Type::Common(t) => write!(f, "{}", t),
+            Type::Any => write!(f, "any"),
+        }
+    }
+}
+
 /// Manager of type
-#[derive(Clone, Debug, PartialEq)]
-pub struct Type {
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct CommonType {
     attr: Vec<Var>,
     funcs: Vec<Function>,
     pub name: usize,
+    pub origin_name: String,
 }
 
-impl Type {
-    pub fn new(name: usize) -> Self {
+impl Display for CommonType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.origin_name)
+    }
+}
+
+impl CommonType {
+    pub fn new(name: usize, origin_name: String) -> Self {
         Self {
             attr: vec![],
             funcs: vec![],
             name,
+            origin_name,
         }
     }
 
@@ -74,20 +133,21 @@ impl Type {
     }
 }
 lazy_static! {
-    pub static ref INT_TYPE: Type = Type::new(INT_ID_POS);
-    pub static ref FLOAT_TYPE: Type = Type::new(INT_ID_POS);
-    pub static ref STR_TYPE: Type = Type::new(INT_ID_POS);
-    pub static ref BOOL_TYPE: Type = Type::new(INT_ID_POS);
+    pub static ref INT_TYPE: Type = Type::Common(CommonType::new(INT_ID_POS, "int".to_string()));
+    pub static ref FLOAT_TYPE: Type =
+        Type::Common(CommonType::new(FLOAT_ID_POS, "float".to_string()));
+    pub static ref STR_TYPE: Type = Type::Common(CommonType::new(STR_ID_POS, "str".to_string()));
+    pub static ref BOOL_TYPE: Type = Type::Common(CommonType::new(BOOL_ID_POS, "bool".to_string()));
 }
 
 pub struct SymScope {
     prev_scope: Option<Rc<RefCell<SymScope>>>,
     sym_map: HashMap<usize, usize>,
     scope_sym_id: usize,
-    types: HashMap<usize, Type>,
-    funcs: HashMap<usize, Function>,
+    types: HashMap<usize, CommonType>,
+    funcs: HashMap<usize, Box<dyn FunctionInterface>>,
     vars: HashMap<usize, Var>,
-    native_funcs: HashMap<usize, usize>,
+    modules: HashMap<usize, &'static StdlibNode>,
 }
 
 impl SymScope {
@@ -99,7 +159,7 @@ impl SymScope {
             types: HashMap::new(),
             funcs: HashMap::new(),
             vars: HashMap::new(),
-            native_funcs: HashMap::new(),
+            modules: HashMap::new(),
         };
         match prev_scope {
             Some(prev_scope) => {
@@ -115,6 +175,17 @@ impl SymScope {
         ret
     }
 
+    /// import the module defined in rust
+    pub fn import_native_module(&mut self, id: usize, stdlib: &'static StdlibNode) {
+        self.modules.insert(id, stdlib);
+    }
+
+    pub fn import_prelude(&mut self, const_pool: &ValuePool) {
+        for i in &STDLIB_LIST.sons.get("prelude").unwrap().functions {
+            self.add_func(const_pool.name_pool[&i.name], Box::new((*i).clone()));
+        }
+    }
+
     pub fn has_sym(&self, id: usize) -> bool {
         if self.sym_map.contains_key(&id) {
             return true;
@@ -123,6 +194,12 @@ impl SymScope {
             Some(ref prev_scope) => prev_scope.as_ref().borrow().has_sym(id),
             None => false,
         };
+    }
+
+    pub fn new_id(&mut self) -> usize {
+        let ret = self.scope_sym_id;
+        self.scope_sym_id += 1;
+        return ret;
     }
 
     pub fn insert_sym(&mut self, id: usize) -> usize {
@@ -148,7 +225,7 @@ impl SymScope {
         }
     }
 
-    pub fn add_func(&mut self, id: usize, f: Function) {
+    pub fn add_func(&mut self, id: usize, f: Box<dyn FunctionInterface>) {
         self.funcs.insert(id, f);
     }
 
@@ -157,10 +234,15 @@ impl SymScope {
     }
 
     pub fn add_type(&mut self, t: Type) {
-        self.types.insert(t.name, t);
+        match t {
+            Type::Common(t) => {
+                self.types.insert(t.name, t);
+            }
+            _ => {}
+        }
     }
 
-    pub fn get_type(&self, id: usize) -> Type {
+    pub fn get_type(&self, id: usize) -> CommonType {
         return self.types.get(&id).unwrap().clone();
     }
 

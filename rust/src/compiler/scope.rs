@@ -1,4 +1,4 @@
-use super::{ValuePool, BOOL_ID_POS, FLOAT_ID_POS, INT_ID_POS, STR_ID_POS};
+use super::ValuePool;
 use crate::base::stdlib::{ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT};
 use lazy_static::lazy_static;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
@@ -141,13 +141,6 @@ impl ClassInterface for CommonType {
     fn get_id(&self) -> usize {
         self.name
     }
-}
-
-lazy_static! {
-    pub static ref INT_TYPE: Type = Box::new(CommonType::new(INT_ID_POS, "int"));
-    pub static ref FLOAT_TYPE: Type = Box::new(CommonType::new(FLOAT_ID_POS, "float"));
-    pub static ref STR_TYPE: Type = Box::new(CommonType::new(STR_ID_POS, "str"));
-    pub static ref BOOL_TYPE: Type = Box::new(CommonType::new(BOOL_ID_POS, "bool"));
 }
 
 pub struct SymScope {

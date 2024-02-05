@@ -5,6 +5,7 @@ use crate::base::codegen::{Inst, Opcode, NO_ARG};
 use crate::base::stdlib::{RustFunction, STDLIB_ROOT};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
+use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -85,6 +86,13 @@ macro_rules! ExprGen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
+        let prelude = STDLIB_ROOT.sub_modules.get("prelude").unwrap().clone();
+        for i in prelude.functions {
+            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+        }
+        for i in prelude.classes {
+            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+        }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
         let mut ret = AstBuilder {
@@ -92,9 +100,6 @@ impl<'a> AstBuilder<'a> {
             staticdata: StaticData::new(),
             self_scope: root_scope,
         };
-        for i in &STDLIB_ROOT.sub_modules.get("prelude").unwrap().functions {
-            ret.token_lexer.compiler_data.const_pool.add_id(i.0.clone());
-        }
         ret.self_scope
             .as_ref()
             .borrow_mut()
@@ -197,7 +202,7 @@ impl<'a> AstBuilder<'a> {
                 let argv_list = self.opt_args()?;
                 // match )
                 self.check_next_token(TokenType::RightSmallBrace)?;
-                let tmp = self.self_scope.borrow();
+                let tmp = self.self_scope.as_ref().borrow();
                 let func_obj = tmp.get_function(idx).unwrap();
                 match func_obj.get_io().check_argvs(argv_list) {
                     Err(e) => {
@@ -247,19 +252,61 @@ impl<'a> AstBuilder<'a> {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadInt, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(INT_TYPE.clone()));
+                return Ok(TypeAllowNull::Yes(
+                    self.self_scope
+                        .as_ref()
+                        .borrow()
+                        .get_type(
+                            *self
+                                .token_lexer
+                                .compiler_data
+                                .const_pool
+                                .name_pool
+                                .get("int")
+                                .unwrap(),
+                        )
+                        .clone(),
+                ));
             }
             TokenType::FloatValue => {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadFloat, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(FLOAT_TYPE.clone()));
+                return Ok(TypeAllowNull::Yes(
+                    self.self_scope
+                        .as_ref()
+                        .borrow()
+                        .get_type(
+                            *self
+                                .token_lexer
+                                .compiler_data
+                                .const_pool
+                                .name_pool
+                                .get("float")
+                                .unwrap(),
+                        )
+                        .clone(),
+                ));
             }
             TokenType::StringValue => {
                 self.staticdata
                     .inst
                     .push(Inst::new(Opcode::LoadString, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(STR_TYPE.clone()));
+                return Ok(TypeAllowNull::Yes(
+                    self.self_scope
+                        .as_ref()
+                        .borrow()
+                        .get_type(
+                            *self
+                                .token_lexer
+                                .compiler_data
+                                .const_pool
+                                .name_pool
+                                .get("str")
+                                .unwrap(),
+                        )
+                        .clone(),
+                ));
             }
             _ => {
                 self.token_lexer.next_back(t.clone());

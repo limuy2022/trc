@@ -2,40 +2,31 @@ use super::TrcObj;
 use crate::base::stdlib::*;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
-use crate::{base::error::*, batch_impl_opers, impl_oper};
 use derive::{trc_class, trc_method};
-use gettextrs::gettext;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
 #[derive(Debug)]
-pub struct TrcStr {
-    _value: String,
-}
-
-fn cat_string(a: String, b: String) -> String {
-    format!("{}{}", a, b)
+pub struct TrcChar {
+    pub _value: char,
 }
 
 #[trc_method]
-impl TrcObj for TrcStr {
+impl TrcObj for TrcChar {
     fn get_type_name(&self) -> &str {
-        "str"
+        "char"
     }
-
-    batch_impl_opers! {}
-    impl_oper!(add, cat_string, "+", TrcStr, TrcStr,,);
 }
 
-impl Display for TrcStr {
+impl Display for TrcChar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self._value)
     }
 }
 
-impl TrcStr {
-    pub fn new(value: String) -> Self {
+impl TrcChar {
+    pub fn new(value: char) -> TrcChar {
         Self { _value: value }
     }
 

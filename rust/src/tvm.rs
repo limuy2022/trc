@@ -58,12 +58,8 @@ impl Content {
         }
     }
 
-    fn add_line(&mut self) {
-        self.line_pos += 1;
-    }
-
-    fn del_line(&mut self) {
-        self.line_pos -= 1;
+    fn set_line(&mut self, newline: usize) {
+        self.line_pos = newline;
     }
 }
 
@@ -86,7 +82,7 @@ impl<'a> Vm<'a> {
             pc: 0,
             dynadata: DynaData::new(),
             run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
-            static_data: StaticData::new(),
+            static_data: StaticData::new(false),
         }
     }
 
@@ -105,6 +101,10 @@ impl<'a> Vm<'a> {
 
     pub fn run(&mut self) -> Result<(), RuntimeError> {
         while self.pc < self.static_data.inst.len() {
+            if self.static_data.has_line_table {
+                self.run_contnet
+                    .set_line(self.static_data.line_table[self.pc]);
+            }
             match self.static_data.inst[self.pc].opcode {
                 codegen::Opcode::Add => operator_opcode!(add, self),
                 codegen::Opcode::Sub => operator_opcode!(sub, self),

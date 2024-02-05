@@ -43,10 +43,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     match cli.mode {
         Commands::Build {
             optimize: opt,
-            files: files,
+            files,
         } => {
             for i in files {
-                tools::compile(compiler::Option::new(false, compiler::InputSource::File(i)));
+                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)));
             }
         }
         Commands::Tshell {} => {
@@ -60,11 +60,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         },
         Commands::Run {
             optimize: opt,
-            files: files,
+            files,
         } => {
             for i in files {
-                match tools::run::run(compiler::Option::new(false, compiler::InputSource::File(i)))
-                {
+                match tools::run::run(compiler::Option::new(opt, compiler::InputSource::File(i))) {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);

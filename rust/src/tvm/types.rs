@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::base::error::*;
 use crate::tvm::DynaData;
 use downcast_rs::{impl_downcast, Downcast};
@@ -6,9 +8,16 @@ use gettextrs::gettext;
 pub mod data_structure;
 pub mod trcbigint;
 pub mod trcbool;
+pub mod trcchar;
 pub mod trcfloat;
 pub mod trcint;
 pub mod trcstr;
+
+pub use trcbool::TrcBool;
+pub use trcchar::TrcChar;
+pub use trcfloat::TrcFloat;
+pub use trcint::TrcInt;
+pub use trcstr::TrcStr;
 
 /// help to generate the same error reporter functions
 macro_rules! batch_unsupported_operators {
@@ -105,7 +114,7 @@ macro_rules! gen_interface {
     };
 }
 
-pub trait TrcObj: Downcast + std::fmt::Display {
+pub trait TrcObj: Downcast + std::fmt::Display + Debug {
     batch_unsupported_operators!(
         sub => "-",
         mul => "*",

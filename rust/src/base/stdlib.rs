@@ -165,6 +165,10 @@ impl RustClass {
     pub fn add_attr(&mut self, name: impl Into<String>, attr: Var) {
         self.members.insert(name.into(), attr);
     }
+
+    pub fn export_info() -> Self {
+        ANY_TYPE.clone()
+    }
 }
 
 impl ClassInterface for RustClass {
@@ -177,20 +181,20 @@ impl ClassInterface for RustClass {
         None
     }
 
-    fn get_name(&self) -> &str {
-        &self.name
-    }
-
-    fn get_id(&self) -> usize {
-        self.id
-    }
-
     fn has_attr(&self, attrname: &str) -> Option<Type> {
         let ret = &self.members.get(attrname);
         match ret {
             Some(i) => Some(i.ty.clone()),
             None => None,
         }
+    }
+
+    fn get_name(&self) -> &str {
+        &self.name
+    }
+
+    fn get_id(&self) -> usize {
+        self.id
     }
 }
 

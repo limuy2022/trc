@@ -5,7 +5,6 @@ use crate::base::codegen::{Inst, Opcode, NO_ARG};
 use crate::base::stdlib::{RustFunction, STDLIB_ROOT};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
-use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -17,7 +16,7 @@ pub struct AstBuilder<'a> {
 
 type AstError<T> = RunResult<T>;
 
-macro_rules! TryErr {
+macro_rules! try_err {
     ($istry: expr, $($argvs:expr),*) => {
         {if $istry {
             Err(LightFakeError::new().into())
@@ -28,14 +27,14 @@ macro_rules! TryErr {
     };
 }
 
-macro_rules! TmpExpeFunctionGen {
+macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
         fn $tmpfuncname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
             let next_sym = self.token_lexer.next_token()?;
             match next_sym.tp {
                 $($accepted_token => {
                     let ty_now = self.$next_item_func(istry)?;
-                    self.staticdata.inst.push(Inst::new($add_opcode, NO_ARG));
+                    self.add_bycode($add_opcode, NO_ARG);
                     let ty_after = self.$tmpfuncname(istry)?;
                     if let TypeAllowNull::No = ty_after {
                         return Ok(ty_now);
@@ -46,7 +45,7 @@ macro_rules! TmpExpeFunctionGen {
                     if(ty_now.unwrap().get_id() == ty_after.unwrap().get_id()) {
                         return Ok(ty_now);
                     }
-                    return TryErr!(istry,
+                    return try_err!(istry,
                             Box::new(self.token_lexer.compiler_data.content.clone()),
                             ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, ty_now,
                                     ty_after), gettextrs::gettext(TYPE_ERROR)))
@@ -61,9 +60,9 @@ macro_rules! TmpExpeFunctionGen {
 }
 
 /// there are a log of similar operators to be generated
-macro_rules! ExprGen {
+macro_rules! expr_gen {
     ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
-        TmpExpeFunctionGen!($tmpfuncname, $next_item_func, $($accepted_token => $add_opcode),*);
+        tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token => $add_opcode),*);
         fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
             let t1 = self.$next_item_func(istry)?;
             let t2 = self.$tmpfuncname(istry)?;
@@ -74,7 +73,7 @@ macro_rules! ExprGen {
                 return Ok(t1);
             }
             if t1.unwrap().get_id() != t2.unwrap().get_id() {
-                return TryErr!(istry,
+                return try_err!(istry,
                         Box::new(self.token_lexer.compiler_data.content.clone()),
                         ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, t1,
                                 t2), gettextrs::gettext(TYPE_ERROR)))
@@ -95,9 +94,10 @@ impl<'a> AstBuilder<'a> {
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
-        let mut ret = AstBuilder {
+        let optimize = token_lexer.compiler_data.option.optimize;
+        let ret = AstBuilder {
             token_lexer,
-            staticdata: StaticData::new(),
+            staticdata: StaticData::new(!optimize),
             self_scope: root_scope,
         };
         ret.self_scope
@@ -107,27 +107,27 @@ impl<'a> AstBuilder<'a> {
         ret
     }
 
-    ExprGen!(expr9, expr9_, factor, TokenType::Power => Opcode::Power);
-    ExprGen!(expr8, expr8_, expr9, TokenType::Mul => Opcode::Mul,
+    expr_gen!(expr9, expr9_, factor, TokenType::Power => Opcode::Power);
+    expr_gen!(expr8, expr8_, expr9, TokenType::Mul => Opcode::Mul,
     TokenType::Div => Opcode::Div,
     TokenType::Mod => Opcode::Mod,
     TokenType::ExactDiv => Opcode::ExtraDiv);
-    ExprGen!(expr7, expr7_, expr8, TokenType::Add => Opcode::Add,
+    expr_gen!(expr7, expr7_, expr8, TokenType::Add => Opcode::Add,
         TokenType::Sub => Opcode::Sub);
-    ExprGen!(expr6, expr6_, expr7, TokenType::BitLeftShift => Opcode::BitLeftShift,
+    expr_gen!(expr6, expr6_, expr7, TokenType::BitLeftShift => Opcode::BitLeftShift,
         TokenType::BitRightShift => Opcode::BitRightShift);
-    ExprGen!(expr5, expr5_, expr6, TokenType::BitAnd => Opcode::BitAnd);
-    ExprGen!(expr4, expr4_, expr5, TokenType::Xor => Opcode::Xor);
-    ExprGen!(expr3, expr3_, expr4, TokenType::BitOr => Opcode::BitOr);
-    ExprGen!(expr2, expr2_, expr3, TokenType::Equal => Opcode::Eq,
+    expr_gen!(expr5, expr5_, expr6, TokenType::BitAnd => Opcode::BitAnd);
+    expr_gen!(expr4, expr4_, expr5, TokenType::Xor => Opcode::Xor);
+    expr_gen!(expr3, expr3_, expr4, TokenType::BitOr => Opcode::BitOr);
+    expr_gen!(expr2, expr2_, expr3, TokenType::Equal => Opcode::Eq,
         TokenType::NotEqual => Opcode::Ne,
         TokenType::Less => Opcode::Lt,
         TokenType::LessEqual => Opcode::Le,
         TokenType::Greater => Opcode::Gt,
         TokenType::GreaterEqual => Opcode::Ge
     );
-    ExprGen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
-    ExprGen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
+    expr_gen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
+    expr_gen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
 
     pub fn return_static_data(mut self) -> StaticData {
         self.staticdata.constpool = self.token_lexer.compiler_data.const_pool.store_val_to_vm();
@@ -180,11 +180,11 @@ impl<'a> AstBuilder<'a> {
 
     fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let t = self.token_lexer.next_token()?;
-        if t.tp == TokenType::ID {
+        return if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
             let idx = self.self_scope.as_ref().borrow().get_sym_idx(token_data);
             if let None = idx {
-                return TryErr!(
+                return try_err!(
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
@@ -206,7 +206,7 @@ impl<'a> AstBuilder<'a> {
                 let func_obj = tmp.get_function(idx).unwrap();
                 match func_obj.get_io().check_argvs(argv_list) {
                     Err(e) => {
-                        return TryErr!(
+                        return try_err!(
                             istry,
                             Box::new(self.token_lexer.compiler_data.content.clone()),
                             e
@@ -214,32 +214,29 @@ impl<'a> AstBuilder<'a> {
                     }
                     Ok(_) => {}
                 }
+                drop(tmp);
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
-                    self.staticdata
-                        .inst
-                        .push(Inst::new(Opcode::CallNative, obj.buildin_id));
+                    self.add_bycode(Opcode::CallNative, obj.buildin_id);
                 }
-                return Ok((func_obj.get_io().return_type).clone());
+                Ok(func_obj.get_io().return_type.clone())
             } else {
                 self.token_lexer.next_back(nxt);
                 let varidx = self.self_scope.as_ref().borrow_mut().insert_sym(idx);
-                self.staticdata
-                    .inst
-                    .push(Inst::new(Opcode::LoadLocal, varidx));
+                self.add_bycode(Opcode::LoadLocal, varidx);
                 let tt = self.self_scope.as_ref().borrow().get_type(varidx);
-                return Ok(TypeAllowNull::Yes(tt));
+                Ok(TypeAllowNull::Yes(tt))
             }
         } else {
             self.token_lexer.next_back(t.clone());
-            return TryErr!(
+            try_err!(
                 istry,
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
                     gettext!(UNEXPECTED_TOKEN, t.tp),
                     gettextrs::gettext(SYNTAX_ERROR),
                 )
-            );
-        }
+            )
+        };
     }
 
     fn item(&mut self, istry: bool) -> AstError<TypeAllowNull> {
@@ -247,12 +244,10 @@ impl<'a> AstBuilder<'a> {
             return Ok(v);
         }
         let t = self.token_lexer.next_token()?;
-        match t.tp {
+        return match t.tp {
             TokenType::IntValue => {
-                self.staticdata
-                    .inst
-                    .push(Inst::new(Opcode::LoadInt, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(
+                self.add_bycode(Opcode::LoadInt, t.data.unwrap());
+                Ok(TypeAllowNull::Yes(
                     self.self_scope
                         .as_ref()
                         .borrow()
@@ -266,13 +261,11 @@ impl<'a> AstBuilder<'a> {
                                 .unwrap(),
                         )
                         .clone(),
-                ));
+                ))
             }
             TokenType::FloatValue => {
-                self.staticdata
-                    .inst
-                    .push(Inst::new(Opcode::LoadFloat, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(
+                self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
+                Ok(TypeAllowNull::Yes(
                     self.self_scope
                         .as_ref()
                         .borrow()
@@ -286,13 +279,11 @@ impl<'a> AstBuilder<'a> {
                                 .unwrap(),
                         )
                         .clone(),
-                ));
+                ))
             }
             TokenType::StringValue => {
-                self.staticdata
-                    .inst
-                    .push(Inst::new(Opcode::LoadString, t.data.unwrap()));
-                return Ok(TypeAllowNull::Yes(
+                self.add_bycode(Opcode::LoadString, t.data.unwrap());
+                Ok(TypeAllowNull::Yes(
                     self.self_scope
                         .as_ref()
                         .borrow()
@@ -306,55 +297,51 @@ impl<'a> AstBuilder<'a> {
                                 .unwrap(),
                         )
                         .clone(),
-                ));
+                ))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
-                return TryErr!(
+                try_err!(
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
                         gettext!(UNEXPECTED_TOKEN, t.tp),
                         gettextrs::gettext(SYNTAX_ERROR),
                     )
-                );
+                )
             }
-        }
+        };
     }
 
     fn factor(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let next_token = self.token_lexer.next_token()?;
-        match next_token.tp {
+        return match next_token.tp {
             TokenType::Sub => {
                 let ret = self.factor(istry)?;
-                self.staticdata
-                    .inst
-                    .push(Inst::new(Opcode::SelfNegative, NO_ARG));
-                return Ok(ret);
+                self.add_bycode(Opcode::SelfNegative, NO_ARG);
+                Ok(ret)
             }
             TokenType::BitNot => {
                 let ret = self.factor(istry)?;
-                self.staticdata.inst.push(Inst::new(Opcode::BitNot, NO_ARG));
-                return Ok(ret);
+                self.add_bycode(Opcode::BitNot, NO_ARG);
+                Ok(ret)
             }
             TokenType::Not => {
                 let ret = self.factor(istry)?;
-                self.staticdata.inst.push(Inst::new(Opcode::Not, NO_ARG));
-                return Ok(ret);
+                self.add_bycode(Opcode::Not, NO_ARG);
+                Ok(ret)
             }
-            TokenType::Add => {
-                return Ok(self.factor(istry)?);
-            }
+            TokenType::Add => Ok(self.factor(istry)?),
             TokenType::LeftSmallBrace => {
                 let ret = self.expr(istry)?;
                 self.check_next_token(TokenType::RightSmallBrace)?;
-                return Ok(ret);
+                Ok(ret)
             }
             _ => {
                 self.token_lexer.next_back(next_token);
-                return Ok(self.item(istry)?);
+                Ok(self.item(istry)?)
             }
-        }
+        };
     }
 
     fn def_func(&mut self, istry: bool) -> AstError<()> {
@@ -370,9 +357,9 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn import_module(&mut self, istry: bool) -> AstError<()> {
-        let mut path = self.token_lexer.next_token()?;
+        let path = self.token_lexer.next_token()?;
         if path.tp != TokenType::StringValue {
-            return TryErr!(
+            return try_err!(
                 istry,
                 Box::new(self.token_lexer.compiler_data.content.clone()),
                 ErrorInfo::new(
@@ -405,23 +392,23 @@ impl<'a> AstBuilder<'a> {
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
-            super::token::TokenType::Func => {
+            TokenType::Func => {
                 self.def_func(false)?;
             }
-            super::token::TokenType::Class => {
+            TokenType::Class => {
                 self.def_class(false)?;
             }
-            super::token::TokenType::While => {
+            TokenType::While => {
                 self.while_lex(false)?;
             }
-            super::token::TokenType::For => {
+            TokenType::For => {
                 self.for_lex(false)?;
             }
-            super::token::TokenType::ID => {
+            TokenType::ID => {
                 let name = t.data.unwrap();
                 let tt = self.token_lexer.next_token()?;
                 match tt.tp {
-                    super::token::TokenType::Assign => {
+                    TokenType::Assign => {
                         let var = self.self_scope.as_ref().borrow().get_sym_idx(name);
                         if let None = var {
                             return Err(RuntimeError::new(
@@ -437,11 +424,9 @@ impl<'a> AstBuilder<'a> {
                         }
                         self.expr(false)?;
                         let var = var.unwrap();
-                        self.staticdata
-                            .inst
-                            .push(Inst::new(Opcode::StoreLocal, var))
+                        self.add_bycode(Opcode::StoreLocal, var)
                     }
-                    super::token::TokenType::Store => {
+                    TokenType::Store => {
                         if self.self_scope.as_ref().borrow().has_sym(name) {
                             return Err(RuntimeError::new(
                                 Box::new(self.token_lexer.compiler_data.content.clone()),
@@ -459,9 +444,7 @@ impl<'a> AstBuilder<'a> {
                         self.staticdata.update_sym_table_sz(
                             self.self_scope.as_ref().borrow().get_scope_last_idx(),
                         );
-                        self.staticdata
-                            .inst
-                            .push(Inst::new(Opcode::StoreLocal, var_idx))
+                        self.add_bycode(Opcode::StoreLocal, var_idx)
                     }
                     _ => {
                         self.token_lexer.next_back(tt);
@@ -486,16 +469,26 @@ impl<'a> AstBuilder<'a> {
     pub fn generate_code(&mut self) -> RunResult<()> {
         loop {
             let token = self.token_lexer.next_token()?;
-            if token.tp == super::token::TokenType::EndOfLine {
+            if token.tp == TokenType::EndOfLine {
                 continue;
             }
-            if token.tp == super::token::TokenType::EndOfFile {
+            if token.tp == TokenType::EndOfFile {
                 break;
             }
             self.token_lexer.next_back(token);
             self.statement()?;
         }
         return Ok(());
+    }
+
+    fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
+        self.staticdata.inst.push(Inst::new(opty, opnum));
+        if !self.token_lexer.compiler_data.option.optimize {
+            // 不生成行号表了
+            self.staticdata
+                .line_table
+                .push(self.token_lexer.compiler_data.content.get_line())
+        }
     }
 }
 
@@ -638,7 +631,17 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadString, 0),
-                Inst::new(Opcode::CallNative, 0),
+                Inst::new(
+                    Opcode::CallNative,
+                    STDLIB_ROOT
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
             ]
         )
     }

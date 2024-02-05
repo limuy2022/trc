@@ -1,3 +1,4 @@
+use super::super::types::*;
 use crate::base::stdlib::*;
 use crate::{base::error::*, tvm::DynaData};
 use derive::{def_module, trc_function};
@@ -13,5 +14,9 @@ pub fn println(obj: any) -> void {
 }
 
 def_module!(module_name = prelude, functions = [print => print, println => print], classes = [
-    Trcint => int
+    TrcInt => int,
+    TrcStr => str,
+    TrcBool => bool,
+    TrcFloat => float,
+    TrcChar => char
 ]);

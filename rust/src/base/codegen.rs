@@ -93,15 +93,19 @@ pub struct StaticData {
     pub inst: Vec<Inst>,
     pub funcs: Vec<func::Func>,
     pub sym_table_sz: usize,
+    pub line_table: Vec<usize>,
+    pub has_line_table: bool,
 }
 
 impl StaticData {
-    pub fn new() -> StaticData {
+    pub fn new(has_line_table: bool) -> StaticData {
         Self {
             constpool: ConstPool::new(),
             inst: vec![],
             funcs: vec![],
             sym_table_sz: 0,
+            line_table: vec![],
+            has_line_table,
         }
     }
 

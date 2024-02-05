@@ -2,6 +2,12 @@ use std::ops::DivAssign;
 
 #[macro_export]
 macro_rules! hash_map {
+    [] => {
+        {
+            use std::collections::hash_map::HashMap;
+            HashMap::new()
+        }
+    };
     [$($key:expr => $val:expr),*] => {
         {
             use std::collections::hash_map::HashMap;

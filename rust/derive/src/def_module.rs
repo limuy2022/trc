@@ -11,14 +11,14 @@ pub fn lex_arrow(
     errormsg: &str,
 ) {
     match iter.next().unwrap() {
-        proc_macro::TokenTree::Group(x, ..) => {
+        TokenTree::Group(x, ..) => {
             let mut left_name = TokenStream::new();
             let mut right_name = TokenStream::new();
             let mut control_which_put = false;
             let mut iter = x.stream().into_iter();
             while let Some(i) = iter.next() {
                 // println!("{}", i);
-                if let proc_macro::TokenTree::Punct(x) = i {
+                if let TokenTree::Punct(x) = i {
                     let x = x.to_string();
                     if x == "=" {
                         check_next_iter(&mut iter, ">");
@@ -31,19 +31,17 @@ pub fn lex_arrow(
                         left_name = TokenStream::new();
                         right_name = TokenStream::new();
                         control_which_put = false;
-                    } else if x == "]" {
-                        left_push.push(syn::parse(left_name).expect("left push break"));
-                        right_push.push(syn::parse(right_name).expect("right push break"));
-                        break;
-                    }
-                } else {
-                    if !control_which_put {
-                        left_name.extend(std::iter::once(i));
                     } else {
-                        right_name.extend(std::iter::once(i));
+                        panic!("{}", errormsg);
                     }
+                } else if !control_which_put {
+                    left_name.extend(std::iter::once(i));
+                } else {
+                    right_name.extend(std::iter::once(i));
                 }
             }
+            left_push.push(syn::parse(left_name).expect("left push break"));
+            right_push.push(syn::parse(right_name).expect("right push break"));
         }
         _ => {
             panic!("{}", errormsg);
@@ -53,7 +51,7 @@ pub fn lex_arrow(
 
 fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
     if let Some(i) = iter.next() {
-        if let proc_macro::TokenTree::Punct(x) = i {
+        if let TokenTree::Punct(x) = i {
             if x.to_string() != check_str {
                 panic!("expected {}", check_str);
             }
@@ -75,12 +73,12 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
     let mut submodules = vec![];
     while let Some(i) = iter.next() {
         match i {
-            proc_macro::TokenTree::Ident(x) => {
+            TokenTree::Ident(x) => {
                 let x = x.to_string();
                 if x == "module_name" {
                     check_next_iter(&mut iter, "=");
                     if let TokenTree::Ident(tmp) = iter.next().expect("name is expected") {
-                        if let Some(_) = module_ident {
+                        if module_ident.is_some() {
                             panic!("double defined");
                         }
                         module_ident =
@@ -106,14 +104,14 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
                     );
                 } else if x == "submodules" {
                     check_next_iter(&mut iter, "=");
-                    if let proc_macro::TokenTree::Group(x, ..) = iter.next().unwrap() {
+                    if let TokenTree::Group(x, ..) = iter.next().unwrap() {
                         // println!("{}", x);
                         let mut iter = x.stream().into_iter();
-                        while let Some(i) = iter.next() {
-                            if let proc_macro::TokenTree::Ident(x) = i {
+                        for i in iter {
+                            if let TokenTree::Ident(x) = i {
                                 submodules
                                     .push(syn::parse_str::<syn::Ident>(&(x.to_string())).unwrap());
-                            } else if let proc_macro::TokenTree::Ident(x) = i {
+                            } else if let TokenTree::Ident(x) = i {
                                 let x = x.to_string();
                                 if x != "," {
                                     panic!("expected ,.get {}", x);
@@ -127,7 +125,7 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
                     }
                 }
             }
-            proc_macro::TokenTree::Punct(x) => {
+            TokenTree::Punct(x) => {
                 if x.to_string() != "," {
                     panic!("expected ,");
                 }
@@ -147,15 +145,19 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
             use std::collections::hash_map::HashMap;
             let mut functions = HashMap::new();
             let mut classes = HashMap::new();
+            let mut submodules = HashMap::new();
             #(
                 functions.insert(stringify!(#right_func).to_string(), #left_func());
             )*
             #(
                 classes.insert(stringify!(#right_class).to_string(), #left_class::export_info());
             )*
+            #(
+                submodules.insert(stringify!(#submodules).to_string(), #submodules::init());
+            )*
             Stdlib::new(
                 stringify!(#module_ident),
-                HashMap::new(),
+                submodules,
                 functions,
                 classes
             )

@@ -1,6 +1,5 @@
-use crate::cfg;
 use gettextrs::gettext;
-use std::{collections::HashMap, error::Error, fmt::Display};
+use std::{error::Error, fmt::Display};
 
 static GITHUB_API_URL: &str = "http://185.106.176.199/trc_version";
 

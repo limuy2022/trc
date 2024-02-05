@@ -120,7 +120,7 @@ impl Display for Float {
     }
 }
 
-type Pool<T> = hash_map::HashMap<T, usize>;
+type Pool<T> = HashMap<T, usize>;
 
 pub struct ValuePool {
     const_ints: Pool<i64>,
@@ -190,7 +190,7 @@ impl ValuePool {
         ret.stringpool
             .resize(self.const_strings.len(), "".to_string());
         for i in &self.const_strings {
-            ret.stringpool[*i.1] = (i.0).clone();
+            ret.stringpool[*i.1] = i.0.clone();
         }
         ret
     }
@@ -333,7 +333,7 @@ impl Compiler {
     pub fn new(option: Option) -> Self {
         match option.inputsource {
             InputSource::File(ref filename) => {
-                let f = std::fs::File::open(filename);
+                let f = fs::File::open(filename);
                 Compiler {
                     input: Box::new(FileSource::new(f.unwrap())),
                     const_pool: ValuePool::new(),

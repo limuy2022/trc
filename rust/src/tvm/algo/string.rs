@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub fn kmp(main_string: &str, pattern: &str) -> usize {
     // 首先对模式串构建next数组
@@ -9,14 +9,14 @@ pub fn kmp(main_string: &str, pattern: &str) -> usize {
     let mut ans = 0;
     for i in main_string.chars() {
         while j != -1 && pattern[(j + 1) as usize] != i {
-            j = next_arr[j as usize] as i64;
+            j = next_arr[j as usize];
         }
         if pattern[(j + 1) as usize] == i {
             j += 1;
         }
         if j as usize == pattern.len() - 1 {
             ans += 1;
-            j = next_arr[j as usize] as i64;
+            j = next_arr[j as usize];
         }
     }
     ans
@@ -29,7 +29,7 @@ pub fn kmp_next(pattern: &str) -> Vec<i64> {
     // 从1开始匹配是因为第零个不需要匹配
     for i in 1..pattern.len() {
         while j != -1 && pattern[(j + 1) as usize] != pattern[i] {
-            j = ret[j as usize] as i64;
+            j = ret[j as usize];
         }
         if pattern[(j + 1) as usize] == pattern[i] {
             j += 1;
@@ -41,18 +41,24 @@ pub fn kmp_next(pattern: &str) -> Vec<i64> {
 
 pub fn sa(s: &str) -> Vec<usize> {
     let mut sa: Vec<usize> = Vec::new();
-    let mut t: HashMap<char, usize> = HashMap::new();
+    let mut cntt: BTreeMap<char, usize> = BTreeMap::new();
+    let mut rk: HashMap<char, usize> = HashMap::new();
+    let mut cnt = 1;
     for i in s.chars() {
-        let tmp = t.entry(i).or_insert(0);
+        rk.insert(i, cnt);
+        cnt += 1;
+        let tmp = cntt.entry(i).or_insert(0);
         *tmp += 1;
     }
-    for i in &t {
+
+    cnt = 1;
+    for i in &cntt {
         sa.push(*i.0 as usize);
     }
     let mut rk: Vec<usize> = Vec::new();
     rk.resize(sa.len(), 0);
     for i in &sa {
-        let _tmp = t.entry(char::from_u32(*i as u32).unwrap());
+        let _tmp = cntt.entry(char::from_u32(*i as u32).unwrap());
         // rk[]
     }
     sa

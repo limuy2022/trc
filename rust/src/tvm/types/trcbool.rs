@@ -10,6 +10,7 @@ use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
+#[derive(Debug)]
 pub struct TrcBool {
     _value: bool,
 }
@@ -20,10 +21,10 @@ impl TrcObj for TrcBool {
         "bool"
     }
 
-    impl_single_oper!(not, !, "not", TrcBool, TrcBool);
+    impl_single_oper!(not, !, "!", TrcBool, TrcBool);
     batch_impl_opers!(
-        and => &&, "and", TrcBool, TrcBool,
-        or => ||, "or", TrcBool, TrcBool
+        and => &&, "&&", TrcBool, TrcBool,
+        or => ||, "||", TrcBool, TrcBool
     );
 }
 

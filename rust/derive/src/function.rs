@@ -1,3 +1,6 @@
+use core::panic;
+
+use quote::ToTokens;
 use syn::{
     parse_str, punctuated, token::Comma, FnArg, PatType, ReturnType, Signature, Stmt, Type,
     TypePath,
@@ -24,11 +27,11 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
     };
     let input_args = sig.inputs.clone();
     let mut new_stmts = vec![];
-    let mut new_args: punctuated::Punctuated<FnArg, Comma> = syn::punctuated::Punctuated::new();
+    let mut new_args: punctuated::Punctuated<FnArg, Comma> = punctuated::Punctuated::new();
     // 第一个参数是self
-    if input_args.len() >= 1 {
+    if !input_args.is_empty() {
         if let FnArg::Receiver(_) = &input_args[0] {
-            new_args.push(input_args[0].clone());
+            panic!("don't use self, use fn(DynaData) instead.")
         }
     }
     let mut args_type_required = vec![];
@@ -43,18 +46,25 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     _ => unreachable!(),
                 };
                 // println!("argv:{:#?}", path);
-                if path.path.segments[0].ident.to_string() == "any" {
-                    args_type_required.push(parse_str("ANY_TYPE").unwrap());
+                if path.path.segments[0].ident == "any" {
+                    args_type_required.push(parse_str("RustClass").unwrap());
+                    new_stmts.push(
+                        parse_str::<Stmt>(&format!(
+                            "let mut {} = dydata.obj_stack.pop().unwrap();",
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
                 } else {
                     args_type_required.push(path.clone());
+                    new_stmts.push(
+                        parse_str::<Stmt>(&format!(
+                            "let mut {} = dydata.obj_stack.pop().unwrap().downcast::<{}>().unwrap();",
+                            arg_name, path.to_token_stream()
+                        ))
+                        .unwrap(),
+                    );
                 }
-                new_stmts.push(
-                    parse_str::<Stmt>(&format!(
-                        "let mut {} = dydata.obj_stack.pop().unwrap();",
-                        arg_name
-                    ))
-                    .unwrap(),
-                );
             }
         }
     }

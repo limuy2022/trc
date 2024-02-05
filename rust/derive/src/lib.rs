@@ -10,7 +10,7 @@ mod function;
 
 #[proc_macro_attribute]
 /// 返回值一定要加上return
-pub fn trc_function(_: TokenStream, input: TokenStream) -> TokenStream {
+pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as ItemFn);
     let (mut new_stmts, args_type_required, output) = process_function_def(&mut input.sig);
     let name = input.sig.ident.clone();
@@ -51,15 +51,25 @@ pub fn trc_function(_: TokenStream, input: TokenStream) -> TokenStream {
     let info_func_name =
         parse_str::<Ident>(&function::convent_to_info_func(name.to_string())).expect("name error");
     // println!("{}{:#?}", name.to_string(), info_function_self);
+    let function_path: syn::Path;
+    if let Some(ty) = attr.into_iter().next() {
+        if ty.to_string() == "true" {
+            function_path = parse_str(&format!("Self::{}", name)).unwrap();
+        } else {
+            function_path = parse_str(&name.to_string()).unwrap();
+        }
+    } else {
+        function_path = parse_str(&name.to_string()).unwrap();
+    }
     let rettmp = quote!(#input
         fn #info_func_name() -> RustFunction {
             use crate::base::stdlib::*;
             use crate::compiler::scope::TypeAllowNull;
-            let ret_classes = vec![#(#args_type_required.clone()),*];
-            return RustFunction::new(stringify!(#name), #name, IOType::new(ret_classes, #output));
+            let ret_classes = vec![#(#args_type_required::export_info()),*];
+            return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output));
         }
     );
-    // println!("{}", rettmp.to_token_stream());
+    println!("{}", rettmp.to_token_stream());
     rettmp.into()
 }
 
@@ -83,6 +93,16 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
             // 说明是要导出的成员
             let varname = i.ident.clone().unwrap();
             let vartype = i.ty.clone();
+            if varname
+                .to_token_stream()
+                .into_iter()
+                .next()
+                .unwrap()
+                .to_string()
+                .starts_with('_')
+            {
+                continue;
+            }
             members_ident.push(varname);
             members_ty.push(vartype);
         }
@@ -93,7 +113,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     impl #name {
         pub fn export_info() -> RustClass {
             use std::collections::hash_map::HashMap;
-            use crate::compiler::scope::{Var};
+            use crate::compiler::scope::Var;
             let mut members = HashMap::new();
             #(
                 members.insert(Var::new(stringify!(#members_ty), #members_ident));
@@ -144,12 +164,12 @@ pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
         fn function_export() -> HashMap<String, RustFunction> {
             let mut ret = HashMap::new();
             #(
-                ret.push(stringify!(#funcs).to_string(), self.#funcs());
+                ret.insert(stringify!(#funcs).to_string(), Self::#funcs());
             )*
             ret
         }
     }
     );
-    // println!("{:#?}", ret.to_string());
+    // println!("{}", ret);
     ret.into()
 }

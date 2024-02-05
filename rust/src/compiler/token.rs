@@ -279,7 +279,7 @@ enum NumValue {
 }
 
 impl TokenLex<'_> {
-    pub fn new<'a>(compiler_data: &'a mut Compiler) -> TokenLex<'a> {
+    pub fn new(compiler_data: &mut Compiler) -> TokenLex {
         TokenLex {
             compiler_data,
             braces_check: vec![],
@@ -293,10 +293,7 @@ impl TokenLex<'_> {
             None => {
                 return Err(RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        gettext!(error::UNMATCHED_BRACE, c),
-                        gettext(error::SYNTAX_ERROR),
-                    ),
+                    ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), gettext(SYNTAX_ERROR)),
                 ));
             }
             Some(cc) => {
@@ -310,7 +307,7 @@ impl TokenLex<'_> {
         }
     }
 
-    fn lex_id(&mut self, c: char) -> error::RunResult<Token> {
+    fn lex_id(&mut self, c: char) -> RunResult<Token> {
         Ok({
             let mut retname: String = String::from(c);
             loop {
@@ -367,7 +364,7 @@ impl TokenLex<'_> {
         }
     }
 
-    fn lex_symbol(&mut self, c: char) -> error::RunResult<Token> {
+    fn lex_symbol(&mut self, c: char) -> RunResult<Token> {
         Ok(match c {
             '.' => Token::new(TokenType::Dot, None),
             ',' => Token::new(TokenType::Comma, None),
@@ -572,7 +569,7 @@ impl TokenLex<'_> {
     fn lex_num(&mut self, mut c: char) -> RunResult<Token> {
         let tmp = self.lex_int_float(c)?;
         c = self.compiler_data.input.read();
-        if c == 'e' || c == 'E' {
+        return if c == 'e' || c == 'E' {
             c = self.compiler_data.input.read();
             let mut up_flag: i64 = 1;
             if c == '+' {
@@ -590,10 +587,10 @@ impl TokenLex<'_> {
                         for _ in 0..up {
                             it *= 10;
                         }
-                        return Ok(Token::new(
+                        Ok(Token::new(
                             TokenType::IntValue,
                             Some(self.compiler_data.const_pool.add_int(it)),
-                        ));
+                        ))
                     } else {
                         // 负数次，升级为float
                         let mut float_part = String::new();
@@ -606,14 +603,14 @@ impl TokenLex<'_> {
                                 it /= 10;
                             }
                         }
-                        return Ok(Token::new(
+                        Ok(Token::new(
                             TokenType::FloatValue,
                             Some(self.compiler_data.const_pool.add_float(Float::new(
                                 it,
                                 float_part.parse().unwrap(),
                                 Self::cal_zero(&float_part),
                             ))),
-                        ));
+                        ))
                     }
                 }
                 NumValue::FloatVal(mut v) => {
@@ -633,10 +630,10 @@ impl TokenLex<'_> {
                             v.zero = Self::cal_zero(&s);
                             v.back = s.parse().unwrap();
                         }
-                        return Ok(Token::new(
+                        Ok(Token::new(
                             TokenType::FloatValue,
                             Some(self.compiler_data.const_pool.add_float(v)),
-                        ));
+                        ))
                     } else {
                         up = -up;
                         let mut s = String::new();
@@ -651,20 +648,20 @@ impl TokenLex<'_> {
                         s += &v.back.to_string();
                         v.zero += Self::cal_zero(&s);
                         v.back = s.parse().unwrap();
-                        return Ok(Token::new(
+                        Ok(Token::new(
                             TokenType::FloatValue,
                             Some(self.compiler_data.const_pool.add_float(v)),
-                        ));
+                        ))
                     }
                 }
             }
         } else {
             self.compiler_data.input.unread(c);
-            return Ok(self.turn_to_token(tmp));
-        }
+            Ok(self.turn_to_token(tmp))
+        };
     }
 
-    fn lex_str(&mut self, start_char: char) -> error::RunResult<Token> {
+    fn lex_str(&mut self, start_char: char) -> RunResult<Token> {
         let mut s = String::new();
         let mut c = self.compiler_data.input.read();
         while c != start_char {
@@ -686,11 +683,11 @@ impl TokenLex<'_> {
             s.push(c);
             c = self.compiler_data.input.read();
             if c == '\0' {
-                error::RuntimeError::new(
+                RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
-                    error::ErrorInfo::new(
+                    ErrorInfo::new(
                         gettext!(error::STRING_WITHOUT_END, start_char),
-                        gettext(error::SYNTAX_ERROR),
+                        gettext(SYNTAX_ERROR),
                     ),
                 );
             }
@@ -701,7 +698,7 @@ impl TokenLex<'_> {
         ))
     }
 
-    pub fn next_token(&mut self) -> error::RunResult<Token> {
+    pub fn next_token(&mut self) -> RunResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
             if tmp.tp == TokenType::EndOfLine {
@@ -747,14 +744,14 @@ impl TokenLex<'_> {
     pub fn check(&mut self) -> Result<(), RuntimeError> {
         if !self.braces_check.is_empty() {
             let unmatch_char = self.braces_check.pop().unwrap();
-            return Err(error::RuntimeError::new(
+            return Err(RuntimeError::new(
                 Box::new(Content::new_line(
                     &self.compiler_data.content.module_name,
                     unmatch_char.line,
                 )),
                 ErrorInfo::new(
                     gettext!(error::UNMATCHED_BRACE, unmatch_char.c),
-                    gettext(error::SYNTAX_ERROR),
+                    gettext(SYNTAX_ERROR),
                 ),
             ));
         }

@@ -229,17 +229,13 @@ impl SymScope {
 
     pub fn get_sym_idx(&self, id: usize) -> Option<usize> {
         let t = self.sym_map.get(&id);
-        match t {
-            None => {
-                return match self.prev_scope {
-                    Some(ref prev_scope) => prev_scope.as_ref().borrow().get_sym_idx(id),
-                    None => None,
-                }
-            }
-            Some(t) => {
-                return Some(*t);
-            }
-        }
+        return match t {
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_sym_idx(id),
+                None => None,
+            },
+            Some(t) => Some(*t),
+        };
     }
 
     pub fn add_func(&mut self, id: usize, f: Box<dyn FunctionInterface>) {

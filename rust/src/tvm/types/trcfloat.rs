@@ -12,6 +12,7 @@ use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
+#[derive(Debug)]
 pub struct TrcFloat {
     _value: f64,
 }

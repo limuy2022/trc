@@ -29,23 +29,13 @@ macro_rules! try_err {
 
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
-        fn $tmpfuncname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+        fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<TypeAllowNull> {
             let next_sym = self.token_lexer.next_token()?;
             match next_sym.tp {
                 $($accepted_token => {
-                    let tya = self.$next_item_func(istry)?;
-                    self.add_bycode($add_opcode, NO_ARG);
-                    let tyb = self.$tmpfuncname(istry)?;
-                    if let TypeAllowNull::No = tyb {
-                        return Ok(tya);
-                    }
-                    if let TypeAllowNull::No = tya {
-                        return Ok(tya)
-                    }
+                    let tya = self.$next_item_func(istry)?.unwrap();
                     // 读取IOType检查
-                    let tya = tya.unwrap();
-                    let tyb = tyb.unwrap();
-                    let func_obj = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
+                    let func_obj = self.self_scope.as_ref().borrow().get_class(extend).unwrap();
                     let io_check = func_obj.get_override_func($accepted_token);
                     match io_check {
                         None => return try_err!(istry,
@@ -56,15 +46,26 @@ macro_rules! tmp_expe_function_gen {
                             )
                         ),
                         Some(v) => {
-                            if let Ok(_) = v.check_argvs(vec![tyb]) {
-                                return Ok(v.return_type.clone());
+                            if let Ok(_) = v.check_argvs(vec![tya]) {}
+                            else {
+                                let func_obja = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
+                                return try_err!(istry,
+                                    Box::new(self.token_lexer.compiler_data.content.clone()),
+                                    ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, func_obj.get_name(),
+                                            func_obja.get_name()), gettextrs::gettext(TYPE_ERROR)))
                             }
-                            let func_objb = self.self_scope.as_ref().borrow().get_class(tyb).unwrap();
-                            return try_err!(istry,
-                                Box::new(self.token_lexer.compiler_data.content.clone()),
-                                ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, func_obj.get_name(),
-                                        func_objb.get_name()), gettextrs::gettext(TYPE_ERROR)))
-
+                        }
+                    }
+                    let io_check = io_check.unwrap();
+                    self.add_bycode($add_opcode, NO_ARG);
+                    let stage_ty = io_check.return_type.unwrap();
+                    let tyb = self.$tmpfuncname(istry, stage_ty)?;
+                    match tyb {
+                        TypeAllowNull::No => {
+                            return Ok(TypeAllowNull::Yes(stage_ty));
+                        }
+                        TypeAllowNull::Yes(_) => {
+                            return Ok(tyb);
                         }
                     }
                 })*
@@ -83,20 +84,14 @@ macro_rules! expr_gen {
         tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token => $add_opcode),*);
         fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
             let t1 = self.$next_item_func(istry)?;
-            let t2 = self.$tmpfuncname(istry)?;
-            if let TypeAllowNull::No = t2 {
-                return Ok(t1);
-            }
             if let TypeAllowNull::No = t1 {
                 return Ok(t1);
             }
-            if t1.unwrap() != t2.unwrap() {
-                return try_err!(istry,
-                        Box::new(self.token_lexer.compiler_data.content.clone()),
-                        ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, t1,
-                                t2), gettextrs::gettext(TYPE_ERROR)))
+            let t2 = self.$tmpfuncname(istry, t1.unwrap())?;
+            if let TypeAllowNull::No = t2 {
+                return Ok(t1);
             }
-            Ok(t1)
+            Ok(t2)
         }
     };
 }

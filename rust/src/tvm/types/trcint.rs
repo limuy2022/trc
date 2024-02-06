@@ -1,6 +1,8 @@
+use super::trcbool::TrcBool;
 use super::trcfloat::TrcFloat;
 use super::TrcObj;
 use crate::base::stdlib::*;
+use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
 use crate::impl_single_oper;
@@ -23,7 +25,27 @@ impl TrcInt {
     }
 
     fn override_export() -> HashMap<TokenType, IOType> {
-        hash_map![]
+        hash_map![TokenType::Add => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Sub => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Mul => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Div => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Mod => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Power => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::BitAnd => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::BitOr => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Xor => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::ExactDiv => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::BitLeftShift => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::BitRightShift => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::BitNot => IOType::new(vec![], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::SelfNegative => IOType::new(vec![], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Equal => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
+        TokenType::NotEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
+        TokenType::Less => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
+        TokenType::LessEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
+        TokenType::Greater => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
+        TokenType::GreaterEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()))
+        ]
     }
 }
 
@@ -89,7 +111,14 @@ impl TrcObj for TrcInt {
         bit_and => &, "&", TrcInt, TrcInt,
         bit_or => |, "|", TrcInt, TrcInt,
         bit_left_shift => <<, "<<", TrcInt, TrcInt,
-        bit_right_shift => >>, ">>", TrcInt, TrcInt
+        bit_right_shift => >>, ">>", TrcInt, TrcInt,
+        xor => ^, "^", TrcInt, TrcInt,
+        gt => >, ">", TrcInt, TrcBool,
+        lt => <, "<", TrcInt, TrcBool,
+        eq => ==, "==", TrcInt, TrcBool,
+        ne => !=, "!=",TrcInt, TrcBool,
+        ge => >=, ">=",TrcInt, TrcBool,
+        le => <=, "<=",TrcInt, TrcBool
     );
 
     impl_oper!(div, div_int, "/", TrcInt, TrcFloat, ?);

@@ -125,6 +125,8 @@ pub enum TokenType {
     Func,
     Import,
     Return,
+    // 不会被使用到的自反运算符，仅仅当标识重载运算符使用
+    SelfNegative,
     EndOfFile,
 }
 
@@ -195,6 +197,7 @@ impl Display for TokenType {
             TokenType::Return => "return",
             TokenType::SelfAnd => "&&=",
             TokenType::SelfOr => "||=",
+            TokenType::SelfNegative => "-",
         };
         write!(f, "{}", res)
     }

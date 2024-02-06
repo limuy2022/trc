@@ -150,14 +150,14 @@ impl RustClass {
         name: impl Into<String>,
         members: HashMap<String, Var>,
         functions: Option<HashMap<String, RustFunction>>,
-        overrides: HashMap<TokenType, IOType>,
+        overrides: Option<HashMap<TokenType, IOType>>,
         id: usize,
     ) -> RustClass {
         RustClass {
             name: name.into(),
             members,
             functions: functions.unwrap_or_else(|| HashMap::new()),
-            overrides,
+            overrides: overrides.unwrap_or_else(|| HashMap::new()),
             id,
         }
     }
@@ -283,7 +283,7 @@ impl Stdlib {
 
 lazy_static! {
     pub static ref ANY_TYPE: RustClass =
-        RustClass::new("any", HashMap::new(), None, HashMap::new(), new_class_id());
+        RustClass::new("any", HashMap::new(), None, None, new_class_id());
     pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::init();
 }
 

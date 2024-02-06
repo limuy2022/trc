@@ -152,6 +152,7 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
             #(
                 classes.insert(stringify!(#right_class).to_string(), #left_class::export_info());
                 #left_class::gen_funcs_info();
+                #left_class::gen_overrides_info();
             )*
             #(
                 submodules.insert(stringify!(#submodules).to_string(), #submodules::init());

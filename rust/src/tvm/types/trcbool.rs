@@ -2,6 +2,7 @@ use super::TrcObj;
 use crate::base::error::*;
 use crate::base::error::{ErrorInfo, OPERATOR_ERROR, OPERATOR_IS_NOT_SUPPORT};
 use crate::base::stdlib::*;
+use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::{batch_impl_opers, hash_map, impl_oper, impl_single_oper};
 use derive::{trc_class, trc_method};
@@ -44,6 +45,10 @@ impl TrcBool {
     }
 
     fn override_export() -> HashMap<TokenType, IOType> {
-        hash_map![]
+        hash_map![
+            TokenType::And => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+            TokenType::Or => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+            TokenType::Not => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()))
+        ]
     }
 }

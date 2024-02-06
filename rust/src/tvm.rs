@@ -12,6 +12,7 @@ use crate::base::codegen::{self, StaticData};
 use crate::base::stdlib::STD_FUNC_TABLE;
 use crate::{base::error::*, cfg};
 use gettextrs::gettext;
+use libloading::Library;
 
 pub struct DynaData<'a> {
     obj_stack: Vec<Box<dyn types::TrcObj>>,
@@ -60,6 +61,53 @@ impl Content {
 
     fn set_line(&mut self, newline: usize) {
         self.line_pos = newline;
+    }
+}
+
+/// Load libc
+fn load_libc() -> Option<&'static Library> {
+    static LIBC: std::sync::OnceLock<Option<Library>> = std::sync::OnceLock::new();
+    #[cfg(target_os = "linux")]
+    {
+        let tmp = LIBC.get_or_init(|| unsafe {
+            let lib: Result<Library, libloading::Error> = libloading::Library::new("");
+            match lib {
+                Err(_) => None,
+                Ok(val) => Some(val),
+            }
+        });
+        match tmp {
+            None => None,
+            Some(val) => Some(&val),
+        }
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let tmp = LIBC.get_or_init(|| unsafe {
+            let lib: Result<Library, libloading::Error> = libloading::Library::new("msvcrt.dll");
+            match lib {
+                Err(_) => None,
+                Ok(val) => Some(val),
+            }
+        });
+        match tmp {
+            None => None,
+            Some(val) => Some(&val),
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let tmp = LIBC.get_or_init(|| unsafe {
+            let lib: Result<Library, libloading::Error> = libloading::Library::new("libc.dylib");
+            match lib {
+                Err(_) => None,
+                Ok(val) => Some(val),
+            }
+        });
+        match tmp {
+            None => None,
+            Some(val) => Some(&val),
+        }
     }
 }
 

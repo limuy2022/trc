@@ -126,20 +126,24 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
                     stringify!(#name),
                     members,
                     None,
-                    Self::override_export(),
+                    None,
                     classid
                 );
                 STD_CLASS_TABLE.with(|std| {
                     std.borrow_mut().push(ret);
                 });
-                // let funcs_info = Self::function_export()
-                // ret.functions = funcs_info;
                 classid
             }
 
             pub fn gen_funcs_info() {
                 STD_CLASS_TABLE.with(|std| {
                     std.borrow_mut()[Self::export_info()].functions = Self::function_export();
+                });
+            }
+
+            pub fn gen_overrides_info() {
+                STD_CLASS_TABLE.with(|std| {
+                    std.borrow_mut()[Self::export_info()].overrides = Self::override_export();
                 });
             }
 

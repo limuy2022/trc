@@ -21,43 +21,43 @@ argv : expr
 
 expr : expr1 expr_
 
-expr_: || expr_ | empty
+expr_: || expr1 expr_ | empty
 
 expr1 : expr2 expr1_
 
-expr1_: && expr1_ | empty  
+expr1_: && expr2 expr1_ | empty  
 
 expr2 : expr3 expr2_
 
-expr2_: == expr2_| != expr2_| < expr2_| > expr2_| <= expr2_| >= expr2_ |empty
+expr2_: == expr3 expr2_| != expr3 expr2_| < expr3 expr2_| > expr3 expr2_| <= expr3 expr2_| >= expr3 expr2_ | empty
 
 expr3 : expr4 expr3_
 
-expr3_: | expr3_ | empty
+expr3_: | expr4 expr3_ | empty
 
 expr4 : expr5 expr4_
 
-expr4_: ^ expr4_ | empty
+expr4_: ^ expr5 expr4_ | empty
 
 expr5 : expr6 expr5_
 
-expr5_: & expr5_ | empty
+expr5_: & expr6 expr5_ | empty
 
 expr6: expr7 expr6_
 
-expr6_: << expr6_| >> expr6_ | empty
+expr6_: << expr7 expr6_| >> expr7 expr6_ | empty
 
 expr7 : expr8 expr7_
 
-expr7_: + expr7_| - expr7_ | empty
+expr7_: + expr8 expr7_| - expr8 expr7_ | empty
 
 expr8 : expr9 expr8_
 
-expr8_: * expr8_| / expr8_| % expr8_| // expr8_ | empty
+expr8_: * expr9 expr8_| / expr9 expr8_| % expr8_| // expr9 expr8_ | empty
 
 expr9: factor expr9_
 
-expr9_: ** expr9_ | empty
+expr9_: ** factor expr9_ | empty
 
 factor : (expr) | item | - factor | + factor | ! factor | ~ factor
 

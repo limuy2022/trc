@@ -42,7 +42,7 @@ macro_rules! tmp_expe_function_gen {
                     if let TypeAllowNull::No = ty_now {
                         return Ok(ty_now)
                     }
-                    if(ty_now.unwrap().get_id() == ty_after.unwrap().get_id()) {
+                    if(ty_now.unwrap() == ty_after.unwrap()) {
                         return Ok(ty_now);
                     }
                     return try_err!(istry,
@@ -72,7 +72,7 @@ macro_rules! expr_gen {
             if let TypeAllowNull::No = t1 {
                 return Ok(t1);
             }
-            if t1.unwrap().get_id() != t2.unwrap().get_id() {
+            if t1.unwrap() != t2.unwrap() {
                 return try_err!(istry,
                         Box::new(self.token_lexer.compiler_data.content.clone()),
                         ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, t1,
@@ -160,7 +160,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn opt_args(&mut self) -> AstError<Vec<Type>> {
+    fn opt_args(&mut self) -> AstError<Vec<usize>> {
         let mut ret = vec![];
         loop {
             let t = self.expr(true);
@@ -469,9 +469,6 @@ impl<'a> AstBuilder<'a> {
     pub fn generate_code(&mut self) -> RunResult<()> {
         loop {
             let token = self.token_lexer.next_token()?;
-            if token.tp == TokenType::EndOfLine {
-                continue;
-            }
             if token.tp == TokenType::EndOfFile {
                 break;
             }

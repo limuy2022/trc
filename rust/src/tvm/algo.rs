@@ -1,1 +1,1 @@
-mod string;
+pub mod string;

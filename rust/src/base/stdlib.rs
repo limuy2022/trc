@@ -19,7 +19,7 @@ type StdlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
 
 #[derive(Clone, Debug)]
 pub struct IOType {
-    pub argvs_type: Vec<RustClass>,
+    pub argvs_type: Vec<usize>,
     pub return_type: TypeAllowNull,
 }
 
@@ -32,14 +32,14 @@ pub struct RustFunction {
 }
 
 impl IOType {
-    pub fn new(argvs_type: Vec<RustClass>, return_type: TypeAllowNull) -> IOType {
+    pub fn new(argvs_type: Vec<usize>, return_type: TypeAllowNull) -> IOType {
         IOType {
             argvs_type,
             return_type,
         }
     }
 
-    pub fn check_argvs(&self, argvs: Vec<Type>) -> Result<(), ErrorInfo> {
+    pub fn check_argvs(&self, argvs: Vec<usize>) -> Result<(), ErrorInfo> {
         if argvs.len() != self.argvs_type.len() {
             return Err(ErrorInfo::new(
                 gettextrs::gettext!(ARGU_NUMBER, self.argvs_type.len(), argvs.len()),
@@ -47,10 +47,10 @@ impl IOType {
             ));
         }
         for i in 0..self.argvs_type.len() {
-            if self.argvs_type[i].is_any() {
+            if self.argvs_type[i] == 0 {
                 continue;
             }
-            if self.argvs_type[i].get_id() != argvs[i].get_id() {
+            if self.argvs_type[i] != argvs[i] {
                 return Err(ErrorInfo::new(
                     gettextrs::gettext!(EXPECT_TYPE, self.argvs_type[i], argvs[i]),
                     gettextrs::gettext(ARGUMENT_ERROR),
@@ -146,15 +146,16 @@ impl RustClass {
     pub fn new(
         name: impl Into<String>,
         members: HashMap<String, Var>,
-        functions: HashMap<String, RustFunction>,
+        functions: Option<HashMap<String, RustFunction>>,
         overrides: HashMap<TokenType, IOType>,
+        id: usize,
     ) -> RustClass {
         RustClass {
             name: name.into(),
             members,
-            functions,
+            functions: functions.unwrap_or_else(|| HashMap::new()),
             overrides,
-            id: 0,
+            id,
         }
     }
 
@@ -166,8 +167,8 @@ impl RustClass {
         self.members.insert(name.into(), attr);
     }
 
-    pub fn export_info() -> Self {
-        ANY_TYPE.clone()
+    pub fn export_info() -> usize {
+        0
     }
 }
 
@@ -206,6 +207,11 @@ impl Display for RustClass {
 
 thread_local! {
     pub static STD_FUNC_TABLE: RefCell<Vec<StdlibFunc>> = RefCell::new(vec![]);
+    pub static STD_CLASS_TABLE: RefCell<Vec<RustClass>> = RefCell::new(vec![]);
+}
+
+pub fn new_class_id() -> usize {
+    STD_CLASS_TABLE.with(|std| std.borrow().len())
 }
 
 impl RustFunction {
@@ -227,7 +233,7 @@ pub struct Stdlib {
     pub name: String,
     pub sub_modules: HashMap<String, Stdlib>,
     pub functions: HashMap<String, RustFunction>,
-    pub classes: HashMap<String, RustClass>,
+    pub classes: HashMap<String, usize>,
 }
 
 impl Stdlib {
@@ -235,7 +241,7 @@ impl Stdlib {
         name: impl Into<String>,
         sub_modules: HashMap<String, Stdlib>,
         functions: HashMap<String, RustFunction>,
-        classes: HashMap<String, RustClass>,
+        classes: HashMap<String, usize>,
     ) -> Stdlib {
         Stdlib {
             name: name.into(),
@@ -267,6 +273,6 @@ impl Stdlib {
 
 lazy_static! {
     pub static ref ANY_TYPE: RustClass =
-        RustClass::new("any", HashMap::new(), HashMap::new(), HashMap::new());
+        RustClass::new("any", HashMap::new(), None, HashMap::new(), new_class_id());
     pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::init();
 }

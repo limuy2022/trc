@@ -1293,6 +1293,7 @@ dependencies = [
  "lazy_static",
  "llvm-sys",
  "num-bigint",
+ "once_cell",
  "rand",
  "reqwest",
  "tokio",

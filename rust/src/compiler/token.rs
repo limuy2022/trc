@@ -2,7 +2,7 @@ use super::{Compiler, Content, Float};
 use crate::{
     base::error::{
         self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW, NUMBER_OVER_FLOW,
-        PREFIX_FOR_FLOAT, SYNTAX_ERROR,
+        PREFIX_FOR_FLOAT, SYNTAX_ERROR, UNCLODED_COMMENT,
     },
     cfg::FLOAT_OVER_FLOW_LIMIT,
     hash_map,
@@ -125,7 +125,6 @@ pub enum TokenType {
     Func,
     Import,
     Return,
-    EndOfLine,
     EndOfFile,
 }
 
@@ -190,7 +189,6 @@ impl Display for TokenType {
             TokenType::Class => "class",
             TokenType::Match => "match",
             TokenType::Func => "func",
-            TokenType::EndOfLine => "EOL",
             TokenType::EndOfFile => "EOF",
             TokenType::Import => "import",
             TokenType::Arrow => "->",
@@ -415,13 +413,34 @@ impl TokenLex<'_> {
                 '*',
             ),
             '%' => self.self_symbol(TokenType::Mod, TokenType::SelfMod),
-            '/' => self.double_symbol(
-                TokenType::Div,
-                TokenType::SelfDiv,
-                TokenType::ExactDiv,
-                TokenType::SelfExactDiv,
-                '/',
-            ),
+            '/' => {
+                // 特判注释
+                let c = self.compiler_data.input.read();
+                if c == '*' {
+                    loop {
+                        let c = self.compiler_data.input.read();
+                        if c == '*' {
+                            let c = self.compiler_data.input.read();
+                            if c == '/' {
+                                return self.next_token();
+                            }
+                        } else if c == '\0' {
+                            return Err(RuntimeError::new(
+                                Box::new(self.compiler_data.content.clone()),
+                                ErrorInfo::new(gettext(UNCLODED_COMMENT), gettext(SYNTAX_ERROR)),
+                            ));
+                        }
+                    }
+                }
+                self.compiler_data.input.unread(c);
+                self.double_symbol(
+                    TokenType::Div,
+                    TokenType::SelfDiv,
+                    TokenType::ExactDiv,
+                    TokenType::SelfExactDiv,
+                    '/',
+                )
+            }
             '=' => self.binary_symbol(TokenType::Assign, TokenType::Equal, '='),
             '!' => self.binary_symbol(TokenType::Not, TokenType::NotEqual, '='),
             '>' => self.double_symbol(
@@ -701,12 +720,9 @@ impl TokenLex<'_> {
     pub fn next_token(&mut self) -> RunResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
-            if tmp.tp == TokenType::EndOfLine {
-                self.compiler_data.content.add_line();
-            }
             return Ok(tmp);
         }
-        let mut presecnt_lex;
+        let presecnt_lex;
         loop {
             presecnt_lex = self.compiler_data.input.read();
             match presecnt_lex {
@@ -714,10 +730,24 @@ impl TokenLex<'_> {
                     return Ok(Token::new(TokenType::EndOfFile, None));
                 }
                 '\t' | ' ' => {
-                    continue;
+                    return self.next_token();
                 }
                 '\n' => {
                     self.compiler_data.content.add_line();
+                    return self.next_token();
+                }
+                '#' => {
+                    // 注释
+                    loop {
+                        let c = self.compiler_data.input.read();
+                        if c == '\n' {
+                            self.compiler_data.content.add_line();
+                            return self.next_token();
+                        }
+                        if c == '\0' {
+                            return Ok(Token::new(TokenType::EndOfFile, None));
+                        }
+                    }
                 }
                 _ => break,
             }
@@ -735,9 +765,6 @@ impl TokenLex<'_> {
     }
 
     pub fn next_back(&mut self, t: Token) {
-        if t.tp == TokenType::EndOfLine {
-            self.compiler_data.content.del_line();
-        }
         self.unget_token.push(t);
     }
 
@@ -969,6 +996,10 @@ mod tests {
     fn test_comprehensive_lex() {
         gen_test_token_env!(
             r#"
+            /*a complex test*
+             *
+             *
+             * end */
 import "p"
 func a(int val) -> str {
     if val % 2 == 0 {
@@ -977,11 +1008,13 @@ func a(int val) -> str {
         return "odd"
     }
 }
+#djopekdpekdpedle
 func main() {
-    print("hello world")
+    print("hello world")#djeopjdfopejfopejfpejfop
     p := a(intinput())
     print(p)
 }
+#ojdeopjfoepjfopejop
         "#,
             t
         );

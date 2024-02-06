@@ -1,7 +1,9 @@
 use super::ValuePool;
-use crate::base::stdlib::{ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT};
+use crate::base::stdlib::{
+    ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT, STD_CLASS_TABLE,
+};
 use lazy_static::lazy_static;
-use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
 lazy_static! {
     static ref VAR_TYPE: Vec<String> = vec![
@@ -15,14 +17,14 @@ lazy_static! {
 
 #[derive(Clone, Debug)]
 pub enum TypeAllowNull {
-    Yes(Type),
+    Yes(usize),
     No,
 }
 
 impl TypeAllowNull {
-    pub fn unwrap(&self) -> &Type {
+    pub fn unwrap(&self) -> usize {
         match self {
-            TypeAllowNull::Yes(t) => t,
+            TypeAllowNull::Yes(t) => *t,
             TypeAllowNull::No => panic!("null"),
         }
     }
@@ -147,10 +149,11 @@ pub struct SymScope {
     prev_scope: Option<Rc<RefCell<SymScope>>>,
     sym_map: HashMap<usize, usize>,
     scope_sym_id: usize,
-    types: HashMap<usize, Type>,
+    types: HashMap<usize, usize>,
     funcs: HashMap<usize, Box<dyn FunctionInterface>>,
     vars: HashMap<usize, Var>,
     modules: HashMap<usize, &'static Stdlib>,
+    types_id: usize,
 }
 
 impl SymScope {
@@ -163,12 +166,14 @@ impl SymScope {
             funcs: HashMap::new(),
             vars: HashMap::new(),
             modules: HashMap::new(),
+            types_id: 0,
         };
         match prev_scope {
             Some(prev_scope) => {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
+                ret.types_id = prev_scope.as_ref().borrow().types_id;
             }
-            None => {}
+            None => ret.types_id = STD_CLASS_TABLE.with(|std| std.borrow().len()),
         }
         ret
     }
@@ -187,7 +192,7 @@ impl SymScope {
         let types = &STDLIB_ROOT.sub_modules.get("prelude").unwrap().classes;
         for i in types {
             let idx = self.insert_sym(const_pool.name_pool[i.0]);
-            self.add_type(idx, Box::new((*i.1).clone()));
+            self.add_type(idx, (*i.1).clone());
         }
     }
 
@@ -246,11 +251,11 @@ impl SymScope {
         self.vars.insert(id, v);
     }
 
-    pub fn add_type(&mut self, id: usize, t: Type) {
+    pub fn add_type(&mut self, id: usize, t: usize) {
         self.types.insert(id, t);
     }
 
-    pub fn get_type(&self, id: usize) -> Type {
+    pub fn get_type(&self, id: usize) -> usize {
         return self.types.get(&id).unwrap().clone();
     }
 

@@ -28,6 +28,7 @@ pub const SYMBOL_REDEFINED: &str = "Symbol {} redefined";
 pub const TYPE_NOT_THE_SAME: &str = "Type {} and {} are not the same";
 pub const ARGU_NUMBER: &str = "expect {}.But given {}";
 pub const EXPECT_TYPE: &str = "Expect type {}.But given type {}";
+pub const UNCLODED_COMMENT: &str = "unclosed comment";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

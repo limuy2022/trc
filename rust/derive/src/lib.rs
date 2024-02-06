@@ -5,6 +5,7 @@ use syn::ImplItem;
 use syn::{
     parse_macro_input, parse_str, Expr, Ident, ItemFn, ItemImpl, ItemStruct, Stmt, Type, Visibility,
 };
+
 mod def_module;
 mod function;
 
@@ -32,7 +33,6 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                 new_stmts.push(i);
                 continue;
             }
-
             new_stmts.push(
                 parse_str::<Stmt>(&format!(
                     "dydata.obj_stack.push(Box::new({}));",
@@ -69,7 +69,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
             return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output));
         }
     );
-    println!("{}", rettmp.to_token_stream());
+    // println!("{}", rettmp.to_token_stream());
     rettmp.into()
 }
 
@@ -108,25 +108,49 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
     // export_info函数会调用method宏生成function_export函数
+    // 目前的实现策略是先提供一个由once_cell储存的usize数，表示在类型表中的索引，里面储存该类型的Rc指针
+    // 因为很可能某个函数的参数就是标准库中的某个类型，所以我们需要先将类型导入到class_table中
     let ret = quote!(#input
-    use crate::base::stdlib::RustClass;
-    impl #name {
-        pub fn export_info() -> RustClass {
-            use std::collections::hash_map::HashMap;
-            use crate::compiler::scope::Var;
-            let mut members = HashMap::new();
-            #(
-                members.insert(Var::new(stringify!(#members_ty), #members_ident));
-            )*
-            let mut ret = RustClass::new(
+        use crate::base::stdlib::{RustClass, new_class_id, STD_CLASS_TABLE};
+        use once_cell::sync::OnceCell;
+        impl #name {
+            pub fn init_info() -> usize {
+                use std::collections::hash_map::HashMap;
+                use crate::compiler::scope::Var;
+                let mut members = HashMap::new();
+                #(
+                    members.insert(Var::new(stringify!(#members_ty), #members_ident));
+                )*
+                let classid = new_class_id();
+                let mut ret = RustClass::new(
                     stringify!(#name),
                     members,
-                    Self::function_export(),
-                    Self::override_export()
+                    None,
+                    Self::override_export(),
+                    classid
                 );
-            ret
+                STD_CLASS_TABLE.with(|std| {
+                    std.borrow_mut().push(ret);
+                });
+                // let funcs_info = Self::function_export()
+                // ret.functions = funcs_info;
+                classid
+            }
+
+            pub fn gen_funcs_info() {
+                STD_CLASS_TABLE.with(|std| {
+                    std.borrow_mut()[Self::export_info()].functions = Self::function_export();
+                });
+            }
+
+            pub fn export_info() -> usize {
+                static ID: OnceCell<usize> = OnceCell::new();
+                *ID.get_or_init(|| {
+                    let id = Self::init_info();
+                    id
+                })
+            }
         }
-    }
     );
     // println!("{}", ret.to_string());
     ret.into()
@@ -144,18 +168,13 @@ pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
     // println!("!!!!!!!!!!!!!!!!!!!!!!!!!!:{:#?}", name);
     let mut funcs = vec![];
     for i in &input.items {
-        match i {
-            ImplItem::Fn(func) => {
-                if let Visibility::Public(_) = func.vis {
-                    funcs.push(
-                        parse_str::<Ident>(&function::convent_to_info_func(
-                            func.sig.ident.to_string(),
-                        ))
+        if let ImplItem::Fn(func) = i {
+            if let Visibility::Public(_) = func.vis {
+                funcs.push(
+                    parse_str::<Ident>(&function::convent_to_info_func(func.sig.ident.to_string()))
                         .unwrap(),
-                    );
-                }
+                );
             }
-            _ => {}
         }
     }
     let ret = quote!(

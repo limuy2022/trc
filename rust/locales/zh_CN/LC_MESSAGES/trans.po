@@ -45,7 +45,7 @@ msgid "Float {} is too large to store"
 msgstr "浮点数{}超过了储存范围"
 
 msgid "token {} is not expected"
-msgstr "token{}不是被期望的"
+msgstr "token {}不是被期望的"
 
 msgid "In module {}"
 msgstr "在模块{}中"
@@ -79,4 +79,7 @@ msgstr "期望{}.但是输入{}"
 
 msgid "Expect type {}.But given type {}"
 msgstr "期望类型{}.但是传入类型是{}"
+
+msgid "unclosed comment"
+msgstr "未闭合的注释"
 

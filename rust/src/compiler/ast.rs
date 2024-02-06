@@ -33,22 +33,40 @@ macro_rules! tmp_expe_function_gen {
             let next_sym = self.token_lexer.next_token()?;
             match next_sym.tp {
                 $($accepted_token => {
-                    let ty_now = self.$next_item_func(istry)?;
+                    let tya = self.$next_item_func(istry)?;
                     self.add_bycode($add_opcode, NO_ARG);
-                    let ty_after = self.$tmpfuncname(istry)?;
-                    if let TypeAllowNull::No = ty_after {
-                        return Ok(ty_now);
+                    let tyb = self.$tmpfuncname(istry)?;
+                    if let TypeAllowNull::No = tyb {
+                        return Ok(tya);
                     }
-                    if let TypeAllowNull::No = ty_now {
-                        return Ok(ty_now)
+                    if let TypeAllowNull::No = tya {
+                        return Ok(tya)
                     }
-                    if(ty_now.unwrap() == ty_after.unwrap()) {
-                        return Ok(ty_now);
-                    }
-                    return try_err!(istry,
+                    // 读取IOType检查
+                    let tya = tya.unwrap();
+                    let tyb = tyb.unwrap();
+                    let func_obj = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
+                    let io_check = func_obj.get_override_func($accepted_token);
+                    match io_check {
+                        None => return try_err!(istry,
                             Box::new(self.token_lexer.compiler_data.content.clone()),
-                            ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, ty_now,
-                                    ty_after), gettextrs::gettext(TYPE_ERROR)))
+                            ErrorInfo::new(
+                                gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()),
+                                gettext(OPERATOR_ERROR),
+                            )
+                        ),
+                        Some(v) => {
+                            if let Ok(_) = v.check_argvs(vec![tyb]) {
+                                return Ok(v.return_type.clone());
+                            }
+                            let func_objb = self.self_scope.as_ref().borrow().get_class(tyb).unwrap();
+                            return try_err!(istry,
+                                Box::new(self.token_lexer.compiler_data.content.clone()),
+                                ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, func_obj.get_name(),
+                                        func_objb.get_name()), gettextrs::gettext(TYPE_ERROR)))
+
+                        }
+                    }
                 })*
                 _ => {
                     self.token_lexer.next_back(next_sym);

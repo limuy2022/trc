@@ -141,21 +141,21 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
     fn not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         return Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "!", self.get_type_name()),
-            gettext(SYNTAX_ERROR),
+            gettext(OPERATOR_ERROR),
         ));
     }
 
     fn bit_not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         return Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "~", self.get_type_name()),
-            gettext(SYNTAX_ERROR),
+            gettext(OPERATOR_ERROR),
         ));
     }
 
     fn self_negative(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         return Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "-", self.get_type_name()),
-            gettext(SYNTAX_ERROR),
+            gettext(OPERATOR_ERROR),
         ));
     }
 

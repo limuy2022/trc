@@ -112,7 +112,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     // 因为很可能某个函数的参数就是标准库中的某个类型，所以我们需要先将类型导入到class_table中
     let ret = quote!(#input
         use crate::base::stdlib::{RustClass, new_class_id, STD_CLASS_TABLE};
-        use once_cell::sync::OnceCell;
+        use std::sync::OnceLock;
         impl #name {
             pub fn init_info() -> usize {
                 use std::collections::hash_map::HashMap;
@@ -144,7 +144,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
             }
 
             pub fn export_info() -> usize {
-                static ID: OnceCell<usize> = OnceCell::new();
+                static ID: OnceLock<usize> = OnceLock::new();
                 *ID.get_or_init(|| {
                     let id = Self::init_info();
                     id

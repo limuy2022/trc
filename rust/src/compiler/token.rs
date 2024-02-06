@@ -11,7 +11,7 @@ use gettextrs::gettext;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, fmt::Display, process::exit};
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq)]
 pub enum TokenType {
     // ->
     Arrow,
@@ -424,11 +424,14 @@ impl TokenLex<'_> {
                             if c == '/' {
                                 return self.next_token();
                             }
+                            self.compiler_data.input.unread(c);
                         } else if c == '\0' {
                             return Err(RuntimeError::new(
                                 Box::new(self.compiler_data.content.clone()),
                                 ErrorInfo::new(gettext(UNCLODED_COMMENT), gettext(SYNTAX_ERROR)),
                             ));
+                        } else if c == '\n' {
+                            self.compiler_data.content.add_line();
                         }
                     }
                 }

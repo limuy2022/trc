@@ -1,6 +1,6 @@
 /*
 test expr
 */
-print(1+1)
+print(1.0+9.0)
 print("hello")
-#print("ppp"+1)
+#print(1+"ppp")

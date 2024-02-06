@@ -1,6 +1,7 @@
 use super::ValuePool;
 use crate::base::stdlib::{
-    ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT, STD_CLASS_TABLE,
+    get_stdclass_end, ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT,
+    STD_CLASS_TABLE,
 };
 use lazy_static::lazy_static;
 use std::{borrow::Borrow, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
@@ -143,6 +144,10 @@ impl ClassInterface for CommonType {
     fn get_id(&self) -> usize {
         self.name
     }
+
+    fn get_override_func(&self, oper_token: super::token::TokenType) -> Option<&IOType> {
+        None
+    }
 }
 
 pub struct SymScope {
@@ -154,6 +159,7 @@ pub struct SymScope {
     vars: HashMap<usize, Var>,
     modules: HashMap<usize, &'static Stdlib>,
     types_id: usize,
+    types_custom_store: HashMap<usize, CommonType>,
 }
 
 impl SymScope {
@@ -166,6 +172,7 @@ impl SymScope {
             funcs: HashMap::new(),
             vars: HashMap::new(),
             modules: HashMap::new(),
+            types_custom_store: HashMap::new(),
             types_id: 0,
         };
         match prev_scope {
@@ -261,6 +268,27 @@ impl SymScope {
 
     pub fn get_scope_last_idx(&self) -> usize {
         self.scope_sym_id
+    }
+
+    pub fn get_class(&self, classid: usize) -> Option<Type> {
+        // 在标准库界限内
+        if classid < get_stdclass_end() {
+            return Some(Box::new(
+                STD_CLASS_TABLE.with(|std| std.borrow()[classid].clone()),
+            ));
+        }
+        // 不存在的类
+        if classid >= self.types_id {
+            return None;
+        }
+        let t = self.types.get(&classid);
+        return match t {
+            Some(t) => Some(Box::new(self.types_custom_store.get(t).unwrap().clone())),
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_class(classid),
+                None => None,
+            },
+        };
     }
 }
 

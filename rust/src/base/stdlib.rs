@@ -9,6 +9,7 @@ use crate::{
 };
 use downcast_rs::{impl_downcast, Downcast};
 use lazy_static::lazy_static;
+use std::sync::OnceLock;
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -103,6 +104,8 @@ pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display 
     fn is_any(&self) -> bool {
         self.get_id() == 0
     }
+
+    fn get_override_func(&self, oper_token: TokenType) -> Option<&IOType>;
 }
 
 impl<T> ClassClone for T
@@ -197,6 +200,13 @@ impl ClassInterface for RustClass {
     fn get_id(&self) -> usize {
         self.id
     }
+
+    fn get_override_func(&self, oper_token: TokenType) -> Option<&IOType> {
+        match self.overrides.get(&oper_token) {
+            Some(i) => Some(i),
+            None => None,
+        }
+    }
 }
 
 impl Display for RustClass {
@@ -275,4 +285,13 @@ lazy_static! {
     pub static ref ANY_TYPE: RustClass =
         RustClass::new("any", HashMap::new(), None, HashMap::new(), new_class_id());
     pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::init();
+}
+
+/// 获取到标准库的类的个数，从而区分标准库和用户自定义的类
+pub fn get_stdclass_end() -> usize {
+    static STD_NUM: OnceLock<usize> = OnceLock::new();
+    *STD_NUM.get_or_init(|| {
+        let mut num = STD_CLASS_TABLE.with(|std| std.borrow().len());
+        num
+    })
 }

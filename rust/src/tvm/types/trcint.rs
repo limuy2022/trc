@@ -16,7 +16,7 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug)]
 pub struct TrcInt {
-    _value: i64,
+    pub _value: i64,
 }
 
 impl TrcInt {
@@ -49,7 +49,7 @@ impl TrcInt {
     }
 }
 
-fn extra_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
+pub fn exact_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             gettext!(ZERO_DIV, a),
@@ -59,7 +59,7 @@ fn extra_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     Ok(a / b)
 }
 
-fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
+pub fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             gettext!(ZERO_DIV, a),
@@ -69,7 +69,7 @@ fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
     Ok(a as f64 / b as f64)
 }
 
-fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
+pub fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             gettext!(ZERO_DIV, a),
@@ -80,7 +80,7 @@ fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
 }
 
 /// won't throw error,although 0^0 is undefined,but to be more convenient to use, so we return 1
-fn power_int(a: i64, b: i64) -> i64 {
+pub fn power_int(a: i64, b: i64) -> i64 {
     if b == 0 {
         return 1;
     }
@@ -122,7 +122,7 @@ impl TrcObj for TrcInt {
     );
 
     impl_oper!(div, div_int, "/", TrcInt, TrcFloat, ?);
-    impl_oper!(extra_div, extra_div_int, "//", TrcInt, TrcInt, ?);
+    impl_oper!(extra_div, exact_div_int, "//", TrcInt, TrcInt, ?);
     impl_oper!(modd, mod_int, "%", TrcInt, TrcInt, ?);
     impl_oper!(power, power_int, "**", TrcInt, TrcInt,,);
     impl_single_oper!(bit_not, !, "~", TrcInt, TrcInt);

@@ -76,9 +76,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
 #[proc_macro]
 /// def_module!(module_name = module_name, functions = [func1 => func1, func2 => func2], classes = [class1 => class1, class2 => class2], submodules=[submodule1, submodule2])
 pub fn def_module(input: TokenStream) -> TokenStream {
-    // let input = parse_macro_input!(input as DeriveInput);
-    let processed = def_module::def_impl(input);
-    processed
+    def_module::def_impl(input)
 }
 
 #[proc_macro_attribute]

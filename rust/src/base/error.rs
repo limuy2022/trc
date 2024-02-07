@@ -84,7 +84,7 @@ impl RuntimeError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct LightFakeError {}
 
 impl Error for LightFakeError {}
@@ -101,6 +101,7 @@ impl LightFakeError {
     }
 }
 
+#[derive(Default)]
 pub struct LightFakeContent {}
 
 impl ErrorContent for LightFakeError {

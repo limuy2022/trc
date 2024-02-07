@@ -17,7 +17,7 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug)]
 pub struct TrcFloat {
-    _value: f64,
+    pub _value: f64,
 }
 
 impl TrcFloat {
@@ -43,7 +43,7 @@ impl TrcFloat {
     }
 }
 
-fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
+pub fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
             gettext!(ZERO_DIV, a),
@@ -53,7 +53,7 @@ fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
     Ok(a / b)
 }
 
-fn div_exact_float(a: f64, b: f64) -> Result<i64, ErrorInfo> {
+pub fn exact_div_float(a: f64, b: f64) -> Result<i64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
             gettext!(ZERO_DIV, a),
@@ -80,7 +80,7 @@ impl TrcObj for TrcFloat {
         le => <=, "<=",TrcFloat, TrcBool
     }
     impl_oper!(div, div_float, "/", TrcFloat, TrcFloat, ?);
-    impl_oper!(extra_div, div_exact_float, "//", TrcFloat, TrcInt, ?);
+    impl_oper!(extra_div, exact_div_float, "//", TrcFloat, TrcInt, ?);
     impl_single_oper!(self_negative, -, "-", TrcFloat, TrcFloat);
 }
 

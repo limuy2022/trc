@@ -87,28 +87,18 @@ macro_rules! impl_single_oper {
 macro_rules! gen_interface {
     ($funcname:ident, 2) => {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
-            let t2 = dydata.obj_stack.pop();
-            let t1 = dydata.obj_stack.pop();
-            if t2.is_none() || t1.is_none() {
-                return Err(ErrorInfo::new(
-                    gettext!(VM_DATA_NUMBER, 2),
-                    gettext(VM_ERROR),
-                ));
-            }
-            dydata.obj_stack.push(t1.unwrap().$funcname(t2.unwrap())?);
+            dydata.check_stack(2)?;
+            let t2 = dydata.obj_stack.pop().unwrap();
+            let t1 = dydata.obj_stack.pop().unwrap();
+            dydata.obj_stack.push(t1.$funcname(t2)?);
             Ok(())
         }
     };
     ($funcname:ident, 1) => {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
-            let t1 = dydata.obj_stack.pop();
-            if t1.is_none() {
-                return Err(ErrorInfo::new(
-                    gettext!(VM_DATA_NUMBER, 1),
-                    gettext(VM_ERROR),
-                ));
-            }
-            dydata.obj_stack.push(t1.unwrap().$funcname()?);
+            dydata.check_stack(1)?;
+            let t1 = dydata.obj_stack.pop().unwrap();
+            dydata.obj_stack.push(t1.$funcname()?);
             Ok(())
         }
     };
@@ -139,24 +129,24 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
     );
 
     fn not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
-        return Err(ErrorInfo::new(
+        Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "!", self.get_type_name()),
             gettext(OPERATOR_ERROR),
-        ));
+        ))
     }
 
     fn bit_not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
-        return Err(ErrorInfo::new(
+        Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "~", self.get_type_name()),
             gettext(OPERATOR_ERROR),
-        ));
+        ))
     }
 
     fn self_negative(&self) -> RuntimeResult<Box<dyn TrcObj>> {
-        return Err(ErrorInfo::new(
+        Err(ErrorInfo::new(
             gettext!(OPERATOR_IS_NOT_SUPPORT, "-", self.get_type_name()),
             gettext(OPERATOR_ERROR),
-        ));
+        ))
     }
 
     fn get_type_name(&self) -> &str;

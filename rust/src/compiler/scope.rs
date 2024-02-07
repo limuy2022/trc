@@ -137,12 +137,12 @@ impl ClassInterface for CommonType {
         None
     }
 
-    fn get_name(&self) -> &str {
-        &self.origin_name
-    }
-
     fn get_id(&self) -> usize {
         self.name
+    }
+
+    fn get_name(&self) -> &str {
+        &self.origin_name
     }
 
     fn get_override_func(&self, oper_token: super::token::TokenType) -> Option<&IOType> {
@@ -191,17 +191,15 @@ impl SymScope {
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
-        unsafe {
-            let funcs = &get_stdlib().sub_modules.get("prelude").unwrap().functions;
-            for i in funcs {
-                let idx = self.insert_sym(const_pool.name_pool[i.0]);
-                self.add_func(idx, Box::new((i.1).clone()));
-            }
-            let types = &get_stdlib().sub_modules.get("prelude").unwrap().classes;
-            for i in types {
-                let idx = self.insert_sym(const_pool.name_pool[i.0]);
-                self.add_type(idx, (i.1).clone());
-            }
+        let funcs = &get_stdlib().sub_modules.get("prelude").unwrap().functions;
+        for i in funcs {
+            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            self.add_func(idx, Box::new(i.1.clone()));
+        }
+        let types = &get_stdlib().sub_modules.get("prelude").unwrap().classes;
+        for i in types {
+            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            self.add_type(idx, *i.1);
         }
     }
 
@@ -230,7 +228,7 @@ impl SymScope {
     pub fn new_id(&mut self) -> usize {
         let ret = self.scope_sym_id;
         self.scope_sym_id += 1;
-        return ret;
+        ret
     }
 
     pub fn insert_sym(&mut self, id: usize) -> usize {
@@ -238,7 +236,7 @@ impl SymScope {
         if *t == self.scope_sym_id {
             self.scope_sym_id += 1;
         }
-        return *t;
+        *t
     }
 
     pub fn get_sym_idx(&self, id: usize) -> Option<usize> {
@@ -265,7 +263,7 @@ impl SymScope {
     }
 
     pub fn get_type(&self, id: usize) -> usize {
-        return self.types.get(&id).unwrap().clone();
+        return *self.types.get(&id).unwrap();
     }
 
     pub fn get_scope_last_idx(&self) -> usize {

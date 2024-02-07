@@ -291,12 +291,10 @@ impl TokenLex<'_> {
     fn check_braces_stack(&mut self, c: char) -> Result<(), RuntimeError> {
         let top = self.braces_check.pop();
         match top {
-            None => {
-                return Err(RuntimeError::new(
-                    Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), gettext(SYNTAX_ERROR)),
-                ));
-            }
+            None => Err(RuntimeError::new(
+                Box::new(self.compiler_data.content.clone()),
+                ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), gettext(SYNTAX_ERROR)),
+            )),
             Some(cc) => {
                 check_braces_match!(self, c, cc,
                     '{' => '}',
@@ -332,37 +330,46 @@ impl TokenLex<'_> {
     }
 
     fn check_whether_symbol(c: char) -> bool {
-        match c {
-            '.' | ',' | '{' | '}' | '[' | ']' | '(' | ')' | '+' | '-' | '*' | '%' | '/' | '='
-            | '!' | '>' | '<' | '~' | '^' | '|' | ':' | ';' | '&' => true,
-            _ => false,
-        }
+        matches!(
+            c,
+            '.' | ','
+                | '{'
+                | '}'
+                | '['
+                | ']'
+                | '('
+                | ')'
+                | '+'
+                | '-'
+                | '*'
+                | '%'
+                | '/'
+                | '='
+                | '!'
+                | '>'
+                | '<'
+                | '~'
+                | '^'
+                | '|'
+                | ':'
+                | ';'
+                | '&'
+        )
     }
 
     fn is_useless_char(c: char) -> bool {
-        match c {
-            ' ' | '\n' | '\t' | '\0' => true,
-            _ => false,
-        }
+        matches!(c, ' ' | '\n' | '\t' | '\0')
     }
 
     fn is_string_begin(c: char) -> bool {
-        match c {
-            '"' | '\'' => true,
-            _ => false,
-        }
+        matches!(c, '"' | '\'')
     }
 
     fn is_id_char(c: char) -> bool {
-        if Self::check_whether_symbol(c)
-            || c.is_digit(10)
+        !(Self::check_whether_symbol(c)
+            || c.is_ascii_digit()
             || Self::is_string_begin(c)
-            || Self::is_useless_char(c)
-        {
-            false
-        } else {
-            true
-        }
+            || Self::is_useless_char(c))
     }
 
     fn lex_symbol(&mut self, c: char) -> RunResult<Token> {
@@ -529,7 +536,7 @@ impl TokenLex<'_> {
             }
             c = self.compiler_data.input.read();
         }
-        let intpart = format!("{}", self.lex_num_integer(c, radix));
+        let intpart = self.lex_num_integer(c, radix).to_string();
         c = self.compiler_data.input.read();
         if c == '.' {
             // float can be used with prefix
@@ -588,13 +595,13 @@ impl TokenLex<'_> {
                 zero += 1;
             }
         }
-        return zero;
+        zero
     }
 
     fn lex_num(&mut self, mut c: char) -> RunResult<Token> {
         let tmp = self.lex_int_float(c)?;
         c = self.compiler_data.input.read();
-        return if c == 'e' || c == 'E' {
+        if c == 'e' || c == 'E' {
             c = self.compiler_data.input.read();
             let mut up_flag: i64 = 1;
             if c == '+' {
@@ -683,7 +690,7 @@ impl TokenLex<'_> {
         } else {
             self.compiler_data.input.unread(c);
             Ok(self.turn_to_token(tmp))
-        };
+        }
     }
 
     fn lex_str(&mut self, start_char: char) -> RunResult<Token> {
@@ -728,46 +735,43 @@ impl TokenLex<'_> {
             let tmp = self.unget_token.pop().unwrap();
             return Ok(tmp);
         }
-        let presecnt_lex;
-        loop {
-            presecnt_lex = self.compiler_data.input.read();
-            match presecnt_lex {
-                '\0' => {
-                    return Ok(Token::new(TokenType::EndOfFile, None));
-                }
-                '\t' | ' ' => {
-                    return self.next_token();
-                }
-                '\n' => {
-                    self.compiler_data.content.add_line();
-                    return self.next_token();
-                }
-                '#' => {
-                    // 注释
-                    loop {
-                        let c = self.compiler_data.input.read();
-                        if c == '\n' {
-                            self.compiler_data.content.add_line();
-                            return self.next_token();
-                        }
-                        if c == '\0' {
-                            return Ok(Token::new(TokenType::EndOfFile, None));
-                        }
+        let presecnt_lex = self.compiler_data.input.read();
+        match presecnt_lex {
+            '\0' => {
+                return Ok(Token::new(TokenType::EndOfFile, None));
+            }
+            '\t' | ' ' => {
+                return self.next_token();
+            }
+            '\n' => {
+                self.compiler_data.content.add_line();
+                return self.next_token();
+            }
+            '#' => {
+                // 注释
+                loop {
+                    let c = self.compiler_data.input.read();
+                    if c == '\n' {
+                        self.compiler_data.content.add_line();
+                        return self.next_token();
+                    }
+                    if c == '\0' {
+                        return Ok(Token::new(TokenType::EndOfFile, None));
                     }
                 }
-                _ => break,
             }
+            _ => {}
         }
-        if presecnt_lex.is_digit(10) {
-            return Ok(self.lex_num(presecnt_lex)?);
+        if presecnt_lex.is_ascii_digit() {
+            return self.lex_num(presecnt_lex);
         }
         if Self::is_string_begin(presecnt_lex) {
-            return Ok(self.lex_str(presecnt_lex)?);
+            return self.lex_str(presecnt_lex);
         }
         if Self::check_whether_symbol(presecnt_lex) {
-            return Ok(self.lex_symbol(presecnt_lex)?);
+            return self.lex_symbol(presecnt_lex);
         }
-        Ok(self.lex_id(presecnt_lex)?)
+        self.lex_id(presecnt_lex)
     }
 
     pub fn next_back(&mut self, t: Token) {
@@ -826,12 +830,9 @@ impl TokenLex<'_> {
 impl Drop for TokenLex<'_> {
     fn drop(&mut self) {
         // check the braces stack
-        match self.check() {
-            Err(e) => {
-                eprintln!("{}", e);
-                exit(1);
-            }
-            _ => {}
+        if let Err(e) = self.check() {
+            eprintln!("{}", e);
+            exit(1);
         }
     }
 }
@@ -918,7 +919,7 @@ mod tests {
             ],
         );
         check_pool(
-            vec![100, 232_304904, 0b011, 0x2aA4, 0o2434, 0, 1, 1e9 as i64],
+            vec![100, 232_304904, 0b011, 0x2AA4, 0o2434, 0, 1, 1e9 as i64],
             &t.compiler_data.const_pool.const_ints,
         );
         check_pool(

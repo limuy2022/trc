@@ -12,7 +12,7 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug)]
 pub struct TrcStr {
-    _value: String,
+    pub _value: String,
 }
 
 fn cat_string(a: String, b: String) -> String {

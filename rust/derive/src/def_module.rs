@@ -111,7 +111,7 @@ pub fn def_impl(content: TokenStream) -> TokenStream {
                             if let TokenTree::Ident(x) = i {
                                 submodules
                                     .push(syn::parse_str::<syn::Ident>(&(x.to_string())).unwrap());
-                            } else if let TokenTree::Ident(x) = i {
+                            } else if let TokenTree::Punct(x) = i {
                                 let x = x.to_string();
                                 if x != "," {
                                     panic!("expected ,.get {}", x);

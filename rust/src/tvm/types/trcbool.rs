@@ -13,7 +13,7 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug)]
 pub struct TrcBool {
-    _value: bool,
+    pub _value: bool,
 }
 
 #[trc_method]

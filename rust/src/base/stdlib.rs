@@ -5,17 +5,12 @@ use crate::{
         scope::{Type, TypeAllowNull, Var},
         token::TokenType,
     },
-    hash_map,
     tvm::DynaData,
 };
 use downcast_rs::{impl_downcast, Downcast};
 use lazy_static::lazy_static;
+use std::sync::OnceLock;
 use std::{
-    borrow::{Borrow, BorrowMut},
-    sync::OnceLock,
-};
-use std::{
-    cell::RefCell,
     collections::HashMap,
     fmt::{Debug, Display},
 };
@@ -51,13 +46,13 @@ impl IOType {
                 gettextrs::gettext(ARGUMENT_ERROR),
             ));
         }
-        for i in 0..self.argvs_type.len() {
-            if self.argvs_type[i] == 0 {
+        for i in argvs.iter().enumerate().take(self.argvs_type.len()) {
+            if self.argvs_type[i.0] == 0 {
                 continue;
             }
-            if self.argvs_type[i] != argvs[i] {
+            if self.argvs_type[i.0] != *i.1 {
                 return Err(ErrorInfo::new(
-                    gettextrs::gettext!(EXPECT_TYPE, self.argvs_type[i], argvs[i]),
+                    gettextrs::gettext!(EXPECT_TYPE, self.argvs_type[i.0], i.1),
                     gettextrs::gettext(ARGUMENT_ERROR),
                 ));
             }
@@ -159,8 +154,8 @@ impl RustClass {
     ) -> RustClass {
         RustClass {
             members,
-            functions: functions.unwrap_or_else(|| HashMap::new()),
-            overrides: overrides.unwrap_or_else(|| HashMap::new()),
+            functions: functions.unwrap_or_default(),
+            overrides: overrides.unwrap_or_default(),
             id,
             name,
         }
@@ -197,12 +192,12 @@ impl ClassInterface for RustClass {
         }
     }
 
-    fn get_name(&self) -> &str {
-        self.name
-    }
-
     fn get_id(&self) -> usize {
         self.id
+    }
+
+    fn get_name(&self) -> &str {
+        self.name
     }
 
     fn get_override_func(&self, oper_token: TokenType) -> Option<&IOType> {
@@ -224,10 +219,7 @@ pub static mut STD_CLASS_TABLE: Vec<RustClass> = vec![];
 
 pub fn get_stdlib() -> &'static Stdlib {
     static INIT: OnceLock<Stdlib> = OnceLock::new();
-    INIT.get_or_init(|| {
-        let mut ret = crate::tvm::stdlib::import_stdlib();
-        ret
-    })
+    INIT.get_or_init(crate::tvm::stdlib::import_stdlib)
 }
 
 pub fn new_class_id() -> usize {
@@ -288,7 +280,7 @@ impl Stdlib {
         }
         let item = item.unwrap();
         let lock = self.sub_modules.get(&item).unwrap();
-        return lock.get_module(path);
+        lock.get_module(path)
     }
 }
 
@@ -299,8 +291,5 @@ lazy_static! {
 /// 获取到标准库的类的个数，从而区分标准库和用户自定义的类
 pub fn get_stdclass_end() -> usize {
     static STD_NUM: OnceLock<usize> = OnceLock::new();
-    *STD_NUM.get_or_init(|| unsafe {
-        let mut num = STD_CLASS_TABLE.len();
-        num
-    })
+    *STD_NUM.get_or_init(|| unsafe { STD_CLASS_TABLE.len() })
 }

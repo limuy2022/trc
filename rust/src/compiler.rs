@@ -2,6 +2,7 @@
 //! reference float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
 
 mod ast;
+pub mod llvm_convent;
 pub mod scope;
 pub mod token;
 
@@ -9,7 +10,7 @@ use self::token::TokenLex;
 use crate::base::codegen::{ConstPool, StaticData};
 use crate::base::error::{self, RunResult};
 use crate::cfg;
-use std::collections::{hash_map, HashMap};
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::io::BufRead;
 use std::{fs, io, vec};
@@ -366,7 +367,6 @@ impl Compiler {
 
 mod tests {
     use super::*;
-    use std::fs::{read_to_string, File};
 
     fn check_read(reader: &mut impl TokenIo<Item = char>, s: &str) {
         let mut iter = s.chars();
@@ -391,8 +391,9 @@ mod tests {
     #[test]
     fn test_file_read() {
         let test_file_path = "tests/testdata/compiler/compiler1.txt";
-        let source = read_to_string(test_file_path).expect("please run in root dir");
-        let mut t = FileSource::new(File::open(test_file_path).expect("please run in root dir"));
+        let source = std::fs::read_to_string(test_file_path).expect("please run in root dir");
+        let mut t =
+            FileSource::new(std::fs::File::open(test_file_path).expect("please run in root dir"));
         let mut tmp: Vec<char> = vec![t.read(), t.read()];
         tmp.reverse();
         for i in &tmp {

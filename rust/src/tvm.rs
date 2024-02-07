@@ -5,17 +5,17 @@ mod gc;
 pub mod stdlib;
 mod types;
 
-use std::borrow::Borrow;
-
-use self::types::trcfloat::TrcFloat;
-use self::types::trcint::TrcInt;
+use self::types::trcfloat::{div_float, exact_div_float, TrcFloat};
+use self::types::trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt};
 use self::types::trcstr::TrcStr;
+use self::types::{TrcBool, TrcChar, TrcObj};
 use crate::base::codegen::{self, StaticData};
 use crate::base::stdlib::STD_FUNC_TABLE;
 use crate::{base::error::*, cfg};
 use gettextrs::gettext;
 use libloading::Library;
 
+#[derive(Default)]
 pub struct DynaData<'a> {
     obj_stack: Vec<Box<dyn types::TrcObj>>,
     frames_stack: Vec<function::Frame<'a>>,
@@ -27,6 +27,16 @@ impl<'a> DynaData<'a> {
             obj_stack: Vec::new(),
             frames_stack: vec![],
         }
+    }
+
+    pub fn check_stack(&self, require: usize) -> RuntimeResult<()> {
+        if self.obj_stack.len() < require {
+            return Err(ErrorInfo::new(
+                gettext!(VM_DATA_NUMBER, require),
+                gettext(VM_ERROR),
+            ));
+        }
+        Ok(())
     }
 }
 
@@ -72,7 +82,7 @@ fn load_libc() -> Option<&'static Library> {
     #[cfg(target_os = "linux")]
     {
         let tmp = LIBC.get_or_init(|| unsafe {
-            let lib: Result<Library, libloading::Error> = libloading::Library::new("");
+            let lib: Result<Library, libloading::Error> = Library::new("");
             match lib {
                 Err(_) => None,
                 Ok(val) => Some(val),
@@ -80,7 +90,7 @@ fn load_libc() -> Option<&'static Library> {
         });
         match tmp {
             None => None,
-            Some(val) => Some(&val),
+            Some(val) => Some(val),
         }
     }
     #[cfg(target_os = "windows")]
@@ -136,6 +146,39 @@ impl<'a> Vm<'a> {
         }
     }
 
+    pub fn impl_ty_opcode<T1: TrcObj, T2: TrcObj>(&mut self) -> RunResult<(Box<T1>, Box<T2>)> {
+        let tmp = self.dynadata.check_stack(2);
+        self.throw_err_info(tmp)?;
+        let second = self
+            .dynadata
+            .obj_stack
+            .pop()
+            .unwrap()
+            .downcast::<T2>()
+            .unwrap();
+        let first = self
+            .dynadata
+            .obj_stack
+            .pop()
+            .unwrap()
+            .downcast::<T1>()
+            .unwrap();
+        Ok((first, second))
+    }
+
+    pub fn impl_unary_opcode<T1: TrcObj>(&mut self) -> RunResult<Box<T1>> {
+        let tmp = self.dynadata.check_stack(1);
+        self.throw_err_info(tmp)?;
+        let first = self
+            .dynadata
+            .obj_stack
+            .pop()
+            .unwrap()
+            .downcast::<T1>()
+            .unwrap();
+        Ok(first)
+    }
+
     pub fn new_init(static_data: StaticData) -> Self {
         Self {
             pc: 0,
@@ -147,6 +190,13 @@ impl<'a> Vm<'a> {
 
     pub fn set_static_data(&mut self, static_data: StaticData) {
         self.static_data = static_data;
+    }
+
+    pub fn throw_err_info<T>(&self, info: RuntimeResult<T>) -> RunResult<T> {
+        match info {
+            Ok(data) => Ok(data),
+            Err(e) => Err(RuntimeError::new(Box::new(self.run_contnet.clone()), e)),
+        }
     }
 
     pub fn run(&mut self) -> Result<(), RuntimeError> {
@@ -217,14 +267,252 @@ impl<'a> Vm<'a> {
                     operator_opcode!(self_negative, self);
                 }
                 codegen::Opcode::CallNative => unsafe {
-                    match STD_FUNC_TABLE[self.static_data.inst[self.pc].operand](&mut self.dynadata)
-                    {
-                        Ok(_) => {}
-                        Err(e) => {
-                            return Err(RuntimeError::new(Box::new(self.run_contnet.clone()), e));
-                        }
-                    }
+                    let tmp =
+                        STD_FUNC_TABLE[self.static_data.inst[self.pc].operand](&mut self.dynadata);
+                    self.throw_err_info(tmp)?;
                 },
+                codegen::Opcode::AddInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value + second._value)));
+                }
+                codegen::Opcode::AddFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcFloat::new(first._value + second._value)));
+                }
+                codegen::Opcode::AddStr => {
+                    let (first, second) = self.impl_ty_opcode::<TrcStr, TrcStr>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcStr::new(format!(
+                        "{}{}",
+                        first._value, second._value
+                    ))));
+                }
+                codegen::Opcode::SubInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value - second._value)));
+                }
+                codegen::Opcode::SubFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcFloat::new(first._value - second._value)));
+                }
+                codegen::Opcode::MulInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value * second._value)));
+                }
+                codegen::Opcode::MulFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcFloat::new(first._value * second._value)));
+                }
+                codegen::Opcode::DivInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcFloat::new(
+                        self.throw_err_info(div_int(first._value, second._value))?,
+                    )));
+                }
+                codegen::Opcode::DivFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcFloat::new(
+                        self.throw_err_info(div_float(first._value, second._value))?,
+                    )));
+                }
+                codegen::Opcode::ExtraDivInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(
+                        self.throw_err_info(exact_div_int(first._value, second._value))?,
+                    )));
+                }
+                codegen::Opcode::ExtraDivFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(
+                        self.throw_err_info(exact_div_float(first._value, second._value))?,
+                    )));
+                }
+                codegen::Opcode::ModInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(
+                        self.throw_err_info(mod_int(first._value, second._value))?,
+                    )));
+                }
+                codegen::Opcode::PowerInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata.obj_stack.push(Box::new(TrcInt::new(power_int(
+                        first._value,
+                        second._value,
+                    ))));
+                }
+                codegen::Opcode::EqInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value == second._value)));
+                }
+                codegen::Opcode::EqFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value == second._value)));
+                }
+                codegen::Opcode::EqStr => {
+                    let (first, second) = self.impl_ty_opcode::<TrcStr, TrcStr>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value == second._value)));
+                }
+                codegen::Opcode::EqChar => {
+                    let (first, second) = self.impl_ty_opcode::<TrcChar, TrcChar>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value == second._value)));
+                }
+                codegen::Opcode::EqBool => {
+                    let (first, second) = self.impl_ty_opcode::<TrcBool, TrcBool>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value == second._value)));
+                }
+                codegen::Opcode::NeInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value != second._value)));
+                }
+                codegen::Opcode::NeFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value != second._value)));
+                }
+                codegen::Opcode::NeStr => {
+                    let (first, second) = self.impl_ty_opcode::<TrcStr, TrcStr>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value != second._value)));
+                }
+                codegen::Opcode::NeChar => {
+                    let (first, second) = self.impl_ty_opcode::<TrcChar, TrcChar>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value != second._value)));
+                }
+                codegen::Opcode::NeBool => {
+                    let (first, second) = self.impl_ty_opcode::<TrcBool, TrcBool>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value != second._value)));
+                }
+                codegen::Opcode::LtInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value < second._value)));
+                }
+                codegen::Opcode::LtFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value < second._value)));
+                }
+                codegen::Opcode::LeInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value <= second._value)));
+                }
+                codegen::Opcode::LeFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value <= second._value)));
+                }
+                codegen::Opcode::GtInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value > second._value)));
+                }
+                codegen::Opcode::GtFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value > second._value)));
+                }
+                codegen::Opcode::GeInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value >= second._value)));
+                }
+                codegen::Opcode::GeFloat => {
+                    let (first, second) = self.impl_ty_opcode::<TrcFloat, TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value >= second._value)));
+                }
+                codegen::Opcode::AndBool => {
+                    let (first, second) = self.impl_ty_opcode::<TrcBool, TrcBool>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value && second._value)));
+                }
+                codegen::Opcode::OrBool => {
+                    let (first, second) = self.impl_ty_opcode::<TrcBool, TrcBool>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(first._value || second._value)));
+                }
+                codegen::Opcode::NotBool => {
+                    let first = self.impl_unary_opcode::<TrcBool>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcBool::new(!first._value)));
+                }
+                codegen::Opcode::XorInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value ^ second._value)));
+                }
+                codegen::Opcode::BitNotInt => {
+                    let first = self.impl_unary_opcode::<TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(!first._value)));
+                }
+                codegen::Opcode::BitAndInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value & second._value)));
+                }
+                codegen::Opcode::BitOrInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value | second._value)));
+                }
+                codegen::Opcode::BitLeftShiftInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value << second._value)));
+                }
+                codegen::Opcode::BitRightShiftInt => {
+                    let (first, second) = self.impl_ty_opcode::<TrcInt, TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(first._value >> second._value)));
+                }
             }
             self.pc += 1;
         }

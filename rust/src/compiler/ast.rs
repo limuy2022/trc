@@ -5,7 +5,6 @@ use crate::base::codegen::{Inst, Opcode, NO_ARG};
 use crate::base::stdlib::{get_stdlib, RustFunction};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
-use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -49,7 +48,6 @@ macro_rules! tmp_expe_function_gen {
                         Some(v) => {
                             if let Ok(_) = v.check_argvs(vec![tya]) {}
                             else {
-                                let func_obja = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
                                 return try_err!(istry,
                                     Box::new(self.token_lexer.compiler_data.content.clone()),
                                     ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()), gettextrs::gettext(OPERATOR_ERROR)))
@@ -98,14 +96,12 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
-        unsafe {
-            let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
-            for i in &prelude.functions {
-                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
-            }
-            for i in &prelude.classes {
-                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
-            }
+        let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
+        for i in &prelude.functions {
+            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+        }
+        for i in &prelude.classes {
+            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
@@ -198,7 +194,7 @@ impl<'a> AstBuilder<'a> {
         return if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
             let idx = self.self_scope.as_ref().borrow().get_sym_idx(token_data);
-            if let None = idx {
+            if idx.is_none() {
                 return try_err!(
                     istry,
                     Box::new(self.token_lexer.compiler_data.content.clone()),
@@ -219,15 +215,12 @@ impl<'a> AstBuilder<'a> {
                 self.check_next_token(TokenType::RightSmallBrace)?;
                 let tmp = self.self_scope.as_ref().borrow();
                 let func_obj = tmp.get_function(idx).unwrap();
-                match func_obj.get_io().check_argvs(argv_list) {
-                    Err(e) => {
-                        return try_err!(
-                            istry,
-                            Box::new(self.token_lexer.compiler_data.content.clone()),
-                            e
-                        )
-                    }
-                    Ok(_) => {}
+                if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
+                    return try_err!(
+                        istry,
+                        Box::new(self.token_lexer.compiler_data.content.clone()),
+                        e
+                    );
                 }
                 drop(tmp);
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
@@ -318,7 +311,7 @@ impl<'a> AstBuilder<'a> {
 
     fn factor(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let next_token = self.token_lexer.next_token()?;
-        return match next_token.tp {
+        match next_token.tp {
             TokenType::Sub => {
                 let ret = self.factor(istry)?;
                 self.add_bycode(Opcode::SelfNegative, NO_ARG);
@@ -344,7 +337,7 @@ impl<'a> AstBuilder<'a> {
                 self.token_lexer.next_back(next_token);
                 Ok(self.item(istry)?)
             }
-        };
+        }
     }
 
     fn def_func(&mut self, istry: bool) -> AstError<()> {
@@ -379,15 +372,13 @@ impl<'a> AstBuilder<'a> {
         // the standard library first
         let strpath = path.to_str().unwrap();
         if strpath.get(0..3) == Some("std") {
-        } else {
-            if let InputSource::File(now_module_path) =
-                self.token_lexer.compiler_data.option.inputsource.clone()
-            {
-                let mut now_module_path = std::path::PathBuf::from(now_module_path);
-                now_module_path.pop();
-                now_module_path = now_module_path.join(path);
-                if now_module_path.exists() {}
-            }
+        } else if let InputSource::File(now_module_path) =
+            self.token_lexer.compiler_data.option.inputsource.clone()
+        {
+            let mut now_module_path = std::path::PathBuf::from(now_module_path);
+            now_module_path.pop();
+            now_module_path = now_module_path.join(path);
+            if now_module_path.exists() {}
         }
         Ok(())
     }
@@ -413,7 +404,7 @@ impl<'a> AstBuilder<'a> {
                 match tt.tp {
                     TokenType::Assign => {
                         let var = self.self_scope.as_ref().borrow().get_sym_idx(name);
-                        if let None = var {
+                        if var.is_none() {
                             return Err(RuntimeError::new(
                                 Box::new(self.token_lexer.compiler_data.content.clone()),
                                 ErrorInfo::new(
@@ -470,7 +461,7 @@ impl<'a> AstBuilder<'a> {
             self.token_lexer.next_back(token);
             self.statement()?;
         }
-        return Ok(());
+        Ok(())
     }
 
     fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
@@ -619,25 +610,23 @@ mod tests {
     fn test_call_builtin_function() {
         gen_test_env!(r#"print("hello world!")"#, t);
         t.generate_code().unwrap();
-        unsafe {
-            assert_eq!(
-                t.staticdata.inst,
-                vec![
-                    Inst::new(Opcode::LoadString, 0),
-                    Inst::new(
-                        Opcode::CallNative,
-                        get_stdlib()
-                            .sub_modules
-                            .get("prelude")
-                            .unwrap()
-                            .functions
-                            .get("print")
-                            .unwrap()
-                            .buildin_id
-                    ),
-                ]
-            )
-        }
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
+            ]
+        )
     }
 
     #[test]

@@ -2,9 +2,10 @@ use super::token::TokenType;
 use super::TokenLex;
 use super::{scope::*, InputSource};
 use crate::base::codegen::{Inst, Opcode, NO_ARG};
-use crate::base::stdlib::{RustFunction, STDLIB_ROOT};
+use crate::base::stdlib::{get_stdlib, RustFunction};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
+use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -97,12 +98,14 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
-        let prelude = STDLIB_ROOT.sub_modules.get("prelude").unwrap().clone();
-        for i in prelude.functions {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
-        }
-        for i in prelude.classes {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+        unsafe {
+            let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
+            for i in &prelude.functions {
+                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            }
+            for i in &prelude.classes {
+                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            }
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
@@ -583,7 +586,7 @@ mod tests {
 
     #[test]
     fn test_expr_final() {
-        gen_test_env!(r#"(1+-2)*3/4**(5**6)==1||7==(8&9)"#, t);
+        gen_test_env!(r#"(1+-2)*3//4**(5**6)==1||7==(8&9)"#, t);
         t.generate_code().unwrap();
         assert_eq!(
             t.staticdata.inst,
@@ -599,7 +602,7 @@ mod tests {
                 Inst::new(Opcode::LoadInt, 6),
                 Inst::new(Opcode::Power, NO_ARG),
                 Inst::new(Opcode::Power, NO_ARG),
-                Inst::new(Opcode::Div, NO_ARG),
+                Inst::new(Opcode::ExtraDiv, NO_ARG),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::Eq, NO_ARG),
                 Inst::new(Opcode::LoadInt, 7),
@@ -616,23 +619,25 @@ mod tests {
     fn test_call_builtin_function() {
         gen_test_env!(r#"print("hello world!")"#, t);
         t.generate_code().unwrap();
-        assert_eq!(
-            t.staticdata.inst,
-            vec![
-                Inst::new(Opcode::LoadString, 0),
-                Inst::new(
-                    Opcode::CallNative,
-                    STDLIB_ROOT
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
-                ),
-            ]
-        )
+        unsafe {
+            assert_eq!(
+                t.staticdata.inst,
+                vec![
+                    Inst::new(Opcode::LoadString, 0),
+                    Inst::new(
+                        Opcode::CallNative,
+                        get_stdlib()
+                            .sub_modules
+                            .get("prelude")
+                            .unwrap()
+                            .functions
+                            .get("print")
+                            .unwrap()
+                            .buildin_id
+                    ),
+                ]
+            )
+        }
     }
 
     #[test]

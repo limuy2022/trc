@@ -129,28 +129,28 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
                     None,
                     classid
                 );
-                STD_CLASS_TABLE.with(|std| {
-                    std.borrow_mut().push(ret);
-                });
+                unsafe {
+                    STD_CLASS_TABLE.push(ret);
+                }
                 classid
             }
 
             pub fn gen_funcs_info() {
-                STD_CLASS_TABLE.with(|std| {
-                    std.borrow_mut()[Self::export_info()].functions = Self::function_export();
-                });
+                unsafe {
+                    STD_CLASS_TABLE[Self::export_info()].functions = Self::function_export();
+                }
             }
 
             pub fn gen_overrides_info() {
-                STD_CLASS_TABLE.with(|std| {
-                    std.borrow_mut()[Self::export_info()].overrides = Self::override_export();
-                });
+                unsafe {
+                    STD_CLASS_TABLE[Self::export_info()].overrides = Self::override_export();
+                }
             }
 
             pub fn modify_shadow_name(name: &'static str) {
-                STD_CLASS_TABLE.with(|std| {
-                    std.borrow_mut()[Self::export_info()].name = name;
-                });
+                unsafe {
+                    STD_CLASS_TABLE[Self::export_info()].name = name;
+                }
             }
 
             pub fn export_info() -> usize {

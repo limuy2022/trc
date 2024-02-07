@@ -5,11 +5,15 @@ use crate::{
         scope::{Type, TypeAllowNull, Var},
         token::TokenType,
     },
+    hash_map,
     tvm::DynaData,
 };
 use downcast_rs::{impl_downcast, Downcast};
 use lazy_static::lazy_static;
-use std::sync::OnceLock;
+use std::{
+    borrow::{Borrow, BorrowMut},
+    sync::OnceLock,
+};
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -215,23 +219,30 @@ impl Display for RustClass {
     }
 }
 
-thread_local! {
-    pub static STD_FUNC_TABLE: RefCell<Vec<StdlibFunc>> = RefCell::new(vec![]);
-    pub static STD_CLASS_TABLE: RefCell<Vec<RustClass>> = RefCell::new(vec![]);
+pub static mut STD_FUNC_TABLE: Vec<StdlibFunc> = vec![];
+pub static mut STD_CLASS_TABLE: Vec<RustClass> = vec![];
+
+pub fn get_stdlib() -> &'static Stdlib {
+    static INIT: OnceLock<Stdlib> = OnceLock::new();
+    INIT.get_or_init(|| {
+        let mut ret = crate::tvm::stdlib::import_stdlib();
+        ret
+    })
 }
 
 pub fn new_class_id() -> usize {
-    STD_CLASS_TABLE.with(|std| std.borrow().len())
+    unsafe { STD_CLASS_TABLE.len() }
 }
 
 impl RustFunction {
     pub fn new(name: impl Into<String>, ptr: StdlibFunc, io: IOType) -> RustFunction {
+        let buildin_id = unsafe {
+            STD_FUNC_TABLE.push(ptr);
+            STD_FUNC_TABLE.len()
+        } - 1;
         Self {
             name: name.into(),
-            buildin_id: STD_FUNC_TABLE.with(|std| {
-                std.borrow_mut().push(ptr);
-                std.borrow().len()
-            }) - 1,
+            buildin_id,
             ptr,
             io,
         }
@@ -283,14 +294,13 @@ impl Stdlib {
 
 lazy_static! {
     pub static ref ANY_TYPE: RustClass = RustClass::new("any", HashMap::new(), None, None, 0);
-    pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::import_stdlib();
 }
 
 /// 获取到标准库的类的个数，从而区分标准库和用户自定义的类
 pub fn get_stdclass_end() -> usize {
     static STD_NUM: OnceLock<usize> = OnceLock::new();
-    *STD_NUM.get_or_init(|| {
-        let mut num = STD_CLASS_TABLE.with(|std| std.borrow().len());
+    *STD_NUM.get_or_init(|| unsafe {
+        let mut num = STD_CLASS_TABLE.len();
         num
     })
 }

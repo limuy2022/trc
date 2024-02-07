@@ -3,18 +3,7 @@ use crate::base::stdlib::{
     get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, Stdlib,
     STD_CLASS_TABLE,
 };
-use lazy_static::lazy_static;
-use std::{borrow::Borrow, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
-
-lazy_static! {
-    static ref VAR_TYPE: Vec<String> = vec![
-        "int".to_string(),
-        "float".to_string(),
-        "str".to_string(),
-        "bool".to_string(),
-        "bigint".to_string(),
-    ];
-}
+use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
 #[derive(Clone, Debug)]
 pub enum TypeAllowNull {

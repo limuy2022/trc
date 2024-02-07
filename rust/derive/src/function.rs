@@ -47,7 +47,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                 };
                 // println!("argv:{:#?}", path);
                 if path.path.segments[0].ident == "any" {
-                    args_type_required.push(parse_str("RustClass").unwrap());
+                    args_type_required.push(parse_str("AnyType").unwrap());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
                             "let mut {} = dydata.obj_stack.pop().unwrap();",

@@ -450,7 +450,6 @@ dependencies = [
  "derive",
  "downcast-rs",
  "gettext-rs",
- "lazy_static",
  "libloading",
  "llvm-sys",
  "num-bigint",

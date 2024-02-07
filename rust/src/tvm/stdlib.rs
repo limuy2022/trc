@@ -1,4 +1,4 @@
-use crate::base::stdlib::{new_class_id, Stdlib, ANY_TYPE, STD_CLASS_TABLE};
+use crate::base::stdlib::{get_any_type, new_class_id, Stdlib, STD_CLASS_TABLE};
 use derive::def_module;
 
 pub mod algo;
@@ -10,8 +10,7 @@ def_module!(module_name = std, submodules = [prelude, ds, algo]);
 pub fn import_stdlib() -> Stdlib {
     let _newid = new_class_id();
     unsafe {
-        STD_CLASS_TABLE.push(ANY_TYPE.clone());
+        STD_CLASS_TABLE.push(get_any_type().clone());
     }
-
     init()
 }

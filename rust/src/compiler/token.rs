@@ -8,8 +8,7 @@ use crate::{
     hash_map,
 };
 use gettextrs::gettext;
-use lazy_static::lazy_static;
-use std::{collections::HashMap, fmt::Display, process::exit};
+use std::{collections::HashMap, fmt::Display, process::exit, sync::OnceLock};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq)]
 pub enum TokenType {
@@ -255,23 +254,32 @@ macro_rules! check_braces_match {
     }}
 }
 
-lazy_static! {
-    static ref KEYWORDS: HashMap<String, TokenType> = hash_map![
-        "while".to_string() => TokenType::While,
-        "for".to_string() => TokenType::For,
-        "if".to_string() => TokenType::If,
-        "else".to_string() => TokenType::Else,
-        "class".to_string() => TokenType::Class,
-        "func".to_string() => TokenType::Func,
-        "match".to_string() => TokenType::Match,
-        "return".to_string() => TokenType::Return,
-        "import".to_string() => TokenType::Import
-    ];
-    static ref RADIX_TO_PREFIX: HashMap<usize, &'static str> = hash_map![
-        2 => "0b",
-        8 => "0o",
-        16 => "0x"
-    ];
+fn get_keywords() -> &'static HashMap<String, TokenType> {
+    static KEYWORDS: OnceLock<HashMap<String, TokenType>> = OnceLock::new();
+    KEYWORDS.get_or_init(|| {
+        hash_map![
+            "while".to_string() => TokenType::While,
+            "for".to_string() => TokenType::For,
+            "if".to_string() => TokenType::If,
+            "else".to_string() => TokenType::Else,
+            "class".to_string() => TokenType::Class,
+            "func".to_string() => TokenType::Func,
+            "match".to_string() => TokenType::Match,
+            "return".to_string() => TokenType::Return,
+            "import".to_string() => TokenType::Import
+        ]
+    })
+}
+
+fn get_redix_to_prefix() -> &'static HashMap<usize, &'static str> {
+    static RADIX_TO_PREFIX: OnceLock<HashMap<usize, &'static str>> = OnceLock::new();
+    RADIX_TO_PREFIX.get_or_init(|| {
+        hash_map![
+            2 => "0b",
+            8 => "0o",
+            16 => "0x"
+        ]
+    })
 }
 
 enum NumValue {
@@ -318,7 +326,7 @@ impl TokenLex<'_> {
                     break;
                 }
             }
-            let tmp = KEYWORDS.get(&retname);
+            let tmp = get_keywords().get(&retname);
             match tmp {
                 Some(val) => Token::new((*val).clone(), None),
                 None => Token::new(
@@ -544,7 +552,7 @@ impl TokenLex<'_> {
                 return Err(RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(PREFIX_FOR_FLOAT, RADIX_TO_PREFIX[&(radix as usize)]),
+                        gettext!(PREFIX_FOR_FLOAT, get_redix_to_prefix()[&(radix as usize)]),
                         gettext(SYNTAX_ERROR),
                     ),
                 ));

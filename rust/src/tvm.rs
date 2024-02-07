@@ -513,6 +513,18 @@ impl<'a> Vm<'a> {
                         .obj_stack
                         .push(Box::new(TrcInt::new(first._value >> second._value)));
                 }
+                codegen::Opcode::SelfNegativeInt => {
+                    let first = self.impl_unary_opcode::<TrcInt>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcInt::new(-first._value)));
+                }
+                codegen::Opcode::SelfNegativeFloat => {
+                    let first = self.impl_unary_opcode::<TrcFloat>()?;
+                    self.dynadata
+                        .obj_stack
+                        .push(Box::new(TrcFloat::new(-first._value)));
+                }
             }
             self.pc += 1;
         }

@@ -88,6 +88,8 @@ pub enum Opcode {
     Empty,
     // a = -a
     SelfNegative,
+    SelfNegativeInt,
+    SelfNegativeFloat,
     // call native func
     CallNative,
 }

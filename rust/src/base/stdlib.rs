@@ -8,7 +8,6 @@ use crate::{
     tvm::DynaData,
 };
 use downcast_rs::{impl_downcast, Downcast};
-use lazy_static::lazy_static;
 use std::sync::OnceLock;
 use std::{
     collections::HashMap,
@@ -16,6 +15,7 @@ use std::{
 };
 
 type StdlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
+const ANY_TYPE_ID: usize = 0;
 
 #[derive(Clone, Debug)]
 pub struct IOType {
@@ -168,10 +168,6 @@ impl RustClass {
     pub fn add_attr(&mut self, name: impl Into<String>, attr: Var) {
         self.members.insert(name.into(), attr);
     }
-
-    pub fn export_info() -> usize {
-        0
-    }
 }
 
 impl ClassInterface for RustClass {
@@ -284,8 +280,17 @@ impl Stdlib {
     }
 }
 
-lazy_static! {
-    pub static ref ANY_TYPE: RustClass = RustClass::new("any", HashMap::new(), None, None, 0);
+pub fn get_any_type() -> &'static RustClass {
+    static ANY_TYPE: OnceLock<RustClass> = OnceLock::new();
+    ANY_TYPE.get_or_init(|| RustClass::new("any", HashMap::new(), None, None, ANY_TYPE_ID))
+}
+
+pub struct AnyType {}
+
+impl AnyType {
+    pub fn export_info() -> usize {
+        ANY_TYPE_ID
+    }
 }
 
 /// 获取到标准库的类的个数，从而区分标准库和用户自定义的类

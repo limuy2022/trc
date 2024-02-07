@@ -51,8 +51,7 @@ macro_rules! tmp_expe_function_gen {
                                 let func_obja = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
                                 return try_err!(istry,
                                     Box::new(self.token_lexer.compiler_data.content.clone()),
-                                    ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, func_obj.get_name(),
-                                            func_obja.get_name()), gettextrs::gettext(TYPE_ERROR)))
+                                    ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()), gettextrs::gettext(OPERATOR_ERROR)))
                             }
                         }
                     }
@@ -467,16 +466,8 @@ impl<'a> AstBuilder<'a> {
             _ => {}
         }
         self.token_lexer.next_back(t.clone());
-        if let Ok(_) = self.expr(true) {
-            return Ok(());
-        }
-        return Err(RuntimeError::new(
-            Box::new(self.token_lexer.compiler_data.content.clone()),
-            ErrorInfo::new(
-                gettext!(UNEXPECTED_TOKEN, t.tp),
-                gettextrs::gettext(SYNTAX_ERROR),
-            ),
-        ));
+        self.expr(false)?;
+        Ok(())
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
@@ -654,5 +645,12 @@ mod tests {
                 ),
             ]
         )
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type() {
+        gen_test_env!(r#"1.0+9"#, t);
+        t.generate_code().unwrap();
     }
 }

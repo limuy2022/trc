@@ -3,8 +3,7 @@ use std::{error::Error, fmt::Display};
 
 static GITHUB_API_URL: &str = "http://185.106.176.199/trc_version";
 
-pub async fn check_version() -> reqwest::Result<()> {
-    reqwest::get(GITHUB_API_URL).await?.json().await?;
+pub fn check_version() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 

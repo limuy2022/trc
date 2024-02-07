@@ -97,9 +97,9 @@ pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display 
 
     fn has_attr(&self, attrname: &str) -> Option<Type>;
 
-    fn get_name(&self) -> &str;
-
     fn get_id(&self) -> usize;
+
+    fn get_name(&self) -> &str;
 
     fn is_any(&self) -> bool {
         self.get_id() == 0
@@ -137,28 +137,28 @@ impl FunctionInterface for RustFunction {
 
 #[derive(Debug, Clone)]
 pub struct RustClass {
-    pub name: String,
     pub members: HashMap<String, Var>,
     pub functions: HashMap<String, RustFunction>,
     pub overrides: HashMap<TokenType, IOType>,
     pub id: usize,
+    pub name: &'static str,
 }
 
 /// 约定，0号id是any类型
 impl RustClass {
     pub fn new(
-        name: impl Into<String>,
+        name: &'static str,
         members: HashMap<String, Var>,
         functions: Option<HashMap<String, RustFunction>>,
         overrides: Option<HashMap<TokenType, IOType>>,
         id: usize,
     ) -> RustClass {
         RustClass {
-            name: name.into(),
             members,
             functions: functions.unwrap_or_else(|| HashMap::new()),
             overrides: overrides.unwrap_or_else(|| HashMap::new()),
             id,
+            name,
         }
     }
 
@@ -194,7 +194,7 @@ impl ClassInterface for RustClass {
     }
 
     fn get_name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     fn get_id(&self) -> usize {
@@ -282,9 +282,8 @@ impl Stdlib {
 }
 
 lazy_static! {
-    pub static ref ANY_TYPE: RustClass =
-        RustClass::new("any", HashMap::new(), None, None, new_class_id());
-    pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::init();
+    pub static ref ANY_TYPE: RustClass = RustClass::new("any", HashMap::new(), None, None, 0);
+    pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::import_stdlib();
 }
 
 /// 获取到标准库的类的个数，从而区分标准库和用户自定义的类

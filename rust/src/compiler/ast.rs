@@ -260,55 +260,43 @@ impl<'a> AstBuilder<'a> {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("int")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("int")
+                            .unwrap(),
+                    ),
                 ))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("float")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("float")
+                            .unwrap(),
+                    ),
                 ))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("str")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("str")
+                            .unwrap(),
+                    ),
                 ))
             }
             _ => {
@@ -651,6 +639,20 @@ mod tests {
     #[should_panic(expected = "OperatorError")]
     fn test_wrong_type() {
         gen_test_env!(r#"1.0+9"#, t);
+        t.generate_code().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type2() {
+        gen_test_env!(r#"1+"90""#, t);
+        t.generate_code().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type3() {
+        gen_test_env!(r#""90"+28"#, t);
         t.generate_code().unwrap();
     }
 }

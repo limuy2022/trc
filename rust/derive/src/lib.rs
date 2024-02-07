@@ -123,7 +123,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
                 )*
                 let classid = new_class_id();
                 let mut ret = RustClass::new(
-                    stringify!(#name),
+                    "",
                     members,
                     None,
                     None,
@@ -144,6 +144,12 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
             pub fn gen_overrides_info() {
                 STD_CLASS_TABLE.with(|std| {
                     std.borrow_mut()[Self::export_info()].overrides = Self::override_export();
+                });
+            }
+
+            pub fn modify_shadow_name(name: &'static str) {
+                STD_CLASS_TABLE.with(|std| {
+                    std.borrow_mut()[Self::export_info()].name = name;
                 });
             }
 

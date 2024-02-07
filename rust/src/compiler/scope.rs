@@ -1,6 +1,6 @@
 use super::ValuePool;
 use crate::base::stdlib::{
-    get_stdclass_end, ClassInterface, FunctionInterface, IOType, Stdlib, STDLIB_ROOT,
+    get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, Stdlib,
     STD_CLASS_TABLE,
 };
 use lazy_static::lazy_static;
@@ -180,7 +180,7 @@ impl SymScope {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
                 ret.types_id = prev_scope.as_ref().borrow().types_id;
             }
-            None => ret.types_id = STD_CLASS_TABLE.with(|std| std.borrow().len()),
+            None => ret.types_id = get_stdclass_end(),
         }
         ret
     }
@@ -191,15 +191,17 @@ impl SymScope {
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
-        let funcs = &STDLIB_ROOT.sub_modules.get("prelude").unwrap().functions;
-        for i in funcs {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]);
-            self.add_func(idx, Box::new((*i.1).clone()));
-        }
-        let types = &STDLIB_ROOT.sub_modules.get("prelude").unwrap().classes;
-        for i in types {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]);
-            self.add_type(idx, (*i.1).clone());
+        unsafe {
+            let funcs = &get_stdlib().sub_modules.get("prelude").unwrap().functions;
+            for i in funcs {
+                let idx = self.insert_sym(const_pool.name_pool[i.0]);
+                self.add_func(idx, Box::new((i.1).clone()));
+            }
+            let types = &get_stdlib().sub_modules.get("prelude").unwrap().classes;
+            for i in types {
+                let idx = self.insert_sym(const_pool.name_pool[i.0]);
+                self.add_type(idx, (i.1).clone());
+            }
         }
     }
 
@@ -273,9 +275,9 @@ impl SymScope {
     pub fn get_class(&self, classid: usize) -> Option<Type> {
         // 在标准库界限内
         if classid < get_stdclass_end() {
-            return Some(Box::new(
-                STD_CLASS_TABLE.with(|std| std.borrow()[classid].clone()),
-            ));
+            unsafe {
+                return Some(Box::new(STD_CLASS_TABLE[classid].clone()));
+            }
         }
         // 不存在的类
         if classid >= self.types_id {

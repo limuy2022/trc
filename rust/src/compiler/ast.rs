@@ -2,9 +2,10 @@ use super::token::TokenType;
 use super::TokenLex;
 use super::{scope::*, InputSource};
 use crate::base::codegen::{Inst, Opcode, NO_ARG};
-use crate::base::stdlib::{RustFunction, STDLIB_ROOT};
+use crate::base::stdlib::{get_stdlib, RustFunction};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
+use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -51,8 +52,7 @@ macro_rules! tmp_expe_function_gen {
                                 let func_obja = self.self_scope.as_ref().borrow().get_class(tya).unwrap();
                                 return try_err!(istry,
                                     Box::new(self.token_lexer.compiler_data.content.clone()),
-                                    ErrorInfo::new(gettext!(TYPE_NOT_THE_SAME, func_obj.get_name(),
-                                            func_obja.get_name()), gettextrs::gettext(TYPE_ERROR)))
+                                    ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()), gettextrs::gettext(OPERATOR_ERROR)))
                             }
                         }
                     }
@@ -98,12 +98,14 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
-        let prelude = STDLIB_ROOT.sub_modules.get("prelude").unwrap().clone();
-        for i in prelude.functions {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
-        }
-        for i in prelude.classes {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+        unsafe {
+            let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
+            for i in &prelude.functions {
+                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            }
+            for i in &prelude.classes {
+                token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            }
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
@@ -261,55 +263,43 @@ impl<'a> AstBuilder<'a> {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("int")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("int")
+                            .unwrap(),
+                    ),
                 ))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("float")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("float")
+                            .unwrap(),
+                    ),
                 ))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
                 Ok(TypeAllowNull::Yes(
-                    self.self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_type(
-                            *self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .name_pool
-                                .get("str")
-                                .unwrap(),
-                        )
-                        .clone(),
+                    self.self_scope.as_ref().borrow().get_type(
+                        *self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .name_pool
+                            .get("str")
+                            .unwrap(),
+                    ),
                 ))
             }
             _ => {
@@ -467,16 +457,8 @@ impl<'a> AstBuilder<'a> {
             _ => {}
         }
         self.token_lexer.next_back(t.clone());
-        if let Ok(_) = self.expr(true) {
-            return Ok(());
-        }
-        return Err(RuntimeError::new(
-            Box::new(self.token_lexer.compiler_data.content.clone()),
-            ErrorInfo::new(
-                gettext!(UNEXPECTED_TOKEN, t.tp),
-                gettextrs::gettext(SYNTAX_ERROR),
-            ),
-        ));
+        self.expr(false)?;
+        Ok(())
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
@@ -604,7 +586,7 @@ mod tests {
 
     #[test]
     fn test_expr_final() {
-        gen_test_env!(r#"(1+-2)*3/4**(5**6)==1||7==(8&9)"#, t);
+        gen_test_env!(r#"(1+-2)*3//4**(5**6)==1||7==(8&9)"#, t);
         t.generate_code().unwrap();
         assert_eq!(
             t.staticdata.inst,
@@ -620,7 +602,7 @@ mod tests {
                 Inst::new(Opcode::LoadInt, 6),
                 Inst::new(Opcode::Power, NO_ARG),
                 Inst::new(Opcode::Power, NO_ARG),
-                Inst::new(Opcode::Div, NO_ARG),
+                Inst::new(Opcode::ExtraDiv, NO_ARG),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::Eq, NO_ARG),
                 Inst::new(Opcode::LoadInt, 7),
@@ -637,22 +619,45 @@ mod tests {
     fn test_call_builtin_function() {
         gen_test_env!(r#"print("hello world!")"#, t);
         t.generate_code().unwrap();
-        assert_eq!(
-            t.staticdata.inst,
-            vec![
-                Inst::new(Opcode::LoadString, 0),
-                Inst::new(
-                    Opcode::CallNative,
-                    STDLIB_ROOT
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
-                ),
-            ]
-        )
+        unsafe {
+            assert_eq!(
+                t.staticdata.inst,
+                vec![
+                    Inst::new(Opcode::LoadString, 0),
+                    Inst::new(
+                        Opcode::CallNative,
+                        get_stdlib()
+                            .sub_modules
+                            .get("prelude")
+                            .unwrap()
+                            .functions
+                            .get("print")
+                            .unwrap()
+                            .buildin_id
+                    ),
+                ]
+            )
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type() {
+        gen_test_env!(r#"1.0+9"#, t);
+        t.generate_code().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type2() {
+        gen_test_env!(r#"1+"90""#, t);
+        t.generate_code().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "OperatorError")]
+    fn test_wrong_type3() {
+        gen_test_env!(r#""90"+28"#, t);
+        t.generate_code().unwrap();
     }
 }

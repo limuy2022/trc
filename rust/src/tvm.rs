@@ -5,6 +5,8 @@ mod gc;
 pub mod stdlib;
 mod types;
 
+use std::borrow::Borrow;
+
 use self::types::trcfloat::TrcFloat;
 use self::types::trcint::TrcInt;
 use self::types::trcstr::TrcStr;
@@ -214,16 +216,15 @@ impl<'a> Vm<'a> {
                 codegen::Opcode::SelfNegative => {
                     operator_opcode!(self_negative, self);
                 }
-                codegen::Opcode::CallNative => {
-                    match STD_FUNC_TABLE.with(|std| -> RuntimeResult<()> {
-                        std.borrow()[self.static_data.inst[self.pc].operand](&mut self.dynadata)
-                    }) {
+                codegen::Opcode::CallNative => unsafe {
+                    match STD_FUNC_TABLE[self.static_data.inst[self.pc].operand](&mut self.dynadata)
+                    {
                         Ok(_) => {}
                         Err(e) => {
                             return Err(RuntimeError::new(Box::new(self.run_contnet.clone()), e));
                         }
                     }
-                }
+                },
             }
             self.pc += 1;
         }

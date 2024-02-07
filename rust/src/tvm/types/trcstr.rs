@@ -1,5 +1,6 @@
 use super::TrcObj;
 use crate::base::stdlib::*;
+use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
 use crate::{base::error::*, batch_impl_opers, impl_oper};
@@ -40,6 +41,8 @@ impl TrcStr {
     }
 
     fn override_export() -> HashMap<TokenType, IOType> {
-        hash_map![]
+        hash_map![
+            TokenType::Add => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()))
+        ]
     }
 }

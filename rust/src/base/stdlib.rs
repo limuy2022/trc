@@ -5,11 +5,15 @@ use crate::{
         scope::{Type, TypeAllowNull, Var},
         token::TokenType,
     },
+    hash_map,
     tvm::DynaData,
 };
 use downcast_rs::{impl_downcast, Downcast};
 use lazy_static::lazy_static;
-use std::sync::OnceLock;
+use std::{
+    borrow::{Borrow, BorrowMut},
+    sync::OnceLock,
+};
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -97,9 +101,9 @@ pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display 
 
     fn has_attr(&self, attrname: &str) -> Option<Type>;
 
-    fn get_name(&self) -> &str;
-
     fn get_id(&self) -> usize;
+
+    fn get_name(&self) -> &str;
 
     fn is_any(&self) -> bool {
         self.get_id() == 0
@@ -137,28 +141,28 @@ impl FunctionInterface for RustFunction {
 
 #[derive(Debug, Clone)]
 pub struct RustClass {
-    pub name: String,
     pub members: HashMap<String, Var>,
     pub functions: HashMap<String, RustFunction>,
     pub overrides: HashMap<TokenType, IOType>,
     pub id: usize,
+    pub name: &'static str,
 }
 
 /// 约定，0号id是any类型
 impl RustClass {
     pub fn new(
-        name: impl Into<String>,
+        name: &'static str,
         members: HashMap<String, Var>,
         functions: Option<HashMap<String, RustFunction>>,
         overrides: Option<HashMap<TokenType, IOType>>,
         id: usize,
     ) -> RustClass {
         RustClass {
-            name: name.into(),
             members,
             functions: functions.unwrap_or_else(|| HashMap::new()),
             overrides: overrides.unwrap_or_else(|| HashMap::new()),
             id,
+            name,
         }
     }
 
@@ -194,7 +198,7 @@ impl ClassInterface for RustClass {
     }
 
     fn get_name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     fn get_id(&self) -> usize {
@@ -215,23 +219,30 @@ impl Display for RustClass {
     }
 }
 
-thread_local! {
-    pub static STD_FUNC_TABLE: RefCell<Vec<StdlibFunc>> = RefCell::new(vec![]);
-    pub static STD_CLASS_TABLE: RefCell<Vec<RustClass>> = RefCell::new(vec![]);
+pub static mut STD_FUNC_TABLE: Vec<StdlibFunc> = vec![];
+pub static mut STD_CLASS_TABLE: Vec<RustClass> = vec![];
+
+pub fn get_stdlib() -> &'static Stdlib {
+    static INIT: OnceLock<Stdlib> = OnceLock::new();
+    INIT.get_or_init(|| {
+        let mut ret = crate::tvm::stdlib::import_stdlib();
+        ret
+    })
 }
 
 pub fn new_class_id() -> usize {
-    STD_CLASS_TABLE.with(|std| std.borrow().len())
+    unsafe { STD_CLASS_TABLE.len() }
 }
 
 impl RustFunction {
     pub fn new(name: impl Into<String>, ptr: StdlibFunc, io: IOType) -> RustFunction {
+        let buildin_id = unsafe {
+            STD_FUNC_TABLE.push(ptr);
+            STD_FUNC_TABLE.len()
+        } - 1;
         Self {
             name: name.into(),
-            buildin_id: STD_FUNC_TABLE.with(|std| {
-                std.borrow_mut().push(ptr);
-                std.borrow().len()
-            }) - 1,
+            buildin_id,
             ptr,
             io,
         }
@@ -282,16 +293,14 @@ impl Stdlib {
 }
 
 lazy_static! {
-    pub static ref ANY_TYPE: RustClass =
-        RustClass::new("any", HashMap::new(), None, None, new_class_id());
-    pub static ref STDLIB_ROOT: Stdlib = crate::tvm::stdlib::init();
+    pub static ref ANY_TYPE: RustClass = RustClass::new("any", HashMap::new(), None, None, 0);
 }
 
 /// 获取到标准库的类的个数，从而区分标准库和用户自定义的类
 pub fn get_stdclass_end() -> usize {
     static STD_NUM: OnceLock<usize> = OnceLock::new();
-    *STD_NUM.get_or_init(|| {
-        let mut num = STD_CLASS_TABLE.with(|std| std.borrow().len());
+    *STD_NUM.get_or_init(|| unsafe {
+        let mut num = STD_CLASS_TABLE.len();
         num
     })
 }

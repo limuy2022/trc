@@ -28,7 +28,7 @@ impl TrcInt {
         hash_map![TokenType::Add => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
         TokenType::Sub => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
         TokenType::Mul => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Div => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
+        TokenType::Div => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcFloat::export_info())),
         TokenType::Mod => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
         TokenType::Power => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
         TokenType::BitAnd => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),

@@ -1,3 +1,4 @@
+use colored::Colorize;
 use gettextrs::gettext;
 use std::error::Error;
 use std::fmt::{Debug, Display};
@@ -70,8 +71,8 @@ impl Display for RuntimeError {
 {}:{}"#,
             gettext!(ERROR_IN_LINE, self.content.get_line()),
             gettext!(IN_MODULE, self.content.get_module_name()),
-            gettext(self.info.error_type.clone()),
-            self.info.message
+            gettext(self.info.error_type.clone()).red(),
+            self.info.message.red()
         );
         write!(f, "{}", s)
     }

@@ -11,8 +11,10 @@ pub const NUMBER_OVER_FLOW: &str = "NumberOverFlowError";
 pub const SYMBOL_ERROR: &str = "SymbolError";
 pub const TYPE_ERROR: &str = "TypeError";
 pub const ARGUMENT_ERROR: &str = "ArgumentError";
+pub const FORMAT_STR_ERROR: &str = "FormatStringError";
 
 pub const STRING_WITHOUT_END: &str = "this string should be ended with {}";
+pub const CHAR_FORMAT: &str = "char should be the format like 'x'.";
 pub const UNMATCHED_BRACE: &str = "{} is unmatched";
 pub const OPERATOR_IS_NOT_SUPPORT: &str = "operator {} is not supported for type {}";
 pub const VM_DATA_NUMBER: &str =
@@ -30,6 +32,7 @@ pub const TYPE_NOT_THE_SAME: &str = "Type {} and {} are not the same";
 pub const ARGU_NUMBER: &str = "expect {}.But given {}";
 pub const EXPECT_TYPE: &str = "Expect type {}.But given type {}";
 pub const UNCLODED_COMMENT: &str = "unclosed comment";
+pub const UNCLOSED_FORMAT: &str = "{ is not matched.";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

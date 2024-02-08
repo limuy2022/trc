@@ -1,7 +1,7 @@
 use super::ValuePool;
 use crate::base::stdlib::{
-    get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, Stdlib,
-    STD_CLASS_TABLE,
+    get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, OverrideWrapper,
+    Stdlib, STD_CLASS_TABLE,
 };
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
@@ -72,6 +72,7 @@ impl Var {
 }
 
 pub type Type = Box<dyn ClassInterface>;
+pub type Func = Box<dyn FunctionInterface>;
 
 /// Manager of type
 #[derive(Clone, Debug)]
@@ -134,7 +135,7 @@ impl ClassInterface for CommonType {
         &self.origin_name
     }
 
-    fn get_override_func(&self, oper_token: super::token::TokenType) -> Option<&IOType> {
+    fn get_override_func(&self, oper_token: super::token::TokenType) -> Option<&OverrideWrapper> {
         None
     }
 }

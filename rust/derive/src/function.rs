@@ -46,11 +46,57 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     _ => unreachable!(),
                 };
                 // println!("argv:{:#?}", path);
-                if path.path.segments[0].ident == "any" {
+                let typename = path.path.to_token_stream().to_string();
+                if typename.ends_with("any") {
                     args_type_required.push(parse_str("AnyType").unwrap());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
-                            "let mut {} = dydata.obj_stack.pop().unwrap();",
+                            r#"let mut {} = dydata.obj_stack.pop().expect("any empty");"#,
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
+                } else if typename.ends_with("str") {
+                    args_type_required.push(parse_str("TrcStr").unwrap());
+                    new_stmts.push(
+                        parse_str(&format!(
+                            r#"let mut {} = dydata.str_stack.pop().expect("str empty");"#,
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
+                } else if typename.ends_with("int") {
+                    args_type_required.push(parse_str("TrcInt").unwrap());
+                    new_stmts.push(
+                        parse_str(&format!(
+                            r#"let mut {} = dydata.int_stack.pop().expect("int empty");"#,
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
+                } else if typename.ends_with("bool") {
+                    args_type_required.push(parse_str("TrcBool").unwrap());
+                    new_stmts.push(
+                        parse_str(&format!(
+                            r#"let mut {} = dydata.bool_stack.pop().expect("bool empty");"#,
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
+                } else if typename.ends_with("char") {
+                    args_type_required.push(parse_str("TrcChar").unwrap());
+                    new_stmts.push(
+                        parse_str(&format!(
+                            r#"let mut {} = dydata.char_stack.pop().expect("char empty"");"#,
+                            arg_name
+                        ))
+                        .unwrap(),
+                    );
+                } else if typename.ends_with("float") {
+                    args_type_required.push(parse_str("TrcFloat").unwrap());
+                    new_stmts.push(
+                        parse_str(&format!(
+                            r#"let mut {} = dydata.float_stack.pop().expect("float empty");"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -59,7 +105,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(path.clone());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
-                            "let mut {} = dydata.obj_stack.pop().unwrap().downcast::<{}>().unwrap();",
+                            r#"let mut {} = dydata.obj_stack.pop().unwrap().downcast::<{}>().expect("obj empty");"#,
                             arg_name, path.to_token_stream()
                         ))
                         .unwrap(),

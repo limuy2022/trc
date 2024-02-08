@@ -1,5 +1,6 @@
+use def_module::check_next_iter;
 use function::process_function_def;
-use proc_macro::TokenStream;
+use proc_macro::{TokenStream, TokenTree};
 use quote::{quote, ToTokens};
 use syn::ImplItem;
 use syn::{
@@ -10,11 +11,72 @@ mod def_module;
 mod function;
 
 #[proc_macro_attribute]
+/// # warning
 /// 返回值一定要加上return
+/// # usage
+/// 在开头加上#[trc_function]即可，想表示任意类型就用any表示，想表示返回值为空就用void表示（留空当然可以）
+/// 对可变参数的支持在于，你可以通过指定var_params=true来支持可变参数，可变参数会附加到你的最后一个参数后面，类型是任意，我们会把它读取到va_list Vec里面
+/// 如果你要表示这是一个类的方法，你不能直接加上这个，还需要添加参数method=true，而你的方法需要写成类似fn a(type s, int a){}这样，第一个参数是你定义到的类型
+/// 在这里面写基础类型，需要以trc内部的名字书写，例如，你不能写TrcInt,而需要写int,但是书写别的类型需要以rust内部定义的名字类书写，例如，写Sam而不是sam
 pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as ItemFn);
     let (mut new_stmts, args_type_required, output) = process_function_def(&mut input.sig);
     let name = input.sig.ident.clone();
+    let mut function_path: syn::Path = parse_str(&name.to_string()).unwrap();
+    let mut attr_iter = attr.into_iter();
+    let mut if_enable_var_params: syn::Expr = parse_str("false").unwrap();
+    while let Some(i) = attr_iter.next() {
+        match i {
+            TokenTree::Ident(ident_name) => {
+                let ident_name = ident_name.to_string();
+                if ident_name == "method" {
+                    check_next_iter(&mut attr_iter, "=");
+                    let bol = attr_iter.next().unwrap().to_string();
+                    if bol == "true" {
+                        function_path = parse_str(&format!("Self::{}", name)).unwrap();
+                    } else if bol == "false" {
+                    } else {
+                        panic!("expected true or false, not {}", bol);
+                    }
+                } else if ident_name == "var_params" {
+                    check_next_iter(&mut attr_iter, "=");
+                    let bol = attr_iter.next().unwrap().to_string();
+                    if bol == "true" {
+                        // 既然是可变参数，还要做一点手脚,可变参数是第一个到来的参数
+                        if_enable_var_params = parse_str("true").unwrap();
+                        let mut var_lex_tmp: Vec<Stmt> = vec![
+                            parse_str("let mut va_list = vec![];").unwrap(),
+                            parse_str("let args_num = dydata.int_stack.pop().unwrap() as usize;")
+                                .unwrap(),
+                            parse_str("va_list.reserve(args_num);").unwrap(),
+                            parse_str(
+                                r#"for i in 0..args_num {
+                            va_list.push(dydata.obj_stack.pop().unwrap());
+                        }"#,
+                            )
+                            .expect("Err on lex loop"),
+                        ];
+                        // 将自己放到new_stmts的前面
+                        var_lex_tmp.extend(new_stmts);
+                        new_stmts = var_lex_tmp;
+                    } else if bol == "false" {
+                    } else {
+                        panic!("expected true or false, not {}", bol);
+                    }
+                } else {
+                    panic!("unexpected:{}", ident_name);
+                }
+            }
+            TokenTree::Punct(sym) => {
+                if sym.to_string() == "," {
+                    continue;
+                }
+            }
+            _ => {
+                panic!("unexpected:{}", i);
+            }
+        }
+    }
     input.sig.output = parse_str::<syn::ReturnType>("-> RuntimeResult<()>").expect("err1");
     let return_stmt = parse_str::<Stmt>("return Ok(());").expect("err2");
     for i in input.block.stmts {
@@ -51,22 +113,13 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     let info_func_name =
         parse_str::<Ident>(&function::convent_to_info_func(name.to_string())).expect("name error");
     // println!("{}{:#?}", name.to_string(), info_function_self);
-    let function_path: syn::Path;
-    if let Some(ty) = attr.into_iter().next() {
-        if ty.to_string() == "true" {
-            function_path = parse_str(&format!("Self::{}", name)).unwrap();
-        } else {
-            function_path = parse_str(&name.to_string()).unwrap();
-        }
-    } else {
-        function_path = parse_str(&name.to_string()).unwrap();
-    }
+
     let rettmp = quote!(#input
         fn #info_func_name() -> RustFunction {
             use crate::base::stdlib::*;
             use crate::compiler::scope::TypeAllowNull;
             let ret_classes = vec![#(#args_type_required::export_info()),*];
-            return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output));
+            return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output, #if_enable_var_params));
         }
     );
     // println!("{}", rettmp.to_token_stream());
@@ -166,7 +219,6 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 /// 返回值一定要加上return
-/// 定义一个函数体为空的函数会被当成接口声明，用于宏生成的接口
 pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as ItemImpl);
     // 生成一个function_export，返回一个vec,里面存着functions

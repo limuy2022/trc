@@ -31,23 +31,23 @@ Tip3:The form like 001 is supported
 The next is the string value. To make you to write strings more easily:
 
 | Way               | Explain                                       |
-|:------------------|:----------------------------------------------|
+| :---------------- | :-------------------------------------------- |
 | "hello world"     | commom value                                  |
-| 'hello_world'     | another method that equals to "hello world"   |
+| 'h'               | A way to store character                      |
 | """hello world""" | this method is for code across multiple lines |
 
 There are also many easape char in the string:
 
 | escape char | meaning                           |
-|:------------|:----------------------------------|
+| :---------- | :-------------------------------- | --- |
 | \t          | tab                               |
 | \n          | new line                          |
-| \\\\|\|     |                                   |
+| \\\\        | \|                                |     |
 | \'          | '                                 |
 | \"          | "                                 |
 | \0          | the tick of the end of the string |
 
-If you add ```r``` or ```R``` in front of the string.Trc will treat it as a raw string.
+If you add `r` or `R` in front of the string.Trc will treat it as a raw string.
 Yes.These rules are from Python.I love its grammar rules
 
 ok.now you know how to write value in Trc.Then let's go to the next part.
@@ -59,14 +59,14 @@ the operators for basic types of trc is like others language.
 Here are the operator support
 
 | Operator | Explain                  |
-|:---------|:-------------------------|
+| :------- | :----------------------- |
 | +        | addition                 |
 | -        | subtraction              |
-| *        | multiplication           |
+| \*       | multiplication           |
 | /        | division                 |
 | //       | divisible                |
 | %        | mod                      |
-| **       | exponent                 |
+| \*\*     | exponent                 |
 | <        | less than                |
 | >        | greater than             |
 | <=       | less than or equal to    |
@@ -83,9 +83,9 @@ Here are the operator support
 | >>       | bit right shift          |
 | !        | not                      |
 
-Obviously,operators like ```+=``` is supported,too.
+Obviously,operators like `+=` is supported,too.
 
-But,something should be noticed is that you cannot use logical operators for ```int``` or anything else,just for bool.
+But,something should be noticed is that you cannot use logical operators for `int` or anything else,just for bool.
 
 So,code like this cannot be compiled successfully:
 
@@ -111,7 +111,7 @@ the compiler will report an error
 
 ## the control flow of Trc
 
-First,you can use ```if ... else if ... else``` statements
+First,you can use `if ... else if ... else` statements
 
 An example:
 
@@ -125,7 +125,7 @@ if 1 == 1 {
 }
 ```
 
-```for``` support two kinds
+`for` support two kinds
 
 First:
 
@@ -143,15 +143,15 @@ for i in xxx {
 }
 ```
 
-```xxx``` should be a iterable var
+`xxx` should be a iterable var
 
 ## the comments of Trc
 
 Trc support two kinds of comments
 
-the first is use ```#```,from ```#``` to the end of the line belongs to the comment
+the first is use `#`,from `#` to the end of the line belongs to the comment
 
-the second is use ```/**/```,this kind can cross the line,like:
+the second is use `/**/`,this kind can cross the line,like:
 
 ```cpp
 /*
@@ -180,7 +180,7 @@ int a:=90
 Std lib provide many kinds of data structures for Trc.Here is the list:
 
 | Structure        |
-|:-----------------|
+| :--------------- |
 | St table         |
 | suffix automaton |
 | ac automaton     |

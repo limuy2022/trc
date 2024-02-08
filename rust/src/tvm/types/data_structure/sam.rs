@@ -1,5 +1,5 @@
 use crate::base::error::*;
-use crate::base::stdlib::RustFunction;
+use crate::base::stdlib::{OverrideWrapper, RustFunction};
 use crate::tvm::types::trcchar::TrcChar;
 use crate::tvm::types::TrcObj;
 use crate::tvm::DynaData;
@@ -32,7 +32,7 @@ pub struct Sam {
 }
 
 impl Sam {
-    fn override_export() -> HashMap<TokenType, IOType> {
+    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![]
     }
 
@@ -45,7 +45,7 @@ impl Sam {
 
 #[trc_method]
 impl Sam {
-    #[trc_function(true)]
+    #[trc_function(method = true)]
     pub fn extend(s: Sam, c: TrcChar) {
         let id: usize = s._states.len();
         // 后缀自动机最后一个节点

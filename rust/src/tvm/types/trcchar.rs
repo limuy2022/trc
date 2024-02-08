@@ -30,7 +30,7 @@ impl TrcChar {
         Self { _value: value }
     }
 
-    fn override_export() -> HashMap<TokenType, IOType> {
+    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![]
     }
 }

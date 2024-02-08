@@ -1,6 +1,7 @@
 use super::trcbool::TrcBool;
 use super::trcfloat::TrcFloat;
 use super::TrcObj;
+use crate::base::codegen::Opcode;
 use crate::base::stdlib::*;
 use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
@@ -24,27 +25,27 @@ impl TrcInt {
         TrcInt { _value: value }
     }
 
-    fn override_export() -> HashMap<TokenType, IOType> {
-        hash_map![TokenType::Add => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Sub => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Mul => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Div => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcFloat::export_info())),
-        TokenType::Mod => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Power => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::BitAnd => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::BitOr => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Xor => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::ExactDiv => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::BitLeftShift => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::BitRightShift => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::BitNot => IOType::new(vec![], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::SelfNegative => IOType::new(vec![], TypeAllowNull::Yes(Self::export_info())),
-        TokenType::Equal => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
-        TokenType::NotEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
-        TokenType::Less => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
-        TokenType::LessEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
-        TokenType::Greater => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info())),
-        TokenType::GreaterEqual => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()))
+    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
+        hash_map![TokenType::Add => OverrideWrapper::new(Opcode::AddInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Sub => OverrideWrapper::new(Opcode::SubInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Mul => OverrideWrapper::new(Opcode::MulInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Div => OverrideWrapper::new(Opcode::DivInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcFloat::export_info()), false)),
+        TokenType::Mod => OverrideWrapper::new(Opcode::ModInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Power => OverrideWrapper::new(Opcode::PowerInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::BitAnd => OverrideWrapper::new(Opcode::BitAndInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::BitOr => OverrideWrapper::new(Opcode::BitOrInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Xor => OverrideWrapper::new(Opcode::XorInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::ExactDiv => OverrideWrapper::new(Opcode::ExactDivInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::BitLeftShift => OverrideWrapper::new(Opcode::BitLeftShiftInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::BitRightShift => OverrideWrapper::new(Opcode::BitRightShiftInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::BitNot => OverrideWrapper::new(Opcode::BitNotInt,IOType::new(vec![], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeInt,IOType::new(vec![], TypeAllowNull::Yes(Self::export_info()), false)),
+        TokenType::Equal => OverrideWrapper::new(Opcode::EqInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
+        TokenType::NotEqual => OverrideWrapper::new(Opcode::NeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
+        TokenType::Less => OverrideWrapper::new(Opcode::LtInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
+        TokenType::LessEqual => OverrideWrapper::new(Opcode::LeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
+        TokenType::Greater => OverrideWrapper::new(Opcode::GtInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
+        TokenType::GreaterEqual => OverrideWrapper::new(Opcode::GeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false))
         ]
     }
 }

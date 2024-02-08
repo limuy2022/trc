@@ -44,11 +44,11 @@ impl TrcBool {
         Self { _value: value }
     }
 
-    fn override_export() -> HashMap<TokenType, IOType> {
+    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![
-            TokenType::And => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-            TokenType::Or => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info())),
-            TokenType::Not => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()))
+            TokenType::And => OverrideWrapper::new(crate::base::codegen::Opcode::AndBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+            TokenType::Or => OverrideWrapper::new(crate::base::codegen::Opcode::OrBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
+            TokenType::Not => OverrideWrapper::new(crate::base::codegen::Opcode::NotBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false))
         ]
     }
 }

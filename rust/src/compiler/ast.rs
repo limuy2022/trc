@@ -1,17 +1,47 @@
 use super::token::TokenType;
-use super::TokenLex;
+use super::{scope, TokenLex};
 use super::{scope::*, InputSource};
-use crate::base::codegen::{Inst, Opcode, NO_ARG};
-use crate::base::stdlib::{get_stdlib, RustFunction};
+use crate::base::codegen::{Inst, Opcode, VmStackType, NO_ARG};
+use crate::base::func::Func;
+use crate::base::stdlib::{get_stdlib, FunctionInterface, RustFunction};
 use crate::base::{codegen::StaticData, error::*};
 use gettextrs::gettext;
+use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+/// 过程间分析用的结构
+struct LexProcess {
+    stack_type: Vec<VmStackType>,
+}
+
+impl LexProcess {
+    pub fn new() -> Self {
+        Self { stack_type: vec![] }
+    }
+
+    pub fn new_type(&mut self, ty: VmStackType) {
+        self.stack_type.push(ty);
+    }
+
+    pub fn get_last_ty(&self) -> Option<VmStackType> {
+        self.stack_type.last().copied()
+    }
+
+    /// pop two val at the top of stack
+    pub fn cal_val(&mut self, ty: VmStackType) {
+        assert!(self.stack_type.len() >= 2);
+        self.stack_type.pop();
+        self.stack_type.pop();
+        self.new_type(ty)
+    }
+}
 
 pub struct AstBuilder<'a> {
     token_lexer: TokenLex<'a>,
     staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
+    process_info: LexProcess,
 }
 
 type AstError<T> = RunResult<T>;
@@ -28,7 +58,7 @@ macro_rules! try_err {
 }
 
 macro_rules! tmp_expe_function_gen {
-    ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
+    ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
         fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<TypeAllowNull> {
             let next_sym = self.token_lexer.next_token()?;
             match next_sym.tp {
@@ -46,7 +76,7 @@ macro_rules! tmp_expe_function_gen {
                             )
                         ),
                         Some(v) => {
-                            if let Ok(_) = v.check_argvs(vec![tya]) {}
+                            if let Ok(_) = v.io.check_argvs(vec![tya]) {}
                             else {
                                 return try_err!(istry,
                                     Box::new(self.token_lexer.compiler_data.content.clone()),
@@ -55,9 +85,10 @@ macro_rules! tmp_expe_function_gen {
                         }
                     }
                     let io_check = io_check.unwrap();
-                    self.add_bycode($add_opcode, NO_ARG);
-                    let stage_ty = io_check.return_type.unwrap();
+                    self.add_bycode(io_check.opcode.clone(), NO_ARG);
+                    let stage_ty = io_check.io.return_type.unwrap();
                     let tyb = self.$tmpfuncname(istry, stage_ty)?;
+                    self.process_info.cal_val(self.convert_to_vm_type(stage_ty));
                     match tyb {
                         TypeAllowNull::No => {
                             return Ok(TypeAllowNull::Yes(stage_ty));
@@ -78,8 +109,8 @@ macro_rules! tmp_expe_function_gen {
 
 /// there are a log of similar operators to be generated
 macro_rules! expr_gen {
-    ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path => $add_opcode:path),*) => {
-        tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token => $add_opcode),*);
+    ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
+        tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token),*);
         fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
             let t1 = self.$next_item_func(istry)?;
             if let TypeAllowNull::No = t1 {
@@ -110,6 +141,7 @@ impl<'a> AstBuilder<'a> {
             token_lexer,
             staticdata: StaticData::new(!optimize),
             self_scope: root_scope,
+            process_info: LexProcess::new(),
         };
         ret.self_scope
             .as_ref()
@@ -118,27 +150,40 @@ impl<'a> AstBuilder<'a> {
         ret
     }
 
-    expr_gen!(expr9, expr9_, factor, TokenType::Power => Opcode::Power);
-    expr_gen!(expr8, expr8_, expr9, TokenType::Mul => Opcode::Mul,
-    TokenType::Div => Opcode::Div,
-    TokenType::Mod => Opcode::Mod,
-    TokenType::ExactDiv => Opcode::ExtraDiv);
-    expr_gen!(expr7, expr7_, expr8, TokenType::Add => Opcode::Add,
-        TokenType::Sub => Opcode::Sub);
-    expr_gen!(expr6, expr6_, expr7, TokenType::BitLeftShift => Opcode::BitLeftShift,
-        TokenType::BitRightShift => Opcode::BitRightShift);
-    expr_gen!(expr5, expr5_, expr6, TokenType::BitAnd => Opcode::BitAnd);
-    expr_gen!(expr4, expr4_, expr5, TokenType::Xor => Opcode::Xor);
-    expr_gen!(expr3, expr3_, expr4, TokenType::BitOr => Opcode::BitOr);
-    expr_gen!(expr2, expr2_, expr3, TokenType::Equal => Opcode::Eq,
-        TokenType::NotEqual => Opcode::Ne,
-        TokenType::Less => Opcode::Lt,
-        TokenType::LessEqual => Opcode::Le,
-        TokenType::Greater => Opcode::Gt,
-        TokenType::GreaterEqual => Opcode::Ge
+    expr_gen!(expr9, expr9_, factor, TokenType::Power);
+    expr_gen!(
+        expr8,
+        expr8_,
+        expr9,
+        TokenType::Mul,
+        TokenType::Div,
+        TokenType::Mod,
+        TokenType::ExactDiv
     );
-    expr_gen!(expr1, expr1_, expr2, TokenType::And => Opcode::And);
-    expr_gen!(expr, expr_, expr1, TokenType::Or => Opcode::Or);
+    expr_gen!(expr7, expr7_, expr8, TokenType::Sub, TokenType::Add);
+    expr_gen!(
+        expr6,
+        expr6_,
+        expr7,
+        TokenType::BitLeftShift,
+        TokenType::BitRightShift
+    );
+    expr_gen!(expr5, expr5_, expr6, TokenType::BitAnd);
+    expr_gen!(expr4, expr4_, expr5, TokenType::Xor);
+    expr_gen!(expr3, expr3_, expr4, TokenType::BitOr);
+    expr_gen!(
+        expr2,
+        expr2_,
+        expr3,
+        TokenType::Equal,
+        TokenType::NotEqual,
+        TokenType::Less,
+        TokenType::LessEqual,
+        TokenType::Greater,
+        TokenType::GreaterEqual
+    );
+    expr_gen!(expr1, expr1_, expr2, TokenType::And);
+    expr_gen!(expr, expr_, expr1, TokenType::Or);
 
     pub fn return_static_data(mut self) -> StaticData {
         self.staticdata.constpool = self.token_lexer.compiler_data.const_pool.store_val_to_vm();
@@ -171,27 +216,95 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn opt_args(&mut self) -> AstError<Vec<usize>> {
+    /// 解析出函数参数
+    fn opt_args(&mut self, lex_func_obj: &scope::Func) -> AstError<Vec<usize>> {
         let mut ret = vec![];
+        let mut var_params_num = 0;
+        let io_tmp = lex_func_obj.get_io();
         loop {
             let t = self.expr(true);
             match t {
                 Err(_) => {
+                    if io_tmp.var_params {
+                        let tmp = self
+                            .token_lexer
+                            .compiler_data
+                            .const_pool
+                            .add_int(var_params_num);
+                        self.add_bycode(Opcode::LoadInt, tmp);
+                    }
                     return Ok(ret);
                 }
                 Ok(ty) => match ty {
                     TypeAllowNull::No => {
+                        if io_tmp.var_params {
+                            let tmp = self
+                                .token_lexer
+                                .compiler_data
+                                .const_pool
+                                .add_int(var_params_num);
+                            self.add_bycode(Opcode::LoadInt, tmp);
+                        }
                         return Ok(ret);
                     }
-                    TypeAllowNull::Yes(t) => ret.push(t),
+                    TypeAllowNull::Yes(t) => {
+                        // 如果是可变参数是需要将其转入obj_stack的
+                        if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
+                            // the values that have been stored is more than exact requirement of function
+                            self.move_val_into_obj_stack();
+                            var_params_num += 1;
+                        }
+                        ret.push(t)
+                    }
                 },
             }
         }
     }
 
+    fn get_type_id(&self, ty_name: &str) -> usize {
+        self.self_scope.as_ref().borrow().get_type(
+            *self
+                .token_lexer
+                .compiler_data
+                .const_pool
+                .name_pool
+                .get(ty_name)
+                .unwrap(),
+        )
+    }
+
+    fn convert_to_vm_type(&self, ty: usize) -> VmStackType {
+        if ty == self.get_type_id("int") {
+            VmStackType::Int
+        } else if ty == self.get_type_id("float") {
+            VmStackType::Float
+        } else if ty == self.get_type_id("str") {
+            VmStackType::Str
+        } else if ty == self.get_type_id("char") {
+            VmStackType::Char
+        } else if ty == self.get_type_id("bool") {
+            VmStackType::Bool
+        } else {
+            VmStackType::Object
+        }
+    }
+
+    fn move_val_into_obj_stack(&mut self) {
+        let obj_top = self.process_info.stack_type.pop().unwrap();
+        match obj_top {
+            VmStackType::Int => self.add_bycode(Opcode::MoveInt, NO_ARG),
+            VmStackType::Float => self.add_bycode(Opcode::MoveFloat, NO_ARG),
+            VmStackType::Str => self.add_bycode(Opcode::MoveStr, NO_ARG),
+            VmStackType::Char => self.add_bycode(Opcode::MoveChar, NO_ARG),
+            VmStackType::Bool => self.add_bycode(Opcode::MoveBool, NO_ARG),
+            VmStackType::Object => {}
+        }
+        self.process_info.new_type(VmStackType::Object);
+    }
+
     fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let t = self.token_lexer.next_token()?;
-        return if t.tp == TokenType::ID {
+        if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
             let idx = self.self_scope.as_ref().borrow().get_sym_idx(token_data);
             if idx.is_none() {
@@ -210,11 +323,21 @@ impl<'a> AstBuilder<'a> {
             let idx = idx.unwrap();
             let nxt = self.token_lexer.next_token()?;
             if nxt.tp == TokenType::LeftSmallBrace {
-                let argv_list = self.opt_args()?;
+                let func_obj = self.self_scope.as_ref().borrow().get_function(idx).unwrap();
+                let argv_list = self.opt_args(&func_obj)?;
                 // match )
                 self.check_next_token(TokenType::RightSmallBrace)?;
-                let tmp = self.self_scope.as_ref().borrow();
-                let func_obj = tmp.get_function(idx).unwrap();
+                // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
+                // 第二种情况就是入参有明确的类型
+                // 接下来在这种情况的基础上再分两种情况
+                // 第一种情况是自定义函数，这种情况下我们会像cpp模板那样对应生成版本
+                // 第二种情况是rust函数，这种情况下我们只能记录类型，然后由rust函数自己判断从哪个栈中取出函数
+                // 还有一种情况是any类型传入到函数中
+                // 这种情况无论是哪种函数我们都会插入一条尝试转换类型的指令,将类型栈进行移动
+                // 但是仅仅提供将其它类型移动到TrcObj的指令和从TrcObj转换到类型栈的函数
+                // 类型之间会互相转换我们会以内置函数形式提供
+                // 这是为了加速
+                // 可变参数的话，因为类型不确定，我们会将其生成指令移入obj栈中
                 if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
                     return try_err!(
                         istry,
@@ -222,7 +345,6 @@ impl<'a> AstBuilder<'a> {
                         e
                     );
                 }
-                drop(tmp);
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
                 }
@@ -244,7 +366,7 @@ impl<'a> AstBuilder<'a> {
                     gettextrs::gettext(SYNTAX_ERROR),
                 )
             )
-        };
+        }
     }
 
     fn item(&mut self, istry: bool) -> AstError<TypeAllowNull> {
@@ -252,48 +374,31 @@ impl<'a> AstBuilder<'a> {
             return Ok(v);
         }
         let t = self.token_lexer.next_token()?;
-        return match t.tp {
+        match t.tp {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
-                Ok(TypeAllowNull::Yes(
-                    self.self_scope.as_ref().borrow().get_type(
-                        *self
-                            .token_lexer
-                            .compiler_data
-                            .const_pool
-                            .name_pool
-                            .get("int")
-                            .unwrap(),
-                    ),
-                ))
+                self.process_info.new_type(VmStackType::Int);
+                Ok(TypeAllowNull::Yes(self.get_type_id("int")))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
-                Ok(TypeAllowNull::Yes(
-                    self.self_scope.as_ref().borrow().get_type(
-                        *self
-                            .token_lexer
-                            .compiler_data
-                            .const_pool
-                            .name_pool
-                            .get("float")
-                            .unwrap(),
-                    ),
-                ))
+                self.process_info.new_type(VmStackType::Float);
+                Ok(TypeAllowNull::Yes(self.get_type_id("float")))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
-                Ok(TypeAllowNull::Yes(
-                    self.self_scope.as_ref().borrow().get_type(
-                        *self
-                            .token_lexer
-                            .compiler_data
-                            .const_pool
-                            .name_pool
-                            .get("str")
-                            .unwrap(),
-                    ),
-                ))
+                self.process_info.new_type(VmStackType::Str);
+                Ok(TypeAllowNull::Yes(self.get_type_id("str")))
+            }
+            TokenType::CharValue => {
+                self.add_bycode(Opcode::LoadChar, t.data.unwrap());
+                self.process_info.new_type(VmStackType::Char);
+                Ok(TypeAllowNull::Yes(self.get_type_id("char")))
+            }
+            TokenType::BoolValue => {
+                self.add_bycode(Opcode::LoadBool, t.data.unwrap());
+                self.process_info.new_type(VmStackType::Bool);
+                Ok(TypeAllowNull::Yes(self.get_type_id("bool")))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
@@ -306,28 +411,68 @@ impl<'a> AstBuilder<'a> {
                     )
                 )
             }
-        };
+        }
+    }
+
+    fn unary_opcode_impl(
+        &mut self,
+        istry: bool,
+        optoken: TokenType,
+        valtype: usize,
+    ) -> AstError<TypeAllowNull> {
+        let class_obj = self
+            .self_scope
+            .as_ref()
+            .borrow()
+            .get_class(valtype)
+            .unwrap();
+        let oride = class_obj.get_override_func(optoken.clone());
+        match oride {
+            Some(v) => {
+                let tmp = v.io.check_argvs(vec![]);
+                match tmp {
+                    Ok(_) => {
+                        self.add_bycode(v.opcode.clone(), NO_ARG);
+                        Ok(v.io.return_type.clone())
+                    }
+                    Err(e) => {
+                        try_err!(
+                            istry,
+                            Box::new(self.token_lexer.compiler_data.content.clone()),
+                            e
+                        )
+                    }
+                }
+            }
+            None => {
+                try_err!(
+                    istry,
+                    Box::new(self.token_lexer.compiler_data.content.clone()),
+                    ErrorInfo::new(
+                        gettext!(OPERATOR_IS_NOT_SUPPORT, optoken, class_obj.get_name()),
+                        gettext(OPERATOR_ERROR),
+                    )
+                )
+            }
+        }
     }
 
     fn factor(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let next_token = self.token_lexer.next_token()?;
         match next_token.tp {
             TokenType::Sub => {
-                let ret = self.factor(istry)?;
-                self.add_bycode(Opcode::SelfNegative, NO_ARG);
-                Ok(ret)
+                let ret = self.factor(istry)?.unwrap();
+                self.unary_opcode_impl(istry, TokenType::SelfNegative, ret)
             }
             TokenType::BitNot => {
-                let ret = self.factor(istry)?;
-                self.add_bycode(Opcode::BitNot, NO_ARG);
-                Ok(ret)
+                let ret = self.factor(istry)?.unwrap();
+                self.unary_opcode_impl(istry, TokenType::BitNot, ret)
             }
             TokenType::Not => {
-                let ret = self.factor(istry)?;
-                self.add_bycode(Opcode::Not, NO_ARG);
-                Ok(ret)
+                let ret = self.factor(istry)?.unwrap();
+                self.unary_opcode_impl(istry, TokenType::Not, ret)
             }
-            TokenType::Add => Ok(self.factor(istry)?),
+            TokenType::Add => self.factor(istry),
             TokenType::LeftSmallBrace => {
                 let ret = self.expr(istry)?;
                 self.check_next_token(TokenType::RightSmallBrace)?;
@@ -517,8 +662,8 @@ mod tests {
             vec![
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LoadInt, 3),
-                Inst::new(Opcode::BitNot, NO_ARG),
-                Inst::new(Opcode::Add, NO_ARG)
+                Inst::new(Opcode::BitNotInt, NO_ARG),
+                Inst::new(Opcode::AddInt, NO_ARG)
             ]
         );
     }
@@ -532,9 +677,9 @@ mod tests {
             vec![
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LoadInt, 3),
-                Inst::new(Opcode::Sub, NO_ARG),
+                Inst::new(Opcode::SubInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 3),
-                Inst::new(Opcode::Sub, NO_ARG)
+                Inst::new(Opcode::SubInt, NO_ARG)
             ]
         )
     }
@@ -548,9 +693,9 @@ mod tests {
             vec![
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LoadInt, 3),
-                Inst::new(Opcode::Sub, NO_ARG),
+                Inst::new(Opcode::SubInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 4),
-                Inst::new(Opcode::Mul, NO_ARG)
+                Inst::new(Opcode::MulInt, NO_ARG)
             ]
         )
     }
@@ -564,13 +709,13 @@ mod tests {
             vec![
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::Add, NO_ARG),
+                Inst::new(Opcode::AddInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 3),
                 Inst::new(Opcode::LoadInt, 4),
                 Inst::new(Opcode::LoadInt, 5),
-                Inst::new(Opcode::Power, NO_ARG),
-                Inst::new(Opcode::Mul, NO_ARG),
-                Inst::new(Opcode::Sub, NO_ARG),
+                Inst::new(Opcode::PowerInt, NO_ARG),
+                Inst::new(Opcode::MulInt, NO_ARG),
+                Inst::new(Opcode::SubInt, NO_ARG),
             ]
         );
     }
@@ -584,24 +729,24 @@ mod tests {
             vec![
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::SelfNegative, NO_ARG),
-                Inst::new(Opcode::Add, NO_ARG),
+                Inst::new(Opcode::SelfNegativeInt, NO_ARG),
+                Inst::new(Opcode::AddInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 3),
-                Inst::new(Opcode::Mul, NO_ARG),
+                Inst::new(Opcode::MulInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 4),
                 Inst::new(Opcode::LoadInt, 5),
                 Inst::new(Opcode::LoadInt, 6),
-                Inst::new(Opcode::Power, NO_ARG),
-                Inst::new(Opcode::Power, NO_ARG),
-                Inst::new(Opcode::ExtraDiv, NO_ARG),
+                Inst::new(Opcode::PowerInt, NO_ARG),
+                Inst::new(Opcode::PowerInt, NO_ARG),
+                Inst::new(Opcode::ExactDivInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 1),
-                Inst::new(Opcode::Eq, NO_ARG),
+                Inst::new(Opcode::EqInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 7),
                 Inst::new(Opcode::LoadInt, 8),
                 Inst::new(Opcode::LoadInt, 9),
-                Inst::new(Opcode::BitAnd, NO_ARG),
-                Inst::new(Opcode::Eq, NO_ARG),
-                Inst::new(Opcode::Or, NO_ARG),
+                Inst::new(Opcode::BitAndInt, NO_ARG),
+                Inst::new(Opcode::EqInt, NO_ARG),
+                Inst::new(Opcode::OrBool, NO_ARG),
             ]
         );
     }
@@ -648,5 +793,44 @@ mod tests {
     fn test_wrong_type3() {
         gen_test_env!(r#""90"+28"#, t);
         t.generate_code().unwrap();
+    }
+
+    #[test]
+    fn test_if() {
+        gen_test_env!(
+            r#"a:=9 
+if a<8{
+
+} else if a>11 {
+
+} else {
+if 8 == 7 {
+
+} else {
+
+}
+}"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 9),
+                Inst::new(Opcode::LoadInt, 8),
+                Inst::new(Opcode::LtInt, NO_ARG),
+                Inst::new(Opcode::JumpIfFalse, 0),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::Jump, 0),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::LoadInt, 11),
+                Inst::new(Opcode::GtInt, NO_ARG),
+                Inst::new(Opcode::JumpIfFalse, 0),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::Jump, 0),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::LoadInt, 7)
+            ]
+        )
     }
 }

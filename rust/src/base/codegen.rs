@@ -2,7 +2,7 @@ use super::func;
 use core::cmp::max;
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Opcode {
     Add,
     AddInt,
@@ -17,8 +17,8 @@ pub enum Opcode {
     Div,
     DivInt,
     DivFloat,
-    ExtraDiv,
-    ExtraDivInt,
+    ExactDiv,
+    ExactDivInt,
     ExtraDivFloat,
     Mod,
     ModInt,
@@ -66,8 +66,6 @@ pub enum Opcode {
     BitLeftShiftInt,
     BitRightShift,
     BitRightShiftInt,
-    // change pc counter
-    Goto,
     // return from a function
     PopFrame,
     // create a frame to hold the function
@@ -81,7 +79,14 @@ pub enum Opcode {
     // Load a bigint from const pool
     LoadBigInt,
     // Load a local var to the stack
+    LoadChar,
+    LoadBool,
     LoadLocal,
+    MoveInt,
+    MoveFloat,
+    MoveChar,
+    MoveBool,
+    MoveStr,
     // Store a local var
     StoreLocal,
     // Do Nothing
@@ -92,6 +97,8 @@ pub enum Opcode {
     SelfNegativeFloat,
     // call native func
     CallNative,
+    JumpIfFalse,
+    Jump,
 }
 
 impl Display for Opcode {
@@ -110,9 +117,7 @@ pub struct ConstPool {
 impl ConstPool {
     pub fn new() -> Self {
         Self {
-            intpool: Vec::new(),
-            stringpool: Vec::new(),
-            floatpool: Vec::new(),
+            ..Default::default()
         }
     }
 }
@@ -131,6 +136,17 @@ impl Inst {
     }
 }
 
+#[derive(Clone, Copy)]
+pub enum VmStackType {
+    Int,
+    Float,
+    Str,
+    Char,
+    Bool,
+    Object,
+}
+
+#[derive(Default)]
 pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: Vec<Inst>,
@@ -138,17 +154,14 @@ pub struct StaticData {
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,
     pub has_line_table: bool,
+    pub type_list: Vec<Vec<VmStackType>>,
 }
 
 impl StaticData {
     pub fn new(has_line_table: bool) -> StaticData {
         Self {
-            constpool: ConstPool::new(),
-            inst: vec![],
-            funcs: vec![],
-            sym_table_sz: 0,
-            line_table: vec![],
             has_line_table,
+            ..Default::default()
         }
     }
 

@@ -87,7 +87,7 @@ macro_rules! impl_single_oper {
 macro_rules! gen_interface {
     ($funcname:ident, 2) => {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
-            dydata.check_stack(2)?;
+            DynaData::check_stack(&mut dydata.obj_stack, 2)?;
             let t2 = dydata.obj_stack.pop().unwrap();
             let t1 = dydata.obj_stack.pop().unwrap();
             dydata.obj_stack.push(t1.$funcname(t2)?);
@@ -96,7 +96,7 @@ macro_rules! gen_interface {
     };
     ($funcname:ident, 1) => {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
-            dydata.check_stack(1)?;
+            DynaData::check_stack(&mut dydata.obj_stack, 1)?;
             let t1 = dydata.obj_stack.pop().unwrap();
             dydata.obj_stack.push(t1.$funcname()?);
             Ok(())

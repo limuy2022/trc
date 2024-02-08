@@ -49,13 +49,9 @@ pub fn lex_arrow(
     }
 }
 
-fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
-    if let Some(i) = iter.next() {
-        if let TokenTree::Punct(x) = i {
-            if x.to_string() != check_str {
-                panic!("expected {}", check_str);
-            }
-        } else {
+pub fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
+    if let Some(TokenTree::Punct(x), ..) = iter.next() {
+        if x.to_string() != check_str {
             panic!("expected {}", check_str);
         }
     } else {

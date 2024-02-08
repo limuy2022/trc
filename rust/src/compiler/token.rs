@@ -1,8 +1,8 @@
 use super::{Compiler, Content, Float};
 use crate::{
     base::error::{
-        self, ErrorContent, ErrorInfo, RunResult, RuntimeError, FLOAT_OVER_FLOW, NUMBER_OVER_FLOW,
-        PREFIX_FOR_FLOAT, SYNTAX_ERROR, UNCLODED_COMMENT,
+        self, ErrorContent, ErrorInfo, RunResult, RuntimeError, CHAR_FORMAT, FLOAT_OVER_FLOW,
+        NUMBER_OVER_FLOW, PREFIX_FOR_FLOAT, SYNTAX_ERROR, UNCLODED_COMMENT,
     },
     cfg::FLOAT_OVER_FLOW_LIMIT,
     hash_map,
@@ -84,6 +84,8 @@ pub enum TokenType {
     StringValue,
     FloatValue,
     LongIntValue,
+    CharValue,
+    BoolValue,
     // ||=
     SelfOr,
     // &&=
@@ -197,6 +199,8 @@ impl Display for TokenType {
             TokenType::SelfAnd => "&&=",
             TokenType::SelfOr => "||=",
             TokenType::SelfNegative => "-",
+            TokenType::CharValue => "char",
+            TokenType::BoolValue => "bool",
         };
         write!(f, "{}", res)
     }
@@ -329,10 +333,18 @@ impl TokenLex<'_> {
             let tmp = get_keywords().get(&retname);
             match tmp {
                 Some(val) => Token::new((*val).clone(), None),
-                None => Token::new(
-                    TokenType::ID,
-                    Some(self.compiler_data.const_pool.add_id(retname)),
-                ),
+                None => {
+                    if retname == "true" {
+                        return Ok(Token::new(TokenType::BoolValue, Some(1)));
+                    }
+                    if retname == "false" {
+                        return Ok(Token::new(TokenType::BoolValue, Some(0)));
+                    }
+                    Token::new(
+                        TokenType::ID,
+                        Some(self.compiler_data.const_pool.add_id(retname)),
+                    )
+                }
             }
         })
     }
@@ -369,14 +381,14 @@ impl TokenLex<'_> {
         matches!(c, ' ' | '\n' | '\t' | '\0')
     }
 
-    fn is_string_begin(c: char) -> bool {
+    fn is_string_or_char_begin(c: char) -> bool {
         matches!(c, '"' | '\'')
     }
 
     fn is_id_char(c: char) -> bool {
         !(Self::check_whether_symbol(c)
             || c.is_ascii_digit()
-            || Self::is_string_begin(c)
+            || Self::is_string_or_char_begin(c)
             || Self::is_useless_char(c))
     }
 
@@ -701,10 +713,10 @@ impl TokenLex<'_> {
         }
     }
 
-    fn lex_str(&mut self, start_char: char) -> RunResult<Token> {
+    fn lex_str(&mut self) -> RunResult<Token> {
         let mut s = String::new();
         let mut c = self.compiler_data.input.read();
-        while c != start_char {
+        while c != '"' {
             if c == '\\' {
                 c = self.compiler_data.input.read();
                 c = match c {
@@ -726,7 +738,7 @@ impl TokenLex<'_> {
                 RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(error::STRING_WITHOUT_END, start_char),
+                        gettext!(error::STRING_WITHOUT_END, '"'),
                         gettext(SYNTAX_ERROR),
                     ),
                 );
@@ -736,6 +748,18 @@ impl TokenLex<'_> {
             TokenType::StringValue,
             Some(self.compiler_data.const_pool.add_string(s)),
         ))
+    }
+
+    fn lex_char(&mut self) -> RunResult<Token> {
+        let c = self.compiler_data.input.read();
+        let end = self.compiler_data.input.read();
+        if end != '\'' {
+            return Err(RuntimeError::new(
+                Box::new(self.compiler_data.content.clone()),
+                ErrorInfo::new(gettext(CHAR_FORMAT), gettext(SYNTAX_ERROR)),
+            ));
+        }
+        Ok(Token::new(TokenType::CharValue, Some(c as usize)))
     }
 
     pub fn next_token(&mut self) -> RunResult<Token> {
@@ -773,8 +797,11 @@ impl TokenLex<'_> {
         if presecnt_lex.is_ascii_digit() {
             return self.lex_num(presecnt_lex);
         }
-        if Self::is_string_begin(presecnt_lex) {
-            return self.lex_str(presecnt_lex);
+        if presecnt_lex == '"' {
+            return self.lex_str();
+        }
+        if presecnt_lex == '\'' {
+            return self.lex_char();
         }
         if Self::check_whether_symbol(presecnt_lex) {
             return self.lex_symbol(presecnt_lex);
@@ -980,23 +1007,22 @@ mod tests {
 
     #[test]
     fn test_string_lex() {
-        gen_test_token_env!(r#""s"'sd''sdscdcdfvf'"depkd"''"\n\t"'ttt\tt'"#, t);
+        gen_test_token_env!(r#""s"'s'"sdscdcdfvf""depkd""""\n\t""ttt\tt""#, t);
         check(
             &mut t,
             vec![
                 Token::new(TokenType::StringValue, Some(0)),
+                Token::new(TokenType::CharValue, Some('s' as usize)),
                 Token::new(TokenType::StringValue, Some(1)),
                 Token::new(TokenType::StringValue, Some(2)),
                 Token::new(TokenType::StringValue, Some(3)),
                 Token::new(TokenType::StringValue, Some(4)),
                 Token::new(TokenType::StringValue, Some(5)),
-                Token::new(TokenType::StringValue, Some(6)),
             ],
         );
         check_pool(
             vec![
                 String::from("s"),
-                String::from("sd"),
                 String::from("sdscdcdfvf"),
                 String::from("depkd"),
                 String::from(""),
@@ -1158,6 +1184,40 @@ func main() {
                 Token::new(TokenType::RightSmallBrace, None),
             ],
         );
+    }
+
+    #[test]
+    #[should_panic(expected = "SyntaxError")]
+    fn test_wrong_char1() {
+        gen_test_token_env!(r#"''"#, t);
+        t.next_token().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "SyntaxError")]
+    fn test_wrong_char2() {
+        gen_test_token_env!(r#"'sasa'"#, t);
+        t.next_token().unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "SyntaxError")]
+    fn test_wrong_char3() {
+        gen_test_token_env!(r#"'"#, t);
+        t.next_token().unwrap();
+    }
+
+    #[test]
+    fn test_bool() {
+        gen_test_token_env!(r#"true tru false"#, t);
+        check(
+            &mut t,
+            vec![
+                Token::new(TokenType::BoolValue, Some(1)),
+                Token::new(TokenType::ID, Some(0)),
+                Token::new(TokenType::BoolValue, Some(0)),
+            ],
+        )
     }
 
     #[test]

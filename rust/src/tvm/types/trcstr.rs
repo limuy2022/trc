@@ -40,9 +40,9 @@ impl TrcStr {
         Self { _value: value }
     }
 
-    fn override_export() -> HashMap<TokenType, IOType> {
+    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![
-            TokenType::Add => IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()))
+            TokenType::Add => OverrideWrapper::new(crate::base::codegen::Opcode::AddStr, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false))
         ]
     }
 }

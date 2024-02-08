@@ -83,3 +83,12 @@ msgstr "期望类型{}.但是传入类型是{}"
 msgid "unclosed comment"
 msgstr "未闭合的注释"
 
+msgid "FormatStringError"
+msgstr "格式化字符串错误"
+
+msgid "{ is not matched."
+msgstr "{未匹配"
+
+msgid "char should be the format like 'x'."
+msgstr "字符应当以类似'x'的格式书写."
+

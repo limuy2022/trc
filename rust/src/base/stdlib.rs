@@ -1,4 +1,4 @@
-use super::error::*;
+use super::{codegen::Opcode, error::*};
 use crate::{
     base::error::{ARGUMENT_ERROR, ARGU_NUMBER, EXPECT_TYPE},
     compiler::{
@@ -19,6 +19,8 @@ const ANY_TYPE_ID: usize = 0;
 
 #[derive(Clone, Debug)]
 pub struct IOType {
+    // 如果有这个参数，代表在函数末尾是可变参数
+    pub var_params: bool,
     pub argvs_type: Vec<usize>,
     pub return_type: TypeAllowNull,
 }
@@ -32,10 +34,11 @@ pub struct RustFunction {
 }
 
 impl IOType {
-    pub fn new(argvs_type: Vec<usize>, return_type: TypeAllowNull) -> IOType {
+    pub fn new(argvs_type: Vec<usize>, return_type: TypeAllowNull, var_params: bool) -> IOType {
         IOType {
             argvs_type,
             return_type,
+            var_params,
         }
     }
 
@@ -104,7 +107,7 @@ pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display 
         self.get_id() == 0
     }
 
-    fn get_override_func(&self, oper_token: TokenType) -> Option<&IOType>;
+    fn get_override_func(&self, oper_token: TokenType) -> Option<&OverrideWrapper>;
 }
 
 impl<T> ClassClone for T
@@ -135,10 +138,22 @@ impl FunctionInterface for RustFunction {
 }
 
 #[derive(Debug, Clone)]
+pub struct OverrideWrapper {
+    pub opcode: Opcode,
+    pub io: IOType,
+}
+
+impl OverrideWrapper {
+    pub fn new(opcode: Opcode, io: IOType) -> OverrideWrapper {
+        OverrideWrapper { opcode, io }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct RustClass {
     pub members: HashMap<String, Var>,
     pub functions: HashMap<String, RustFunction>,
-    pub overrides: HashMap<TokenType, IOType>,
+    pub overrides: HashMap<TokenType, OverrideWrapper>,
     pub id: usize,
     pub name: &'static str,
 }
@@ -149,7 +164,7 @@ impl RustClass {
         name: &'static str,
         members: HashMap<String, Var>,
         functions: Option<HashMap<String, RustFunction>>,
-        overrides: Option<HashMap<TokenType, IOType>>,
+        overrides: Option<HashMap<TokenType, OverrideWrapper>>,
         id: usize,
     ) -> RustClass {
         RustClass {
@@ -196,7 +211,7 @@ impl ClassInterface for RustClass {
         self.name
     }
 
-    fn get_override_func(&self, oper_token: TokenType) -> Option<&IOType> {
+    fn get_override_func(&self, oper_token: TokenType) -> Option<&OverrideWrapper> {
         match self.overrides.get(&oper_token) {
             Some(i) => Some(i),
             None => None,

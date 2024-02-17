@@ -1,0 +1,51 @@
+[tshell]
+welcome = "Welcome to tshell.Type help() to get more infomation"
+
+[compiler]
+ZeroDivisionError = "ZeroDivisionError"
+NumberOverFlowError = "NumberOverFlowError"
+ArgumentError = "ArgumentError"
+FormatStringError = "FormatStringError"
+SymbolError = "SymbolError"
+TypeError = "TypeError"
+OperatorError = "OperatorError"
+VmError = "VmError"
+SyntaxError = "SyntaxError"
+
+[compiler.syntaxerror]
+str_error = "this string should be ended with \""
+unmatched = "%{0} is unmatched"
+prefix_float = "Prefix %{0} can be used for float"
+unexpected_token = "token %{0} is not expected"
+unclosed_comment = "unclosed comment"
+char_error = "char should be the format like 'x'."
+
+[compiler.symbolerror]
+not_found_sym = "Symbol %{0} not found"
+redefined_sym = "Symbol %{0} redefined"
+
+[compiler.argumenterror]
+argu_num = "expect %{0}.But given %{1}"
+type_unmatched = "Expect type %{0}.But given type %{1}"
+void_argu = "argument cannot be 'void'"
+
+[compiler.formatstringerror]
+unclosed_format = "unmatched {"
+
+[compiler.typerror]
+operator_unsupport = "operator %{0} is not supported for type %{1}"
+type_not_same = "Type %{0} and %{1} are not the same"
+
+[compiler.report]
+in_module = "In module %{name}"
+error_in_line = "Error in line %{line}"
+
+[compiler.numberoverflowerror]
+float_over_flow = "Float %{0} is too large to store"
+
+[vm.vmerror]
+data_num_error = "The number of data of vm stack is not correct, should have %{0} data"
+stack_frame_empty = "frame stack is empty.But running a pop frame opcode"
+
+[vm.zerodivisionerror]
+zerodiv = "%{0} is divided by zero"

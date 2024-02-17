@@ -8,6 +8,7 @@ use crate::{
     tvm::DynaData,
 };
 use downcast_rs::{impl_downcast, Downcast};
+use rust_i18n::t;
 use std::sync::OnceLock;
 use std::{
     collections::HashMap,
@@ -45,8 +46,8 @@ impl IOType {
     pub fn check_argvs(&self, argvs: Vec<usize>) -> Result<(), ErrorInfo> {
         if argvs.len() != self.argvs_type.len() {
             return Err(ErrorInfo::new(
-                gettextrs::gettext!(ARGU_NUMBER, self.argvs_type.len(), argvs.len()),
-                gettextrs::gettext(ARGUMENT_ERROR),
+                t!(ARGU_NUMBER, "0" = self.argvs_type.len(), "1" = argvs.len()),
+                t!(ARGUMENT_ERROR),
             ));
         }
         for i in argvs.iter().enumerate().take(self.argvs_type.len()) {
@@ -55,8 +56,8 @@ impl IOType {
             }
             if self.argvs_type[i.0] != *i.1 {
                 return Err(ErrorInfo::new(
-                    gettextrs::gettext!(EXPECT_TYPE, self.argvs_type[i.0], i.1),
-                    gettextrs::gettext(ARGUMENT_ERROR),
+                    t!(EXPECT_TYPE, "0" = self.argvs_type[i.0], "1" = i.1),
+                    t!(ARGUMENT_ERROR),
                 ));
             }
         }

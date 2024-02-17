@@ -1,23 +1,25 @@
 use super::token::TokenType;
 use super::{scope, TokenLex};
 use super::{scope::*, InputSource};
-use crate::base::codegen::{Inst, Opcode, VmStackType, NO_ARG};
-use crate::base::func::Func;
-use crate::base::stdlib::{get_stdlib, FunctionInterface, RustFunction};
-use crate::base::{codegen::StaticData, error::*};
-use gettextrs::gettext;
-use std::borrow::Borrow;
-use std::cell::RefCell;
-use std::rc::Rc;
+use crate::base::{
+    codegen::{Inst, Opcode, StaticData, VmStackType, NO_ARG},
+    error::*,
+    stdlib::{get_stdlib, RustFunction},
+};
+use rust_i18n::t;
+use std::{cell::RefCell, rc::Rc};
 
 /// 过程间分析用的结构
+#[derive(Default)]
 struct LexProcess {
     stack_type: Vec<VmStackType>,
 }
 
 impl LexProcess {
     pub fn new() -> Self {
-        Self { stack_type: vec![] }
+        Self {
+            ..Default::default()
+        }
     }
 
     pub fn new_type(&mut self, ty: VmStackType) {
@@ -46,17 +48,6 @@ pub struct AstBuilder<'a> {
 
 type AstError<T> = RunResult<T>;
 
-macro_rules! try_err {
-    ($istry: expr, $($argvs:expr),*) => {
-        {if $istry {
-            Err(LightFakeError::new().into())
-        } else {
-            Err(RuntimeError::new($($argvs),*))
-        }
-    }
-    };
-}
-
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
         fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<TypeAllowNull> {
@@ -68,19 +59,17 @@ macro_rules! tmp_expe_function_gen {
                     let func_obj = self.self_scope.as_ref().borrow().get_class(extend).unwrap();
                     let io_check = func_obj.get_override_func($accepted_token);
                     match io_check {
-                        None => return try_err!(istry,
-                            Box::new(self.token_lexer.compiler_data.content.clone()),
+                        None => self.try_err(istry,
                             ErrorInfo::new(
-                                gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()),
-                                gettext(OPERATOR_ERROR),
+                                t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()),
+                                t!(OPERATOR_ERROR),
                             )
-                        ),
+                        )?,
                         Some(v) => {
                             if let Ok(_) = v.io.check_argvs(vec![tya]) {}
                             else {
-                                return try_err!(istry,
-                                    Box::new(self.token_lexer.compiler_data.content.clone()),
-                                    ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $accepted_token, func_obj.get_name()), gettextrs::gettext(OPERATOR_ERROR)))
+                                self.try_err(istry,
+                                    ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()), t!(OPERATOR_ERROR)))?
                             }
                         }
                     }
@@ -126,6 +115,15 @@ macro_rules! expr_gen {
 }
 
 impl<'a> AstBuilder<'a> {
+    #[inline]
+    pub fn try_err<T>(&self, istry: bool, info: ErrorInfo) -> AstError<T> {
+        if istry {
+            Err(LightFakeError::new().into())
+        } else {
+            self.token_lexer.compiler_data.report_compiler_error(info)
+        }
+    }
+
     pub fn new(token_lexer: TokenLex<'a>) -> Self {
         let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
         for i in &prelude.functions {
@@ -205,15 +203,23 @@ impl<'a> AstBuilder<'a> {
     fn check_next_token(&mut self, tp: TokenType) -> AstError<()> {
         let next_sym = self.token_lexer.next_token()?;
         if next_sym.tp != tp {
-            return Err(RuntimeError::new(
-                Box::new(self.token_lexer.compiler_data.content.clone()),
-                ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, next_sym.tp),
-                    gettextrs::gettext(SYNTAX_ERROR),
-                ),
-            ));
+            self.token_lexer
+                .compiler_data
+                .report_compiler_error(ErrorInfo::new(
+                    t!(UNEXPECTED_TOKEN, "0" = next_sym.tp),
+                    t!(SYNTAX_ERROR),
+                ))?;
         }
         Ok(())
+    }
+
+    fn add_var_params_bycode(&mut self, var_params_num: usize) {
+        let tmp = self
+            .token_lexer
+            .compiler_data
+            .const_pool
+            .add_int(var_params_num as i64);
+        self.add_bycode(Opcode::LoadInt, tmp);
     }
 
     /// 解析出函数参数
@@ -222,41 +228,39 @@ impl<'a> AstBuilder<'a> {
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();
         loop {
-            let t = self.expr(true);
+            let t = self.expr(true)?;
             match t {
-                Err(_) => {
-                    if io_tmp.var_params {
-                        let tmp = self
-                            .token_lexer
-                            .compiler_data
-                            .const_pool
-                            .add_int(var_params_num);
-                        self.add_bycode(Opcode::LoadInt, tmp);
+                TypeAllowNull::No => {
+                    self.token_lexer
+                        .compiler_data
+                        .report_compiler_error(ErrorInfo::new(
+                            t!(ARGUMENT_CANNOT_BE_VOID),
+                            t!(ARGUMENT_ERROR),
+                        ))?;
+                }
+                TypeAllowNull::Yes(t) => {
+                    // 如果是可变参数是需要将其转入obj_stack的
+                    if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
+                        // the values that have been stored is more than exact requirement of function
+                        self.move_val_into_obj_stack();
+                        var_params_num += 1;
                     }
+                    ret.push(t)
+                }
+            }
+            let nextt = self.token_lexer.next_token()?;
+            match nextt.tp {
+                TokenType::RightSmallBrace => {
+                    if io_tmp.var_params {
+                        self.add_var_params_bycode(var_params_num);
+                    }
+                    self.token_lexer.next_back(nextt);
                     return Ok(ret);
                 }
-                Ok(ty) => match ty {
-                    TypeAllowNull::No => {
-                        if io_tmp.var_params {
-                            let tmp = self
-                                .token_lexer
-                                .compiler_data
-                                .const_pool
-                                .add_int(var_params_num);
-                            self.add_bycode(Opcode::LoadInt, tmp);
-                        }
-                        return Ok(ret);
-                    }
-                    TypeAllowNull::Yes(t) => {
-                        // 如果是可变参数是需要将其转入obj_stack的
-                        if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
-                            // the values that have been stored is more than exact requirement of function
-                            self.move_val_into_obj_stack();
-                            var_params_num += 1;
-                        }
-                        ret.push(t)
-                    }
-                },
+                TokenType::Comma => {}
+                _ => {
+                    self.token_lexer.next_back(nextt);
+                }
             }
         }
     }
@@ -308,17 +312,16 @@ impl<'a> AstBuilder<'a> {
             let token_data = t.data.unwrap();
             let idx = self.self_scope.as_ref().borrow().get_sym_idx(token_data);
             if idx.is_none() {
-                return try_err!(
+                self.try_err(
                     istry,
-                    Box::new(self.token_lexer.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(
+                        t!(
                             SYMBOL_NOT_FOUND,
-                            self.token_lexer.compiler_data.const_pool.id_name[token_data]
+                            "0" = self.token_lexer.compiler_data.const_pool.id_name[token_data]
                         ),
-                        gettextrs::gettext(SYMBOL_ERROR),
-                    )
-                );
+                        t!(SYMBOL_ERROR),
+                    ),
+                )?
             }
             let idx = idx.unwrap();
             let nxt = self.token_lexer.next_token()?;
@@ -339,11 +342,7 @@ impl<'a> AstBuilder<'a> {
                 // 这是为了加速
                 // 可变参数的话，因为类型不确定，我们会将其生成指令移入obj栈中
                 if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
-                    return try_err!(
-                        istry,
-                        Box::new(self.token_lexer.compiler_data.content.clone()),
-                        e
-                    );
+                    self.try_err(istry, e)?
                 }
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
@@ -358,14 +357,10 @@ impl<'a> AstBuilder<'a> {
             }
         } else {
             self.token_lexer.next_back(t.clone());
-            try_err!(
+            self.try_err(
                 istry,
-                Box::new(self.token_lexer.compiler_data.content.clone()),
-                ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, t.tp),
-                    gettextrs::gettext(SYNTAX_ERROR),
-                )
-            )
+                ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
+            )?
         }
     }
 
@@ -402,14 +397,10 @@ impl<'a> AstBuilder<'a> {
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
-                try_err!(
+                self.try_err(
                     istry,
-                    Box::new(self.token_lexer.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        gettext!(UNEXPECTED_TOKEN, t.tp),
-                        gettextrs::gettext(SYNTAX_ERROR),
-                    )
-                )
+                    ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
+                )?
             }
         }
     }
@@ -435,25 +426,20 @@ impl<'a> AstBuilder<'a> {
                         self.add_bycode(v.opcode.clone(), NO_ARG);
                         Ok(v.io.return_type.clone())
                     }
-                    Err(e) => {
-                        try_err!(
-                            istry,
-                            Box::new(self.token_lexer.compiler_data.content.clone()),
-                            e
-                        )
-                    }
+                    Err(e) => self.try_err(istry, e)?,
                 }
             }
-            None => {
-                try_err!(
-                    istry,
-                    Box::new(self.token_lexer.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        gettext!(OPERATOR_IS_NOT_SUPPORT, optoken, class_obj.get_name()),
-                        gettext(OPERATOR_ERROR),
-                    )
-                )
-            }
+            None => self.try_err(
+                istry,
+                ErrorInfo::new(
+                    t!(
+                        OPERATOR_IS_NOT_SUPPORT,
+                        "0" = optoken,
+                        "1" = class_obj.get_name()
+                    ),
+                    t!(OPERATOR_ERROR),
+                ),
+            )?,
         }
     }
 
@@ -500,14 +486,10 @@ impl<'a> AstBuilder<'a> {
     fn import_module(&mut self, istry: bool) -> AstError<()> {
         let path = self.token_lexer.next_token()?;
         if path.tp != TokenType::StringValue {
-            return try_err!(
+            self.try_err(
                 istry,
-                Box::new(self.token_lexer.compiler_data.content.clone()),
-                ErrorInfo::new(
-                    gettext!(UNEXPECTED_TOKEN, path.tp),
-                    gettextrs::gettext(SYNTAX_ERROR),
-                )
-            );
+                ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = path.tp), t!(SYNTAX_ERROR)),
+            )?
         }
         let path = std::path::PathBuf::from(
             self.token_lexer.compiler_data.const_pool.id_str[path.data.unwrap()]
@@ -553,11 +535,12 @@ impl<'a> AstBuilder<'a> {
                             return Err(RuntimeError::new(
                                 Box::new(self.token_lexer.compiler_data.content.clone()),
                                 ErrorInfo::new(
-                                    gettext!(
+                                    t!(
                                         SYMBOL_NOT_FOUND,
-                                        self.token_lexer.compiler_data.const_pool.id_name[name]
+                                        "0" =
+                                            self.token_lexer.compiler_data.const_pool.id_name[name]
                                     ),
-                                    gettext(SYMBOL_ERROR),
+                                    t!(SYMBOL_ERROR),
                                 ),
                             ));
                         }
@@ -570,11 +553,12 @@ impl<'a> AstBuilder<'a> {
                             return Err(RuntimeError::new(
                                 Box::new(self.token_lexer.compiler_data.content.clone()),
                                 ErrorInfo::new(
-                                    gettext!(
+                                    t!(
                                         SYMBOL_REDEFINED,
-                                        self.token_lexer.compiler_data.const_pool.id_name[name]
+                                        "0" =
+                                            self.token_lexer.compiler_data.const_pool.id_name[name]
                                     ),
-                                    gettext(SYMBOL_ERROR),
+                                    t!(SYMBOL_ERROR),
                                 ),
                             ));
                         }
@@ -623,7 +607,7 @@ impl<'a> AstBuilder<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::compiler::{Compiler, INT_VAL_POOL_ONE};
+    use crate::compiler::{Compiler, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     macro_rules! gen_test_env {
         ($test_code:expr, $env_name:ident) => {
@@ -759,6 +743,7 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(
                     Opcode::CallNative,
                     get_stdlib()
@@ -830,6 +815,33 @@ if 8 == 7 {
                 Inst::new(Opcode::Jump, 0),
                 Inst::new(Opcode::LoadInt, 0),
                 Inst::new(Opcode::LoadInt, 7)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_var_params() {
+        gen_test_env!(r#"print("{}{}{}", 1, 2, 3)"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
             ]
         )
     }

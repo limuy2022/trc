@@ -1,9 +1,8 @@
-use std::fmt::Debug;
-
 use crate::base::error::*;
 use crate::tvm::DynaData;
 use downcast_rs::{impl_downcast, Downcast};
-use gettextrs::gettext;
+use rust_i18n::t;
+use std::fmt::Debug;
 
 pub mod data_structure;
 pub mod trcbigint;
@@ -25,12 +24,12 @@ macro_rules! batch_unsupported_operators {
         $(
         fn $traie_name(&self, _:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
             return Err(ErrorInfo::new(
-                gettext!(
+                t!(
                     OPERATOR_IS_NOT_SUPPORT,
-                    $oper_name,
-                    self.get_type_name()
+                    "0"=$oper_name,
+                    "1"=self.get_type_name()
                 ),
-                gettext(SYNTAX_ERROR),
+                t!(SYNTAX_ERROR),
             ));
         })*
     };
@@ -46,7 +45,7 @@ macro_rules! impl_oper {
                     return Ok(Box::new($newtype::new($oper(self._value.clone(), v._value.clone())$whether_throw_error)));
                 },
                 None => {
-                    return Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
+                    return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=other.get_type_name()), t!(OPERATOR_ERROR)))
                 }
             }
         }
@@ -59,7 +58,7 @@ macro_rules! impl_oper {
                     return Ok(Box::new($newtype::new(self._value $oper v._value)));
                 },
                 None => {
-                    return Err(ErrorInfo::new(gettext!(OPERATOR_IS_NOT_SUPPORT, $error_oper_name, other.get_type_name()), gettext(OPERATOR_ERROR)))
+                    return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=other.get_type_name()), t!(OPERATOR_ERROR)))
                 }
             }
         }
@@ -130,22 +129,34 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
 
     fn not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         Err(ErrorInfo::new(
-            gettext!(OPERATOR_IS_NOT_SUPPORT, "!", self.get_type_name()),
-            gettext(OPERATOR_ERROR),
+            t!(
+                OPERATOR_IS_NOT_SUPPORT,
+                "0" = "!",
+                "1" = self.get_type_name()
+            ),
+            t!(OPERATOR_ERROR),
         ))
     }
 
     fn bit_not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         Err(ErrorInfo::new(
-            gettext!(OPERATOR_IS_NOT_SUPPORT, "~", self.get_type_name()),
-            gettext(OPERATOR_ERROR),
+            t!(
+                OPERATOR_IS_NOT_SUPPORT,
+                "0" = "~",
+                "1" = self.get_type_name()
+            ),
+            t!(OPERATOR_ERROR),
         ))
     }
 
     fn self_negative(&self) -> RuntimeResult<Box<dyn TrcObj>> {
         Err(ErrorInfo::new(
-            gettext!(OPERATOR_IS_NOT_SUPPORT, "-", self.get_type_name()),
-            gettext(OPERATOR_ERROR),
+            t!(
+                OPERATOR_IS_NOT_SUPPORT,
+                "0" = "-",
+                "1" = self.get_type_name()
+            ),
+            t!(OPERATOR_ERROR),
         ))
     }
 

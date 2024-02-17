@@ -7,6 +7,7 @@ pub mod tvm;
 use clap::{self, Parser, Subcommand};
 use std::error::Error;
 
+rust_i18n::i18n!("locales");
 #[derive(Debug, Parser)]
 #[command(
     author = "limuy",

@@ -12,8 +12,8 @@ use self::types::{TrcBool, TrcChar, TrcObj};
 use crate::base::codegen::{self, Opcode, StaticData};
 use crate::base::stdlib::STD_FUNC_TABLE;
 use crate::{base::error::*, cfg};
-use gettextrs::gettext;
 use libloading::Library;
+use rust_i18n::t;
 
 #[derive(Default)]
 pub struct DynaData<'a> {
@@ -36,8 +36,8 @@ impl<'a> DynaData<'a> {
     pub fn check_stack<T>(obj: &[T], require: usize) -> RuntimeResult<()> {
         if obj.len() < require {
             return Err(ErrorInfo::new(
-                gettext!(VM_DATA_NUMBER, require),
-                gettext(VM_ERROR),
+                t!(VM_DATA_NUMBER, "0" = require),
+                t!(VM_ERROR),
             ));
         }
         Ok(())
@@ -223,7 +223,7 @@ impl<'a> Vm<'a> {
                     if ret.is_none() {
                         return Err(RuntimeError::new(
                             Box::new(self.run_contnet.clone()),
-                            ErrorInfo::new(gettext(VM_FRAME_EMPTY), gettext(VM_ERROR)),
+                            ErrorInfo::new(t!(VM_FRAME_EMPTY), t!(VM_ERROR)),
                         ));
                     }
                 }

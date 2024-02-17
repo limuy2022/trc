@@ -6,7 +6,7 @@ use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::{batch_impl_opers, hash_map, impl_oper, impl_single_oper};
 use derive::{trc_class, trc_method};
-use gettextrs::gettext;
+use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 

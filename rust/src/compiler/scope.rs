@@ -1,13 +1,14 @@
-use super::ValuePool;
+use super::{token::ConstPoolIndexTy, ValuePool};
 use crate::base::stdlib::{
     get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, OverrideWrapper,
     Stdlib, STD_CLASS_TABLE,
 };
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
+pub type ScopeAllocIdTy = usize;
 #[derive(Clone, Debug)]
 pub enum TypeAllowNull {
-    Yes(usize),
+    Yes(ScopeAllocIdTy),
     No,
 }
 
@@ -75,7 +76,7 @@ pub type Type = Box<dyn ClassInterface>;
 pub type Func = Box<dyn FunctionInterface>;
 
 /// Manager of type
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct CommonType {
     attr: Vec<Var>,
     funcs: Vec<Function>,
@@ -92,10 +93,9 @@ impl Display for CommonType {
 impl CommonType {
     pub fn new(name: usize, origin_name: impl Into<String>) -> Self {
         Self {
-            attr: vec![],
-            funcs: vec![],
             name,
             origin_name: origin_name.into(),
+            ..Default::default()
         }
     }
 
@@ -140,30 +140,31 @@ impl ClassInterface for CommonType {
     }
 }
 
+pub type ScopeAllocClassId = usize;
+
+#[derive(Default)]
 pub struct SymScope {
+    //父作用域
     prev_scope: Option<Rc<RefCell<SymScope>>>,
-    sym_map: HashMap<usize, usize>,
-    scope_sym_id: usize,
-    types: HashMap<usize, usize>,
-    funcs: HashMap<usize, Box<dyn FunctionInterface>>,
-    vars: HashMap<usize, Var>,
-    modules: HashMap<usize, &'static Stdlib>,
-    types_id: usize,
-    types_custom_store: HashMap<usize, CommonType>,
+    // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
+    sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
+    // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
+    scope_sym_id: ScopeAllocIdTy,
+    types: HashMap<ScopeAllocIdTy, ScopeAllocClassId>,
+    funcs: HashMap<ScopeAllocIdTy, Box<dyn FunctionInterface>>,
+    // token id
+    vars: HashMap<ScopeAllocIdTy, Var>,
+    // 由token id到模块的映射
+    modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
+    types_id: ScopeAllocClassId,
+    types_custom_store: HashMap<ScopeAllocClassId, CommonType>,
 }
 
 impl SymScope {
     pub fn new(prev_scope: Option<Rc<RefCell<SymScope>>>) -> Self {
         let mut ret = Self {
             prev_scope: prev_scope.clone(),
-            sym_map: HashMap::new(),
-            scope_sym_id: 0,
-            types: HashMap::new(),
-            funcs: HashMap::new(),
-            vars: HashMap::new(),
-            modules: HashMap::new(),
-            types_custom_store: HashMap::new(),
-            types_id: 0,
+            ..Default::default()
         };
         match prev_scope {
             Some(prev_scope) => {
@@ -176,7 +177,7 @@ impl SymScope {
     }
 
     /// import the module defined in rust
-    pub fn import_native_module(&mut self, id: usize, stdlib: &'static Stdlib) {
+    pub fn import_native_module(&mut self, id: ScopeAllocIdTy, stdlib: &'static Stdlib) {
         self.modules.insert(id, stdlib);
     }
 
@@ -199,7 +200,7 @@ impl SymScope {
         match self.funcs.get(&id) {
             Some(f) => Some(f.clone()),
             None => match self.prev_scope {
-                Some(ref prev) => return prev.as_ref().borrow().get_function(id),
+                Some(ref prev) => prev.as_ref().borrow().get_function(id),
                 None => None,
             },
         }
@@ -209,10 +210,10 @@ impl SymScope {
         if self.sym_map.contains_key(&id) {
             return true;
         }
-        return match self.prev_scope {
+        match self.prev_scope {
             Some(ref prev_scope) => prev_scope.as_ref().borrow().has_sym(id),
             None => false,
-        };
+        }
     }
 
     pub fn new_id(&mut self) -> usize {
@@ -231,13 +232,13 @@ impl SymScope {
 
     pub fn get_sym_idx(&self, id: usize) -> Option<usize> {
         let t = self.sym_map.get(&id);
-        return match t {
+        match t {
             None => match self.prev_scope {
                 Some(ref prev_scope) => prev_scope.as_ref().borrow().get_sym_idx(id),
                 None => None,
             },
             Some(t) => Some(*t),
-        };
+        }
     }
 
     pub fn add_func(&mut self, id: usize, f: Box<dyn FunctionInterface>) {
@@ -253,7 +254,7 @@ impl SymScope {
     }
 
     pub fn get_type(&self, id: usize) -> usize {
-        return *self.types.get(&id).unwrap();
+        *self.types.get(&id).unwrap()
     }
 
     pub fn get_scope_last_idx(&self) -> usize {
@@ -272,13 +273,13 @@ impl SymScope {
             return None;
         }
         let t = self.types.get(&classid);
-        return match t {
+        match t {
             Some(t) => Some(Box::new(self.types_custom_store.get(t).unwrap().clone())),
             None => match self.prev_scope {
                 Some(ref prev_scope) => prev_scope.as_ref().borrow().get_class(classid),
                 None => None,
             },
-        };
+        }
     }
 }
 

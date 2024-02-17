@@ -7,7 +7,7 @@ use crate::{
     cfg::FLOAT_OVER_FLOW_LIMIT,
     hash_map,
 };
-use gettextrs::gettext;
+use rust_i18n::t;
 use std::{collections::HashMap, fmt::Display, process::exit, sync::OnceLock};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq)]
@@ -131,6 +131,8 @@ pub enum TokenType {
     EndOfFile,
 }
 
+pub type ConstPoolIndexTy = usize;
+
 impl Display for TokenType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
@@ -244,8 +246,8 @@ macro_rules! check_braces_match {
                         return Err(error::RuntimeError::new(
                             Box::new(Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line)),
                             ErrorInfo::new(
-                                gettext!(error::UNMATCHED_BRACE, $brace_record.c),
-                                gettext(error::SYNTAX_ERROR),
+                                t!(error::UNMATCHED_BRACE, "0"=$brace_record.c),
+                                t!(error::SYNTAX_ERROR),
                             ),
                         ));
                     }
@@ -305,7 +307,7 @@ impl TokenLex<'_> {
         match top {
             None => Err(RuntimeError::new(
                 Box::new(self.compiler_data.content.clone()),
-                ErrorInfo::new(gettext!(error::UNMATCHED_BRACE, c), gettext(SYNTAX_ERROR)),
+                ErrorInfo::new(t!(error::UNMATCHED_BRACE, "0" = c), t!(SYNTAX_ERROR)),
             )),
             Some(cc) => {
                 check_braces_match!(self, c, cc,
@@ -458,7 +460,7 @@ impl TokenLex<'_> {
                         } else if c == '\0' {
                             return Err(RuntimeError::new(
                                 Box::new(self.compiler_data.content.clone()),
-                                ErrorInfo::new(gettext(UNCLODED_COMMENT), gettext(SYNTAX_ERROR)),
+                                ErrorInfo::new(t!(UNCLODED_COMMENT), t!(SYNTAX_ERROR)),
                             ));
                         } else if c == '\n' {
                             self.compiler_data.content.add_line();
@@ -564,8 +566,11 @@ impl TokenLex<'_> {
                 return Err(RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(PREFIX_FOR_FLOAT, get_redix_to_prefix()[&(radix as usize)]),
-                        gettext(SYNTAX_ERROR),
+                        t!(
+                            PREFIX_FOR_FLOAT,
+                            "0" = get_redix_to_prefix()[&(radix as usize)]
+                        ),
+                        t!(SYNTAX_ERROR),
                     ),
                 ));
             }
@@ -577,8 +582,8 @@ impl TokenLex<'_> {
                 return Err(RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
                     ErrorInfo::new(
-                        gettext!(FLOAT_OVER_FLOW, format!("{intpart}.{float_part}")),
-                        gettext(NUMBER_OVER_FLOW),
+                        t!(FLOAT_OVER_FLOW, "0" = format!("{intpart}.{float_part}")),
+                        t!(NUMBER_OVER_FLOW),
                     ),
                 ));
             }
@@ -737,10 +742,7 @@ impl TokenLex<'_> {
             if c == '\0' {
                 RuntimeError::new(
                     Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        gettext!(error::STRING_WITHOUT_END, '"'),
-                        gettext(SYNTAX_ERROR),
-                    ),
+                    ErrorInfo::new(t!(error::STRING_WITHOUT_END), t!(SYNTAX_ERROR)),
                 );
             }
         }
@@ -756,7 +758,7 @@ impl TokenLex<'_> {
         if end != '\'' {
             return Err(RuntimeError::new(
                 Box::new(self.compiler_data.content.clone()),
-                ErrorInfo::new(gettext(CHAR_FORMAT), gettext(SYNTAX_ERROR)),
+                ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)),
             ));
         }
         Ok(Token::new(TokenType::CharValue, Some(c as usize)))
@@ -822,8 +824,8 @@ impl TokenLex<'_> {
                     unmatch_char.line,
                 )),
                 ErrorInfo::new(
-                    gettext!(error::UNMATCHED_BRACE, unmatch_char.c),
-                    gettext(SYNTAX_ERROR),
+                    t!(error::UNMATCHED_BRACE, "0" = unmatch_char.c),
+                    t!(SYNTAX_ERROR),
                 ),
             ));
         }

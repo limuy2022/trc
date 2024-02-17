@@ -11,8 +11,7 @@ repository = "https://github.com/limuy2022/trc"
 
 [dependencies]
 rand = "0.8.5"
-clap = { version = "4.5.0", features = ["derive"] }
-gettext-rs = "0.7.0"
+clap = { version = "4.5.1", features = ["derive"] }
 colored = "2.1.0"
 downcast-rs = "1.2.0"
 num-bigint = "0.4.4"
@@ -20,6 +19,8 @@ llvm-sys = "170.0.1"
 derive = { path = "./derive" }
 libloading = "0.8.1"
 stdlib = { path = "./stdlib" }
+rust-i18n = "3.0.1"
+sys-locale = "0.3.1"
 
 [profile.release]
 panic = "abort"
@@ -29,3 +30,15 @@ strip = true
 
 [workspace]
 members = ["derive", ".", "stdlib"]
+
+[package.metadata.i18n]
+# The available locales for your application, default: ["en"].
+available-locales = ["en", "zh-CN"]
+
+# The default locale, default: "en".
+default-locale = "en"
+
+# Path for your translations YAML file, default: "locales".
+# This config for let `cargo i18n` command line tool know where to find your translations.
+# You must keep this path same as the one you pass to method `rust_i18n::i18n!`.
+load-path = "locales"

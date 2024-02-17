@@ -10,7 +10,7 @@ use crate::impl_single_oper;
 use crate::{base::error::*, batch_impl_opers, impl_oper};
 use derive::trc_class;
 use derive::trc_method;
-use gettextrs::gettext;
+use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
@@ -53,8 +53,8 @@ impl TrcInt {
 pub fn exact_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
-            gettext!(ZERO_DIV, a),
-            gettext(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIV, "0" = a),
+            t!(ZERO_DIVSION_ERROR),
         ));
     }
     Ok(a / b)
@@ -63,8 +63,8 @@ pub fn exact_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
 pub fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
-            gettext!(ZERO_DIV, a),
-            gettext(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIV, "0" = a),
+            t!(ZERO_DIVSION_ERROR),
         ));
     }
     Ok(a as f64 / b as f64)
@@ -73,8 +73,8 @@ pub fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
 pub fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
-            gettext!(ZERO_DIV, a),
-            gettext(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIV, "0" = a),
+            t!(ZERO_DIVSION_ERROR),
         ));
     }
     Ok(a % b)

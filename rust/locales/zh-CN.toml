@@ -1,0 +1,51 @@
+[tshell]
+welcome = "欢迎使用tshell。输入help()获取更多信息"
+
+[compiler]
+NumberOverFlowError = "数值溢出错误"
+FormatStringError = "格式化字符串错误"
+SymbolError = "符号错误"
+TypeError = "类型错误"
+ZeroDivisionError = "除零错误"
+VmError = "虚拟机错误"
+ArgumentError = "参数错误"
+SyntaxError = "语法错误"
+OperatorError = "操作符错误"
+
+[compiler.syntaxerror]
+unmatched = "%{0}未匹配"
+char_error = "字符应当以类似'x'的格式书写."
+str_error = "这个字符串应当以\"结束"
+unclosed_comment = "未闭合的注释"
+prefix_float = "前缀%{0}不能对浮点数使用"
+unexpected_token = "token %{0}不是被期望的"
+
+[compiler.symbolerror]
+not_found_sym = "未找到符号%{0}"
+redefined_sym = "符号%{0}重定义"
+
+[compiler.argumenterror]
+void_argu = "参数不能为void"
+type_unmatched = "期望类型%{0}.但是传入类型是%{1}"
+argu_num = "期望%{0}个参数.但是输入%{1}个参数"
+
+[compiler.formatstringerror]
+unclosed_format = "{未匹配"
+
+[compiler.typerror]
+operator_unsupport = "操作符%{0}不支持类型%{1}"
+type_not_same = "类型%{0}和%{1}不同"
+
+[compiler.report]
+error_in_line = "错误在第%{line}行"
+in_module = "在模块%{name}中"
+
+[compiler.numberoverflowerror]
+float_over_flow = "浮点数%{0}超过了储存范围"
+
+[vm.vmerror]
+data_num_error = "虚拟机栈中数据数量不正确,期望有%{0}个数据"
+stack_frame_empty = "帧栈为空,但运行了pop frame指令"
+
+[vm.zerodivisionerror]
+zerodiv = "%{0}被零除"

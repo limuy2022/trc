@@ -11,7 +11,7 @@ use crate::impl_single_oper;
 use crate::{batch_impl_opers, impl_oper};
 use derive::trc_class;
 use derive::trc_method;
-use gettextrs::gettext;
+use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
@@ -47,8 +47,8 @@ impl TrcFloat {
 pub fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
-            gettext!(ZERO_DIV, a),
-            gettext(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIV, "0" = a),
+            t!(ZERO_DIVSION_ERROR),
         ));
     }
     Ok(a / b)
@@ -57,8 +57,8 @@ pub fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
 pub fn exact_div_float(a: f64, b: f64) -> Result<i64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
-            gettext!(ZERO_DIV, a),
-            gettext(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIV, "0" = a),
+            t!(ZERO_DIVSION_ERROR),
         ));
     }
     Ok((a / b).floor() as i64)

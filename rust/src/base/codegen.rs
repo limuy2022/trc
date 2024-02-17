@@ -146,10 +146,12 @@ pub enum VmStackType {
     Object,
 }
 
+pub type InstSet = Vec<Inst>;
+
 #[derive(Default)]
 pub struct StaticData {
     pub constpool: ConstPool,
-    pub inst: Vec<Inst>,
+    pub inst: InstSet,
     pub funcs: Vec<func::Func>,
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,

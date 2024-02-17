@@ -6,9 +6,11 @@ pub mod llvm_convent;
 pub mod scope;
 pub mod token;
 
+use rust_i18n::t;
+
 use self::token::TokenLex;
 use crate::base::codegen::{ConstPool, StaticData};
-use crate::base::error::{self, RunResult};
+use crate::base::error::*;
 use crate::cfg;
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -32,7 +34,7 @@ pub struct Content {
     line: usize,
 }
 
-impl error::ErrorContent for Content {
+impl ErrorContent for Content {
     fn get_module_name(&self) -> &str {
         &self.module_name
     }
@@ -362,6 +364,11 @@ impl Compiler {
         let mut ast_builder = ast::AstBuilder::new(token_lexer);
         ast_builder.generate_code()?;
         Ok(ast_builder.return_static_data())
+    }
+
+    #[inline]
+    pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RunResult<T> {
+        Err(RuntimeError::new(Box::new(self.content.clone()), info))
     }
 }
 

@@ -1,10 +1,9 @@
-use std::io::{self, Write};
-
 use super::super::types::*;
 use crate::base::stdlib::*;
 use crate::{base::error::*, tvm::DynaData};
 use derive::{def_module, trc_function};
-use gettextrs::gettext;
+use rust_i18n::t;
+use std::io::{self, Write};
 
 #[trc_function(var_params = true)]
 pub fn print(fmt_string: str) -> void {
@@ -17,10 +16,7 @@ pub fn print(fmt_string: str) -> void {
                 .unwrap();
             if let Some(j) = output_iter.next() {
                 if j != '}' {
-                    return Err(ErrorInfo::new(
-                        gettext(UNCLOSED_FORMAT),
-                        gettext(FORMAT_STR_ERROR),
-                    ));
+                    return Err(ErrorInfo::new(t!(UNCLOSED_FORMAT), t!(FORMAT_STR_ERROR)));
                 }
             }
         } else {
@@ -40,10 +36,7 @@ pub fn println(fmt_string: str) -> void {
                 .unwrap();
             if let Some(j) = output_iter.next() {
                 if j != '}' {
-                    return Err(ErrorInfo::new(
-                        gettext(UNCLOSED_FORMAT),
-                        gettext(FORMAT_STR_ERROR),
-                    ));
+                    return Err(ErrorInfo::new(t!(UNCLOSED_FORMAT), t!(FORMAT_STR_ERROR)));
                 }
             }
         } else {

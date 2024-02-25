@@ -4,7 +4,7 @@ pub mod compiler;
 pub mod tools;
 pub mod tvm;
 
-use clap::{self, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use std::error::Error;
 
 rust_i18n::i18n!("locales");
@@ -28,6 +28,8 @@ enum Commands {
         optimize: bool,
         #[arg()]
         files: Vec<String>,
+        #[arg(long, default_value_t = false)]
+        dev: bool,
     },
     Tshell {},
     Update {},
@@ -45,9 +47,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         Commands::Build {
             optimize: opt,
             files,
+            dev,
         } => {
             for i in files {
-                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)));
+                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)), dev);
             }
         }
         Commands::Tshell {} => {

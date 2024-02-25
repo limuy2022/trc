@@ -83,6 +83,9 @@ impl Display for RuntimeError {
 
 impl RuntimeError {
     pub fn new(content: Box<dyn ErrorContent>, info: ErrorInfo) -> RuntimeError {
+        // if info.message != "" {
+        // panic!("develop debug use");
+        // }
         RuntimeError { content, info }
     }
 }

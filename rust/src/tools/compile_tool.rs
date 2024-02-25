@@ -1,13 +1,17 @@
 use crate::compiler;
 use std::process::exit;
 
-pub fn compile(opt: compiler::Option) {
+pub fn compile(opt: compiler::Option, dev: bool) {
     let mut compiler = compiler::Compiler::new(opt);
     match compiler.lex() {
         Ok(data) => {}
         Err(e) => {
-            eprintln!("{}", e);
-            exit(1)
+            if (dev) {
+                Err::<(), _>(e).unwrap();
+            } else {
+                eprintln!("{}", e);
+                exit(1)
+            }
         }
     }
 }

@@ -244,8 +244,9 @@ impl<'a> AstBuilder<'a> {
                         // the values that have been stored is more than exact requirement of function
                         self.move_val_into_obj_stack();
                         var_params_num += 1;
+                    } else {
+                        ret.push(t)
                     }
-                    ret.push(t)
                 }
             }
             let nextt = self.token_lexer.next_token()?;
@@ -828,8 +829,11 @@ if 8 == 7 {
             vec![
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 3),
                 Inst::new(
                     Opcode::CallNative,

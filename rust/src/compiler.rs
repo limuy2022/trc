@@ -15,6 +15,7 @@ use crate::cfg;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::io::BufRead;
+use std::process::exit;
 use std::{fs, io, vec};
 
 #[derive(Debug, Clone)]
@@ -336,9 +337,15 @@ impl Compiler {
     pub fn new(option: Option) -> Self {
         match option.inputsource {
             InputSource::File(ref filename) => {
-                let f = fs::File::open(filename);
+                let f = match fs::File::open(filename) {
+                    Err(e) => {
+                        eprintln!("Cannot open file {}:{}", filename, e);
+                        exit(1);
+                    }
+                    Ok(file) => file,
+                };
                 Compiler {
-                    input: Box::new(FileSource::new(f.unwrap())),
+                    input: Box::new(FileSource::new(f)),
                     const_pool: ValuePool::new(),
                     option,
                     content: Content::new(cfg::MAIN_MODULE_NAME),

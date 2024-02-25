@@ -55,6 +55,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                         }"#,
                             )
                             .expect("Err on lex loop"),
+                            parse_str("va_list.reverse();").unwrap(),
                         ];
                         // 将自己放到new_stmts的前面
                         var_lex_tmp.extend(new_stmts);

@@ -50,7 +50,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             dev,
         } => {
             for i in files {
-                tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i)), dev);
+                tools::compile(
+                    compiler::Option::new(opt, compiler::InputSource::File(i)),
+                    dev,
+                );
             }
         }
         Commands::Tshell {} => {

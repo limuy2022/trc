@@ -6,7 +6,7 @@ pub fn compile(opt: compiler::Option, dev: bool) {
     match compiler.lex() {
         Ok(data) => {}
         Err(e) => {
-            if (dev) {
+            if dev {
                 Err::<(), _>(e).unwrap();
             } else {
                 eprintln!("{}", e);

@@ -14,6 +14,7 @@ use crate::{
     },
     cfg,
 };
+use rust_i18n::t;
 use std::{
     collections::HashMap,
     fmt::Display,
@@ -344,7 +345,11 @@ impl Compiler {
             InputSource::File(ref filename) => {
                 let f = match fs::File::open(filename) {
                     Err(e) => {
-                        eprintln!("Cannot open file {}:{}", filename, e);
+                        eprintln!(
+                            "{}:{}",
+                            t!("common.cannot_open_file", filename = filename),
+                            e
+                        );
                         exit(1);
                     }
                     Ok(file) => file,

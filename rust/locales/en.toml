@@ -1,6 +1,9 @@
 [tshell]
 welcome = "Welcome to tshell.Type help() to get more infomation"
 
+[common]
+cannot_open_file = "Cannot open %{filename}"
+
 [compiler]
 ZeroDivisionError = "ZeroDivisionError"
 NumberOverFlowError = "NumberOverFlowError"

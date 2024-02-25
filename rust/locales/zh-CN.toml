@@ -1,6 +1,9 @@
 [tshell]
 welcome = "欢迎使用tshell。输入help()获取更多信息"
 
+[common]
+cannot_open_file = "无法打开文件%{filename}"
+
 [compiler]
 NumberOverFlowError = "数值溢出错误"
 FormatStringError = "格式化字符串错误"

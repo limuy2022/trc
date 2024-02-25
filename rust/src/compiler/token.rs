@@ -1,12 +1,5 @@
 use super::{Compiler, Content, Float};
-use crate::{
-    base::error::{
-        self, ErrorContent, ErrorInfo, RunResult, RuntimeError, CHAR_FORMAT, FLOAT_OVER_FLOW,
-        NUMBER_OVER_FLOW, PREFIX_FOR_FLOAT, SYNTAX_ERROR, UNCLODED_COMMENT,
-    },
-    cfg::FLOAT_OVER_FLOW_LIMIT,
-    hash_map,
-};
+use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
 use rust_i18n::t;
 use std::{collections::HashMap, fmt::Display, process::exit, sync::OnceLock};
 
@@ -243,11 +236,11 @@ macro_rules! check_braces_match {
             $(
                 $front_brace => {
                     if $should_be_matched != $after_brace {
-                        return Err(error::RuntimeError::new(
+                        return $sself.report_error_with_context(RuntimeError::new(
                             Box::new(Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line)),
                             ErrorInfo::new(
-                                t!(error::UNMATCHED_BRACE, "0"=$brace_record.c),
-                                t!(error::SYNTAX_ERROR),
+                                t!(UNMATCHED_BRACE, "0"=$brace_record.c),
+                                t!(SYNTAX_ERROR),
                             ),
                         ));
                     }
@@ -305,9 +298,9 @@ impl TokenLex<'_> {
     fn check_braces_stack(&mut self, c: char) -> Result<(), RuntimeError> {
         let top = self.braces_check.pop();
         match top {
-            None => Err(RuntimeError::new(
-                Box::new(self.compiler_data.content.clone()),
-                ErrorInfo::new(t!(error::UNMATCHED_BRACE, "0" = c), t!(SYNTAX_ERROR)),
+            None => self.report_error(ErrorInfo::new(
+                t!(UNMATCHED_BRACE, "0" = c),
+                t!(SYNTAX_ERROR),
             )),
             Some(cc) => {
                 check_braces_match!(self, c, cc,
@@ -458,9 +451,9 @@ impl TokenLex<'_> {
                             }
                             self.compiler_data.input.unread(c);
                         } else if c == '\0' {
-                            return Err(RuntimeError::new(
-                                Box::new(self.compiler_data.content.clone()),
-                                ErrorInfo::new(t!(UNCLODED_COMMENT), t!(SYNTAX_ERROR)),
+                            return self.report_error(ErrorInfo::new(
+                                t!(UNCLODED_COMMENT),
+                                t!(SYNTAX_ERROR),
                             ));
                         } else if c == '\n' {
                             self.compiler_data.content.add_line();
@@ -563,15 +556,12 @@ impl TokenLex<'_> {
         if c == '.' {
             // float can be used with prefix
             if radix != 10 {
-                return Err(RuntimeError::new(
-                    Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        t!(
-                            PREFIX_FOR_FLOAT,
-                            "0" = get_redix_to_prefix()[&(radix as usize)]
-                        ),
-                        t!(SYNTAX_ERROR),
+                return self.report_error(ErrorInfo::new(
+                    t!(
+                        PREFIX_FOR_FLOAT,
+                        "0" = get_redix_to_prefix()[&(radix as usize)]
                     ),
+                    t!(SYNTAX_ERROR),
                 ));
             }
             // float mode
@@ -579,12 +569,9 @@ impl TokenLex<'_> {
             let float_part = self.lex_num_integer(c, radix);
             if float_part.len() + intpart.len() > FLOAT_OVER_FLOW_LIMIT {
                 // overflow
-                return Err(RuntimeError::new(
-                    Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(
-                        t!(FLOAT_OVER_FLOW, "0" = format!("{intpart}.{float_part}")),
-                        t!(NUMBER_OVER_FLOW),
-                    ),
+                return self.report_error(ErrorInfo::new(
+                    t!(FLOAT_OVER_FLOW, "0" = format!("{intpart}.{float_part}")),
+                    t!(NUMBER_OVER_FLOW),
                 ));
             }
             return Ok(NumValue::FloatVal(Float::new(
@@ -740,10 +727,7 @@ impl TokenLex<'_> {
             s.push(c);
             c = self.compiler_data.input.read();
             if c == '\0' {
-                RuntimeError::new(
-                    Box::new(self.compiler_data.content.clone()),
-                    ErrorInfo::new(t!(error::STRING_WITHOUT_END), t!(SYNTAX_ERROR)),
-                );
+                return self.report_error(ErrorInfo::new(t!(STRING_WITHOUT_END), t!(SYNTAX_ERROR)));
             }
         }
         Ok(Token::new(
@@ -756,12 +740,23 @@ impl TokenLex<'_> {
         let c = self.compiler_data.input.read();
         let end = self.compiler_data.input.read();
         if end != '\'' {
-            return Err(RuntimeError::new(
-                Box::new(self.compiler_data.content.clone()),
-                ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)),
-            ));
+            return self.report_error(ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)));
         }
         Ok(Token::new(TokenType::CharValue, Some(c as usize)))
+    }
+
+    fn report_error<T>(&mut self, e: ErrorInfo) -> Result<T, RuntimeError> {
+        self.clear_error();
+        self.compiler_data.report_compiler_error(e)
+    }
+
+    fn report_error_with_context<T>(&mut self, e: RuntimeError) -> Result<T, RuntimeError> {
+        self.clear_error();
+        Err(e)
+    }
+
+    fn clear_error(&mut self) {
+        self.braces_check.clear();
     }
 
     pub fn next_token(&mut self) -> RunResult<Token> {
@@ -818,15 +813,13 @@ impl TokenLex<'_> {
     pub fn check(&mut self) -> Result<(), RuntimeError> {
         if !self.braces_check.is_empty() {
             let unmatch_char = self.braces_check.pop().unwrap();
-            return Err(RuntimeError::new(
+            self.clear_error();
+            return self.report_error_with_context(RuntimeError::new(
                 Box::new(Content::new_line(
                     &self.compiler_data.content.module_name,
                     unmatch_char.line,
                 )),
-                ErrorInfo::new(
-                    t!(error::UNMATCHED_BRACE, "0" = unmatch_char.c),
-                    t!(SYNTAX_ERROR),
-                ),
+                ErrorInfo::new(t!(UNMATCHED_BRACE, "0" = unmatch_char.c), t!(SYNTAX_ERROR)),
             ));
         }
         Ok(())
@@ -879,7 +872,7 @@ mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
     use super::*;
-    use crate::compiler::{Float, InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
+    use crate::compiler::{InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {
@@ -918,6 +911,18 @@ mod tests {
                 pool_be_checked
             );
         }
+    }
+
+    fn check_until_eof(tokenlex: &mut TokenLex) {
+        loop {
+            let token_tmp = tokenlex.next_token().unwrap();
+            println!("{:?}", token_tmp);
+            if token_tmp.tp == TokenType::EndOfFile {
+                break;
+            }
+        }
+        // println!("fuck you ccf");
+        tokenlex.check().unwrap();
     }
 
     #[test]
@@ -1189,24 +1194,24 @@ func main() {
     }
 
     #[test]
-    #[should_panic(expected = "SyntaxError")]
+    #[should_panic(expected = "char")]
     fn test_wrong_char1() {
         gen_test_token_env!(r#"''"#, t);
-        t.next_token().unwrap();
+        check_until_eof(&mut t);
     }
 
     #[test]
-    #[should_panic(expected = "SyntaxError")]
+    #[should_panic(expected = "char")]
     fn test_wrong_char2() {
         gen_test_token_env!(r#"'sasa'"#, t);
-        t.next_token().unwrap();
+        check_until_eof(&mut t);
     }
 
     #[test]
-    #[should_panic(expected = "SyntaxError")]
+    #[should_panic(expected = "char")]
     fn test_wrong_char3() {
         gen_test_token_env!(r#"'"#, t);
-        t.next_token().unwrap();
+        check_until_eof(&mut t);
     }
 
     #[test]
@@ -1247,5 +1252,19 @@ func main() {
                 Token::new(TokenType::LeftSmallBrace, None),
             ],
         );
+    }
+
+    #[test]
+    #[should_panic(expected = "char")]
+    fn test_error_char() {
+        gen_test_token_env!(r#"print("{}", 'pp')"#, t);
+        check_until_eof(&mut t);
+    }
+
+    #[test]
+    #[should_panic(expected = "string")]
+    fn test_error_str() {
+        gen_test_token_env!(r#"print("{}", "pp)"#, t);
+        check_until_eof(&mut t);
     }
 }

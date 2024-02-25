@@ -5,13 +5,20 @@ mod gc;
 pub mod stdlib;
 mod types;
 
-use self::types::trcfloat::{div_float, exact_div_float, TrcFloat};
-use self::types::trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt};
-use self::types::trcstr::TrcStr;
-use self::types::{TrcBool, TrcChar};
-use crate::base::codegen::{Opcode, StaticData};
-use crate::base::stdlib::STD_FUNC_TABLE;
-use crate::{base::error::*, cfg};
+use self::types::{
+    trcfloat::{div_float, exact_div_float, TrcFloat},
+    trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt},
+    trcstr::TrcStr,
+    TrcBool, TrcChar,
+};
+use crate::{
+    base::{
+        codegen::{Opcode, StaticData},
+        error::*,
+        stdlib::STD_FUNC_TABLE,
+    },
+    cfg,
+};
 use libloading::Library;
 use rust_i18n::t;
 

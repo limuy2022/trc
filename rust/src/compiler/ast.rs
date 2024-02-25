@@ -1,6 +1,8 @@
-use super::token::TokenType;
-use super::{scope, TokenLex};
-use super::{scope::*, InputSource};
+use super::{
+    scope::{self, *},
+    token::TokenType,
+    InputSource, TokenLex,
+};
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, NO_ARG},
     error::*,

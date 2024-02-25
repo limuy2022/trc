@@ -7,14 +7,21 @@ pub mod scope;
 pub mod token;
 
 use self::token::TokenLex;
-use crate::base::codegen::{ConstPool, StaticData};
-use crate::base::error::*;
-use crate::cfg;
-use std::collections::HashMap;
-use std::fmt::Display;
-use std::io::BufRead;
-use std::process::exit;
-use std::{fs, io, vec};
+use crate::{
+    base::{
+        codegen::{ConstPool, StaticData},
+        error::*,
+    },
+    cfg,
+};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    fs,
+    io::{self, BufRead},
+    process::exit,
+    vec,
+};
 
 #[derive(Debug, Clone)]
 pub enum InputSource {

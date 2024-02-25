@@ -32,9 +32,9 @@ impl TrcObj for TrcBool {
 impl Display for TrcBool {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self._value {
-            write!(f, "True")
+            write!(f, "true")
         } else {
-            write!(f, "False")
+            write!(f, "false")
         }
     }
 }

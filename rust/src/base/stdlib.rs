@@ -1,6 +1,5 @@
 use super::{codegen::Opcode, error::*};
 use crate::{
-    base::error::{ARGUMENT_ERROR, ARGU_NUMBER, EXPECT_TYPE},
     compiler::{
         scope::{Type, TypeAllowNull, Var},
         token::TokenType,

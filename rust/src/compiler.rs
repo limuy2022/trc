@@ -6,8 +6,6 @@ pub mod llvm_convent;
 pub mod scope;
 pub mod token;
 
-use rust_i18n::t;
-
 use self::token::TokenLex;
 use crate::base::codegen::{ConstPool, StaticData};
 use crate::base::error::*;

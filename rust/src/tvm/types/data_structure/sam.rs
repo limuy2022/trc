@@ -3,7 +3,7 @@ use crate::base::stdlib::{OverrideWrapper, RustFunction};
 use crate::tvm::types::trcchar::TrcChar;
 use crate::tvm::types::TrcObj;
 use crate::tvm::DynaData;
-use crate::{base::stdlib::IOType, compiler::token::TokenType, hash_map};
+use crate::{compiler::token::TokenType, hash_map};
 use derive::{trc_class, trc_function, trc_method};
 use std::collections::HashMap;
 use std::fmt::Display;

@@ -1,6 +1,5 @@
 use super::TrcObj;
 use crate::base::error::*;
-use crate::base::error::{ErrorInfo, OPERATOR_ERROR, OPERATOR_IS_NOT_SUPPORT};
 use crate::base::stdlib::*;
 use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;

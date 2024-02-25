@@ -37,7 +37,7 @@ operator_unsupport = "操作符%{0}不支持类型%{1}"
 type_not_same = "类型%{0}和%{1}不同"
 
 [compiler.report]
-error_in_line = "错误在第%{line}行"
+error_in_line = "在第%{line}行发生了错误"
 in_module = "在模块%{name}中"
 
 [compiler.numberoverflowerror]

@@ -1,4 +1,4 @@
-use super::{Compiler, Content, Float};
+use super::{Compiler, Context, Float};
 use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
 use rust_i18n::t;
 use std::{collections::HashMap, fmt::Display, process::exit, sync::OnceLock};
@@ -237,7 +237,7 @@ macro_rules! check_braces_match {
                 $front_brace => {
                     if $should_be_matched != $after_brace {
                         return $sself.report_error_with_context(RuntimeError::new(
-                            Box::new(Content::new_line(&$sself.compiler_data.content.module_name, $brace_record.line)),
+                            Box::new(Context::new_line(&$sself.compiler_data.context.module_name, $brace_record.line)),
                             ErrorInfo::new(
                                 t!(UNMATCHED_BRACE, "0"=$brace_record.c),
                                 t!(SYNTAX_ERROR),
@@ -393,7 +393,7 @@ impl TokenLex<'_> {
             ',' => Token::new(TokenType::Comma, None),
             '{' => {
                 self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
                 Token::new(TokenType::LeftBigBrace, None)
             }
             '}' => {
@@ -402,7 +402,7 @@ impl TokenLex<'_> {
             }
             '[' => {
                 self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
                 Token::new(TokenType::LeftMiddleBrace, None)
             }
             ']' => {
@@ -411,7 +411,7 @@ impl TokenLex<'_> {
             }
             '(' => {
                 self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.content.get_line()));
+                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
                 Token::new(TokenType::LeftSmallBrace, None)
             }
             ')' => {
@@ -456,7 +456,7 @@ impl TokenLex<'_> {
                                 t!(SYNTAX_ERROR),
                             ));
                         } else if c == '\n' {
-                            self.compiler_data.content.add_line();
+                            self.compiler_data.context.add_line();
                         }
                     }
                 }
@@ -773,7 +773,7 @@ impl TokenLex<'_> {
                 return self.next_token();
             }
             '\n' => {
-                self.compiler_data.content.add_line();
+                self.compiler_data.context.add_line();
                 return self.next_token();
             }
             '#' => {
@@ -781,7 +781,7 @@ impl TokenLex<'_> {
                 loop {
                     let c = self.compiler_data.input.read();
                     if c == '\n' {
-                        self.compiler_data.content.add_line();
+                        self.compiler_data.context.add_line();
                         return self.next_token();
                     }
                     if c == '\0' {
@@ -815,8 +815,8 @@ impl TokenLex<'_> {
             let unmatch_char = self.braces_check.pop().unwrap();
             self.clear_error();
             return self.report_error_with_context(RuntimeError::new(
-                Box::new(Content::new_line(
-                    &self.compiler_data.content.module_name,
+                Box::new(Context::new_line(
+                    &self.compiler_data.context.module_name,
                     unmatch_char.line,
                 )),
                 ErrorInfo::new(t!(UNMATCHED_BRACE, "0" = unmatch_char.c), t!(SYNTAX_ERROR)),

@@ -1,6 +1,6 @@
 use crate::base::func;
 
-/// A content structure which hold the running info of the function
+/// A context structure which hold the running info of the function
 pub struct Frame<'a> {
     name: &'a str,
 }

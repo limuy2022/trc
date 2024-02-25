@@ -30,12 +30,12 @@ pub struct Option {
 }
 
 #[derive(Debug, Clone)]
-pub struct Content {
+pub struct Context {
     module_name: String,
     line: usize,
 }
 
-impl ErrorContent for Content {
+impl ErrorContext for Context {
     fn get_module_name(&self) -> &str {
         &self.module_name
     }
@@ -45,7 +45,7 @@ impl ErrorContent for Content {
     }
 }
 
-impl Content {
+impl Context {
     pub fn new(module_name: &str) -> Self {
         Self {
             module_name: String::from(module_name),
@@ -330,7 +330,7 @@ pub struct Compiler {
     input: Box<dyn TokenIo<Item = char>>,
     pub const_pool: ValuePool,
     option: Option,
-    content: Content,
+    context: Context,
 }
 
 impl Compiler {
@@ -348,7 +348,7 @@ impl Compiler {
                     input: Box::new(FileSource::new(f)),
                     const_pool: ValuePool::new(),
                     option,
-                    content: Content::new(cfg::MAIN_MODULE_NAME),
+                    context: Context::new(cfg::MAIN_MODULE_NAME),
                 }
             }
             _ => {
@@ -362,7 +362,7 @@ impl Compiler {
             input: Box::new(StringSource::new(String::from(source))),
             const_pool: ValuePool::new(),
             option,
-            content: Content::new(cfg::MAIN_MODULE_NAME),
+            context: Context::new(cfg::MAIN_MODULE_NAME),
         }
     }
 
@@ -375,7 +375,7 @@ impl Compiler {
 
     #[inline]
     pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RunResult<T> {
-        Err(RuntimeError::new(Box::new(self.content.clone()), info))
+        Err(RuntimeError::new(Box::new(self.context.clone()), info))
     }
 }
 

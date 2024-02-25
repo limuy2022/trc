@@ -59,9 +59,9 @@ pub fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
     }
 }
 
-pub fn def_impl(content: TokenStream) -> TokenStream {
+pub fn def_impl(context: TokenStream) -> TokenStream {
     let mut module_ident = None;
-    let mut iter = content.into_iter();
+    let mut iter = context.into_iter();
     let mut left_func = vec![];
     let mut right_func = vec![];
     let mut left_class = vec![];

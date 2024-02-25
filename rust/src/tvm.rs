@@ -45,19 +45,19 @@ impl<'a> DynaData<'a> {
 }
 
 pub struct Vm<'a> {
-    run_contnet: Content,
+    run_context: Context,
     dynadata: DynaData<'a>,
     pc: usize,
     static_data: StaticData,
 }
 
 #[derive(Debug, Clone)]
-struct Content {
+struct Context {
     module_name: String,
     line_pos: usize,
 }
 
-impl ErrorContent for Content {
+impl ErrorContext for Context {
     fn get_module_name(&self) -> &str {
         &self.module_name
     }
@@ -67,9 +67,9 @@ impl ErrorContent for Content {
     }
 }
 
-impl Content {
+impl Context {
     fn new(module_name: &str) -> Self {
-        Content {
+        Context {
             module_name: String::from(module_name),
             line_pos: 0,
         }
@@ -133,7 +133,7 @@ macro_rules! operator_opcode {
         let ret = types::$trait_used(&mut $sself.dynadata);
         match ret {
             Err(e) => {
-                return Err(RuntimeError::new(Box::new($sself.run_contnet.clone()), e));
+                return Err(RuntimeError::new(Box::new($sself.run_context.clone()), e));
             }
             Ok(_) => {}
         }
@@ -166,7 +166,7 @@ impl<'a> Vm<'a> {
         Self {
             pc: 0,
             dynadata: DynaData::new(),
-            run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
+            run_context: Context::new(cfg::MAIN_MODULE_NAME),
             static_data: StaticData::new(false),
         }
     }
@@ -175,7 +175,7 @@ impl<'a> Vm<'a> {
         Self {
             pc: 0,
             dynadata: DynaData::new(),
-            run_contnet: Content::new(cfg::MAIN_MODULE_NAME),
+            run_context: Context::new(cfg::MAIN_MODULE_NAME),
             static_data,
         }
     }
@@ -187,14 +187,14 @@ impl<'a> Vm<'a> {
     fn throw_err_info<T>(&self, info: RuntimeResult<T>) -> RunResult<T> {
         match info {
             Ok(data) => Ok(data),
-            Err(e) => Err(RuntimeError::new(Box::new(self.run_contnet.clone()), e)),
+            Err(e) => Err(RuntimeError::new(Box::new(self.run_context.clone()), e)),
         }
     }
 
     pub fn run(&mut self) -> Result<(), RuntimeError> {
         while self.pc < self.static_data.inst.len() {
             if self.static_data.has_line_table {
-                self.run_contnet
+                self.run_context
                     .set_line(self.static_data.line_table[self.pc]);
             }
             match self.static_data.inst[self.pc].opcode {
@@ -222,7 +222,7 @@ impl<'a> Vm<'a> {
                     let ret = self.dynadata.frames_stack.pop();
                     if ret.is_none() {
                         return Err(RuntimeError::new(
-                            Box::new(self.run_contnet.clone()),
+                            Box::new(self.run_context.clone()),
                             ErrorInfo::new(t!(VM_FRAME_EMPTY), t!(VM_ERROR)),
                         ));
                     }

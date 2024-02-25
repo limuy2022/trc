@@ -49,7 +49,7 @@ impl ErrorInfo {
     }
 }
 
-pub trait ErrorContent: Debug + Send + Sync {
+pub trait ErrorContext: Debug + Send + Sync {
     fn get_module_name(&self) -> &str;
 
     fn get_line(&self) -> usize;
@@ -57,7 +57,7 @@ pub trait ErrorContent: Debug + Send + Sync {
 
 #[derive(Debug)]
 pub struct RuntimeError {
-    content: Box<dyn ErrorContent>,
+    context: Box<dyn ErrorContext>,
     info: ErrorInfo,
 }
 
@@ -72,8 +72,8 @@ impl Display for RuntimeError {
             r#"{}
 {}
 {}:{}"#,
-            t!(ERROR_IN_LINE, line = self.content.get_line()),
-            t!(IN_MODULE, name = self.content.get_module_name()),
+            t!(ERROR_IN_LINE, line = self.context.get_line()),
+            t!(IN_MODULE, name = self.context.get_module_name()),
             self.info.error_type.clone().red(),
             self.info.message.red()
         );
@@ -82,11 +82,11 @@ impl Display for RuntimeError {
 }
 
 impl RuntimeError {
-    pub fn new(content: Box<dyn ErrorContent>, info: ErrorInfo) -> RuntimeError {
+    pub fn new(context: Box<dyn ErrorContext>, info: ErrorInfo) -> RuntimeError {
         // if info.message != "" {
         // panic!("develop debug use");
         // }
-        RuntimeError { content, info }
+        RuntimeError { context, info }
     }
 }
 
@@ -108,9 +108,9 @@ impl LightFakeError {
 }
 
 #[derive(Default)]
-pub struct LightFakeContent {}
+pub struct LightFakeContext {}
 
-impl ErrorContent for LightFakeError {
+impl ErrorContext for LightFakeError {
     fn get_module_name(&self) -> &str {
         ""
     }
@@ -119,9 +119,9 @@ impl ErrorContent for LightFakeError {
     }
 }
 
-impl LightFakeContent {
-    pub fn new() -> LightFakeContent {
-        LightFakeContent {}
+impl LightFakeContext {
+    pub fn new() -> LightFakeContext {
+        LightFakeContext {}
     }
 }
 

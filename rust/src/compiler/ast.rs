@@ -534,7 +534,7 @@ impl<'a> AstBuilder<'a> {
                         let var = self.self_scope.as_ref().borrow().get_sym_idx(name);
                         if var.is_none() {
                             return Err(RuntimeError::new(
-                                Box::new(self.token_lexer.compiler_data.content.clone()),
+                                Box::new(self.token_lexer.compiler_data.context.clone()),
                                 ErrorInfo::new(
                                     t!(
                                         SYMBOL_NOT_FOUND,
@@ -552,7 +552,7 @@ impl<'a> AstBuilder<'a> {
                     TokenType::Store => {
                         if self.self_scope.as_ref().borrow().has_sym(name) {
                             return Err(RuntimeError::new(
-                                Box::new(self.token_lexer.compiler_data.content.clone()),
+                                Box::new(self.token_lexer.compiler_data.context.clone()),
                                 ErrorInfo::new(
                                     t!(
                                         SYMBOL_REDEFINED,
@@ -600,7 +600,7 @@ impl<'a> AstBuilder<'a> {
             // 不生成行号表了
             self.staticdata
                 .line_table
-                .push(self.token_lexer.compiler_data.content.get_line())
+                .push(self.token_lexer.compiler_data.context.get_line())
         }
     }
 }

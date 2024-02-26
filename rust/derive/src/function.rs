@@ -105,10 +105,12 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(path.clone());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
-                            r#"let mut {} = dydata.obj_stack.pop().unwrap().downcast::<{}>().expect("obj empty");"#,
+                            r#"let mut {} = unsafe{{
+                                (&mut *dydata.obj_stack.pop().unwrap()).downcast_mut::<{}>().expect("obj empty")
+                            }};"#,
                             arg_name, path.to_token_stream()
                         ))
-                        .unwrap(),
+                        .expect("cast error"),
                     );
                 }
             }

@@ -8,7 +8,7 @@ use derive::{trc_class, trc_function, trc_method};
 use std::collections::HashMap;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Node {
     link: Option<usize>,
     next: HashMap<char, usize>,
@@ -26,7 +26,7 @@ impl Node {
 }
 
 #[trc_class]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sam {
     pub _states: Vec<Node>,
 }

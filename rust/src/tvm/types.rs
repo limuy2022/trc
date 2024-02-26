@@ -18,11 +18,13 @@ pub use trcfloat::TrcFloat;
 pub use trcint::TrcInt;
 pub use trcstr::TrcStr;
 
+use super::gc::GcMgr;
+
 /// help to generate the same error reporter functions
 macro_rules! batch_unsupported_operators {
     ($($traie_name:ident => $oper_name:expr),*) => {
         $(
-        fn $traie_name(&self, _:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
+        fn $traie_name(&self, _:*mut dyn TrcObj, _: &mut crate::tvm::GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
             return Err(ErrorInfo::new(
                 t!(
                     OPERATOR_IS_NOT_SUPPORT,
@@ -39,28 +41,32 @@ macro_rules! batch_unsupported_operators {
 macro_rules! impl_oper {
     // for unsupported operator in rust
     ($trait_oper_fn_name:ident, $oper:ident, $error_oper_name:expr, $self_type:ident, $newtype:ident, $whether_throw_error:tt) => {
-        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
-            match other.downcast_ref::<$self_type>() {
+        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+        unsafe {
+        match (*other).downcast_ref::<$self_type>() {
                 Some(v) => {
-                    return Ok(Box::new($newtype::new($oper(self._value.clone(), v._value.clone())$whether_throw_error)));
+                    return Ok(gc.alloc($newtype::new($oper(self._value, v._value)$whether_throw_error)));
                 },
                 None => {
-                    return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=other.get_type_name()), t!(OPERATOR_ERROR)))
+                        return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=(*other).get_type_name()), t!(OPERATOR_ERROR)))
+                    }
                 }
             }
         }
     };
     // for supported operator in rust
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
-        fn $trait_oper_fn_name(&self, other:Box<dyn TrcObj>) -> RuntimeResult<Box<dyn TrcObj>> {
-            match other.downcast_ref::<$self_type>() {
+        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+        unsafe {
+        match (*other).downcast_ref::<$self_type>() {
                 Some(v) => {
-                    return Ok(Box::new($newtype::new(self._value $oper v._value)));
+                    return Ok(gc.alloc($newtype::new(self._value $oper v._value)));
                 },
                 None => {
-                    return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=other.get_type_name()), t!(OPERATOR_ERROR)))
+                        return Err(ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$error_oper_name, "1"=(*other).get_type_name()), t!(OPERATOR_ERROR)))
                 }
             }
+        }
         }
     };
 }
@@ -77,8 +83,8 @@ macro_rules! batch_impl_opers {
 #[macro_export]
 macro_rules! impl_single_oper {
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
-        fn $trait_oper_fn_name(&self) -> RuntimeResult<Box<dyn TrcObj>> {
-            return Ok(Box::new($newtype::new($oper self._value)));
+        fn $trait_oper_fn_name(&self, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+            return Ok(gc.alloc($newtype::new($oper self._value)));
         }
     };
 }
@@ -89,7 +95,9 @@ macro_rules! gen_interface {
             DynaData::check_stack(&mut dydata.obj_stack, 2)?;
             let t2 = dydata.obj_stack.pop().unwrap();
             let t1 = dydata.obj_stack.pop().unwrap();
-            dydata.obj_stack.push(t1.$funcname(t2)?);
+            unsafe {
+                dydata.obj_stack.push((*t1).$funcname(t2, &mut dydata.gc)?);
+            }
             Ok(())
         }
     };
@@ -97,13 +105,34 @@ macro_rules! gen_interface {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
             DynaData::check_stack(&mut dydata.obj_stack, 1)?;
             let t1 = dydata.obj_stack.pop().unwrap();
-            dydata.obj_stack.push(t1.$funcname()?);
+            unsafe {
+                dydata.obj_stack.push((*t1).$funcname(&mut dydata.gc)?);
+            }
             Ok(())
         }
     };
 }
 
-pub trait TrcObj: Downcast + std::fmt::Display + Debug {
+pub trait TrcObjClone {
+    fn clone_box(&self) -> Box<dyn TrcObj>;
+}
+
+impl Clone for Box<dyn TrcObj> {
+    fn clone(&self) -> Box<dyn TrcObj> {
+        self.clone_box()
+    }
+}
+
+impl<T> TrcObjClone for T
+where
+    T: Clone + 'static + TrcObj,
+{
+    fn clone_box(&self) -> Box<dyn TrcObj> {
+        Box::new(self.clone())
+    }
+}
+
+pub trait TrcObj: Downcast + std::fmt::Display + Debug + TrcObjClone {
     batch_unsupported_operators!(
         sub => "-",
         mul => "*",
@@ -127,7 +156,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
         bit_right_shift => ">>"
     );
 
-    fn not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+    fn not(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,
@@ -138,7 +167,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
         ))
     }
 
-    fn bit_not(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+    fn bit_not(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,
@@ -149,7 +178,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug {
         ))
     }
 
-    fn self_negative(&self) -> RuntimeResult<Box<dyn TrcObj>> {
+    fn self_negative(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,

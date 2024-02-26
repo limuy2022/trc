@@ -3,19 +3,20 @@ use crate::base::stdlib::*;
 use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
-use crate::{base::error::*, batch_impl_opers, impl_oper};
+use crate::tvm::GcMgr;
+use crate::{base::error::*, batch_impl_opers};
 use derive::{trc_class, trc_method};
 use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrcStr {
     pub _value: String,
 }
 
-fn cat_string(a: String, b: String) -> String {
+fn cat_string(a: &String, b: &String) -> String {
     format!("{}{}", a, b)
 }
 
@@ -26,7 +27,25 @@ impl TrcObj for TrcStr {
     }
 
     batch_impl_opers! {}
-    impl_oper!(add, cat_string, "+", TrcStr, TrcStr,,);
+    fn add(&self, other: *mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+        unsafe {
+            match (*other).downcast_ref::<TrcStr>() {
+                Some(v) => {
+                    return Ok(gc.alloc(TrcStr::new(cat_string(&self._value, &v._value))));
+                }
+                None => {
+                    return Err(ErrorInfo::new(
+                        t!(
+                            OPERATOR_IS_NOT_SUPPORT,
+                            "0" = "+",
+                            "1" = (*other).get_type_name()
+                        ),
+                        t!(OPERATOR_ERROR),
+                    ))
+                }
+            }
+        }
+    }
 }
 
 impl Display for TrcStr {

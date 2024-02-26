@@ -7,7 +7,7 @@ use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrcChar {
     pub _value: char,
 }

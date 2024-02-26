@@ -11,9 +11,11 @@ pub fn print(fmt_string: str) -> void {
     let mut output_iter = fmt_string.chars();
     while let Some(i) = output_iter.next() {
         if i == '{' {
-            io::stdout()
-                .write_all(iter.next().unwrap().to_string().as_bytes())
-                .unwrap();
+            unsafe {
+                io::stdout()
+                    .write_all((**iter.next().unwrap()).to_string().as_bytes())
+                    .unwrap();
+            }
             if let Some(j) = output_iter.next() {
                 if j != '}' {
                     return Err(ErrorInfo::new(t!(UNCLOSED_FORMAT), t!(FORMAT_STR_ERROR)));
@@ -31,9 +33,11 @@ pub fn println(fmt_string: str) -> void {
     let mut output_iter = fmt_string.chars();
     while let Some(i) = output_iter.next() {
         if i == '{' {
-            io::stdout()
-                .write_all(iter.next().unwrap().to_string().as_bytes())
-                .unwrap();
+            unsafe {
+                io::stdout()
+                    .write_all((**iter.next().unwrap()).to_string().as_bytes())
+                    .unwrap();
+            }
             if let Some(j) = output_iter.next() {
                 if j != '}' {
                     return Err(ErrorInfo::new(t!(UNCLOSED_FORMAT), t!(FORMAT_STR_ERROR)));

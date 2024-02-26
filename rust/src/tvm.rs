@@ -5,11 +5,14 @@ mod gc;
 pub mod stdlib;
 mod types;
 
-use self::types::{
-    trcfloat::{div_float, exact_div_float, TrcFloat},
-    trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt},
-    trcstr::TrcStr,
-    TrcBool, TrcChar,
+use self::{
+    gc::GcMgr,
+    types::{
+        trcfloat::{div_float, exact_div_float, TrcFloat},
+        trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt},
+        trcstr::TrcStr,
+        TrcBool, TrcChar, TrcObj,
+    },
 };
 use crate::{
     base::{
@@ -24,13 +27,15 @@ use rust_i18n::t;
 
 #[derive(Default)]
 pub struct DynaData<'a> {
-    obj_stack: Vec<Box<dyn types::TrcObj>>,
+    gc: GcMgr,
+    obj_stack: Vec<*mut dyn TrcObj>,
     int_stack: Vec<i64>,
     str_stack: Vec<String>,
     float_stack: Vec<f64>,
     bool_stack: Vec<bool>,
     char_stack: Vec<char>,
     frames_stack: Vec<function::Frame<'a>>,
+    var_store: Vec<*mut dyn TrcObj>,
 }
 
 impl<'a> DynaData<'a> {
@@ -48,6 +53,10 @@ impl<'a> DynaData<'a> {
             ));
         }
         Ok(())
+    }
+
+    pub fn resize_var_store(&mut self, cap: usize) {
+        self.var_store.reserve(cap);
     }
 }
 
@@ -199,6 +208,8 @@ impl<'a> Vm<'a> {
     }
 
     pub fn run(&mut self) -> Result<(), RuntimeError> {
+        self.dynadata
+            .resize_var_store(self.static_data.sym_table_sz);
         while self.pc < self.static_data.inst.len() {
             if self.static_data.has_line_table {
                 self.run_context
@@ -244,7 +255,11 @@ impl<'a> Vm<'a> {
                 Opcode::BitNot => operator_opcode!(bit_not, self),
                 Opcode::BitLeftShift => operator_opcode!(bit_left_shift, self),
                 Opcode::BitRightShift => operator_opcode!(bit_right_shift, self),
-                Opcode::LoadLocal => {}
+                Opcode::LoadLocal => {
+                    // self.dynadata.obj_stack.push(
+                    // self.dynadata.var_store[self.static_data.inst[self.pc].operand].clone(),
+                    // );
+                }
                 Opcode::StoreLocal => {}
                 Opcode::LoadString => {
                     self.dynadata.str_stack.push(
@@ -466,21 +481,41 @@ impl<'a> Vm<'a> {
                         .bool_stack
                         .push(self.static_data.inst[self.pc].operand != 0);
                 }
-                Opcode::MoveInt => self.dynadata.obj_stack.push(Box::new(TrcInt::new(
-                    self.dynadata.int_stack.pop().unwrap(),
-                ))),
-                Opcode::MoveFloat => self.dynadata.obj_stack.push(Box::new(TrcFloat::new(
-                    self.dynadata.float_stack.pop().unwrap(),
-                ))),
-                Opcode::MoveChar => self.dynadata.obj_stack.push(Box::new(TrcChar::new(
-                    self.dynadata.char_stack.pop().unwrap(),
-                ))),
-                Opcode::MoveBool => self.dynadata.obj_stack.push(Box::new(TrcBool::new(
-                    self.dynadata.bool_stack.pop().unwrap(),
-                ))),
-                Opcode::MoveStr => self.dynadata.obj_stack.push(Box::new(TrcStr::new(
-                    self.dynadata.str_stack.pop().unwrap(),
-                ))),
+                Opcode::MoveInt => {
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcInt::new(self.dynadata.int_stack.pop().unwrap()));
+                    self.dynadata.obj_stack.push(ptr);
+                }
+                Opcode::MoveFloat => {
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcFloat::new(self.dynadata.float_stack.pop().unwrap()));
+                    self.dynadata.obj_stack.push(ptr);
+                }
+                Opcode::MoveChar => {
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcChar::new(self.dynadata.char_stack.pop().unwrap()));
+                    self.dynadata.obj_stack.push(ptr);
+                }
+                Opcode::MoveBool => {
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcBool::new(self.dynadata.bool_stack.pop().unwrap()));
+                    self.dynadata.obj_stack.push(ptr);
+                }
+                Opcode::MoveStr => {
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcStr::new(self.dynadata.str_stack.pop().unwrap()));
+                    self.dynadata.obj_stack.push(ptr);
+                }
             }
             self.pc += 1;
         }
@@ -490,6 +525,21 @@ impl<'a> Vm<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::compiler::Compiler;
+    use crate::compiler::InputSource;
+    use crate::compiler::Option;
+
+    fn gen_test_env(code: &str) -> StaticData {
+        let mut compiler =
+            Compiler::new_string_compiler(Option::new(false, InputSource::StringInternal), code);
+        compiler.lex().unwrap()
+    }
+
     #[test]
-    fn test_vm() {}
+    fn test_vm() {
+        let staticdata = gen_test_env(r#"print("{},{},{},{}", 1, "h", 'p', true)"#);
+        let mut vm = Vm::new_init(staticdata);
+        vm.run().unwrap()
+    }
 }

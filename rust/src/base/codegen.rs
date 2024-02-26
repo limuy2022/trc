@@ -152,7 +152,9 @@ pub type InstSet = Vec<Inst>;
 pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,
+    // 储存函数的位置
     pub funcs: Vec<func::Func>,
+    // 符号表需要的长度
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,
     pub has_line_table: bool,

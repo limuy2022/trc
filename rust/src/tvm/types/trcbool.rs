@@ -3,6 +3,7 @@ use crate::base::error::*;
 use crate::base::stdlib::*;
 use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
+use crate::tvm::GcMgr;
 use crate::{batch_impl_opers, hash_map, impl_oper, impl_single_oper};
 use derive::{trc_class, trc_method};
 use rust_i18n::t;
@@ -10,7 +11,7 @@ use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrcBool {
     pub _value: bool,
 }

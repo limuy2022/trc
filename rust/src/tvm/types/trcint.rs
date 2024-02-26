@@ -7,6 +7,7 @@ use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
 use crate::impl_single_oper;
+use crate::tvm::gc::*;
 use crate::{base::error::*, batch_impl_opers, impl_oper};
 use derive::trc_class;
 use derive::trc_method;
@@ -15,7 +16,7 @@ use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
 #[trc_class]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrcInt {
     pub _value: i64,
 }

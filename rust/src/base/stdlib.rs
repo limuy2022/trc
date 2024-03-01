@@ -1,7 +1,7 @@
 use super::{codegen::Opcode, error::*};
 use crate::{
     compiler::{
-        scope::{Type, TypeAllowNull, Var},
+        scope::{ScopeAllocClassId, Type, TypeAllowNull, Var},
         token::TokenType,
     },
     tvm::DynaData,
@@ -97,7 +97,7 @@ pub trait ClassClone {
 pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display {
     fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>>;
 
-    fn has_attr(&self, attrname: &str) -> Option<Type>;
+    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId>;
 
     fn get_id(&self) -> usize;
 
@@ -195,10 +195,10 @@ impl ClassInterface for RustClass {
         None
     }
 
-    fn has_attr(&self, attrname: &str) -> Option<Type> {
+    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId> {
         let ret = &self.members.get(attrname);
         match ret {
-            Some(i) => Some(i.ty.clone()),
+            Some(i) => Some(i.ty),
             None => None,
         }
     }
@@ -308,8 +308,14 @@ impl AnyType {
     }
 }
 
-/// 获取到标准库的类的个数，从而区分标准库和用户自定义的类
+/// 获取到标准库的类的个数，从而区分标准库和用户自定义的类，其实也相当于获取第一个用户可以定义的类的ID
 pub fn get_stdclass_end() -> usize {
     static STD_NUM: OnceLock<usize> = OnceLock::new();
     *STD_NUM.get_or_init(|| unsafe { STD_CLASS_TABLE.len() })
 }
+
+pub const INT: &str = "int";
+pub const FLOAT: &str = "float";
+pub const BOOL: &str = "bool";
+pub const CHAR: &str = "char";
+pub const STR: &str = "str";

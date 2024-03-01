@@ -256,11 +256,14 @@ impl<'a> Vm<'a> {
                 Opcode::BitLeftShift => operator_opcode!(bit_left_shift, self),
                 Opcode::BitRightShift => operator_opcode!(bit_right_shift, self),
                 Opcode::LoadLocal => {
-                    // self.dynadata.obj_stack.push(
-                    // self.dynadata.var_store[self.static_data.inst[self.pc].operand].clone(),
-                    // );
+                    self.dynadata
+                        .obj_stack
+                        .push(self.dynadata.var_store[self.static_data.inst[self.pc].operand]);
                 }
-                Opcode::StoreLocal => {}
+                Opcode::StoreLocal => {
+                    self.dynadata.var_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.obj_stack.pop().unwrap();
+                }
                 Opcode::LoadString => {
                     self.dynadata.str_stack.push(
                         self.static_data.constpool.stringpool
@@ -530,16 +533,15 @@ mod tests {
     use crate::compiler::InputSource;
     use crate::compiler::Option;
 
-    fn gen_test_env(code: &str) -> StaticData {
+    fn gen_test_env(code: &str) -> Vm {
         let mut compiler =
             Compiler::new_string_compiler(Option::new(false, InputSource::StringInternal), code);
-        compiler.lex().unwrap()
+        Vm::new_init(compiler.lex().unwrap())
     }
 
     #[test]
     fn test_vm() {
-        let staticdata = gen_test_env(r#"print("{},{},{},{}", 1, "h", 'p', true)"#);
-        let mut vm = Vm::new_init(staticdata);
+        let mut vm = gen_test_env(r#"print("{},{},{},{}", 1, "h", 'p', true)"#);
         vm.run().unwrap()
     }
 }

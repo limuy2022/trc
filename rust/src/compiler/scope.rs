@@ -62,12 +62,12 @@ impl FunctionInterface for Function {
 
 #[derive(Clone, Debug)]
 pub struct Var {
-    pub ty: Box<dyn ClassInterface>,
+    pub ty: ScopeAllocClassId,
     pub name: String,
 }
 
 impl Var {
-    pub fn new(ty: Box<dyn ClassInterface>, name: String) -> Self {
+    pub fn new(ty: ScopeAllocClassId, name: String) -> Self {
         Self { ty, name }
     }
 }
@@ -118,10 +118,10 @@ impl ClassInterface for CommonType {
         None
     }
 
-    fn has_attr(&self, attrname: &str) -> Option<Type> {
+    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId> {
         for i in &self.attr {
             if i.name == attrname {
-                return Some(i.ty.clone());
+                return Some(i.ty);
             }
         }
         None
@@ -150,13 +150,17 @@ pub struct SymScope {
     sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
     scope_sym_id: ScopeAllocIdTy,
+    // ID到class id的映射
     types: HashMap<ScopeAllocIdTy, ScopeAllocClassId>,
+    // ID到函数的映射
     funcs: HashMap<ScopeAllocIdTy, Box<dyn FunctionInterface>>,
     // token id
     vars: HashMap<ScopeAllocIdTy, Var>,
     // 由token id到模块的映射
     modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
+    // 当前作用域可以分配的下一个class id
     types_id: ScopeAllocClassId,
+    // 用户自定义的类型储存位置
     types_custom_store: HashMap<ScopeAllocClassId, CommonType>,
 }
 
@@ -230,11 +234,21 @@ impl SymScope {
         *t
     }
 
-    pub fn get_sym_idx(&self, id: usize) -> Option<usize> {
+    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<Var> {
+        match self.vars.get(&id) {
+            Some(v) => Some(v.clone()),
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_var(id),
+                None => None,
+            },
+        }
+    }
+
+    pub fn get_sym(&self, id: usize) -> Option<usize> {
         let t = self.sym_map.get(&id);
         match t {
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_sym_idx(id),
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_sym(id),
                 None => None,
             },
             Some(t) => Some(*t),
@@ -253,8 +267,8 @@ impl SymScope {
         self.types.insert(id, t);
     }
 
-    pub fn get_type(&self, id: usize) -> usize {
-        *self.types.get(&id).unwrap()
+    pub fn get_type(&self, id: usize) -> Option<usize> {
+        self.types.get(&id).copied()
     }
 
     pub fn get_scope_last_idx(&self) -> usize {
@@ -293,8 +307,8 @@ mod tests {
         root_scope.as_ref().borrow_mut().insert_sym(1);
         let mut son_scope = SymScope::new(Some(root_scope.clone()));
         son_scope.insert_sym(2);
-        assert_eq!(son_scope.get_sym_idx(2), Some(1));
+        assert_eq!(son_scope.get_sym(2), Some(1));
         drop(son_scope);
-        assert_eq!(root_scope.as_ref().borrow().get_sym_idx(1), Some(0));
+        assert_eq!(root_scope.as_ref().borrow().get_sym(1), Some(0));
     }
 }

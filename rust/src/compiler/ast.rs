@@ -6,7 +6,7 @@ use super::{
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, NO_ARG},
     error::*,
-    stdlib::{get_stdlib, RustFunction},
+    stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
@@ -268,7 +268,7 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    fn get_type_id(&self, ty_name: &str) -> usize {
+    fn get_type_id(&self, ty_name: &str) -> Option<usize> {
         self.self_scope.as_ref().borrow().get_type(
             *self
                 .token_lexer
@@ -281,15 +281,15 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn convert_to_vm_type(&self, ty: usize) -> VmStackType {
-        if ty == self.get_type_id("int") {
+        if ty == self.get_type_id(INT).unwrap() {
             VmStackType::Int
-        } else if ty == self.get_type_id("float") {
+        } else if ty == self.get_type_id(FLOAT).unwrap() {
             VmStackType::Float
-        } else if ty == self.get_type_id("str") {
+        } else if ty == self.get_type_id(STR).unwrap() {
             VmStackType::Str
-        } else if ty == self.get_type_id("char") {
+        } else if ty == self.get_type_id(CHAR).unwrap() {
             VmStackType::Char
-        } else if ty == self.get_type_id("bool") {
+        } else if ty == self.get_type_id(BOOL).unwrap() {
             VmStackType::Bool
         } else {
             VmStackType::Object
@@ -313,7 +313,7 @@ impl<'a> AstBuilder<'a> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
-            let idx = self.self_scope.as_ref().borrow().get_sym_idx(token_data);
+            let idx = self.self_scope.as_ref().borrow().get_sym(token_data);
             if idx.is_none() {
                 self.try_err(
                     istry,
@@ -353,9 +353,20 @@ impl<'a> AstBuilder<'a> {
                 Ok(func_obj.get_io().return_type.clone())
             } else {
                 self.token_lexer.next_back(nxt);
-                let varidx = self.self_scope.as_ref().borrow_mut().insert_sym(idx);
-                self.add_bycode(Opcode::LoadLocal, varidx);
-                let tt = self.self_scope.as_ref().borrow().get_type(varidx);
+                self.add_bycode(Opcode::LoadLocal, idx);
+                let tt = match self.self_scope.as_ref().borrow().get_var(idx) {
+                    Some(v) => v.ty,
+                    None => self.try_err(
+                        istry,
+                        ErrorInfo::new(
+                            t!(
+                                SYMBOL_NOT_FOUND,
+                                "0" = self.token_lexer.compiler_data.const_pool.id_name[token_data]
+                            ),
+                            t!(SYMBOL_ERROR),
+                        ),
+                    )?,
+                };
                 Ok(TypeAllowNull::Yes(tt))
             }
         } else {
@@ -376,27 +387,27 @@ impl<'a> AstBuilder<'a> {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
                 self.process_info.new_type(VmStackType::Int);
-                Ok(TypeAllowNull::Yes(self.get_type_id("int")))
+                Ok(TypeAllowNull::Yes(self.get_type_id(INT).unwrap()))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
                 self.process_info.new_type(VmStackType::Float);
-                Ok(TypeAllowNull::Yes(self.get_type_id("float")))
+                Ok(TypeAllowNull::Yes(self.get_type_id(FLOAT).unwrap()))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
                 self.process_info.new_type(VmStackType::Str);
-                Ok(TypeAllowNull::Yes(self.get_type_id("str")))
+                Ok(TypeAllowNull::Yes(self.get_type_id(STR).unwrap()))
             }
             TokenType::CharValue => {
                 self.add_bycode(Opcode::LoadChar, t.data.unwrap());
                 self.process_info.new_type(VmStackType::Char);
-                Ok(TypeAllowNull::Yes(self.get_type_id("char")))
+                Ok(TypeAllowNull::Yes(self.get_type_id(CHAR).unwrap()))
             }
             TokenType::BoolValue => {
                 self.add_bycode(Opcode::LoadBool, t.data.unwrap());
                 self.process_info.new_type(VmStackType::Bool);
-                Ok(TypeAllowNull::Yes(self.get_type_id("bool")))
+                Ok(TypeAllowNull::Yes(self.get_type_id(BOOL).unwrap()))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
@@ -533,7 +544,7 @@ impl<'a> AstBuilder<'a> {
                 let tt = self.token_lexer.next_token()?;
                 match tt.tp {
                     TokenType::Assign => {
-                        let var = self.self_scope.as_ref().borrow().get_sym_idx(name);
+                        let var = self.self_scope.as_ref().borrow().get_sym(name);
                         if var.is_none() {
                             return Err(RuntimeError::new(
                                 Box::new(self.token_lexer.compiler_data.context.clone()),
@@ -628,6 +639,15 @@ mod tests {
     #[test]
     fn test_assign() {
         gen_test_env!(r#"a:=10"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::StoreLocal, 0)
+            ],
+        )
     }
 
     #[test]
@@ -767,6 +787,7 @@ mod tests {
     fn test_wrong_type() {
         gen_test_env!(r#"1.0+9"#, t);
         t.generate_code().unwrap();
+        println!("{:?}", t.staticdata.inst);
     }
 
     #[test]

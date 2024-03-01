@@ -13,7 +13,7 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug, Clone)]
 pub struct TrcStr {
-    pub _value: String,
+    pub _value: *mut String,
 }
 
 fn cat_string(a: &String, b: &String) -> String {
@@ -26,12 +26,12 @@ impl TrcObj for TrcStr {
         "str"
     }
 
-    batch_impl_opers! {}
     fn add(&self, other: *mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
         unsafe {
             match (*other).downcast_ref::<TrcStr>() {
                 Some(v) => {
-                    return Ok(gc.alloc(TrcStr::new(cat_string(&self._value, &v._value))));
+                    let val = gc.alloc(cat_string(&*self._value, &*((*v)._value)));
+                    return Ok(gc.alloc(TrcStr::new(val)));
                 }
                 None => {
                     return Err(ErrorInfo::new(
@@ -50,12 +50,12 @@ impl TrcObj for TrcStr {
 
 impl Display for TrcStr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self._value)
+        write!(f, "{}", unsafe { &*self._value })
     }
 }
 
 impl TrcStr {
-    pub fn new(value: String) -> Self {
+    pub fn new(value: *mut String) -> Self {
         Self { _value: value }
     }
 

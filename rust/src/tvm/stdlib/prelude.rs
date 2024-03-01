@@ -8,7 +8,7 @@ use std::io::{self, Write};
 #[trc_function(var_params = true)]
 pub fn print(fmt_string: str) -> void {
     let mut iter = va_list.iter();
-    let mut output_iter = fmt_string.chars();
+    let mut output_iter = unsafe { (*fmt_string).chars() };
     while let Some(i) = output_iter.next() {
         if i == '{' {
             unsafe {
@@ -30,7 +30,7 @@ pub fn print(fmt_string: str) -> void {
 #[trc_function(var_params = true)]
 pub fn println(fmt_string: str) -> void {
     let mut iter = va_list.iter();
-    let mut output_iter = fmt_string.chars();
+    let mut output_iter = unsafe { (*fmt_string).chars() };
     while let Some(i) = output_iter.next() {
         if i == '{' {
             unsafe {

@@ -82,6 +82,12 @@ pub enum Opcode {
     LoadChar,
     LoadBool,
     LoadLocal,
+    LoadVarBool,
+    LoadVarInt,
+    LoadVarFloat,
+    LoadVarStr,
+    LoadVarChar,
+    // Move a value into the stack
     MoveInt,
     MoveFloat,
     MoveChar,
@@ -89,6 +95,11 @@ pub enum Opcode {
     MoveStr,
     // Store a local var
     StoreLocal,
+    StoreInt,
+    StoreFloat,
+    StoreChar,
+    StoreBool,
+    StoreStr,
     // Do Nothing
     Empty,
     // a = -a

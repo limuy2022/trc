@@ -560,7 +560,8 @@ impl<'a> AstBuilder<'a> {
                         }
                         self.expr(false)?;
                         let var = var.unwrap();
-                        self.add_bycode(Opcode::StoreLocal, var)
+                        self.add_bycode(Opcode::StoreLocal, var);
+                        return Ok(());
                     }
                     TokenType::Store => {
                         if self.self_scope.as_ref().borrow().has_sym(name) {
@@ -581,7 +582,8 @@ impl<'a> AstBuilder<'a> {
                         self.staticdata.update_sym_table_sz(
                             self.self_scope.as_ref().borrow().get_scope_last_idx(),
                         );
-                        self.add_bycode(Opcode::StoreLocal, var_idx)
+                        self.add_bycode(Opcode::StoreLocal, var_idx);
+                        return Ok(());
                     }
                     _ => {
                         self.token_lexer.next_back(tt);

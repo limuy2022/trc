@@ -30,12 +30,17 @@ pub struct DynaData<'a> {
     gc: GcMgr,
     obj_stack: Vec<*mut dyn TrcObj>,
     int_stack: Vec<i64>,
-    str_stack: Vec<String>,
+    str_stack: Vec<*mut String>,
     float_stack: Vec<f64>,
     bool_stack: Vec<bool>,
     char_stack: Vec<char>,
     frames_stack: Vec<function::Frame<'a>>,
     var_store: Vec<*mut dyn TrcObj>,
+    int_store: Vec<i64>,
+    float_store: Vec<f64>,
+    str_store: Vec<*mut String>,
+    bool_store: Vec<bool>,
+    char_store: Vec<char>,
 }
 
 impl<'a> DynaData<'a> {
@@ -265,11 +270,10 @@ impl<'a> Vm<'a> {
                         self.dynadata.obj_stack.pop().unwrap();
                 }
                 Opcode::LoadString => {
-                    self.dynadata.str_stack.push(
-                        self.static_data.constpool.stringpool
-                            [self.static_data.inst[self.pc].operand]
-                            .clone(),
-                    );
+                    let tmp = self.static_data.inst[self.pc].operand;
+                    let tmp = self.static_data.constpool.stringpool[tmp].clone();
+                    let tmp = self.dynadata.gc.alloc(tmp);
+                    self.dynadata.str_stack.push(tmp);
                 }
                 Opcode::LoadFloat => {
                     self.dynadata.float_stack.push(
@@ -297,7 +301,11 @@ impl<'a> Vm<'a> {
                 }
                 Opcode::AddStr => {
                     let (first, second) = impl_opcode!(self.dynadata.str_stack, self, 2);
-                    self.dynadata.str_stack.push(format!("{}{}", first, second));
+                    self.dynadata.str_stack.push(
+                        self.dynadata
+                            .gc
+                            .alloc(unsafe { format!("{}{}", *first, *second) }),
+                    );
                 }
                 Opcode::SubInt => {
                     let (first, second) = impl_opcode!(self.dynadata.int_stack, self, 2);
@@ -513,11 +521,56 @@ impl<'a> Vm<'a> {
                     self.dynadata.obj_stack.push(ptr);
                 }
                 Opcode::MoveStr => {
-                    let ptr = self
-                        .dynadata
-                        .gc
-                        .alloc(TrcStr::new(self.dynadata.str_stack.pop().unwrap()));
+                    // todo:inmprove performance
+                    let ptr = self.dynadata.gc.alloc(TrcStr::new(unsafe {
+                        self.dynadata.str_stack.pop().unwrap()
+                    }));
                     self.dynadata.obj_stack.push(ptr);
+                }
+                Opcode::StoreInt => {
+                    self.dynadata.int_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.int_stack.pop().unwrap();
+                }
+                Opcode::StoreFloat => {
+                    self.dynadata.float_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.float_stack.pop().unwrap();
+                }
+                Opcode::StoreChar => {
+                    self.dynadata.char_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.char_stack.pop().unwrap();
+                }
+                Opcode::StoreBool => {
+                    self.dynadata.bool_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.bool_stack.pop().unwrap();
+                }
+                Opcode::StoreStr => {
+                    self.dynadata.str_store[self.static_data.inst[self.pc].operand] =
+                        self.dynadata.str_stack.pop().unwrap();
+                }
+                Opcode::LoadVarBool => {
+                    self.dynadata
+                        .bool_stack
+                        .push(self.dynadata.bool_store[self.static_data.inst[self.pc].operand]);
+                }
+                Opcode::LoadVarInt => {
+                    self.dynadata
+                        .int_stack
+                        .push(self.dynadata.int_store[self.static_data.inst[self.pc].operand]);
+                }
+                Opcode::LoadVarFloat => {
+                    self.dynadata
+                        .float_stack
+                        .push(self.dynadata.float_store[self.static_data.inst[self.pc].operand]);
+                }
+                Opcode::LoadVarStr => {
+                    self.dynadata
+                        .str_stack
+                        .push(self.dynadata.str_store[self.static_data.inst[self.pc].operand]);
+                }
+                Opcode::LoadVarChar => {
+                    self.dynadata
+                        .char_stack
+                        .push(self.dynadata.char_store[self.static_data.inst[self.pc].operand]);
                 }
             }
             self.pc += 1;

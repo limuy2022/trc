@@ -52,8 +52,8 @@ trc_long::trc_long(const std::string& a) {
 
 trc_long::trc_long()
     : value((bit_type*)(malloc(size
-        * sizeof(
-            bit_type)))) { // 至少申请一个符号位，否则在realloc的过程中会卡死
+          * sizeof(
+              bit_type)))) { // 至少申请一个符号位，否则在realloc的过程中会卡死
     // 默认为+0
     value[0] = 0;
     value[1] = 0;

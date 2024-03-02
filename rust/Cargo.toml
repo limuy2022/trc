@@ -15,7 +15,7 @@ clap = { version = "4.5.1", features = ["derive"] }
 colored = "2.1.0"
 downcast-rs = "1.2.0"
 num-bigint = "0.4.4"
-llvm-sys = "170.0.1"
+# llvm-sys = "170.0.1"
 derive = { path = "./derive" }
 libloading = "0.8.1"
 stdlib = { path = "./stdlib" }

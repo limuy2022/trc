@@ -41,12 +41,7 @@ impl Sam {
             _states: vec![Node::new(0)],
         }
     }
-}
-
-#[trc_method]
-impl Sam {
-    #[trc_function(method = true)]
-    pub fn extend(s: Sam, c: TrcChar) {
+    pub fn extend_internel(s: &mut Sam, c: char) {
         let id: usize = s._states.len();
         // 后缀自动机最后一个节点
         let mut last = id - 1;
@@ -54,8 +49,8 @@ impl Sam {
         let mut u = Node::new(s._states[last].len + 1);
 
         loop {
-            if !s._states[last].next.contains_key(&c._value) {
-                s._states[last].next.insert(c._value, id);
+            if let std::collections::hash_map::Entry::Vacant(e) = s._states[last].next.entry(c) {
+                e.insert(id);
             } else {
                 break;
             }
@@ -68,11 +63,11 @@ impl Sam {
                 }
             }
         }
-        if let None = s._states[last].link {
+        if s._states[last].link.is_none() {
             u.link = Some(0);
             s._states.push(u);
         } else {
-            let q = s._states[last].next[&c._value];
+            let q = s._states[last].next[&c];
             if s._states[q].len == s._states[last].len + 1 {
                 u.link = Some(q);
                 s._states.push(u);
@@ -82,7 +77,7 @@ impl Sam {
                 clone.link = s._states[q].link;
                 let cloneid = id + 1;
                 loop {
-                    if let Some(tmp) = s._states[last].next.get_mut(&c._value) {
+                    if let Some(tmp) = s._states[last].next.get_mut(&c) {
                         if *tmp != q {
                             break;
                         }
@@ -108,6 +103,14 @@ impl Sam {
     }
 }
 
+#[trc_method]
+impl Sam {
+    #[trc_function(method = true)]
+    pub fn extend(s: Sam, c: TrcChar) {
+        Self::extend_internel(s, c._value);
+    }
+}
+
 impl TrcObj for Sam {
     fn get_type_name(&self) -> &str {
         "sam"
@@ -128,7 +131,7 @@ mod tests {
         let mut sam = Sam::new();
         let str1 = "jdoasjdbasdhasjhdsjashdjsahshdhajdhsajkhdajshdsjadsjgfajshdasjfgjashdasjkdhudhwuidhsahsjkdhjadzxbjxbcnnxmbfdhbgsdahjkshdjbasjvahfghghgasjkdhasjdbdkhvfadhvfahdasjkhdasjkgdasjkbjkbchkdfgjhkasdghasjkdhasjdbfasjkgaskjdhadkjfgashk";
         for c in str1.chars() {
-            // sam.extend(c);
+            Sam::extend_internel(&mut sam, c);
         }
         assert_eq!(sam._states.len(), 334);
     }

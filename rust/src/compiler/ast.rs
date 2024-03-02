@@ -633,7 +633,7 @@ mod tests {
                 Option::new(false, InputSource::StringInternal),
                 $test_code,
             );
-            let mut token_lexer = TokenLex::new(&mut compiler);
+            let token_lexer = TokenLex::new(&mut compiler);
             let mut $env_name = AstBuilder::new(token_lexer);
         };
     }

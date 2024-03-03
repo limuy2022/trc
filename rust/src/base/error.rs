@@ -15,6 +15,7 @@ pub const FORMAT_STR_ERROR: &str = "compiler.FormatStringError";
 
 pub const STRING_WITHOUT_END: &str = "compiler.syntaxerror.str_error";
 pub const CHAR_FORMAT: &str = "compiler.syntaxerror.char_error";
+pub const EXPECTED_EXPR: &str = "compiler.syntaxerror.expected_expr";
 pub const UNMATCHED_BRACE: &str = "compiler.syntaxerror.unmatched";
 pub const OPERATOR_IS_NOT_SUPPORT: &str = "compiler.typerror.operator_unsupport";
 pub const VM_DATA_NUMBER: &str = "vm.vmerror.data_num_error";

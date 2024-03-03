@@ -1,8 +1,8 @@
 use super::{codegen::Opcode, error::*};
 use crate::{
     compiler::{
-        scope::{ScopeAllocClassId, Type, TypeAllowNull, Var},
-        token::TokenType,
+        scope::{ScopeAllocClassId, TyIdxTy, Type, TypeAllowNull},
+        token::{ConstPoolIndexTy, TokenType},
     },
     tvm::DynaData,
 };
@@ -97,7 +97,7 @@ pub trait ClassClone {
 pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display {
     fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>>;
 
-    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId>;
+    fn has_attr(&self, attrname: usize) -> bool;
 
     fn get_id(&self) -> usize;
 
@@ -149,20 +149,21 @@ impl OverrideWrapper {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct RustClass {
-    pub members: HashMap<String, Var>,
+    pub members: HashMap<String, String>,
     pub functions: HashMap<String, RustFunction>,
     pub overrides: HashMap<TokenType, OverrideWrapper>,
     pub id: usize,
     pub name: &'static str,
+    pub id_to_var: HashMap<ConstPoolIndexTy, TyIdxTy>,
 }
 
 /// 约定，0号id是any类型
 impl RustClass {
     pub fn new(
         name: &'static str,
-        members: HashMap<String, Var>,
+        members: HashMap<String, String>,
         functions: Option<HashMap<String, RustFunction>>,
         overrides: Option<HashMap<TokenType, OverrideWrapper>>,
         id: usize,
@@ -173,6 +174,7 @@ impl RustClass {
             overrides: overrides.unwrap_or_default(),
             id,
             name,
+            ..Default::default()
         }
     }
 
@@ -180,8 +182,8 @@ impl RustClass {
         self.functions.insert(name.into(), func);
     }
 
-    pub fn add_attr(&mut self, name: impl Into<String>, attr: Var) {
-        self.members.insert(name.into(), attr);
+    pub fn add_attr(&mut self, name: impl Into<String>, ty: String) {
+        self.members.insert(name.into(), ty);
     }
 }
 
@@ -195,12 +197,8 @@ impl ClassInterface for RustClass {
         None
     }
 
-    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId> {
-        let ret = &self.members.get(attrname);
-        match ret {
-            Some(i) => Some(i.ty),
-            None => None,
-        }
+    fn has_attr(&self, attrname: usize) -> bool {
+        self.id_to_var.contains_key(&attrname)
     }
 
     fn get_id(&self) -> usize {

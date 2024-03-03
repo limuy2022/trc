@@ -134,6 +134,7 @@ pub fn def_module(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
+/// 用下划线开头的成员被认为不会导出
 pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as ItemStruct);
     let name = input.ident.clone();
@@ -168,10 +169,9 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
         impl #name {
             pub fn init_info() -> usize {
                 use std::collections::hash_map::HashMap;
-                use crate::compiler::scope::Var;
                 let mut members = HashMap::new();
                 #(
-                    members.insert(Var::new(stringify!(#members_ty), #members_ident));
+                    members.insert(stringify!(#members_ty), stringify!(#members_ident));
                 )*
                 let classid = new_class_id();
                 let mut ret = RustClass::new(

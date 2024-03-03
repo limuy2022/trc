@@ -3,7 +3,7 @@ use crate::base::stdlib::{
     get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, OverrideWrapper,
     Stdlib, STD_CLASS_TABLE,
 };
-use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
 
 pub type ScopeAllocIdTy = usize;
 #[derive(Clone, Debug)]
@@ -60,28 +60,18 @@ impl FunctionInterface for Function {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Var {
-    pub ty: ScopeAllocClassId,
-    pub name: String,
-}
-
-impl Var {
-    pub fn new(ty: ScopeAllocClassId, name: String) -> Self {
-        Self { ty, name }
-    }
-}
-
 pub type Type = Box<dyn ClassInterface>;
 pub type Func = Box<dyn FunctionInterface>;
+
+pub type TyIdxTy = ScopeAllocIdTy;
 
 /// Manager of type
 #[derive(Clone, Debug, Default)]
 pub struct CommonType {
-    attr: Vec<Var>,
     funcs: Vec<Function>,
     pub name: usize,
     pub origin_name: String,
+    pub id_to_attr: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
 }
 
 impl Display for CommonType {
@@ -99,8 +89,8 @@ impl CommonType {
         }
     }
 
-    pub fn add_attr(&mut self, attr: Var) {
-        self.attr.push(attr);
+    pub fn add_attr(&mut self, attrname: ScopeAllocIdTy, attrty: TyIdxTy) -> Option<TyIdxTy> {
+        self.id_to_attr.insert(attrname, attrty)
     }
 
     pub fn add_func(&mut self, f: Function) {
@@ -118,13 +108,8 @@ impl ClassInterface for CommonType {
         None
     }
 
-    fn has_attr(&self, attrname: &str) -> Option<ScopeAllocClassId> {
-        for i in &self.attr {
-            if i.name == attrname {
-                return Some(i.ty);
-            }
-        }
-        None
+    fn has_attr(&self, attrname: usize) -> bool {
+        self.id_to_attr.contains_key(&attrname)
     }
 
     fn get_id(&self) -> usize {
@@ -141,6 +126,7 @@ impl ClassInterface for CommonType {
 }
 
 pub type ScopeAllocClassId = usize;
+pub type VarIdxTy = ScopeAllocIdTy;
 
 #[derive(Default)]
 pub struct SymScope {
@@ -154,12 +140,14 @@ pub struct SymScope {
     types: HashMap<ScopeAllocIdTy, ScopeAllocClassId>,
     // ID到函数的映射
     funcs: HashMap<ScopeAllocIdTy, Box<dyn FunctionInterface>>,
-    // token id
-    vars: HashMap<ScopeAllocIdTy, Var>,
+    // id到变量类型的映射
+    vars: HashMap<ScopeAllocIdTy, (TyIdxTy, VarIdxTy)>,
     // 由token id到模块的映射
     modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
     types_id: ScopeAllocClassId,
+    // vars id
+    vars_id: ScopeAllocIdTy,
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ScopeAllocClassId, CommonType>,
 }
@@ -174,8 +162,12 @@ impl SymScope {
             Some(prev_scope) => {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
                 ret.types_id = prev_scope.as_ref().borrow().types_id;
+                ret.vars_id = prev_scope.as_ref().borrow().vars_id;
             }
-            None => ret.types_id = get_stdclass_end(),
+            None => {
+                ret.types_id = get_stdclass_end();
+                ret.vars_id = 0;
+            }
         }
         ret
     }
@@ -234,7 +226,7 @@ impl SymScope {
         *t
     }
 
-    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<Var> {
+    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<(TyIdxTy, VarIdxTy)> {
         match self.vars.get(&id) {
             Some(v) => Some(v.clone()),
             None => match self.prev_scope {
@@ -259,8 +251,11 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_var(&mut self, id: usize, v: Var) {
-        self.vars.insert(id, v);
+    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy) -> VarIdxTy {
+        self.vars.insert(id, (ty, self.vars_id));
+        let ret = self.vars_id;
+        self.vars_id += 1;
+        ret
     }
 
     pub fn add_type(&mut self, id: usize, t: usize) {

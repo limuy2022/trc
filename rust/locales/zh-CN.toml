@@ -22,6 +22,7 @@ str_error = "这个字符串应当以\"结束"
 unclosed_comment = "未闭合的注释"
 prefix_float = "前缀%{0}不能对浮点数使用"
 unexpected_token = "token %{0}不是被期望的"
+expected_expr = "期望表达式"
 
 [compiler.symbolerror]
 not_found_sym = "未找到符号%{0}"

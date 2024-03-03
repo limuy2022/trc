@@ -1,7 +1,7 @@
 use super::{
     scope::{self, *},
     token::TokenType,
-    InputSource, TokenLex,
+    InputSource, TokenLex, ValuePool,
 };
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, NO_ARG},
@@ -14,7 +14,7 @@ use std::{cell::RefCell, rc::Rc};
 /// 过程间分析用的结构
 #[derive(Default)]
 struct LexProcess {
-    stack_type: Vec<VmStackType>,
+    stack_type: Vec<TyIdxTy>,
 }
 
 impl LexProcess {
@@ -24,20 +24,45 @@ impl LexProcess {
         }
     }
 
-    pub fn new_type(&mut self, ty: VmStackType) {
+    pub fn new_type(&mut self, ty: TyIdxTy) {
         self.stack_type.push(ty);
     }
 
-    pub fn get_last_ty(&self) -> Option<VmStackType> {
+    pub fn clear(&mut self) {
+        self.stack_type.clear();
+    }
+
+    pub fn get_last_ty(&self) -> Option<TyIdxTy> {
         self.stack_type.last().copied()
     }
 
     /// pop two val at the top of stack
-    pub fn cal_val(&mut self, ty: VmStackType) {
+    pub fn cal_val(&mut self, ty: TyIdxTy) {
         assert!(self.stack_type.len() >= 2);
         self.stack_type.pop();
         self.stack_type.pop();
         self.new_type(ty)
+    }
+
+    pub fn pop_last_ty(&mut self) -> Option<TyIdxTy> {
+        self.stack_type.pop()
+    }
+}
+
+#[derive(Default)]
+struct Cache {
+    pub(crate) intty_id: TyIdxTy,
+    pub(crate) floatty_id: TyIdxTy,
+    pub(crate) charty_id: TyIdxTy,
+    pub(crate) boolty_id: TyIdxTy,
+    pub(crate) strty_id: TyIdxTy,
+}
+
+impl Cache {
+    pub fn new() -> Self {
+        Self {
+            ..Default::default()
+        }
     }
 }
 
@@ -46,6 +71,7 @@ pub struct AstBuilder<'a> {
     staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
     process_info: LexProcess,
+    cache: Cache,
 }
 
 type AstError<T> = RunResult<T>;
@@ -79,19 +105,19 @@ macro_rules! tmp_expe_function_gen {
                     self.add_bycode(io_check.opcode.clone(), NO_ARG);
                     let stage_ty = io_check.io.return_type.unwrap();
                     let tyb = self.$tmpfuncname(istry, stage_ty)?;
-                    self.process_info.cal_val(self.convert_to_vm_type(stage_ty));
-                    match tyb {
+                    self.process_info.cal_val(stage_ty);
+                    return match tyb {
                         TypeAllowNull::No => {
-                            return Ok(TypeAllowNull::Yes(stage_ty));
+                            Ok(TypeAllowNull::Yes(stage_ty))
                         }
                         TypeAllowNull::Yes(_) => {
-                            return Ok(tyb);
+                            Ok(tyb)
                         }
                     }
                 })*
                 _ => {
                     self.token_lexer.next_back(next_sym);
-                    return Ok(TypeAllowNull::No);
+                    Ok(TypeAllowNull::No)
                 }
             }
         }
@@ -117,12 +143,27 @@ macro_rules! expr_gen {
 }
 
 impl<'a> AstBuilder<'a> {
+    fn report_error<T>(&self, info: ErrorInfo) -> AstError<T> {
+        self.token_lexer.compiler_data.report_compiler_error(info)
+    }
+
     #[inline]
     pub fn try_err<T>(&self, istry: bool, info: ErrorInfo) -> AstError<T> {
         if istry {
             Err(LightFakeError::new().into())
         } else {
-            self.token_lexer.compiler_data.report_compiler_error(info)
+            self.report_error(info)
+        }
+    }
+
+    pub fn convert_vm_ty_to_id(&self, ty: VmStackType) -> TyIdxTy {
+        match ty {
+            VmStackType::Int => self.cache.intty_id,
+            VmStackType::Float => self.cache.floatty_id,
+            VmStackType::Str => self.cache.strty_id,
+            VmStackType::Char => self.cache.charty_id,
+            VmStackType::Bool => self.cache.boolty_id,
+            VmStackType::Object => unreachable!(),
         }
     }
 
@@ -137,16 +178,27 @@ impl<'a> AstBuilder<'a> {
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
         let optimize = token_lexer.compiler_data.option.optimize;
+        root_scope
+            .as_ref()
+            .borrow_mut()
+            .import_prelude(&token_lexer.compiler_data.const_pool);
+        let mut cache = Cache::new();
+        let val_pool_ref = &token_lexer.compiler_data.const_pool;
+        cache.intty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, INT).unwrap();
+        cache.floatty_id =
+            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, FLOAT).unwrap();
+        cache.charty_id =
+            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, CHAR).unwrap();
+        cache.strty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, STR).unwrap();
+        cache.boolty_id =
+            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
         let ret = AstBuilder {
             token_lexer,
             staticdata: StaticData::new(!optimize),
             self_scope: root_scope,
             process_info: LexProcess::new(),
+            cache,
         };
-        ret.self_scope
-            .as_ref()
-            .borrow_mut()
-            .import_prelude(&ret.token_lexer.compiler_data.const_pool);
         ret
     }
 
@@ -245,6 +297,7 @@ impl<'a> AstBuilder<'a> {
                     if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
                         // the values that have been stored is more than exact requirement of function
                         self.move_val_into_obj_stack();
+                        self.process_info.pop_last_ty();
                         var_params_num += 1;
                     } else {
                         ret.push(t)
@@ -268,45 +321,38 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
+    fn get_type_id_internel(
+        scope: Rc<RefCell<SymScope>>,
+        const_pool: &ValuePool,
+        ty_name: &str,
+    ) -> Option<usize> {
+        scope
+            .as_ref()
+            .borrow()
+            .get_type(*const_pool.name_pool.get(ty_name).unwrap())
+    }
+
     fn get_type_id(&self, ty_name: &str) -> Option<usize> {
-        self.self_scope.as_ref().borrow().get_type(
-            *self
-                .token_lexer
-                .compiler_data
-                .const_pool
-                .name_pool
-                .get(ty_name)
-                .unwrap(),
+        Self::get_type_id_internel(
+            self.self_scope.clone(),
+            &self.token_lexer.compiler_data.const_pool,
+            ty_name,
         )
     }
 
-    fn convert_to_vm_type(&self, ty: usize) -> VmStackType {
-        if ty == self.get_type_id(INT).unwrap() {
-            VmStackType::Int
-        } else if ty == self.get_type_id(FLOAT).unwrap() {
-            VmStackType::Float
-        } else if ty == self.get_type_id(STR).unwrap() {
-            VmStackType::Str
-        } else if ty == self.get_type_id(CHAR).unwrap() {
-            VmStackType::Char
-        } else if ty == self.get_type_id(BOOL).unwrap() {
-            VmStackType::Bool
-        } else {
-            VmStackType::Object
-        }
-    }
-
     fn move_val_into_obj_stack(&mut self) {
-        let obj_top = self.process_info.stack_type.pop().unwrap();
-        match obj_top {
-            VmStackType::Int => self.add_bycode(Opcode::MoveInt, NO_ARG),
-            VmStackType::Float => self.add_bycode(Opcode::MoveFloat, NO_ARG),
-            VmStackType::Str => self.add_bycode(Opcode::MoveStr, NO_ARG),
-            VmStackType::Char => self.add_bycode(Opcode::MoveChar, NO_ARG),
-            VmStackType::Bool => self.add_bycode(Opcode::MoveBool, NO_ARG),
-            VmStackType::Object => {}
+        let obj_top = self.process_info.stack_type.last().copied().unwrap();
+        if obj_top == self.cache.intty_id {
+            self.add_bycode(Opcode::MoveInt, NO_ARG);
+        } else if obj_top == self.cache.floatty_id {
+            self.add_bycode(Opcode::MoveFloat, NO_ARG);
+        } else if obj_top == self.cache.charty_id {
+            self.add_bycode(Opcode::MoveChar, NO_ARG);
+        } else if obj_top == self.cache.boolty_id {
+            self.add_bycode(Opcode::MoveBool, NO_ARG);
+        } else if obj_top == self.cache.strty_id {
+            self.add_bycode(Opcode::MoveStr, NO_ARG);
         }
-        self.process_info.new_type(VmStackType::Object);
     }
 
     fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
@@ -355,7 +401,7 @@ impl<'a> AstBuilder<'a> {
                 self.token_lexer.next_back(nxt);
                 self.add_bycode(Opcode::LoadLocal, idx);
                 let tt = match self.self_scope.as_ref().borrow().get_var(idx) {
-                    Some(v) => v.ty,
+                    Some(v) => v.0,
                     None => self.try_err(
                         istry,
                         ErrorInfo::new(
@@ -386,28 +432,28 @@ impl<'a> AstBuilder<'a> {
         match t.tp {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
-                self.process_info.new_type(VmStackType::Int);
-                Ok(TypeAllowNull::Yes(self.get_type_id(INT).unwrap()))
+                self.process_info.new_type(self.cache.intty_id);
+                Ok(TypeAllowNull::Yes(self.cache.intty_id))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
-                self.process_info.new_type(VmStackType::Float);
-                Ok(TypeAllowNull::Yes(self.get_type_id(FLOAT).unwrap()))
+                self.process_info.new_type(self.cache.floatty_id);
+                Ok(TypeAllowNull::Yes(self.cache.floatty_id))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
-                self.process_info.new_type(VmStackType::Str);
-                Ok(TypeAllowNull::Yes(self.get_type_id(STR).unwrap()))
+                self.process_info.new_type(self.cache.strty_id);
+                Ok(TypeAllowNull::Yes(self.cache.strty_id))
             }
             TokenType::CharValue => {
                 self.add_bycode(Opcode::LoadChar, t.data.unwrap());
-                self.process_info.new_type(VmStackType::Char);
-                Ok(TypeAllowNull::Yes(self.get_type_id(CHAR).unwrap()))
+                self.process_info.new_type(self.cache.charty_id);
+                Ok(TypeAllowNull::Yes(self.cache.charty_id))
             }
             TokenType::BoolValue => {
                 self.add_bycode(Opcode::LoadBool, t.data.unwrap());
-                self.process_info.new_type(VmStackType::Bool);
-                Ok(TypeAllowNull::Yes(self.get_type_id(BOOL).unwrap()))
+                self.process_info.new_type(self.cache.boolty_id);
+                Ok(TypeAllowNull::Yes(self.cache.boolty_id))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
@@ -524,6 +570,48 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn store_var(&mut self, name: usize) -> RunResult<()> {
+        if self.self_scope.as_ref().borrow().has_sym(name) {
+            return self.report_error(ErrorInfo::new(
+                t!(
+                    SYMBOL_REDEFINED,
+                    "0" = self.token_lexer.compiler_data.const_pool.id_name[name]
+                ),
+                t!(SYMBOL_ERROR),
+            ));
+        }
+        self.expr(false)?;
+        let var_type = match self.process_info.get_last_ty() {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+        };
+        let sym_idx = self.self_scope.as_ref().borrow_mut().insert_sym(name);
+        let var_sym = self
+            .self_scope
+            .as_ref()
+            .borrow_mut()
+            .add_var(sym_idx, var_type);
+        self.staticdata
+            .update_sym_table_sz(self.self_scope.as_ref().borrow().get_scope_last_idx());
+        self.add_bycode(
+            if var_type == self.cache.intty_id {
+                Opcode::StoreInt
+            } else if var_type == self.cache.floatty_id {
+                Opcode::StoreFloat
+            } else if var_type == self.cache.strty_id {
+                Opcode::StoreStr
+            } else if var_type == self.cache.charty_id {
+                Opcode::StoreChar
+            } else {
+                Opcode::StoreBool
+            },
+            var_sym,
+        );
+        Ok(())
+    }
+
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
@@ -564,25 +652,7 @@ impl<'a> AstBuilder<'a> {
                         return Ok(());
                     }
                     TokenType::Store => {
-                        if self.self_scope.as_ref().borrow().has_sym(name) {
-                            return Err(RuntimeError::new(
-                                Box::new(self.token_lexer.compiler_data.context.clone()),
-                                ErrorInfo::new(
-                                    t!(
-                                        SYMBOL_REDEFINED,
-                                        "0" =
-                                            self.token_lexer.compiler_data.const_pool.id_name[name]
-                                    ),
-                                    t!(SYMBOL_ERROR),
-                                ),
-                            ));
-                        }
-                        self.expr(false)?;
-                        let var_idx = self.self_scope.as_ref().borrow_mut().insert_sym(name);
-                        self.staticdata.update_sym_table_sz(
-                            self.self_scope.as_ref().borrow().get_scope_last_idx(),
-                        );
-                        self.add_bycode(Opcode::StoreLocal, var_idx);
+                        self.store_var(name)?;
                         return Ok(());
                     }
                     _ => {
@@ -623,7 +693,7 @@ impl<'a> AstBuilder<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::compiler::{Compiler, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
+    use crate::compiler::*;
 
     macro_rules! gen_test_env {
         ($test_code:expr, $env_name:ident) => {
@@ -646,8 +716,7 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
-                Inst::new(Opcode::MoveInt, NO_ARG),
-                Inst::new(Opcode::StoreLocal, 0)
+                Inst::new(Opcode::StoreInt, 0)
             ],
         )
     }

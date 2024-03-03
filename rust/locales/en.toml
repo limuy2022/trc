@@ -22,6 +22,7 @@ prefix_float = "Prefix %{0} can be used for float"
 unexpected_token = "token %{0} is not expected"
 unclosed_comment = "unclosed comment"
 char_error = "char should be the format like 'x'."
+expected_expr = "expected expression"
 
 [compiler.symbolerror]
 not_found_sym = "Symbol %{0} not found"

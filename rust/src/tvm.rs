@@ -5,6 +5,8 @@ mod gc;
 pub mod stdlib;
 mod types;
 
+use std::ptr;
+
 use self::{
     gc::GcMgr,
     types::{
@@ -61,7 +63,13 @@ impl<'a> DynaData<'a> {
     }
 
     pub fn resize_var_store(&mut self, cap: usize) {
-        self.var_store.reserve(cap);
+        // 宁浪费不放过
+        self.var_store.resize(cap, 0 as *mut TrcInt);
+        self.int_store.resize(cap, 0);
+        self.float_store.resize(cap, 0.0);
+        self.str_store.resize(cap, ptr::null_mut());
+        self.bool_store.resize(cap, false);
+        self.char_store.resize(cap, '0');
     }
 }
 
@@ -593,8 +601,14 @@ mod tests {
     }
 
     #[test]
-    fn test_vm() {
+    fn test_stdfunc() {
         let mut vm = gen_test_env(r#"print("{},{},{},{}", 1, "h", 'p', true)"#);
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_var_define() {
+        let mut vm = gen_test_env(r#"a:=10"#);
         vm.run().unwrap()
     }
 }

@@ -594,7 +594,7 @@ impl<'a> AstBuilder<'a> {
             .borrow_mut()
             .add_var(sym_idx, var_type);
         self.staticdata
-            .update_sym_table_sz(self.self_scope.as_ref().borrow().get_scope_last_idx());
+            .update_sym_table_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
         self.add_bycode(
             if var_type == self.cache.intty_id {
                 Opcode::StoreInt
@@ -715,7 +715,7 @@ mod tests {
         assert_eq!(
             t.staticdata.inst,
             vec![
-                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::StoreInt, 0)
             ],
         )

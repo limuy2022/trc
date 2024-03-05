@@ -270,6 +270,10 @@ impl SymScope {
         self.scope_sym_id
     }
 
+    pub fn get_var_table_sz(&self) -> usize {
+        self.vars_id
+    }
+
     pub fn get_class(&self, classid: usize) -> Option<Type> {
         // 在标准库界限内
         if classid < get_stdclass_end() {

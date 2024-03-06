@@ -608,7 +608,11 @@ mod tests {
 
     #[test]
     fn test_var_define() {
-        let mut vm = gen_test_env(r#"a:=10"#);
+        let mut vm = gen_test_env(
+            r#"a:=10
+        a=10
+        print("{}", a)"#,
+        );
         vm.run().unwrap()
     }
 }

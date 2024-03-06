@@ -9,7 +9,7 @@ use crate::base::{
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use rust_i18n::t;
-use std::{cell::RefCell, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, rc::Rc};
 
 /// 过程间分析用的结构
 #[derive(Default)]
@@ -399,9 +399,7 @@ impl<'a> AstBuilder<'a> {
                 Ok(func_obj.get_io().return_type.clone())
             } else {
                 self.token_lexer.next_back(nxt);
-                self.add_bycode(Opcode::LoadLocal, idx);
-                let tt = match self.self_scope.as_ref().borrow().get_var(idx) {
-                    Some(v) => v.0,
+                let var = match self.self_scope.as_ref().borrow().get_var(token_data) {
                     None => self.try_err(
                         istry,
                         ErrorInfo::new(
@@ -412,8 +410,26 @@ impl<'a> AstBuilder<'a> {
                             t!(SYMBOL_ERROR),
                         ),
                     )?,
+                    Some(v) => v,
                 };
-                Ok(TypeAllowNull::Yes(tt))
+                self.add_bycode(
+                    if var.0 == self.cache.intty_id {
+                        Opcode::LoadVarInt
+                    } else if var.0 == self.cache.floatty_id {
+                        Opcode::LoadVarFloat
+                    } else if var.0 == self.cache.boolty_id {
+                        Opcode::LoadVarBool
+                    } else if var.0 == self.cache.charty_id {
+                        Opcode::LoadVarChar
+                    } else if var.0 == self.cache.strty_id {
+                        Opcode::LoadVarStr
+                    } else {
+                        Opcode::LoadLocal
+                    },
+                    var.1,
+                );
+                self.process_info.new_type(var.0);
+                Ok(TypeAllowNull::Yes(var.0))
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -570,6 +586,23 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy) {
+        self.add_bycode(
+            if varty == self.cache.intty_id {
+                Opcode::StoreInt
+            } else if varty == self.cache.floatty_id {
+                Opcode::StoreFloat
+            } else if varty == self.cache.strty_id {
+                Opcode::StoreStr
+            } else if varty == self.cache.charty_id {
+                Opcode::StoreChar
+            } else {
+                Opcode::StoreBool
+            },
+            var_idx,
+        );
+    }
+
     fn store_var(&mut self, name: usize) -> RunResult<()> {
         if self.self_scope.as_ref().borrow().has_sym(name) {
             return self.report_error(ErrorInfo::new(
@@ -593,22 +626,36 @@ impl<'a> AstBuilder<'a> {
             .as_ref()
             .borrow_mut()
             .add_var(sym_idx, var_type);
+        self.modify_var(var_type, var_sym);
         self.staticdata
             .update_sym_table_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
-        self.add_bycode(
-            if var_type == self.cache.intty_id {
-                Opcode::StoreInt
-            } else if var_type == self.cache.floatty_id {
-                Opcode::StoreFloat
-            } else if var_type == self.cache.strty_id {
-                Opcode::StoreStr
-            } else if var_type == self.cache.charty_id {
-                Opcode::StoreChar
-            } else {
-                Opcode::StoreBool
-            },
-            var_sym,
-        );
+        Ok(())
+    }
+
+    fn assign_var(&mut self, name: usize) -> RunResult<()> {
+        self.expr(false)?;
+        let var_type = match self.process_info.get_last_ty() {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+        };
+        let var = match self.self_scope.as_ref().borrow().get_var(name) {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(
+                    t!(
+                        SYMBOL_NOT_FOUND,
+                        "0" = self.token_lexer.compiler_data.const_pool.id_name[name]
+                    ),
+                    t!(SYMBOL_ERROR),
+                ))
+            }
+        };
+        if var.0 != var_type {
+            return self.report_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
+        }
+        self.modify_var(var.0, var.1);
         Ok(())
     }
 
@@ -632,23 +679,7 @@ impl<'a> AstBuilder<'a> {
                 let tt = self.token_lexer.next_token()?;
                 match tt.tp {
                     TokenType::Assign => {
-                        let var = self.self_scope.as_ref().borrow().get_sym(name);
-                        if var.is_none() {
-                            return Err(RuntimeError::new(
-                                Box::new(self.token_lexer.compiler_data.context.clone()),
-                                ErrorInfo::new(
-                                    t!(
-                                        SYMBOL_NOT_FOUND,
-                                        "0" =
-                                            self.token_lexer.compiler_data.const_pool.id_name[name]
-                                    ),
-                                    t!(SYMBOL_ERROR),
-                                ),
-                            ));
-                        }
-                        self.expr(false)?;
-                        let var = var.unwrap();
-                        self.add_bycode(Opcode::StoreLocal, var);
+                        self.assign_var(name)?;
                         return Ok(());
                     }
                     TokenType::Store => {
@@ -710,13 +741,34 @@ mod tests {
 
     #[test]
     fn test_assign() {
-        gen_test_env!(r#"a:=10"#, t);
+        gen_test_env!(
+            r#"a:=10
+        a=10
+        print("{}", a)"#,
+            t
+        );
         t.generate_code().unwrap();
         assert_eq!(
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0)
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
             ],
         )
     }

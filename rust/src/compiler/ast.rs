@@ -757,6 +757,7 @@ mod tests {
                 Inst::new(Opcode::StoreInt, 0),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(
                     Opcode::CallNative,

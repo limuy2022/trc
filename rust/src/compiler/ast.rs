@@ -659,20 +659,65 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn if_lex(&mut self) -> RunResult<()> {
+        self.expr(false)?;
+        self.check_next_token(TokenType::LeftBigBrace)?;
+        // 最后需要跳转地址
+        let mut save_jump_opcode_idx = vec![];
+        let last_should_be_jumped;
+        loop {
+            let op_idx = self.staticdata.inst.len();
+            // 本行是为了跳转到下一个分支
+            self.add_bycode(Opcode::JumpIfFalse, 0);
+            loop {
+                let t = self.token_lexer.next_token()?;
+                if t.tp == TokenType::RightBigBrace {
+                    break;
+                }
+                self.token_lexer.next_back(t);
+                self.statement()?;
+            }
+            self.staticdata.inst[op_idx].operand = self.staticdata.get_last_opcode_id() + 1;
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::Else {
+                save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
+                self.add_bycode(Opcode::Jump, 0);
+                self.check_next_token(TokenType::If)?;
+                self.check_next_token(TokenType::LeftBigBrace)?;
+                continue;
+            }
+            self.token_lexer.next_back(t);
+            last_should_be_jumped = self.staticdata.get_last_opcode_id() + 1;
+            break;
+        }
+        for i in save_jump_opcode_idx {
+            self.staticdata.inst[i].operand = last_should_be_jumped;
+        }
+        Ok(())
+    }
+
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::Func => {
                 self.def_func(false)?;
+                return Ok(());
             }
             TokenType::Class => {
                 self.def_class(false)?;
+                return Ok(());
             }
             TokenType::While => {
                 self.while_lex(false)?;
+                return Ok(());
             }
             TokenType::For => {
                 self.for_lex(false)?;
+                return Ok(());
+            }
+            TokenType::If => {
+                self.if_lex()?;
+                return Ok(());
             }
             TokenType::ID => {
                 let name = t.data.unwrap();
@@ -693,7 +738,7 @@ impl<'a> AstBuilder<'a> {
             }
             _ => {}
         }
-        self.token_lexer.next_back(t.clone());
+        self.token_lexer.next_back(t);
         self.expr(false)?;
         Ok(())
     }
@@ -926,6 +971,34 @@ mod tests {
     fn test_wrong_type3() {
         gen_test_env!(r#""90"+28"#, t);
         t.generate_code().unwrap();
+    }
+
+    #[test]
+    fn test_if_easy() {
+        gen_test_env!(r#"if 1==1 { print("hello world") }"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::EqInt, NO_ARG),
+                Inst::new(Opcode::JumpIfFalse, 7),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
+            ]
+        )
     }
 
     #[test]

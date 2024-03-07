@@ -183,4 +183,8 @@ impl StaticData {
     pub fn update_sym_table_sz(&mut self, newsz: usize) {
         self.sym_table_sz = max(self.sym_table_sz, newsz);
     }
+
+    pub fn get_last_opcode_id(&self) -> usize {
+        self.inst.len() - 1
+    }
 }

@@ -861,8 +861,7 @@ impl Drop for TokenLex<'_> {
     fn drop(&mut self) {
         // check the braces stack
         if let Err(e) = self.check() {
-            eprintln!("{}", e);
-            exit(1);
+            panic!("{}", e);
         }
     }
 }

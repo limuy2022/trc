@@ -682,8 +682,15 @@ impl<'a> AstBuilder<'a> {
             if t.tp == TokenType::Else {
                 save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
                 self.add_bycode(Opcode::Jump, 0);
-                self.check_next_token(TokenType::If)?;
-                self.check_next_token(TokenType::LeftBigBrace)?;
+                let nxt_tok = self.token_lexer.next_token()?;
+                if nxt_tok.tp == TokenType::If {
+                    // self.check_next_token(TokenType::If)?;
+                    self.expr(false)?;
+                    self.check_next_token(TokenType::LeftBigBrace)?;
+                } else {
+                    self.token_lexer.next_back(nxt_tok);
+                    self.check_next_token(TokenType::LeftBigBrace)?;
+                }
                 continue;
             }
             self.token_lexer.next_back(t);
@@ -1002,6 +1009,23 @@ mod tests {
     }
 
     #[test]
+    fn test_if_easy2() {
+        gen_test_env!(
+            r#"
+        if 1==1 {
+            print("hello world")
+        } else if 1==2 {
+
+        } else {
+            print("hello world")
+        }
+        "#,
+            t
+        );
+        t.generate_code().unwrap();
+    }
+
+    #[test]
     fn test_if() {
         gen_test_env!(
             r#"a:=9 
@@ -1010,11 +1034,11 @@ if a<8{
 } else if a>11 {
 
 } else {
-if 8 == 7 {
+    if 8 == 7 {
 
-} else {
+    } else {
 
-}
+    }
 }"#,
             t
         );
@@ -1022,20 +1046,82 @@ if 8 == 7 {
         assert_eq!(
             t.staticdata.inst,
             vec![
-                Inst::new(Opcode::LoadInt, 9),
-                Inst::new(Opcode::LoadInt, 8),
-                Inst::new(Opcode::LtInt, NO_ARG),
-                Inst::new(Opcode::JumpIfFalse, 0),
-                Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::Jump, 0),
-                Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::LoadInt, 11),
-                Inst::new(Opcode::GtInt, NO_ARG),
-                Inst::new(Opcode::JumpIfFalse, 0),
-                Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::Jump, 0),
-                Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::LoadInt, 7)
+                Inst {
+                    opcode: Opcode::LoadInt,
+                    operand: 2
+                },
+                Inst {
+                    opcode: Opcode::StoreInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::LoadVarInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::LoadInt,
+                    operand: 3
+                },
+                Inst {
+                    opcode: Opcode::LtInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::JumpIfFalse,
+                    operand: 19
+                },
+                Inst {
+                    opcode: Opcode::Jump,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::LoadVarInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::LoadInt,
+                    operand: 4
+                },
+                Inst {
+                    opcode: Opcode::GtInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::JumpIfFalse,
+                    operand: 19
+                },
+                Inst {
+                    opcode: Opcode::Jump,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::JumpIfFalse,
+                    operand: 19
+                },
+                Inst {
+                    opcode: Opcode::LoadInt,
+                    operand: 3
+                },
+                Inst {
+                    opcode: Opcode::LoadInt,
+                    operand: 5
+                },
+                Inst {
+                    opcode: Opcode::EqInt,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::JumpIfFalse,
+                    operand: 19
+                },
+                Inst {
+                    opcode: Opcode::Jump,
+                    operand: 0
+                },
+                Inst {
+                    opcode: Opcode::JumpIfFalse,
+                    operand: 19
+                }
             ]
         )
     }

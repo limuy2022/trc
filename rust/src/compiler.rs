@@ -6,7 +6,7 @@ pub mod llvm_convent;
 pub mod scope;
 pub mod token;
 
-use self::token::TokenLex;
+use self::{ast::AstBuilder, token::TokenLex};
 use crate::{
     base::{
         codegen::{ConstPool, StaticData},
@@ -21,6 +21,7 @@ use std::{
     fs,
     io::{self, BufRead},
     process::exit,
+    sync::OnceLock,
     vec,
 };
 
@@ -214,12 +215,18 @@ pub struct StringSource {
 }
 
 impl StringSource {
-    fn new(source: String) -> Self {
+    pub fn new(source: impl Into<String>) -> Self {
         Self {
-            text: source,
+            text: source.into(),
             pos: 0,
             prev_size: 0,
         }
+    }
+
+    pub fn reset_source(&mut self, source: impl Into<String>) {
+        self.pos = 0;
+        self.prev_size = 0;
+        self.text = source.into();
     }
 }
 
@@ -260,7 +267,7 @@ impl TokenIo for StringSource {
     }
 }
 
-trait TokenIo: Iterator {
+pub trait TokenIo: Iterator {
     fn unread(&mut self, c: char);
 
     fn read(&mut self) -> char;
@@ -334,7 +341,6 @@ impl TokenIo for FileSource {
 pub struct Compiler {
     // to support read from stdin and file
     input: Box<dyn TokenIo<Item = char>>,
-    pub const_pool: ValuePool,
     option: Option,
     context: Context,
 }
@@ -356,7 +362,6 @@ impl Compiler {
                 };
                 Compiler {
                     input: Box::new(FileSource::new(f)),
-                    const_pool: ValuePool::new(),
                     option,
                     context: Context::new(cfg::MAIN_MODULE_NAME),
                 }
@@ -370,10 +375,13 @@ impl Compiler {
     pub fn new_string_compiler(option: Option, source: &str) -> Self {
         Compiler {
             input: Box::new(StringSource::new(String::from(source))),
-            const_pool: ValuePool::new(),
             option,
             context: Context::new(cfg::MAIN_MODULE_NAME),
         }
+    }
+
+    pub fn modify_input(&mut self, input: Box<dyn TokenIo<Item = char>>) {
+        self.input = input;
     }
 
     pub fn lex(&mut self) -> RunResult<StaticData> {
@@ -381,6 +389,19 @@ impl Compiler {
         let mut ast_builder = ast::AstBuilder::new(token_lexer);
         ast_builder.generate_code()?;
         Ok(ast_builder.return_static_data())
+    }
+
+    pub fn lex_times(&mut self) -> RunResult<StaticData> {
+        let token_lexer = TokenLex::new(self);
+        let mut ast_builder = ast::AstBuilder::new(token_lexer);
+        ast_builder.generate_code()?;
+        Ok(ast_builder.return_static_data())
+    }
+
+    pub fn get_ast_obj(&mut self) -> AstBuilder {
+        let token_lexer = TokenLex::new(self);
+        let ast_builder = ast::AstBuilder::new(token_lexer);
+        ast_builder
     }
 
     #[inline]

@@ -106,7 +106,7 @@ macro_rules! tmp_expe_function_gen {
                     let stage_ty = io_check.io.return_type.unwrap();
                     let tyb = self.$tmpfuncname(istry, stage_ty)?;
                     self.process_info.cal_val(stage_ty);
-                    return match tyb {
+                    match tyb {
                         TypeAllowNull::No => {
                             Ok(TypeAllowNull::Yes(stage_ty))
                         }
@@ -167,13 +167,33 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    pub fn new(token_lexer: TokenLex<'a>) -> Self {
+    /// make sure code safe,by using match instead of if
+    pub fn convert_id_to_vm_ty(&self, ty: TyIdxTy) -> VmStackType {
+        if ty == self.cache.intty_id {
+            return VmStackType::Int;
+        }
+        if ty == self.cache.floatty_id {
+            return VmStackType::Float;
+        }
+        if ty == self.cache.strty_id {
+            return VmStackType::Str;
+        }
+        if ty == self.cache.charty_id {
+            return VmStackType::Char;
+        }
+        if ty == self.cache.boolty_id {
+            return VmStackType::Bool;
+        }
+        VmStackType::Object
+    }
+
+    pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
         let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
         for i in &prelude.functions {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            token_lexer.const_pool.add_id(i.0.clone());
         }
         for i in &prelude.classes {
-            token_lexer.compiler_data.const_pool.add_id(i.0.clone());
+            token_lexer.const_pool.add_id(i.0.clone());
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
@@ -181,9 +201,9 @@ impl<'a> AstBuilder<'a> {
         root_scope
             .as_ref()
             .borrow_mut()
-            .import_prelude(&token_lexer.compiler_data.const_pool);
+            .import_prelude(&token_lexer.const_pool);
         let mut cache = Cache::new();
-        let val_pool_ref = &token_lexer.compiler_data.const_pool;
+        let val_pool_ref = &token_lexer.const_pool;
         cache.intty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, INT).unwrap();
         cache.floatty_id =
             Self::get_type_id_internel(root_scope.clone(), val_pool_ref, FLOAT).unwrap();
@@ -192,14 +212,13 @@ impl<'a> AstBuilder<'a> {
         cache.strty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, STR).unwrap();
         cache.boolty_id =
             Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
-        let ret = AstBuilder {
+        AstBuilder {
             token_lexer,
             staticdata: StaticData::new(!optimize),
             self_scope: root_scope,
             process_info: LexProcess::new(),
             cache,
-        };
-        ret
+        }
     }
 
     expr_gen!(expr9, expr9_, factor, TokenType::Power);
@@ -238,20 +257,16 @@ impl<'a> AstBuilder<'a> {
     expr_gen!(expr, expr_, expr1, TokenType::Or);
 
     pub fn return_static_data(mut self) -> StaticData {
-        self.staticdata.constpool = self.token_lexer.compiler_data.const_pool.store_val_to_vm();
+        self.staticdata.constpool = self.token_lexer.const_pool.store_val_to_vm();
         self.staticdata
     }
 
-    fn while_lex(&mut self, istry: bool) -> AstError<TypeAllowNull> {
-        todo!()
+    fn while_lex(&mut self) -> AstError<()> {
+        Ok(())
     }
 
-    fn for_lex(&mut self, istry: bool) -> AstError<TypeAllowNull> {
-        todo!()
-    }
-
-    fn generate_block(&mut self, istry: bool) -> AstError<TypeAllowNull> {
-        todo!()
+    fn for_lex(&mut self) -> AstError<()> {
+        Ok(())
     }
 
     fn check_next_token(&mut self, tp: TokenType) -> AstError<()> {
@@ -268,11 +283,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn add_var_params_bycode(&mut self, var_params_num: usize) {
-        let tmp = self
-            .token_lexer
-            .compiler_data
-            .const_pool
-            .add_int(var_params_num as i64);
+        let tmp = self.token_lexer.const_pool.add_int(var_params_num as i64);
         self.add_bycode(Opcode::LoadInt, tmp);
     }
 
@@ -335,23 +346,20 @@ impl<'a> AstBuilder<'a> {
     fn get_type_id(&self, ty_name: &str) -> Option<usize> {
         Self::get_type_id_internel(
             self.self_scope.clone(),
-            &self.token_lexer.compiler_data.const_pool,
+            &self.token_lexer.const_pool,
             ty_name,
         )
     }
 
     fn move_val_into_obj_stack(&mut self) {
         let obj_top = self.process_info.stack_type.last().copied().unwrap();
-        if obj_top == self.cache.intty_id {
-            self.add_bycode(Opcode::MoveInt, NO_ARG);
-        } else if obj_top == self.cache.floatty_id {
-            self.add_bycode(Opcode::MoveFloat, NO_ARG);
-        } else if obj_top == self.cache.charty_id {
-            self.add_bycode(Opcode::MoveChar, NO_ARG);
-        } else if obj_top == self.cache.boolty_id {
-            self.add_bycode(Opcode::MoveBool, NO_ARG);
-        } else if obj_top == self.cache.strty_id {
-            self.add_bycode(Opcode::MoveStr, NO_ARG);
+        match self.convert_id_to_vm_ty(obj_top) {
+            VmStackType::Int => self.add_bycode(Opcode::MoveInt, NO_ARG),
+            VmStackType::Float => self.add_bycode(Opcode::MoveFloat, NO_ARG),
+            VmStackType::Str => self.add_bycode(Opcode::MoveStr, NO_ARG),
+            VmStackType::Char => self.add_bycode(Opcode::MoveChar, NO_ARG),
+            VmStackType::Bool => self.add_bycode(Opcode::MoveBool, NO_ARG),
+            VmStackType::Object => {}
         }
     }
 
@@ -366,7 +374,7 @@ impl<'a> AstBuilder<'a> {
                     ErrorInfo::new(
                         t!(
                             SYMBOL_NOT_FOUND,
-                            "0" = self.token_lexer.compiler_data.const_pool.id_name[token_data]
+                            "0" = self.token_lexer.const_pool.id_name[token_data]
                         ),
                         t!(SYMBOL_ERROR),
                     ),
@@ -405,7 +413,7 @@ impl<'a> AstBuilder<'a> {
                         ErrorInfo::new(
                             t!(
                                 SYMBOL_NOT_FOUND,
-                                "0" = self.token_lexer.compiler_data.const_pool.id_name[token_data]
+                                "0" = self.token_lexer.const_pool.id_name[token_data]
                             ),
                             t!(SYMBOL_ERROR),
                         ),
@@ -413,18 +421,13 @@ impl<'a> AstBuilder<'a> {
                     Some(v) => v,
                 };
                 self.add_bycode(
-                    if var.0 == self.cache.intty_id {
-                        Opcode::LoadVarInt
-                    } else if var.0 == self.cache.floatty_id {
-                        Opcode::LoadVarFloat
-                    } else if var.0 == self.cache.boolty_id {
-                        Opcode::LoadVarBool
-                    } else if var.0 == self.cache.charty_id {
-                        Opcode::LoadVarChar
-                    } else if var.0 == self.cache.strty_id {
-                        Opcode::LoadVarStr
-                    } else {
-                        Opcode::LoadLocal
+                    match self.convert_id_to_vm_ty(var.0) {
+                        VmStackType::Int => Opcode::LoadVarInt,
+                        VmStackType::Float => Opcode::LoadVarFloat,
+                        VmStackType::Str => Opcode::LoadVarStr,
+                        VmStackType::Char => Opcode::LoadVarChar,
+                        VmStackType::Bool => Opcode::LoadVarBool,
+                        VmStackType::Object => Opcode::LoadLocal,
                     },
                     var.1,
                 );
@@ -568,7 +571,7 @@ impl<'a> AstBuilder<'a> {
             )?
         }
         let path = std::path::PathBuf::from(
-            self.token_lexer.compiler_data.const_pool.id_str[path.data.unwrap()]
+            self.token_lexer.const_pool.id_str[path.data.unwrap()]
                 .clone()
                 .replace('.', "/"),
         );
@@ -588,16 +591,13 @@ impl<'a> AstBuilder<'a> {
 
     fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy) {
         self.add_bycode(
-            if varty == self.cache.intty_id {
-                Opcode::StoreInt
-            } else if varty == self.cache.floatty_id {
-                Opcode::StoreFloat
-            } else if varty == self.cache.strty_id {
-                Opcode::StoreStr
-            } else if varty == self.cache.charty_id {
-                Opcode::StoreChar
-            } else {
-                Opcode::StoreBool
+            match self.convert_id_to_vm_ty(varty) {
+                VmStackType::Int => Opcode::StoreInt,
+                VmStackType::Float => Opcode::StoreFloat,
+                VmStackType::Str => Opcode::StoreStr,
+                VmStackType::Char => Opcode::StoreChar,
+                VmStackType::Bool => Opcode::StoreBool,
+                VmStackType::Object => Opcode::StoreLocal,
             },
             var_idx,
         );
@@ -608,7 +608,7 @@ impl<'a> AstBuilder<'a> {
             return self.report_error(ErrorInfo::new(
                 t!(
                     SYMBOL_REDEFINED,
-                    "0" = self.token_lexer.compiler_data.const_pool.id_name[name]
+                    "0" = self.token_lexer.const_pool.id_name[name]
                 ),
                 t!(SYMBOL_ERROR),
             ));
@@ -646,7 +646,7 @@ impl<'a> AstBuilder<'a> {
                 return self.report_error(ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.compiler_data.const_pool.id_name[name]
+                        "0" = self.token_lexer.const_pool.id_name[name]
                     ),
                     t!(SYMBOL_ERROR),
                 ))
@@ -729,11 +729,11 @@ impl<'a> AstBuilder<'a> {
                 return Ok(());
             }
             TokenType::While => {
-                self.while_lex(false)?;
+                self.while_lex()?;
                 return Ok(());
             }
             TokenType::For => {
-                self.for_lex(false)?;
+                self.for_lex()?;
                 return Ok(());
             }
             TokenType::If => {

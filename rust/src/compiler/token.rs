@@ -4,7 +4,7 @@ use rust_i18n::t;
 
 use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
 
-use super::{Compiler, Context, Float};
+use super::{Compiler, Context, Float, ValuePool};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq)]
 pub enum TokenType {
@@ -225,6 +225,7 @@ pub struct TokenLex<'code> {
     pub compiler_data: &'code mut Compiler,
     braces_check: Vec<BraceRecord>,
     unget_token: Vec<Token>,
+    pub const_pool: ValuePool,
 }
 
 impl Token {
@@ -289,12 +290,13 @@ enum NumValue {
     FloatVal(Float),
 }
 
-impl TokenLex<'_> {
-    pub fn new(compiler_data: &mut Compiler) -> TokenLex {
+impl<'a> TokenLex<'a> {
+    pub fn new(compiler_data: &'a mut Compiler) -> TokenLex<'a> {
         TokenLex {
             compiler_data,
-            braces_check: vec![],
-            unget_token: vec![],
+            braces_check: Vec::new(),
+            unget_token: Vec::new(),
+            const_pool: ValuePool::new(),
         }
     }
 
@@ -338,10 +340,7 @@ impl TokenLex<'_> {
                     if retname == "false" {
                         return Ok(Token::new(TokenType::BoolValue, Some(0)));
                     }
-                    Token::new(
-                        TokenType::ID,
-                        Some(self.compiler_data.const_pool.add_id(retname)),
-                    )
+                    Token::new(TokenType::ID, Some(self.const_pool.add_id(retname)))
                 }
             }
         })
@@ -592,14 +591,12 @@ impl TokenLex<'_> {
 
     fn turn_to_token(&mut self, val: NumValue) -> Token {
         match val {
-            NumValue::FloatVal(v) => Token::new(
-                TokenType::FloatValue,
-                Some(self.compiler_data.const_pool.add_float(v)),
-            ),
-            NumValue::Integer(it) => Token::new(
-                TokenType::IntValue,
-                Some(self.compiler_data.const_pool.add_int(it)),
-            ),
+            NumValue::FloatVal(v) => {
+                Token::new(TokenType::FloatValue, Some(self.const_pool.add_float(v)))
+            }
+            NumValue::Integer(it) => {
+                Token::new(TokenType::IntValue, Some(self.const_pool.add_int(it)))
+            }
         }
     }
 
@@ -636,7 +633,7 @@ impl TokenLex<'_> {
                         }
                         Ok(Token::new(
                             TokenType::IntValue,
-                            Some(self.compiler_data.const_pool.add_int(it)),
+                            Some(self.const_pool.add_int(it)),
                         ))
                     } else {
                         // 负数次，升级为float
@@ -652,7 +649,7 @@ impl TokenLex<'_> {
                         }
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.compiler_data.const_pool.add_float(Float::new(
+                            Some(self.const_pool.add_float(Float::new(
                                 it,
                                 float_part.parse().unwrap(),
                                 Self::cal_zero(&float_part),
@@ -679,7 +676,7 @@ impl TokenLex<'_> {
                         }
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.compiler_data.const_pool.add_float(v)),
+                            Some(self.const_pool.add_float(v)),
                         ))
                     } else {
                         up = -up;
@@ -697,7 +694,7 @@ impl TokenLex<'_> {
                         v.back = s.parse().unwrap();
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.compiler_data.const_pool.add_float(v)),
+                            Some(self.const_pool.add_float(v)),
                         ))
                     }
                 }
@@ -735,7 +732,7 @@ impl TokenLex<'_> {
         }
         Ok(Token::new(
             TokenType::StringValue,
-            Some(self.compiler_data.const_pool.add_string(s)),
+            Some(self.const_pool.add_string(s)),
         ))
     }
 
@@ -964,7 +961,7 @@ mod tests {
         );
         check_pool(
             vec![100, 232_304904, 0b011, 0x2AA4, 0o2434, 0, 1, 1e9 as i64],
-            &t.compiler_data.const_pool.const_ints,
+            &t.const_pool.const_ints,
         );
         check_pool(
             vec![
@@ -975,7 +972,7 @@ mod tests {
                 Float::new(0, 17, 1),
                 Float::new(198, 0, 0),
             ],
-            &t.compiler_data.const_pool.const_floats,
+            &t.const_pool.const_floats,
         );
     }
 
@@ -1038,7 +1035,7 @@ mod tests {
                 String::from("\n\t"),
                 String::from("ttt\tt"),
             ],
-            &t.compiler_data.const_pool.const_strings,
+            &t.const_pool.const_strings,
         );
     }
 
@@ -1145,7 +1142,7 @@ func main() {
                 String::from("天帝abc"),
                 String::from("abc天帝"),
             ],
-            &t.compiler_data.const_pool.name_pool,
+            &t.const_pool.name_pool,
         );
     }
 
@@ -1159,7 +1156,7 @@ func main() {
                 Token::new(TokenType::IntValue, Some(2)),
             ],
         );
-        check_pool(vec![0b1, 23, 0], &t.compiler_data.const_pool.const_ints);
+        check_pool(vec![0b1, 23, 0], &t.const_pool.const_ints);
     }
 
     #[test]
@@ -1172,11 +1169,8 @@ func main() {
                 Token::new(TokenType::ID, Some(0)),
             ],
         );
-        check_pool(vec![0xabc, 0, 1], &t.compiler_data.const_pool.const_ints);
-        check_pool(
-            vec!["hds".to_string()],
-            &t.compiler_data.const_pool.name_pool,
-        );
+        check_pool(vec![0xabc, 0, 1], &t.const_pool.const_ints);
+        check_pool(vec!["hds".to_string()], &t.const_pool.name_pool);
     }
 
     #[test]

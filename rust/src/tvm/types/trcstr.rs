@@ -1,14 +1,18 @@
-use super::TrcObj;
+use std::collections::hash_map::HashMap;
+use std::fmt::Display;
+
+use rust_i18n::t;
+
+use derive::{trc_class, trc_method};
+
+use crate::base::error::*;
 use crate::base::stdlib::*;
 use crate::compiler::scope::TypeAllowNull;
 use crate::compiler::token::TokenType;
 use crate::hash_map;
 use crate::tvm::GcMgr;
-use crate::{base::error::*, batch_impl_opers};
-use derive::{trc_class, trc_method};
-use rust_i18n::t;
-use std::collections::hash_map::HashMap;
-use std::fmt::Display;
+
+use super::TrcObj;
 
 #[trc_class]
 #[derive(Debug, Clone)]
@@ -27,14 +31,14 @@ impl TrcObj for TrcStr {
     }
 
     fn add(&self, other: *mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
-        unsafe {
+        return unsafe {
             match (*other).downcast_ref::<TrcStr>() {
                 Some(v) => {
                     let val = gc.alloc(cat_string(&*self._value, &*((*v)._value)));
-                    return Ok(gc.alloc(TrcStr::new(val)));
+                    Ok(gc.alloc(TrcStr::new(val)))
                 }
                 None => {
-                    return Err(ErrorInfo::new(
+                    Err(ErrorInfo::new(
                         t!(
                             OPERATOR_IS_NOT_SUPPORT,
                             "0" = "+",

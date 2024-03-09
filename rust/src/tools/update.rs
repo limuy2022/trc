@@ -16,7 +16,7 @@ impl Display for UpdateError {
         write!(
             f,
             "{}",
-            ("Only support Linux.Users on other platforms should update program by hand")
+            "Only support Linux.Users on other platforms should update program by hand"
         )
     }
 }

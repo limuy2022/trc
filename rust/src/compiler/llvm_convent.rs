@@ -1,11 +1,9 @@
-use std::ptr::null_mut;
+use crate::base::codegen::StaticData;
 
 // use llvm_sys::core::{
 //     LLVMAddFunction, LLVMContextCreate, LLVMCreateBuilderInContext, LLVMFunctionType,
 //     LLVMInt32TypeInContext, LLVMModuleCreateWithName,
 // };
-
-use crate::base::codegen::StaticData;
 
 pub fn convert(tvm_data: StaticData) {
     unsafe {

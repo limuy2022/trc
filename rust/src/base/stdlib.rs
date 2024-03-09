@@ -1,18 +1,21 @@
-use super::{codegen::Opcode, error::*};
-use crate::{
-    compiler::{
-        scope::{ScopeAllocClassId, TyIdxTy, Type, TypeAllowNull},
-        token::{ConstPoolIndexTy, TokenType},
-    },
-    tvm::DynaData,
-};
-use downcast_rs::{impl_downcast, Downcast};
-use rust_i18n::t;
-use std::sync::OnceLock;
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
 };
+use std::sync::OnceLock;
+
+use downcast_rs::{Downcast, impl_downcast};
+use rust_i18n::t;
+
+use crate::{
+    compiler::{
+        scope::{TyIdxTy, TypeAllowNull},
+        token::{ConstPoolIndexTy, TokenType},
+    },
+    tvm::DynaData,
+};
+
+use super::{codegen::Opcode, error::*};
 
 type StdlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
 const ANY_TYPE_ID: usize = 0;

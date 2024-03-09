@@ -1,7 +1,10 @@
-use super::{Compiler, Context, Float};
-use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
+use std::{collections::HashMap, fmt::Display, sync::OnceLock};
+
 use rust_i18n::t;
-use std::{collections::HashMap, fmt::Display, process::exit, sync::OnceLock};
+
+use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
+
+use super::{Compiler, Context, Float};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq)]
 pub enum TokenType {
@@ -869,8 +872,9 @@ impl Drop for TokenLex<'_> {
 mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
+    use crate::compiler::{InputSource, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO, Option, Pool};
+
     use super::*;
-    use crate::compiler::{InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {

@@ -24,7 +24,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = input.sig.ident.clone();
     let mut function_path: syn::Path = parse_str(&name.to_string()).unwrap();
     let mut attr_iter = attr.into_iter();
-    let mut if_enable_var_params: syn::Expr = parse_str("false").unwrap();
+    let mut if_enable_var_params: Expr = parse_str("false").unwrap();
     while let Some(i) = attr_iter.next() {
         match i {
             TokenTree::Ident(ident_name) => {

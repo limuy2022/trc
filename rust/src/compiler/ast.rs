@@ -277,7 +277,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 解析出函数参数
-    fn opt_args(&mut self, lex_func_obj: &scope::Func) -> AstError<Vec<usize>> {
+    fn opt_args(&mut self, lex_func_obj: &Func) -> AstError<Vec<usize>> {
         let mut ret = vec![];
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();

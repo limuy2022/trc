@@ -34,6 +34,7 @@ pub const EXPECT_TYPE: &str = "compiler.argumenterror.type_unmatched";
 pub const UNCLODED_COMMENT: &str = "compiler.syntaxerror.unclosed_comment";
 pub const UNCLOSED_FORMAT: &str = "compiler.formatstringerror.unclosed_format";
 pub const ARGUMENT_CANNOT_BE_VOID: &str = "compiler.argumenterror.void_argu";
+pub const JUST_ACCEPT_BOOL: &str = "compiler.typerror.if_while_accept_bool";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

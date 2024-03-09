@@ -759,8 +759,9 @@ impl<'a> TokenLex<'a> {
         Err(e)
     }
 
-    fn clear_error(&mut self) {
+    pub fn clear_error(&mut self) {
         self.braces_check.clear();
+        self.unget_token.clear();
     }
 
     pub fn next_token(&mut self) -> RunResult<Token> {

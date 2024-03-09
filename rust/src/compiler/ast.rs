@@ -7,6 +7,7 @@ use crate::base::{
     error::*,
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
+use crate::compiler::token::TokenType::RightBigBrace;
 
 use super::{scope::*, token::TokenType, InputSource, TokenLex, ValuePool};
 
@@ -669,8 +670,35 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn if_lex(&mut self) -> RunResult<()> {
+    fn lex_block(&mut self, end_state: TokenType) -> RunResult<()> {
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == end_state {
+                break;
+            }
+            self.token_lexer.next_back(t);
+            self.statement()?;
+        }
+        Ok(())
+    }
+
+    fn lex_condit(&mut self) -> RunResult<()> {
         self.expr(false)?;
+        match self.process_info.stack_type.last() {
+            None => {
+                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+            Some(ty) => {
+                if *ty != self.cache.boolty_id {
+                    return self.report_error(ErrorInfo::new(t!(JUST_ACCEPT_BOOL), t!(TYPE_ERROR)));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn if_lex(&mut self) -> RunResult<()> {
+        self.lex_condit()?;
         self.check_next_token(TokenType::LeftBigBrace)?;
         // 最后需要跳转地址
         let mut save_jump_opcode_idx = vec![];
@@ -678,14 +706,7 @@ impl<'a> AstBuilder<'a> {
             let op_idx = self.staticdata.inst.len();
             // 本行是为了跳转到下一个分支
             self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
-            loop {
-                let t = self.token_lexer.next_token()?;
-                if t.tp == TokenType::RightBigBrace {
-                    break;
-                }
-                self.token_lexer.next_back(t);
-                self.statement()?;
-            }
+            self.lex_block(RightBigBrace)?;
             self.staticdata.inst[op_idx].operand = self.staticdata.get_last_opcode_id() + 1;
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
@@ -693,20 +714,13 @@ impl<'a> AstBuilder<'a> {
             if t.tp == TokenType::Else {
                 let nxt_tok = self.token_lexer.next_token()?;
                 if nxt_tok.tp == TokenType::If {
-                    self.expr(false)?;
+                    self.lex_condit()?;
                     self.check_next_token(TokenType::LeftBigBrace)?;
                     continue;
                 }
                 self.token_lexer.next_back(nxt_tok);
                 self.check_next_token(TokenType::LeftBigBrace)?;
-                loop {
-                    let t = self.token_lexer.next_token()?;
-                    if t.tp == TokenType::RightBigBrace {
-                        break;
-                    }
-                    self.token_lexer.next_back(t);
-                    self.statement()?;
-                }
+                self.lex_block(RightBigBrace)?;
                 break;
             }
             save_jump_opcode_idx.pop();
@@ -775,14 +789,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
-        loop {
-            let token = self.token_lexer.next_token()?;
-            if token.tp == TokenType::EndOfFile {
-                break;
-            }
-            self.token_lexer.next_back(token);
-            self.statement()?;
-        }
+        self.lex_block(TokenType::EndOfFile)?;
         Ok(())
     }
 

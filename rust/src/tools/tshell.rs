@@ -14,18 +14,23 @@ fn get_block() -> String {
     let mut block = String::new();
     let mut cnt = 1;
     loop {
+        for i in 0..cnt {
+            print!("    ");
+        }
+        print!("...");
+        io::stdout().flush().unwrap();
         let mut line = String::new();
         io::stdin().read_line(&mut line).unwrap();
-        if line.ends_with('{') {
+        block += &line;
+        if line.ends_with("{\n") {
             cnt += 1;
         }
-        if line.ends_with('}') {
+        if line.ends_with("}\n") {
             cnt -= 1;
             if cnt == 0 {
                 break;
             }
         }
-        block += &line;
     }
     block
 }
@@ -43,13 +48,13 @@ pub fn tshell() -> RunResult<()> {
         io::stdout().flush().unwrap();
         let mut line = String::new();
         io::stdin().read_line(&mut line).unwrap();
-        if line.ends_with('{') {
+        if line.ends_with("{\n") {
             line += &get_block();
-            continue;
         }
         let source = Box::new(compiler::StringSource::new(line));
         ast.token_lexer.modify_input(source);
         ast.clear_inst();
+        ast.token_lexer.clear_error();
         ast.generate_code().unwrap_or_else(|e| {
             eprintln!("{}", e);
         });

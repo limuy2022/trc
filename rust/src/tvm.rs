@@ -205,9 +205,14 @@ impl<'a> Vm<'a> {
         }
     }
 
-    pub fn run(&mut self) -> Result<(), RuntimeError> {
+    pub fn reset(&mut self) {
+        self.pc = 0;
         self.dynadata
             .resize_var_store(self.static_data.sym_table_sz);
+    }
+
+    pub fn run(&mut self) -> Result<(), RuntimeError> {
+        self.reset();
         while self.pc < self.static_data.inst.len() {
             if self.static_data.has_line_table {
                 self.run_context

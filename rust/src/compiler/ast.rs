@@ -680,18 +680,27 @@ impl<'a> AstBuilder<'a> {
             self.staticdata.inst[op_idx].operand = self.staticdata.get_last_opcode_id() + 1;
             let t = self.token_lexer.next_token()?;
             if t.tp == TokenType::Else {
-                save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
-                self.add_bycode(Opcode::Jump, 0);
                 let nxt_tok = self.token_lexer.next_token()?;
                 if nxt_tok.tp == TokenType::If {
+                    save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
+                    self.add_bycode(Opcode::Jump, 0);
                     // self.check_next_token(TokenType::If)?;
                     self.expr(false)?;
                     self.check_next_token(TokenType::LeftBigBrace)?;
-                } else {
-                    self.token_lexer.next_back(nxt_tok);
-                    self.check_next_token(TokenType::LeftBigBrace)?;
+                    continue;
                 }
-                continue;
+                self.token_lexer.next_back(nxt_tok);
+                self.check_next_token(TokenType::LeftBigBrace)?;
+                loop {
+                    let t = self.token_lexer.next_token()?;
+                    if t.tp == TokenType::RightBigBrace {
+                        break;
+                    }
+                    self.token_lexer.next_back(t);
+                    self.statement()?;
+                }
+                last_should_be_jumped = self.staticdata.get_last_opcode_id() + 1;
+                break;
             }
             self.token_lexer.next_back(t);
             last_should_be_jumped = self.staticdata.get_last_opcode_id() + 1;
@@ -1068,7 +1077,7 @@ if a<8{
                 },
                 Inst {
                     opcode: Opcode::JumpIfFalse,
-                    operand: 19
+                    operand: 15
                 },
                 Inst {
                     opcode: Opcode::Jump,
@@ -1088,15 +1097,7 @@ if a<8{
                 },
                 Inst {
                     opcode: Opcode::JumpIfFalse,
-                    operand: 19
-                },
-                Inst {
-                    opcode: Opcode::Jump,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::JumpIfFalse,
-                    operand: 19
+                    operand: 11
                 },
                 Inst {
                     opcode: Opcode::LoadInt,
@@ -1112,15 +1113,7 @@ if a<8{
                 },
                 Inst {
                     opcode: Opcode::JumpIfFalse,
-                    operand: 19
-                },
-                Inst {
-                    opcode: Opcode::Jump,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::JumpIfFalse,
-                    operand: 19
+                    operand: 15
                 }
             ]
         )

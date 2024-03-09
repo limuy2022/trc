@@ -530,9 +530,10 @@ impl<'a> Vm<'a> {
                 }
                 Opcode::MoveStr => {
                     // todo:inmprove performance
-                    let ptr = self.dynadata.gc.alloc(TrcStr::new(unsafe {
-                        self.dynadata.str_stack.pop().unwrap()
-                    }));
+                    let ptr = self
+                        .dynadata
+                        .gc
+                        .alloc(TrcStr::new(self.dynadata.str_stack.pop().unwrap()));
                     self.dynadata.obj_stack.push(ptr);
                 }
                 Opcode::StoreInt => {
@@ -590,9 +591,7 @@ impl<'a> Vm<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::compiler::Compiler;
-    use crate::compiler::InputSource;
-    use crate::compiler::Option;
+    use crate::compiler::*;
 
     fn gen_test_env(code: &str) -> Vm {
         let mut compiler =
@@ -613,6 +612,19 @@ mod tests {
         a=10
         print("{}", a)"#,
         );
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_if_easy() {
+        let mut vm = gen_test_env(r#"if 1==1 { print("hello world") }"#);
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_if_easy2() {
+        let mut vm =
+            gen_test_env(r#"if 1==1 { print("hello world") } else { print("hello world2") }"#);
         vm.run().unwrap()
     }
 }

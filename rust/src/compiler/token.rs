@@ -813,7 +813,6 @@ impl TokenLex<'_> {
     pub fn check(&mut self) -> Result<(), RuntimeError> {
         if !self.braces_check.is_empty() {
             let unmatch_char = self.braces_check.pop().unwrap();
-            self.clear_error();
             return self.report_error_with_context(RuntimeError::new(
                 Box::new(Context::new_line(
                     &self.compiler_data.context.module_name,

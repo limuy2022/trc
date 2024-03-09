@@ -50,7 +50,7 @@ pub fn println(fmt_string: str) -> void {
     io::stdout().write_all(b"\n").unwrap();
 }
 
-def_module!(module_name = prelude, functions = [print => print, println => print], classes = [
+def_module!(module_name = prelude, functions = [print => print, println => println], classes = [
     TrcInt => int,
     TrcStr => str,
     TrcBool => bool,

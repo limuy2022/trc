@@ -1,10 +1,10 @@
+use std::sync::OnceLock;
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
 };
-use std::sync::OnceLock;
 
-use downcast_rs::{Downcast, impl_downcast};
+use downcast_rs::{impl_downcast, Downcast};
 use rust_i18n::t;
 
 use crate::{

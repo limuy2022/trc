@@ -872,7 +872,7 @@ impl Drop for TokenLex<'_> {
 mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
-    use crate::compiler::{InputSource, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO, Option, Pool};
+    use crate::compiler::{InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     use super::*;
 

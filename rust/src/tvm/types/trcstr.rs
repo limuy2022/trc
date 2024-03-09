@@ -37,18 +37,16 @@ impl TrcObj for TrcStr {
                     let val = gc.alloc(cat_string(&*self._value, &*((*v)._value)));
                     Ok(gc.alloc(TrcStr::new(val)))
                 }
-                None => {
-                    Err(ErrorInfo::new(
-                        t!(
-                            OPERATOR_IS_NOT_SUPPORT,
-                            "0" = "+",
-                            "1" = (*other).get_type_name()
-                        ),
-                        t!(OPERATOR_ERROR),
-                    ))
-                }
+                None => Err(ErrorInfo::new(
+                    t!(
+                        OPERATOR_IS_NOT_SUPPORT,
+                        "0" = "+",
+                        "1" = (*other).get_type_name()
+                    ),
+                    t!(OPERATOR_ERROR),
+                )),
             }
-        }
+        };
     }
 }
 

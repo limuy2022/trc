@@ -64,7 +64,7 @@ impl<'a> DynaData<'a> {
 
     pub fn resize_var_store(&mut self, cap: usize) {
         // 宁浪费不放过
-        self.var_store.resize(cap, 0 as *mut TrcInt);
+        self.var_store.resize(cap, ptr::null_mut::<TrcInt>());
         self.int_store.resize(cap, 0);
         self.float_store.resize(cap, 0.0);
         self.str_store.resize(cap, ptr::null_mut());
@@ -596,7 +596,9 @@ mod tests {
     fn gen_test_env(code: &str) -> Vm {
         let mut compiler =
             Compiler::new_string_compiler(Option::new(false, InputSource::StringInternal), code);
-        Vm::new_init(compiler.lex().unwrap())
+        let com_tmp = compiler.lex().unwrap();
+        // println!("{:?}", com_tmp.inst);
+        Vm::new_init(com_tmp)
     }
 
     #[test]
@@ -617,14 +619,33 @@ mod tests {
 
     #[test]
     fn test_if_easy() {
-        let mut vm = gen_test_env(r#"if 1==1 { print("hello world") }"#);
+        let mut vm = gen_test_env(r#"if 1==1 { println("ok") }"#);
         vm.run().unwrap()
     }
 
     #[test]
     fn test_if_easy2() {
-        let mut vm =
-            gen_test_env(r#"if 1==1 { print("hello world") } else { print("hello world2") }"#);
+        let mut vm = gen_test_env(r#"if 1==1 { println("ok") } else { println("error") }"#);
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_if_final() {
+        let mut vm = gen_test_env(
+            r#"a:=90
+if a==90 {
+  println("i equal to 90")
+}
+if a < 89 {
+  println("i less than 90")
+} else {
+  if a % 2 == 0 {
+    println("i is even")
+  } else {
+    println("i is odd")
+  }
+}"#,
+        );
         vm.run().unwrap()
     }
 }

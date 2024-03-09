@@ -4,7 +4,7 @@ use super::{
     InputSource, TokenLex, ValuePool,
 };
 use crate::base::{
-    codegen::{Inst, Opcode, StaticData, VmStackType, NO_ARG},
+    codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
@@ -664,11 +664,10 @@ impl<'a> AstBuilder<'a> {
         self.check_next_token(TokenType::LeftBigBrace)?;
         // 最后需要跳转地址
         let mut save_jump_opcode_idx = vec![];
-        let last_should_be_jumped;
         loop {
             let op_idx = self.staticdata.inst.len();
             // 本行是为了跳转到下一个分支
-            self.add_bycode(Opcode::JumpIfFalse, 0);
+            self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
             loop {
                 let t = self.token_lexer.next_token()?;
                 if t.tp == TokenType::RightBigBrace {
@@ -678,13 +677,12 @@ impl<'a> AstBuilder<'a> {
                 self.statement()?;
             }
             self.staticdata.inst[op_idx].operand = self.staticdata.get_last_opcode_id() + 1;
+            self.add_bycode(Opcode::Jump, ARG_WRONG);
+            save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
             let t = self.token_lexer.next_token()?;
             if t.tp == TokenType::Else {
                 let nxt_tok = self.token_lexer.next_token()?;
                 if nxt_tok.tp == TokenType::If {
-                    save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
-                    self.add_bycode(Opcode::Jump, 0);
-                    // self.check_next_token(TokenType::If)?;
                     self.expr(false)?;
                     self.check_next_token(TokenType::LeftBigBrace)?;
                     continue;
@@ -699,17 +697,24 @@ impl<'a> AstBuilder<'a> {
                     self.token_lexer.next_back(t);
                     self.statement()?;
                 }
-                last_should_be_jumped = self.staticdata.get_last_opcode_id() + 1;
                 break;
             }
+            save_jump_opcode_idx.pop();
+            self.del_opcode().unwrap();
             self.token_lexer.next_back(t);
-            last_should_be_jumped = self.staticdata.get_last_opcode_id() + 1;
             break;
         }
         for i in save_jump_opcode_idx {
-            self.staticdata.inst[i].operand = last_should_be_jumped;
+            self.staticdata.inst[i].operand = self.staticdata.get_last_opcode_id() + 1;
         }
         Ok(())
+    }
+
+    fn del_opcode(&mut self) -> Result<(), ()> {
+        match self.staticdata.inst.pop() {
+            Some(_) => Ok(()),
+            None => Err(()),
+        }
     }
 
     fn statement(&mut self) -> RunResult<()> {
@@ -1055,66 +1060,23 @@ if a<8{
         assert_eq!(
             t.staticdata.inst,
             vec![
-                Inst {
-                    opcode: Opcode::LoadInt,
-                    operand: 2
-                },
-                Inst {
-                    opcode: Opcode::StoreInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::LoadVarInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::LoadInt,
-                    operand: 3
-                },
-                Inst {
-                    opcode: Opcode::LtInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::JumpIfFalse,
-                    operand: 15
-                },
-                Inst {
-                    opcode: Opcode::Jump,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::LoadVarInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::LoadInt,
-                    operand: 4
-                },
-                Inst {
-                    opcode: Opcode::GtInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::JumpIfFalse,
-                    operand: 11
-                },
-                Inst {
-                    opcode: Opcode::LoadInt,
-                    operand: 3
-                },
-                Inst {
-                    opcode: Opcode::LoadInt,
-                    operand: 5
-                },
-                Inst {
-                    opcode: Opcode::EqInt,
-                    operand: 0
-                },
-                Inst {
-                    opcode: Opcode::JumpIfFalse,
-                    operand: 15
-                }
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::LtInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 6),
+                Inst::new(Opcode::Jump, 17),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadInt, 4),
+                Inst::new(Opcode::GtInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 11),
+                Inst::new(Opcode::Jump, 17),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::LoadInt, 5),
+                Inst::new(Opcode::EqInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 16),
+                Inst::new(Opcode::Jump, 17)
             ]
         )
     }

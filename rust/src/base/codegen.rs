@@ -1,6 +1,6 @@
 use super::func;
 use core::cmp::max;
-use std::fmt::Display;
+use std::{fmt::Display, usize};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Opcode {
@@ -134,6 +134,7 @@ impl ConstPool {
 }
 
 pub const NO_ARG: usize = 0;
+pub const ARG_WRONG: usize = usize::MAX;
 
 #[derive(Debug, PartialEq)]
 pub struct Inst {

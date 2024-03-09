@@ -77,7 +77,7 @@ pub struct Vm<'a> {
     run_context: Context,
     dynadata: DynaData<'a>,
     pc: usize,
-    static_data: StaticData,
+    static_data: &'a StaticData,
 }
 
 #[derive(Debug, Clone)]
@@ -184,23 +184,8 @@ macro_rules! impl_opcode {
     }};
 }
 
-impl Default for Vm<'_> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<'a> Vm<'a> {
-    pub fn new() -> Self {
-        Self {
-            pc: 0,
-            dynadata: DynaData::new(),
-            run_context: Context::new(cfg::MAIN_MODULE_NAME),
-            static_data: StaticData::new(false),
-        }
-    }
-
-    fn new_init(static_data: StaticData) -> Self {
+    pub fn new(static_data: &'a StaticData) -> Self {
         Self {
             pc: 0,
             dynadata: DynaData::new(),
@@ -209,7 +194,7 @@ impl<'a> Vm<'a> {
         }
     }
 
-    pub fn set_static_data(&mut self, static_data: StaticData) {
+    pub fn set_static_data(&mut self, static_data: &'a StaticData) {
         self.static_data = static_data;
     }
 
@@ -593,45 +578,51 @@ mod tests {
     use super::*;
     use crate::compiler::*;
 
-    fn gen_test_env(code: &str) -> Vm {
-        let mut compiler =
-            Compiler::new_string_compiler(Option::new(false, InputSource::StringInternal), code);
-        let com_tmp = compiler.lex().unwrap();
-        // println!("{:?}", com_tmp.inst);
-        Vm::new_init(com_tmp)
+    macro_rules! gen_test_env {
+        ($code:expr, $var:ident) => {
+            let mut compiler = Compiler::new_string_compiler(
+                Option::new(false, InputSource::StringInternal),
+                $code,
+            );
+            let com_tmp = compiler.lex().unwrap();
+            // println!("{:?}", com_tmp.inst);
+            let tmp = com_tmp.return_static_data();
+            let mut $var = Vm::new(&tmp);
+        };
     }
 
     #[test]
     fn test_stdfunc() {
-        let mut vm = gen_test_env(r#"print("{},{},{},{}", 1, "h", 'p', true)"#);
+        gen_test_env!(r#"print("{},{},{},{}", 1, "h", 'p', true)"#, vm);
         vm.run().unwrap()
     }
 
     #[test]
     fn test_var_define() {
-        let mut vm = gen_test_env(
+        gen_test_env!(
             r#"a:=10
         a=10
         print("{}", a)"#,
+            vm
         );
         vm.run().unwrap()
     }
 
     #[test]
     fn test_if_easy() {
-        let mut vm = gen_test_env(r#"if 1==1 { println("ok") }"#);
+        gen_test_env!(r#"if 1==1 { println("ok") }"#, vm);
         vm.run().unwrap()
     }
 
     #[test]
     fn test_if_easy2() {
-        let mut vm = gen_test_env(r#"if 1==1 { println("ok") } else { println("error") }"#);
+        gen_test_env!(r#"if 1==1 { println("ok") } else { println("error") }"#, vm);
         vm.run().unwrap()
     }
 
     #[test]
     fn test_if_final() {
-        let mut vm = gen_test_env(
+        gen_test_env!(
             r#"a:=90
 if a==90 {
   println("i equal to 90")
@@ -645,6 +636,7 @@ if a < 89 {
     println("i is odd")
   }
 }"#,
+            vm
         );
         vm.run().unwrap()
     }

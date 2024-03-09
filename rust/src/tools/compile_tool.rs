@@ -3,7 +3,8 @@ use std::process::exit;
 
 pub fn compile(opt: compiler::Option, dev: bool) {
     let mut compiler = compiler::Compiler::new(opt);
-    match compiler.lex() {
+    let tmp = compiler.lex();
+    match tmp {
         Ok(data) => {}
         Err(e) => {
             if dev {

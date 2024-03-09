@@ -384,24 +384,16 @@ impl Compiler {
         self.input = input;
     }
 
-    pub fn lex(&mut self) -> RunResult<StaticData> {
+    pub fn lex(&mut self) -> RunResult<AstBuilder> {
         let token_lexer = TokenLex::new(self);
-        let mut ast_builder = ast::AstBuilder::new(token_lexer);
+        let mut ast_builder = AstBuilder::new(token_lexer);
         ast_builder.generate_code()?;
-        Ok(ast_builder.return_static_data())
+        Ok(ast_builder)
     }
 
-    pub fn lex_times(&mut self) -> RunResult<StaticData> {
+    pub fn get_token_lex(&mut self) -> TokenLex {
         let token_lexer = TokenLex::new(self);
-        let mut ast_builder = ast::AstBuilder::new(token_lexer);
-        ast_builder.generate_code()?;
-        Ok(ast_builder.return_static_data())
-    }
-
-    pub fn get_ast_obj(&mut self) -> AstBuilder {
-        let token_lexer = TokenLex::new(self);
-        let ast_builder = ast::AstBuilder::new(token_lexer);
-        ast_builder
+        token_lexer
     }
 
     #[inline]

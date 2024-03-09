@@ -118,7 +118,7 @@ impl Display for Opcode {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct ConstPool {
     pub intpool: Vec<i64>,
     pub stringpool: Vec<String>,
@@ -136,7 +136,7 @@ impl ConstPool {
 pub const NO_ARG: usize = 0;
 pub const ARG_WRONG: usize = usize::MAX;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Inst {
     pub opcode: Opcode,
     pub operand: usize,
@@ -160,7 +160,7 @@ pub enum VmStackType {
 
 pub type InstSet = Vec<Inst>;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,

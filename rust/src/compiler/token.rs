@@ -4,7 +4,7 @@ use rust_i18n::t;
 
 use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
 
-use super::{Compiler, Context, Float, ValuePool};
+use super::{Compiler, Context, Float, TokenIo, ValuePool};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq)]
 pub enum TokenType {
@@ -316,6 +316,10 @@ impl<'a> TokenLex<'a> {
                 Ok(())
             }
         }
+    }
+
+    pub fn modify_input(&mut self, source: Box<dyn TokenIo<Item = char>>) {
+        self.compiler_data.input = source;
     }
 
     fn lex_id(&mut self, c: char) -> RunResult<Token> {

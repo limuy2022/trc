@@ -57,14 +57,13 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
         }
         Commands::Tshell {} => {
-            tools::tshell::tshell();
+            tools::tshell::tshell()?;
         }
-        Commands::Update {} => match tools::update::update() {
-            Err(e) => {
+        Commands::Update {} => {
+            if let Err(e) = tools::update::update() {
                 println!("{}", e);
             }
-            Ok(_) => {}
-        },
+        }
         Commands::Run {
             optimize: opt,
             files,

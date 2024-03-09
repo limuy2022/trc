@@ -1,15 +1,14 @@
-use super::{
-    scope::{self, *},
-    token::TokenType,
-    InputSource, TokenLex, ValuePool,
-};
+use std::{borrow::Borrow, cell::RefCell, rc::Rc};
+
+use rust_i18n::t;
+
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
-use rust_i18n::t;
-use std::{borrow::Borrow, cell::RefCell, rc::Rc};
+
+use super::{scope::*, token::TokenType, InputSource, TokenLex, ValuePool};
 
 /// 过程间分析用的结构
 #[derive(Default)]
@@ -67,7 +66,7 @@ impl Cache {
 }
 
 pub struct AstBuilder<'a> {
-    token_lexer: TokenLex<'a>,
+    pub token_lexer: TokenLex<'a>,
     staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
     process_info: LexProcess,
@@ -143,6 +142,10 @@ macro_rules! expr_gen {
 }
 
 impl<'a> AstBuilder<'a> {
+    pub fn clear_inst(&mut self) {
+        self.staticdata.inst.clear();
+    }
+
     fn report_error<T>(&self, info: ErrorInfo) -> AstError<T> {
         self.token_lexer.compiler_data.report_compiler_error(info)
     }
@@ -221,6 +224,8 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
+    pub fn modify_token_lexer(&mut self, token_lexer: TokenLex<'a>) {}
+
     expr_gen!(expr9, expr9_, factor, TokenType::Power);
     expr_gen!(
         expr8,
@@ -256,8 +261,13 @@ impl<'a> AstBuilder<'a> {
     expr_gen!(expr1, expr1_, expr2, TokenType::And);
     expr_gen!(expr, expr_, expr1, TokenType::Or);
 
-    pub fn return_static_data(mut self) -> StaticData {
+    pub fn prepare_get_static(&mut self) -> &StaticData {
         self.staticdata.constpool = self.token_lexer.const_pool.store_val_to_vm();
+        &self.staticdata
+    }
+
+    pub fn return_static_data(mut self) -> StaticData {
+        self.prepare_get_static();
         self.staticdata
     }
 
@@ -789,8 +799,9 @@ impl<'a> AstBuilder<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::compiler::*;
+
+    use super::*;
 
     macro_rules! gen_test_env {
         ($test_code:expr, $env_name:ident) => {

@@ -6,34 +6,9 @@ use std::io::{self, Write};
 
 use crate::{
     base::{codegen::StaticData, error::RunResult},
-    compiler,
+    compiler::{self, token::TokenType},
     tvm::Vm,
 };
-
-fn get_block() -> String {
-    let mut block = String::new();
-    let mut cnt = 1;
-    loop {
-        for i in 0..cnt {
-            print!("    ");
-        }
-        print!("...");
-        io::stdout().flush().unwrap();
-        let mut line = String::new();
-        io::stdin().read_line(&mut line).unwrap();
-        block += &line;
-        if line.ends_with("{\n") {
-            cnt += 1;
-        }
-        if line.ends_with("}\n") {
-            cnt -= 1;
-            if cnt == 0 {
-                break;
-            }
-        }
-    }
-    block
-}
 
 pub fn tshell() -> RunResult<()> {
     println!("{}\n\n", t!("tshell.welcome").bold());
@@ -46,10 +21,50 @@ pub fn tshell() -> RunResult<()> {
     loop {
         print!("tshell>");
         io::stdout().flush().unwrap();
+
         let mut line = String::new();
-        io::stdin().read_line(&mut line).unwrap();
-        if line.ends_with("{\n") {
-            line += &get_block();
+        let mut cnt = 0;
+        // 此处要引入compiler的词法分析器来解析大括号和小括号
+        let mut braces_lexer = compiler::Compiler::new_string_compiler(
+            compiler::Option::new(false, compiler::InputSource::StringInternal),
+            "",
+        );
+        let mut check_lexer = braces_lexer.get_token_lex();
+        let mut flag = true;
+        loop {
+            for _ in 0..cnt {
+                print!("....");
+            }
+            io::stdout().flush().unwrap();
+
+            let mut tmp = String::new();
+            io::stdin().read_line(&mut tmp).unwrap();
+            line += &tmp;
+            check_lexer.modify_input(Box::new(compiler::StringSource::new(tmp)));
+            loop {
+                let i = match check_lexer.next_token() {
+                    Ok(i) => i,
+                    Err(e) => {
+                        eprintln!("{}", e);
+                        flag = false;
+                        break;
+                    }
+                };
+                if i.tp == TokenType::EndOfFile {
+                    break;
+                }
+                if i.tp == compiler::token::TokenType::LeftBigBrace {
+                    cnt += 1;
+                } else if i.tp == compiler::token::TokenType::RightBigBrace {
+                    cnt -= 1;
+                }
+            }
+            if cnt == 0 {
+                break;
+            }
+        }
+        if !flag {
+            continue;
         }
         let source = Box::new(compiler::StringSource::new(line));
         ast.token_lexer.modify_input(source);

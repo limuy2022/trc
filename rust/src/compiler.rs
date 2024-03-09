@@ -8,10 +8,7 @@ pub mod token;
 
 use self::{ast::AstBuilder, token::TokenLex};
 use crate::{
-    base::{
-        codegen::{ConstPool, StaticData},
-        error::*,
-    },
+    base::{codegen::ConstPool, error::*},
     cfg,
 };
 use rust_i18n::t;
@@ -21,7 +18,6 @@ use std::{
     fs,
     io::{self, BufRead},
     process::exit,
-    sync::OnceLock,
     vec,
 };
 

@@ -290,6 +290,23 @@ enum NumValue {
     FloatVal(Float),
 }
 
+impl<'a> Iterator for TokenLex<'a> {
+    type Item = Token;
+
+    fn next(&mut self) -> std::option::Option<Self::Item> {
+        match self.next_token() {
+            Ok(v) => {
+                if v.tp == TokenType::EndOfFile {
+                    None
+                } else {
+                    Some(v)
+                }
+            }
+            Err(_) => None,
+        }
+    }
+}
+
 impl<'a> TokenLex<'a> {
     pub fn new(compiler_data: &'a mut Compiler) -> TokenLex<'a> {
         TokenLex {
@@ -857,15 +874,6 @@ impl<'a> TokenLex<'a> {
         } else {
             self.compiler_data.input.unread(c);
             self.self_symbol(before_sym, before_self_sym)
-        }
-    }
-}
-
-impl Drop for TokenLex<'_> {
-    fn drop(&mut self) {
-        // check the braces stack
-        if let Err(e) = self.check() {
-            panic!("{}", e);
         }
     }
 }

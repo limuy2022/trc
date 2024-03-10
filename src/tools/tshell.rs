@@ -1,8 +1,10 @@
 //! the read execute print loop for trc
 
+use std::io::{self, Write};
+
 use colored::*;
 use rust_i18n::t;
-use std::io::{self, Write};
+use rustyline::{config::Configurer, history::FileHistory, Editor};
 
 use crate::{
     base::{codegen::StaticData, error::RunResult},
@@ -11,17 +13,21 @@ use crate::{
 };
 
 pub fn tshell() -> RunResult<()> {
-    println!("{}\n\n", t!("tshell.welcome").bold());
+    println!("{}\n", t!("tshell.welcome").bold());
+    let config = rustyline::config::Config::builder()
+        .check_cursor_position(true)
+        .build();
+    // let mut rl = rustyline::DefaultEditor::new().unwrap();
+    let mut rl: Editor<(), FileHistory> = rustyline::Editor::with_config(config).unwrap();
+    rl.set_max_history_size(1000).unwrap();
     let mut compiler = compiler::Compiler::new_string_compiler(
         compiler::Option::new(false, compiler::InputSource::StringInternal),
         "",
     );
     let mut ast = compiler.lex()?;
     let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
-    loop {
-        print!("tshell>");
-        io::stdout().flush().unwrap();
-
+    let mut should_exit = false;
+    'stop_repl: loop {
         let mut line = String::new();
         let mut cnt = 0;
         // 此处要引入compiler的词法分析器来解析大括号和小括号
@@ -32,13 +38,24 @@ pub fn tshell() -> RunResult<()> {
         let mut check_lexer = braces_lexer.get_token_lex();
         let mut flag = true;
         loop {
-            for _ in 0..cnt {
-                print!("....");
-            }
-            io::stdout().flush().unwrap();
-
-            let mut tmp = String::new();
-            io::stdin().read_line(&mut tmp).unwrap();
+            let tip_msg = "....".repeat(cnt) + ">>>>";
+            let tmp = match rl.readline(&tip_msg) {
+                Ok(val) => val,
+                Err(rustyline::error::ReadlineError::Interrupted) => {
+                    if should_exit {
+                        break 'stop_repl;
+                    }
+                    flag = false;
+                    should_exit = true;
+                    break;
+                }
+                Err(rustyline::error::ReadlineError::Eof) => {
+                    break 'stop_repl;
+                }
+                Err(err) => {
+                    panic!("{}", err);
+                }
+            };
             line += &tmp;
             check_lexer.modify_input(Box::new(compiler::StringSource::new(tmp)));
             loop {
@@ -66,6 +83,7 @@ pub fn tshell() -> RunResult<()> {
         if !flag {
             continue;
         }
+        rl.add_history_entry(line.clone()).unwrap();
         let source = Box::new(compiler::StringSource::new(line));
         ast.token_lexer.modify_input(source);
         ast.clear_inst();
@@ -80,7 +98,10 @@ pub fn tshell() -> RunResult<()> {
                 eprintln!("{}", e);
             }
         }
+        io::stdout().flush().unwrap();
+        should_exit = false;
     }
+    Ok(())
 }
 
 mod tests {}

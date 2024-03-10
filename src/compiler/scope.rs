@@ -172,6 +172,10 @@ impl SymScope {
         ret
     }
 
+    pub fn add_custom_function(&mut self, id: ScopeAllocIdTy, f: Box<dyn FunctionInterface>) {
+        self.funcs.insert(id, f);
+    }
+
     /// import the module defined in rust
     pub fn import_native_module(&mut self, id: ScopeAllocIdTy, stdlib: &'static Stdlib) {
         self.modules.insert(id, stdlib);

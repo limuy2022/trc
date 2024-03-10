@@ -11,16 +11,17 @@ repository = "https://github.com/limuy2022/trc"
 
 [dependencies]
 rand = "0.8.5"
-clap = { version = "4.5.1", features = ["derive"] }
+clap = { version = "4.5.2", features = ["derive"] }
 colored = "2.1.0"
 downcast-rs = "1.2.0"
 num-bigint = "0.4.4"
 # llvm-sys = "170.0.1"
 derive = { path = "./derive" }
-libloading = "0.8.1"
+libloading = "0.8.3"
 stdlib = { path = "./stdlib" }
 rust-i18n = "3.0.1"
 sys-locale = "0.3.1"
+rustyline = { version = "14.0.0", features = ["with-file-history"] }
 
 [profile.release]
 panic = "abort"

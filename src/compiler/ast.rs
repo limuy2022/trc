@@ -3,13 +3,17 @@ use std::{borrow::Borrow, cell::RefCell, mem::swap, rc::Rc};
 use rust_i18n::t;
 
 use crate::base::{
-    codegen::{Inst, InstSet, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
+    codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 
-use super::{scope::*, token::TokenType, InputSource, TokenLex, ValuePool};
+use super::{
+    scope::*,
+    token::{Token, TokenType},
+    InputSource, TokenLex, ValuePool,
+};
 
 /// 过程间分析用的结构
 #[derive(Default)]
@@ -224,8 +228,6 @@ impl<'a> AstBuilder<'a> {
             cache,
         }
     }
-
-    pub fn modify_token_lexer(&mut self, token_lexer: TokenLex<'a>) {}
 
     expr_gen!(expr9, expr9_, factor, TokenType::Power);
     expr_gen!(
@@ -605,7 +607,27 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn def_func(&mut self) -> AstError<()> {
+        let funcname = self.get_token_checked(TokenType::ID)?;
+        let name_id = self.self_scope
+            .as_ref()
+            .borrow_mut()
+            .insert_sym(funcname.data.unwrap());
         Ok(())
+    }
+
+    fn gen_error<T>(&self, e: ErrorInfo) -> AstError<T> {
+        self.try_err(false, e)
+    }
+
+    fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
+        let t = self.token_lexer.next_token()?;
+        if t.tp != ty {
+            self.gen_error(ErrorInfo::new(
+                t!(UNEXPECTED_TOKEN, "0" = t.tp),
+                t!(SYNTAX_ERROR),
+            ))?;
+        }
+        Ok(t)
     }
 
     fn def_class(&mut self) -> AstError<()> {

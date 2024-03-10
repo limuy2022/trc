@@ -659,4 +659,15 @@ while a > 0 {
         );
         vm.run().unwrap()
     }
+
+    #[test]
+    fn test_for() {
+        gen_test_env!(
+            r#"for i := 0; i <= 10; i=i+1 {
+    print("{}", i)
+}"#,
+            vm
+        );
+        vm.run().unwrap()
+    }
 }

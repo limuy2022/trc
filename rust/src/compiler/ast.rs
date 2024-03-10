@@ -1,9 +1,9 @@
-use std::{borrow::Borrow, cell::RefCell, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, mem::swap, rc::Rc};
 
 use rust_i18n::t;
 
 use crate::base::{
-    codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
+    codegen::{Inst, InstSet, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
     stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
@@ -280,11 +280,46 @@ impl<'a> AstBuilder<'a> {
         let jump_false_id = self.staticdata.get_last_opcode_id();
         self.lex_block(RightBigBrace)?;
         self.add_bycode(Opcode::Jump, condit_id);
-        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_last_opcode_id() + 1;
+        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
         Ok(())
     }
 
     fn for_lex(&mut self) -> AstError<()> {
+        // init
+        self.statement()?;
+        self.check_next_token(TokenType::Semicolon)?;
+        // condit
+        let conid_id = self.staticdata.get_next_opcode_id();
+        self.lex_condit()?;
+        self.check_next_token(TokenType::Semicolon)?;
+        // action
+        let mut token_save = vec![];
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::LeftBigBrace {
+                break;
+            }
+            if t.tp == TokenType::EndOfFile {
+                self.token_lexer
+                    .compiler_data
+                    .report_compiler_error(ErrorInfo::new(
+                        t!(UNEXPECTED_TOKEN, "0" = t.tp),
+                        t!(SYNTAX_ERROR),
+                    ))?;
+            }
+            token_save.push(t);
+        }
+        // loop
+        self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
+        let jump_false_id = self.staticdata.get_last_opcode_id();
+        self.lex_block(RightBigBrace)?;
+        token_save.reverse();
+        for i in token_save {
+            self.token_lexer.next_back(i);
+        }
+        self.statement()?;
+        self.add_bycode(Opcode::Jump, conid_id);
+        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
         Ok(())
     }
 
@@ -1162,6 +1197,41 @@ if a<8{
                         .buildin_id
                 ),
                 Inst::new(Opcode::Jump, 0)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_for_1() {
+        gen_test_env!(r#"for i:=0; i<10; i=i+1 { print("hello world") }"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LtInt, NO_ARG),
+                Inst::new(Opcode::JumpIfFalse, 14),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::AddInt, NO_ARG),
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::Jump, 2)
             ]
         )
     }

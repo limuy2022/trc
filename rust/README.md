@@ -26,6 +26,6 @@ But in order to read test data file,please run in the root dir.
 
 ## Provide translation for this project
 
-The project use GNU Gettext lib tool to provide I18N(Internationalization) and L10N(localiation) support for the Trc.
+The project use rust-i18n to provide I18N(Internationalization) and L10N(localiation) support for the Trc.
 
-If you want to help us to add more translation,please see [Trc translation Guide](docs/developer/translation.md)
+You can do it following the docs about rust-i18n

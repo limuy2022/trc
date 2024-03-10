@@ -12,20 +12,14 @@ Trc is a easy-learn programming language.It can be fast,safe and effective.
 
 there are two ways to use it:
 
-[c++ version](./cpp/)
+[before c++ version](./cpp/)
 [rust version](./rust/)
 
-They have their own adventages.You can choose by your preference.
-
-The c++ version is the first version of trc.But after I uograded it to cpp 20 stardand.it bacame hard to compile and develop.And there is a lot of trouble codes and bugs in it.So I want to stop to develop it until the cpp 20 standard is more stable.
+The c++ version is the first version of trc.But after I upgraded it to cpp 20 stardand.it bacame hard to compile and develop.And there is a lot of trouble codes and bugs in it.So I want to stop to develop it until the cpp 20 standard is more stable.
 
 The rust version is the second version of trc.It is under development now.It is designed better.
 
-I don't know which will be the main version.Maybe both?
-
-## International
-
-Trc supports many different kinds of languages.We use GNU gettext.So it dont't need change the language by hand.
+Rust version will be the main version.
 
 ## Simple examples
 
@@ -72,4 +66,4 @@ Wechat:angelgel2020
 
 QQ:3570249647
 
-email: ```limuyang202011@163.com```
+email: `limuyang202011@163.com`

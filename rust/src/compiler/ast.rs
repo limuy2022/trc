@@ -273,6 +273,14 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn while_lex(&mut self) -> AstError<()> {
+        let condit_id = self.staticdata.get_next_opcode_id();
+        self.lex_condit()?;
+        self.check_next_token(TokenType::LeftBigBrace)?;
+        self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
+        let jump_false_id = self.staticdata.get_last_opcode_id();
+        self.lex_block(RightBigBrace)?;
+        self.add_bycode(Opcode::Jump, condit_id);
+        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_last_opcode_id() + 1;
         Ok(())
     }
 
@@ -707,7 +715,7 @@ impl<'a> AstBuilder<'a> {
             // 本行是为了跳转到下一个分支
             self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
             self.lex_block(RightBigBrace)?;
-            self.staticdata.inst[op_idx].operand = self.staticdata.get_last_opcode_id() + 1;
+            self.staticdata.inst[op_idx].operand = self.staticdata.get_next_opcode_id();
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
             let t = self.token_lexer.next_token()?;
@@ -729,7 +737,7 @@ impl<'a> AstBuilder<'a> {
             break;
         }
         for i in save_jump_opcode_idx {
-            self.staticdata.inst[i].operand = self.staticdata.get_last_opcode_id() + 1;
+            self.staticdata.inst[i].operand = self.staticdata.get_next_opcode_id();
         }
         Ok(())
     }
@@ -1125,6 +1133,35 @@ if a<8{
                         .unwrap()
                         .buildin_id
                 ),
+            ]
+        )
+    }
+
+    #[test]
+    fn test_while_1() {
+        gen_test_env!(r#"while 1==1 { print("hello world") }"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::EqInt, NO_ARG),
+                Inst::new(Opcode::JumpIfFalse, 8),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib()
+                        .sub_modules
+                        .get("prelude")
+                        .unwrap()
+                        .functions
+                        .get("print")
+                        .unwrap()
+                        .buildin_id
+                ),
+                Inst::new(Opcode::Jump, 0)
             ]
         )
     }

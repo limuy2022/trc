@@ -479,6 +479,7 @@ impl<'a> Vm<'a> {
                 }
                 Opcode::Jump => {
                     self.pc = self.static_data.inst[self.pc].operand;
+                    continue;
                 }
                 Opcode::LoadChar => unsafe {
                     self.dynadata.char_stack.push(char::from_u32_unchecked(
@@ -640,6 +641,19 @@ if a < 89 {
   } else {
     println("i is odd")
   }
+}"#,
+            vm
+        );
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_while() {
+        gen_test_env!(
+            r#"a:=10
+while a > 0 {
+    print("{}", a)
+    a = a - 1
 }"#,
             vm
         );

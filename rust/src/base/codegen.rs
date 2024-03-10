@@ -190,4 +190,9 @@ impl StaticData {
     pub fn get_last_opcode_id(&self) -> usize {
         self.inst.len() - 1
     }
+
+    #[inline]
+    pub fn get_next_opcode_id(&self) -> usize {
+        self.inst.len()
+    }
 }

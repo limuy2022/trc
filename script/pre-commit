@@ -1,6 +1,3 @@
 #!/bin/sh
 
-cd cpp/script
-python3 clang_format.py
-cd ../../rust
 cargo fmt

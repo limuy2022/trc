@@ -604,15 +604,11 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    fn def_func(&mut self, istry: bool) -> AstError<()> {
+    fn def_func(&mut self) -> AstError<()> {
         Ok(())
     }
 
-    fn def_class(&mut self, istry: bool) -> AstError<()> {
-        Ok(())
-    }
-
-    fn func_call(&mut self, istry: bool) -> AstError<()> {
+    fn def_class(&mut self) -> AstError<()> {
         Ok(())
     }
 
@@ -788,11 +784,11 @@ impl<'a> AstBuilder<'a> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::Func => {
-                self.def_func(false)?;
+                self.def_func()?;
                 return Ok(());
             }
             TokenType::Class => {
-                self.def_class(false)?;
+                self.def_class()?;
                 return Ok(());
             }
             TokenType::While => {
@@ -805,6 +801,10 @@ impl<'a> AstBuilder<'a> {
             }
             TokenType::If => {
                 self.if_lex()?;
+                return Ok(());
+            }
+            TokenType::Import => {
+                self.import_module(false)?;
                 return Ok(());
             }
             TokenType::ID => {

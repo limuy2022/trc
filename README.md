@@ -10,16 +10,26 @@ Trc is a easy-learn programming language.It can be fast,safe and effective.
 
 **as small as lua**
 
-there are two ways to use it:
+## using language is 100% rust
 
-[before c++ version](./cpp/)
-[rust version](./rust/)
+As a modern language,rust provide us a lot of useful features and I enjoy myself in it.So this project is developed by pure rust.
 
-The c++ version is the first version of trc.But after I upgraded it to cpp 20 stardand.it bacame hard to compile and develop.And there is a lot of trouble codes and bugs in it.So I want to stop to develop it until the cpp 20 standard is more stable.
+## Build
 
-The rust version is the second version of trc.It is under development now.It is designed better.
+Like other common rust project.Just use `cargo build`
 
-Rust version will be the main version.
+Running tests is like other rust project,too.Just `cargo test`
+But in order to read test data file,please run in the root dir.
+
+## How to use
+
+[Trc user Guide](docs/usage.md)
+
+## Provide translation for this project
+
+The project use rust-i18n to provide I18N(Internationalization) and L10N(localiation) support for the Trc.
+
+You can do it following the docs about rust-i18n
 
 ## Simple examples
 

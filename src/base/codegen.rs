@@ -68,8 +68,6 @@ pub enum Opcode {
     BitRightShiftInt,
     // return from a function
     PopFrame,
-    // create a frame to hold the function
-    NewFrame,
     // Load a int from const pool
     LoadInt,
     // Load a float from const pool
@@ -108,8 +106,10 @@ pub enum Opcode {
     SelfNegativeFloat,
     // call native func
     CallNative,
+    CallCustom,
     JumpIfFalse,
     Jump,
+    Stop,
 }
 
 impl Display for Opcode {
@@ -169,14 +169,12 @@ pub struct StaticData {
     // 符号表需要的长度
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,
-    pub has_line_table: bool,
     pub type_list: Vec<Vec<VmStackType>>,
 }
 
 impl StaticData {
-    pub fn new(has_line_table: bool) -> StaticData {
+    pub fn new() -> StaticData {
         Self {
-            has_line_table,
             ..Default::default()
         }
     }

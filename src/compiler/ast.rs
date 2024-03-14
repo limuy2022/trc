@@ -1,11 +1,11 @@
-use std::{borrow::Borrow, cell::RefCell, mem::swap, rc::Rc};
+use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
 
 use rust_i18n::t;
 
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
-    stdlib::{get_stdlib, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
+    stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 
@@ -76,6 +76,8 @@ pub struct AstBuilder<'a> {
     self_scope: Rc<RefCell<SymScope>>,
     process_info: LexProcess,
     cache: Cache,
+    // record if the fisrt func is defined
+    first_func: bool,
 }
 
 type AstError<T> = RunResult<T>;
@@ -222,10 +224,11 @@ impl<'a> AstBuilder<'a> {
             Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
         AstBuilder {
             token_lexer,
-            staticdata: StaticData::new(!optimize),
+            staticdata: StaticData::new(),
             self_scope: root_scope,
             process_info: LexProcess::new(),
             cache,
+            first_func: false,
         }
     }
 
@@ -280,7 +283,7 @@ impl<'a> AstBuilder<'a> {
         self.check_next_token(TokenType::LeftBigBrace)?;
         self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
         let jump_false_id = self.staticdata.get_last_opcode_id();
-        self.lex_block(RightBigBrace)?;
+        self.lex_until(RightBigBrace)?;
         self.add_bycode(Opcode::Jump, condit_id);
         self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
         Ok(())
@@ -314,7 +317,7 @@ impl<'a> AstBuilder<'a> {
         // loop
         self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
         let jump_false_id = self.staticdata.get_last_opcode_id();
-        self.lex_block(RightBigBrace)?;
+        self.lex_until(RightBigBrace)?;
         token_save.reverse();
         for i in token_save {
             self.token_lexer.next_back(i);
@@ -349,6 +352,20 @@ impl<'a> AstBuilder<'a> {
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();
         loop {
+            let nextt = self.token_lexer.next_token()?;
+            match nextt.tp {
+                TokenType::RightSmallBrace => {
+                    if io_tmp.var_params {
+                        self.add_var_params_bycode(var_params_num);
+                    }
+                    self.token_lexer.next_back(nextt);
+                    return Ok(ret);
+                }
+                TokenType::Comma => {}
+                _ => {
+                    self.token_lexer.next_back(nextt);
+                }
+            }
             let t = self.expr(true)?;
             match t {
                 TypeAllowNull::No => {
@@ -369,20 +386,6 @@ impl<'a> AstBuilder<'a> {
                     } else {
                         ret.push(t)
                     }
-                }
-            }
-            let nextt = self.token_lexer.next_token()?;
-            match nextt.tp {
-                TokenType::RightSmallBrace => {
-                    if io_tmp.var_params {
-                        self.add_var_params_bycode(var_params_num);
-                    }
-                    self.token_lexer.next_back(nextt);
-                    return Ok(ret);
-                }
-                TokenType::Comma => {}
-                _ => {
-                    self.token_lexer.next_back(nextt);
                 }
             }
         }
@@ -459,6 +462,8 @@ impl<'a> AstBuilder<'a> {
                 }
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
+                } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
+                    self.add_bycode(Opcode::CallCustom, obj.custom_id);
                 }
                 Ok(func_obj.get_io().return_type.clone())
             } else {
@@ -606,12 +611,81 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
+    fn get_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
+        let t = self.get_token_checked(TokenType::ID)?;
+        let ty = match self.self_scope.as_ref().borrow().get_type(t.data.unwrap()) {
+            None => self.try_err(
+                istry,
+                ErrorInfo::new(
+                    t!(
+                        SYMBOL_NOT_FOUND,
+                        "0" = self.token_lexer.const_pool.id_name[t.data.unwrap()]
+                    ),
+                    t!(TYPE_ERROR),
+                ),
+            )?,
+            Some(v) => v,
+        };
+        Ok(ty)
+    }
+
     fn def_func(&mut self) -> AstError<()> {
-        let funcname = self.get_token_checked(TokenType::ID)?;
-        let name_id = self.self_scope
-            .as_ref()
-            .borrow_mut()
-            .insert_sym(funcname.data.unwrap());
+        let funcname = self.get_token_checked(TokenType::ID)?.data.unwrap();
+        let name_id = match self.self_scope.as_ref().borrow_mut().insert_sym(funcname) {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(
+                    t!(
+                        SYMBOL_REDEFINED,
+                        "0" = self.token_lexer.const_pool.id_name[funcname]
+                    ),
+                    t!(SYMBOL_ERROR),
+                ));
+            }
+        };
+        // lex args
+        self.get_token_checked(TokenType::LeftSmallBrace)?;
+        let mut argname: ArgsNameTy = vec![];
+        let mut ty_list: Vec<TyIdxTy> = vec![];
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::RightSmallBrace {
+                break;
+            }
+            let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
+            let s = self.token_lexer.const_pool.id_name[name_id].clone();
+            argname.push(s);
+            self.check_next_token(TokenType::Colon)?;
+            ty_list.push(self.get_ty(false)?);
+        }
+        let tmp = self.token_lexer.next_token()?;
+        let return_ty = match tmp.tp {
+            TokenType::Arrow => TypeAllowNull::Yes(self.get_ty(false)?),
+            _ => {
+                self.token_lexer.next_back(tmp);
+                TypeAllowNull::No
+            }
+        };
+        let io = IOType::new(ty_list, return_ty, false);
+
+        let mut function_body = vec![];
+        loop {
+            let t = self.token_lexer.next_token()?;
+            function_body.push((t.clone(), self.token_lexer.compiler_data.context.get_line()));
+            if t.tp == TokenType::RightBigBrace {
+                break;
+            }
+        }
+        // self.self_scope = tmp.clone();
+        self.self_scope.as_ref().borrow_mut().add_custom_function(
+            name_id,
+            CustomFunction::new(
+                io,
+                argname,
+                self.token_lexer.const_pool.id_name[funcname].clone(),
+            ),
+            function_body,
+        );
         Ok(())
     }
 
@@ -676,15 +750,6 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn store_var(&mut self, name: usize) -> RunResult<()> {
-        if self.self_scope.as_ref().borrow().has_sym(name) {
-            return self.report_error(ErrorInfo::new(
-                t!(
-                    SYMBOL_REDEFINED,
-                    "0" = self.token_lexer.const_pool.id_name[name]
-                ),
-                t!(SYMBOL_ERROR),
-            ));
-        }
         self.expr(false)?;
         let var_type = match self.process_info.get_last_ty() {
             Some(v) => v,
@@ -692,7 +757,18 @@ impl<'a> AstBuilder<'a> {
                 return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
         };
-        let sym_idx = self.self_scope.as_ref().borrow_mut().insert_sym(name);
+        let sym_idx = match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(
+                    t!(
+                        SYMBOL_REDEFINED,
+                        "0" = self.token_lexer.const_pool.id_name[name]
+                    ),
+                    t!(SYMBOL_ERROR),
+                ));
+            }
+        };
         let var_sym = self
             .self_scope
             .as_ref()
@@ -731,7 +807,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn lex_block(&mut self, end_state: TokenType) -> RunResult<()> {
+    fn lex_until(&mut self, end_state: TokenType) -> RunResult<()> {
         loop {
             let t = self.token_lexer.next_token()?;
             if t.tp == end_state {
@@ -767,7 +843,7 @@ impl<'a> AstBuilder<'a> {
             let op_idx = self.staticdata.inst.len();
             // 本行是为了跳转到下一个分支
             self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
-            self.lex_block(RightBigBrace)?;
+            self.lex_until(RightBigBrace)?;
             self.staticdata.inst[op_idx].operand = self.staticdata.get_next_opcode_id();
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
@@ -781,7 +857,7 @@ impl<'a> AstBuilder<'a> {
                 }
                 self.token_lexer.next_back(nxt_tok);
                 self.check_next_token(TokenType::LeftBigBrace)?;
-                self.lex_block(RightBigBrace)?;
+                self.lex_until(RightBigBrace)?;
                 break;
             }
             save_jump_opcode_idx.pop();
@@ -853,8 +929,52 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn lex_function(&mut self, body: &FuncBodyTy) -> RunResult<()> {
+        if !self.first_func {
+            // 如果不是第一个函数，在末尾加上结束主程序的指令
+            self.first_func = true;
+            self.add_bycode(Opcode::Stop, NO_ARG);
+        }
+        let tmp = self.self_scope.clone();
+        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
+        for i in body.iter().rev() {
+            self.token_lexer.next_back(i.0.clone());
+        }
+        let mut is_pop = false;
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::RightBigBrace {
+                break;
+            }
+            is_pop = false;
+            if t.tp == TokenType::Return {
+                self.expr(false)?;
+                self.add_bycode(Opcode::PopFrame, NO_ARG);
+                is_pop = true;
+            } else {
+                self.statement()?;
+            }
+        }
+        if !is_pop {
+            self.add_bycode(Opcode::PopFrame, NO_ARG);
+        }
+        self.self_scope = tmp.clone();
+        Ok(())
+    }
+
     pub fn generate_code(&mut self) -> RunResult<()> {
-        self.lex_block(TokenType::EndOfFile)?;
+        self.lex_until(TokenType::EndOfFile)?;
+        // 结束一个作用域的代码解析后再解析这里面的函数
+        let tmp = self
+            .self_scope
+            .as_ref()
+            .borrow_mut()
+            .funcs_temp_store
+            .clone();
+        for i in tmp {
+            // let
+            self.lex_function(&i.1)?;
+        }
         Ok(())
     }
 
@@ -871,7 +991,7 @@ impl<'a> AstBuilder<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::compiler::*;
+    use crate::{base::stdlib::get_prelude_function, compiler::*};
 
     use super::*;
 
@@ -910,14 +1030,7 @@ mod tests {
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
             ],
         )
@@ -1042,14 +1155,7 @@ mod tests {
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
             ]
         )
@@ -1092,14 +1198,7 @@ mod tests {
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
             ]
         )
@@ -1181,14 +1280,7 @@ if a<8{
                 Inst::new(Opcode::LoadInt, 3),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
             ]
         )
@@ -1209,14 +1301,7 @@ if a<8{
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
                 Inst::new(Opcode::Jump, 0)
             ]
@@ -1240,20 +1325,59 @@ if a<8{
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(
                     Opcode::CallNative,
-                    get_stdlib()
-                        .sub_modules
-                        .get("prelude")
-                        .unwrap()
-                        .functions
-                        .get("print")
-                        .unwrap()
-                        .buildin_id
+                    get_prelude_function("print").unwrap().buildin_id
                 ),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::AddInt, NO_ARG),
                 Inst::new(Opcode::StoreInt, 0),
                 Inst::new(Opcode::Jump, 2)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_func_def_easy1() {
+        gen_test_env!(r#"func f() { print("hello world") }"#, t);
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::PopFrame, NO_ARG)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_call_custom_func_easy1() {
+        gen_test_env!(
+            r#"
+func f() {
+    print("hello world")
+}
+f()"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::CallCustom, 0),
+                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::PopFrame, NO_ARG)
             ]
         )
     }

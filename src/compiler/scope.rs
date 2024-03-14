@@ -1,7 +1,10 @@
-use super::{token::ConstPoolIndexTy, ValuePool};
+use super::{
+    token::{ConstPoolIndexTy, Token},
+    ValuePool,
+};
 use crate::base::stdlib::{
-    get_stdclass_end, get_stdlib, ClassInterface, FunctionInterface, IOType, OverrideWrapper,
-    Stdlib, STD_CLASS_TABLE,
+    get_stdclass_end, get_stdlib, ArgsNameTy, ClassInterface, FunctionInterface, IOType,
+    OverrideWrapper, Stdlib, STD_CLASS_TABLE,
 };
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
 
@@ -32,25 +35,27 @@ impl Display for TypeAllowNull {
 
 /// Manager of function
 #[derive(Clone, Debug)]
-pub struct Function {
+pub struct CustomFunction {
     io: IOType,
-    start_address: usize,
+    args_names: ArgsNameTy,
+    pub custom_id: FuncIdxTy,
     name: String,
 }
 
-impl Function {
-    pub fn new(io: IOType, start_address: usize, name: String) -> Self {
+impl CustomFunction {
+    pub fn new(io: IOType, args_names: ArgsNameTy, name: impl Into<String>) -> Self {
         Self {
             io,
-            start_address,
-            name,
+            args_names,
+            name: name.into(),
+            custom_id: 0,
         }
     }
 
     pub fn add_argv() {}
 }
 
-impl FunctionInterface for Function {
+impl FunctionInterface for CustomFunction {
     fn get_io(&self) -> &IOType {
         &self.io
     }
@@ -67,20 +72,20 @@ pub type TyIdxTy = ScopeAllocIdTy;
 
 /// Manager of type
 #[derive(Clone, Debug, Default)]
-pub struct CommonType {
-    funcs: Vec<Function>,
+pub struct CustomType {
+    funcs: Vec<CustomFunction>,
     pub name: usize,
     pub origin_name: String,
     pub id_to_attr: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
 }
 
-impl Display for CommonType {
+impl Display for CustomType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.origin_name)
     }
 }
 
-impl CommonType {
+impl CustomType {
     pub fn new(name: usize, origin_name: impl Into<String>) -> Self {
         Self {
             name,
@@ -93,12 +98,12 @@ impl CommonType {
         self.id_to_attr.insert(attrname, attrty)
     }
 
-    pub fn add_func(&mut self, f: Function) {
+    pub fn add_func(&mut self, f: CustomFunction) {
         self.funcs.push(f);
     }
 }
 
-impl ClassInterface for CommonType {
+impl ClassInterface for CustomType {
     fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>> {
         for i in &self.funcs {
             if i.get_name() == funcname {
@@ -127,10 +132,12 @@ impl ClassInterface for CommonType {
 
 pub type ScopeAllocClassId = usize;
 pub type VarIdxTy = ScopeAllocIdTy;
+pub type FuncIdxTy = ScopeAllocIdTy;
+pub type FuncBodyTy = Vec<(Token, usize)>;
 
 #[derive(Default)]
 pub struct SymScope {
-    //父作用域
+    // 父作用域
     prev_scope: Option<Rc<RefCell<SymScope>>>,
     // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
     sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
@@ -146,10 +153,15 @@ pub struct SymScope {
     modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
     types_id: ScopeAllocClassId,
-    // vars id
     vars_id: ScopeAllocIdTy,
+    funcs_custom_id: ScopeAllocIdTy,
     // 用户自定义的类型储存位置
-    types_custom_store: HashMap<ScopeAllocClassId, CommonType>,
+    types_custom_store: HashMap<ScopeAllocClassId, CustomType>,
+    // // 用户自定义的函数
+    // funcs_custom_store: HashMap<ScopeAllocClassId, CustomFunction>,
+    // 作用域暂时储存的函数token
+    pub funcs_temp_store: Vec<(ScopeAllocClassId, Vec<(Token, usize)>)>,
+    pub custom_call_store: Vec<usize>,
 }
 
 impl SymScope {
@@ -163,17 +175,29 @@ impl SymScope {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
                 ret.types_id = prev_scope.as_ref().borrow().types_id;
                 ret.vars_id = prev_scope.as_ref().borrow().vars_id;
+                ret.funcs_custom_id = prev_scope.as_ref().borrow().funcs_custom_id;
             }
             None => {
                 ret.types_id = get_stdclass_end();
                 ret.vars_id = 0;
+                ret.funcs_custom_id = 0;
             }
         }
         ret
     }
 
-    pub fn add_custom_function(&mut self, id: ScopeAllocIdTy, f: Box<dyn FunctionInterface>) {
-        self.funcs.insert(id, f);
+    pub fn add_custom_function(
+        &mut self,
+        id: ScopeAllocIdTy,
+        mut f: CustomFunction,
+        body: Vec<(Token, usize)>,
+    ) -> FuncIdxTy {
+        let ret = self.funcs_custom_id;
+        self.funcs_temp_store.push((id, body));
+        f.custom_id = ret;
+        self.add_func(id, Box::new(f));
+        self.funcs_custom_id += 1;
+        ret
     }
 
     /// import the module defined in rust
@@ -184,12 +208,12 @@ impl SymScope {
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
         let funcs = &get_stdlib().sub_modules.get("prelude").unwrap().functions;
         for i in funcs {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
             self.add_func(idx, Box::new(i.1.clone()));
         }
         let types = &get_stdlib().sub_modules.get("prelude").unwrap().classes;
         for i in types {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]);
+            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
             self.add_type(idx, *i.1);
         }
     }
@@ -222,17 +246,18 @@ impl SymScope {
         ret
     }
 
-    pub fn insert_sym(&mut self, id: usize) -> usize {
-        let t = self.sym_map.entry(id).or_insert(self.scope_sym_id);
-        if *t == self.scope_sym_id {
-            self.scope_sym_id += 1;
+    pub fn insert_sym(&mut self, id: usize) -> Option<usize> {
+        let t = self.sym_map.insert(id, self.scope_sym_id);
+        self.scope_sym_id += 1;
+        match t {
+            None => Some(self.scope_sym_id - 1),
+            Some(_) => None,
         }
-        *t
     }
 
     pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<(TyIdxTy, VarIdxTy)> {
         match self.vars.get(&id) {
-            Some(v) => Some(v.clone()),
+            Some(v) => Some(*v),
             None => match self.prev_scope {
                 Some(ref prev_scope) => prev_scope.as_ref().borrow().get_var(id),
                 None => None,
@@ -267,7 +292,13 @@ impl SymScope {
     }
 
     pub fn get_type(&self, id: usize) -> Option<usize> {
-        self.types.get(&id).copied()
+        match self.types.get(&id) {
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_type(id),
+                None => None,
+            },
+            Some(t) => Some(*t),
+        }
     }
 
     pub fn get_scope_last_idx(&self) -> usize {

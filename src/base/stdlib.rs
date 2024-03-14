@@ -28,6 +28,8 @@ pub struct IOType {
     pub return_type: TypeAllowNull,
 }
 
+pub type ArgsNameTy = Vec<String>;
+
 #[derive(Clone, Debug)]
 pub struct RustFunction {
     pub name: String,
@@ -313,6 +315,15 @@ impl AnyType {
 pub fn get_stdclass_end() -> usize {
     static STD_NUM: OnceLock<usize> = OnceLock::new();
     *STD_NUM.get_or_init(|| unsafe { STD_CLASS_TABLE.len() })
+}
+
+pub fn get_prelude_function(func_name: &str) -> Option<&'static RustFunction> {
+    get_stdlib()
+        .sub_modules
+        .get("prelude")
+        .unwrap()
+        .functions
+        .get(func_name)
 }
 
 pub const INT: &str = "int";

@@ -157,10 +157,8 @@ pub struct SymScope {
     funcs_custom_id: ScopeAllocIdTy,
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ScopeAllocClassId, CustomType>,
-    // // 用户自定义的函数
-    // funcs_custom_store: HashMap<ScopeAllocClassId, CustomFunction>,
     // 作用域暂时储存的函数token
-    pub funcs_temp_store: Vec<(ScopeAllocClassId, Vec<(Token, usize)>)>,
+    pub funcs_temp_store: Vec<(FuncIdxTy, Vec<(Token, usize)>)>,
     pub custom_call_store: Vec<usize>,
 }
 
@@ -193,7 +191,7 @@ impl SymScope {
         body: Vec<(Token, usize)>,
     ) -> FuncIdxTy {
         let ret = self.funcs_custom_id;
-        self.funcs_temp_store.push((id, body));
+        self.funcs_temp_store.push((ret, body));
         f.custom_id = ret;
         self.add_func(id, Box::new(f));
         self.funcs_custom_id += 1;

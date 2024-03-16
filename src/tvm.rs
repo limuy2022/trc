@@ -8,6 +8,7 @@ mod types;
 use std::ptr;
 
 use self::{
+    function::Frame,
     gc::GcMgr,
     types::{
         trcfloat::{div_float, exact_div_float, TrcFloat},
@@ -28,7 +29,7 @@ use libloading::Library;
 use rust_i18n::t;
 
 #[derive(Default)]
-pub struct DynaData<'a> {
+pub struct DynaData {
     gc: GcMgr,
     obj_stack: Vec<*mut dyn TrcObj>,
     int_stack: Vec<i64>,
@@ -36,7 +37,7 @@ pub struct DynaData<'a> {
     float_stack: Vec<f64>,
     bool_stack: Vec<bool>,
     char_stack: Vec<char>,
-    frames_stack: Vec<function::Frame<'a>>,
+    frames_stack: Vec<function::Frame>,
     var_store: Vec<*mut dyn TrcObj>,
     int_store: Vec<i64>,
     float_store: Vec<f64>,
@@ -45,7 +46,7 @@ pub struct DynaData<'a> {
     char_store: Vec<char>,
 }
 
-impl<'a> DynaData<'a> {
+impl DynaData {
     pub fn new() -> Self {
         Self {
             ..Default::default()
@@ -75,7 +76,7 @@ impl<'a> DynaData<'a> {
 
 pub struct Vm<'a> {
     run_context: Context,
-    dynadata: DynaData<'a>,
+    dynadata: DynaData,
     static_data: &'a StaticData,
 }
 
@@ -231,13 +232,14 @@ impl<'a> Vm<'a> {
             Opcode::Not => operator_opcode!(not, self),
             Opcode::Xor => operator_opcode!(xor, self),
             Opcode::PopFrame => {
-                let ret = self.dynadata.frames_stack.pop();
-                if ret.is_none() {
-                    return Err(RuntimeError::new(
-                        Box::new(self.run_context.clone()),
-                        ErrorInfo::new(t!(VM_FRAME_EMPTY), t!(VM_ERROR)),
-                    ));
-                }
+                let ret = match self.dynadata.frames_stack.pop() {
+                    None => {
+                        return self
+                            .throw_err_info(Err(ErrorInfo::new(t!(VM_FRAME_EMPTY), t!(VM_ERROR))))
+                    }
+                    Some(v) => v,
+                };
+                *pc = ret.prev_addr;
             }
             Opcode::LoadInt => {
                 self.dynadata
@@ -566,7 +568,9 @@ impl<'a> Vm<'a> {
                 return Ok(());
             }
             Opcode::CallCustom => {
-                let custom_func_id = self.static_data.inst[*pc].operand;
+                self.dynadata.frames_stack.push(Frame::new(*pc));
+                *pc = self.static_data.inst[*pc].operand;
+                return Ok(());
             }
         };
         *pc += 1;
@@ -677,6 +681,21 @@ while a > 0 {
             r#"for i := 0; i <= 10; i=i+1 {
     print("{}", i)
 }"#,
+            vm
+        );
+        vm.run().unwrap()
+    }
+
+    #[test]
+    fn test_call_custom_function() {
+        gen_test_env!(
+            r#"
+func t() {
+    print("90")
+}
+t()
+t()
+        "#,
             vm
         );
         vm.run().unwrap()

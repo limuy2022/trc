@@ -1,12 +1,10 @@
-use crate::base::func;
-
 /// A context structure which hold the running info of the function
-pub struct Frame<'a> {
-    name: &'a str,
+pub struct Frame {
+    pub prev_addr: usize,
 }
 
-impl<'a> Frame<'a> {
-    fn new(func: &'a func::Func) -> Self {
-        Self { name: &func.name }
+impl Frame {
+    pub fn new(prev_addr: usize) -> Self {
+        Self { prev_addr }
     }
 }

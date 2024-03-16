@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
+use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, rc::Rc};
 
 use rust_i18n::t;
 
@@ -464,6 +464,11 @@ impl<'a> AstBuilder<'a> {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
                 } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
                     self.add_bycode(Opcode::CallCustom, obj.custom_id);
+                    self.self_scope
+                        .as_ref()
+                        .borrow_mut()
+                        .custom_call_store
+                        .push(self.staticdata.get_last_opcode_id())
                 }
                 Ok(func_obj.get_io().return_type.clone())
             } else {
@@ -929,12 +934,15 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn lex_function(&mut self, body: &FuncBodyTy) -> RunResult<()> {
+    /// # Return
+    /// 返回函数的首地址
+    fn lex_function(&mut self, body: &FuncBodyTy) -> RunResult<usize> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             self.first_func = true;
             self.add_bycode(Opcode::Stop, NO_ARG);
         }
+        let begin_inst_idx = self.staticdata.get_next_opcode_id();
         let tmp = self.self_scope.clone();
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
         for i in body.iter().rev() {
@@ -959,7 +967,7 @@ impl<'a> AstBuilder<'a> {
             self.add_bycode(Opcode::PopFrame, NO_ARG);
         }
         self.self_scope = tmp.clone();
-        Ok(())
+        Ok(begin_inst_idx)
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
@@ -971,9 +979,19 @@ impl<'a> AstBuilder<'a> {
             .borrow_mut()
             .funcs_temp_store
             .clone();
+        let mut record_begin_addr: HashMap<usize, usize> = HashMap::new();
         for i in tmp {
-            // let
-            self.lex_function(&i.1)?;
+            record_begin_addr.insert(i.0, self.lex_function(&i.1)?);
+        }
+        let tmp = self
+            .self_scope
+            .as_ref()
+            .borrow_mut()
+            .custom_call_store
+            .clone();
+        for i in tmp {
+            let func_id = self.staticdata.inst[i].operand;
+            self.staticdata.inst[i].operand = record_begin_addr[&func_id];
         }
         Ok(())
     }
@@ -1369,7 +1387,7 @@ f()"#,
         assert_eq!(
             t.staticdata.inst,
             vec![
-                Inst::new(Opcode::CallCustom, 0),
+                Inst::new(Opcode::CallCustom, 2),
                 Inst::new(Opcode::Stop, NO_ARG),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),

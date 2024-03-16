@@ -197,7 +197,7 @@ impl ValuePool {
         ret.stringpool
             .resize(self.const_strings.len(), "".to_string());
         for i in &self.const_strings {
-            ret.stringpool[*i.1] = i.0.clone();
+            ret.stringpool[*i.1].clone_from(i.0);
         }
         ret
     }
@@ -424,9 +424,9 @@ mod tests {
     #[test]
     fn test_file_read() {
         let test_file_path = "tests/testdata/compiler/compiler1.txt";
-        let source = std::fs::read_to_string(test_file_path).expect("please run in root dir");
+        let source = fs::read_to_string(test_file_path).expect("please run in root dir");
         let mut t =
-            FileSource::new(std::fs::File::open(test_file_path).expect("please run in root dir"));
+            FileSource::new(fs::File::open(test_file_path).expect("please run in root dir"));
         let mut tmp: Vec<char> = vec![t.read(), t.read()];
         tmp.reverse();
         for i in &tmp {

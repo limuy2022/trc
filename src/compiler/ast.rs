@@ -672,7 +672,7 @@ impl<'a> AstBuilder<'a> {
         loop {
             let t = self.token_lexer.next_token()?;
             function_body.push((t.clone(), self.token_lexer.compiler_data.context.get_line()));
-            if t.tp == TokenType::RightBigBrace {
+            if t.tp == RightBigBrace {
                 break;
             }
         }
@@ -943,7 +943,7 @@ impl<'a> AstBuilder<'a> {
         let mut is_pop = false;
         loop {
             let t = self.token_lexer.next_token()?;
-            if t.tp == TokenType::RightBigBrace {
+            if t.tp == RightBigBrace {
                 break;
             }
             is_pop = false;

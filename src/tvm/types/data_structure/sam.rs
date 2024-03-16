@@ -73,7 +73,7 @@ impl Sam {
                 s._states.push(u);
             } else {
                 let mut clone = Node::new(s._states[last].len + 1);
-                clone.next = s._states[q].next.clone();
+                clone.next.clone_from(&s._states[q].next);
                 clone.link = s._states[q].link;
                 let cloneid = id + 1;
                 loop {

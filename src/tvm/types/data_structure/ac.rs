@@ -66,12 +66,6 @@ impl AcAutomaton {
     }
 
     /// use search function to add your string
-    /// # Example
-    /// ```
-    /// ac.search("hello", 1);
-    /// ac.search("world", 2);
-    /// let ans = ac.get_ans();
-    /// ````
     fn search(&self, _pattern: &str, _id: u32) {}
 
     fn get_ans(&self) -> HashMap<u32, usize> {

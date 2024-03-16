@@ -70,9 +70,9 @@ pub fn tshell() -> RunResult<()> {
                 if i.tp == TokenType::EndOfFile {
                     break;
                 }
-                if i.tp == compiler::token::TokenType::LeftBigBrace {
+                if i.tp == TokenType::LeftBigBrace {
                     cnt += 1;
-                } else if i.tp == compiler::token::TokenType::RightBigBrace {
+                } else if i.tp == TokenType::RightBigBrace {
                     cnt -= 1;
                 }
             }

@@ -293,7 +293,7 @@ enum NumValue {
 impl<'a> Iterator for TokenLex<'a> {
     type Item = Token;
 
-    fn next(&mut self) -> std::option::Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         match self.next_token() {
             Ok(v) => {
                 if v.tp == TokenType::EndOfFile {

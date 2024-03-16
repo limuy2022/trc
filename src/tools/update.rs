@@ -21,6 +21,12 @@ impl Display for UpdateError {
     }
 }
 
+impl Default for UpdateError {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UpdateError {
     pub fn new() -> Self {
         Self {}

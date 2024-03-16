@@ -34,7 +34,7 @@ impl TrcObj for TrcStr {
         return unsafe {
             match (*other).downcast_ref::<TrcStr>() {
                 Some(v) => {
-                    let val = gc.alloc(cat_string(&*self._value, &*((*v)._value)));
+                    let val = gc.alloc(cat_string(&*self._value, &*(v._value)));
                     Ok(gc.alloc(TrcStr::new(val)))
                 }
                 None => Err(ErrorInfo::new(

@@ -405,7 +405,6 @@ impl<'a> TokenLex<'a> {
 
     fn is_id_char(c: char) -> bool {
         !(Self::check_whether_symbol(c)
-            || c.is_ascii_digit()
             || Self::is_string_or_char_begin(c)
             || Self::is_useless_char(c))
     }
@@ -1136,7 +1135,7 @@ func main() {
 
     #[test]
     fn test_id_lex() {
-        gen_test_token_env!(r#"id fuck _fuck 天帝abc abc天帝"#, t);
+        gen_test_token_env!(r#"id fuck _fuck 天帝abc abc天帝 t1"#, t);
         check(
             &mut t,
             vec![
@@ -1145,6 +1144,7 @@ func main() {
                 Token::new(TokenType::ID, Some(2)),
                 Token::new(TokenType::ID, Some(3)),
                 Token::new(TokenType::ID, Some(4)),
+                Token::new(TokenType::ID, Some(5)),
             ],
         );
         check_pool(
@@ -1154,6 +1154,7 @@ func main() {
                 String::from("_fuck"),
                 String::from("天帝abc"),
                 String::from("abc天帝"),
+                String::from("t1"),
             ],
             &t.const_pool.name_pool,
         );

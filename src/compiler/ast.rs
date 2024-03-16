@@ -1,4 +1,9 @@
-use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, rc::Rc};
+use std::{
+    borrow::{Borrow, BorrowMut},
+    cell::RefCell,
+    collections::HashMap,
+    rc::Rc,
+};
 
 use rust_i18n::t;
 
@@ -280,7 +285,7 @@ impl<'a> AstBuilder<'a> {
     fn while_lex(&mut self) -> AstError<()> {
         let condit_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
-        self.check_next_token(TokenType::LeftBigBrace)?;
+        self.get_token_checked(TokenType::LeftBigBrace)?;
         self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
         let jump_false_id = self.staticdata.get_last_opcode_id();
         self.lex_until(RightBigBrace)?;
@@ -292,11 +297,11 @@ impl<'a> AstBuilder<'a> {
     fn for_lex(&mut self) -> AstError<()> {
         // init
         self.statement()?;
-        self.check_next_token(TokenType::Semicolon)?;
+        self.get_token_checked(TokenType::Semicolon)?;
         // condit
         let conid_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
-        self.check_next_token(TokenType::Semicolon)?;
+        self.get_token_checked(TokenType::Semicolon)?;
         // action
         let mut token_save = vec![];
         loop {
@@ -325,19 +330,6 @@ impl<'a> AstBuilder<'a> {
         self.statement()?;
         self.add_bycode(Opcode::Jump, conid_id);
         self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
-        Ok(())
-    }
-
-    fn check_next_token(&mut self, tp: TokenType) -> AstError<()> {
-        let next_sym = self.token_lexer.next_token()?;
-        if next_sym.tp != tp {
-            self.token_lexer
-                .compiler_data
-                .report_compiler_error(ErrorInfo::new(
-                    t!(UNEXPECTED_TOKEN, "0" = next_sym.tp),
-                    t!(SYNTAX_ERROR),
-                ))?;
-        }
         Ok(())
     }
 
@@ -445,7 +437,7 @@ impl<'a> AstBuilder<'a> {
                 let func_obj = self.self_scope.as_ref().borrow().get_function(idx).unwrap();
                 let argv_list = self.opt_args(&func_obj)?;
                 // match )
-                self.check_next_token(TokenType::RightSmallBrace)?;
+                self.get_token_checked(TokenType::RightSmallBrace)?;
                 // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
                 // 第二种情况就是入参有明确的类型
                 // 接下来在这种情况的基础上再分两种情况
@@ -606,7 +598,7 @@ impl<'a> AstBuilder<'a> {
             TokenType::Add => self.factor(istry),
             TokenType::LeftSmallBrace => {
                 let ret = self.expr(istry)?;
-                self.check_next_token(TokenType::RightSmallBrace)?;
+                self.get_token_checked(TokenType::RightSmallBrace)?;
                 Ok(ret)
             }
             _ => {
@@ -660,7 +652,7 @@ impl<'a> AstBuilder<'a> {
             let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
             let s = self.token_lexer.const_pool.id_name[name_id].clone();
             argname.push(s);
-            self.check_next_token(TokenType::Colon)?;
+            self.get_token_checked(TokenType::Colon)?;
             ty_list.push(self.get_ty(false)?);
         }
         let tmp = self.token_lexer.next_token()?;
@@ -672,7 +664,7 @@ impl<'a> AstBuilder<'a> {
             }
         };
         let io = IOType::new(ty_list, return_ty, false);
-
+        self.get_token_checked(TokenType::LeftBigBrace)?;
         let mut function_body = vec![];
         loop {
             let t = self.token_lexer.next_token()?;
@@ -841,7 +833,7 @@ impl<'a> AstBuilder<'a> {
 
     fn if_lex(&mut self) -> RunResult<()> {
         self.lex_condit()?;
-        self.check_next_token(TokenType::LeftBigBrace)?;
+        self.get_token_checked(TokenType::LeftBigBrace)?;
         // 最后需要跳转地址
         let mut save_jump_opcode_idx = vec![];
         loop {
@@ -857,11 +849,11 @@ impl<'a> AstBuilder<'a> {
                 let nxt_tok = self.token_lexer.next_token()?;
                 if nxt_tok.tp == TokenType::If {
                     self.lex_condit()?;
-                    self.check_next_token(TokenType::LeftBigBrace)?;
+                    self.get_token_checked(TokenType::LeftBigBrace)?;
                     continue;
                 }
                 self.token_lexer.next_back(nxt_tok);
-                self.check_next_token(TokenType::LeftBigBrace)?;
+                self.get_token_checked(TokenType::LeftBigBrace)?;
                 self.lex_until(RightBigBrace)?;
                 break;
             }
@@ -960,28 +952,32 @@ impl<'a> AstBuilder<'a> {
                 self.add_bycode(Opcode::PopFrame, NO_ARG);
                 is_pop = true;
             } else {
+                self.token_lexer.next_back(t);
                 self.statement()?;
             }
         }
         if !is_pop {
             self.add_bycode(Opcode::PopFrame, NO_ARG);
         }
+        self.generate_func_in_scope()?;
         self.self_scope = tmp.clone();
         Ok(begin_inst_idx)
     }
 
-    pub fn generate_code(&mut self) -> RunResult<()> {
-        self.lex_until(TokenType::EndOfFile)?;
-        // 结束一个作用域的代码解析后再解析这里面的函数
+    fn generate_func_in_scope(&mut self) -> AstError<()> {
         let tmp = self
             .self_scope
             .as_ref()
             .borrow_mut()
             .funcs_temp_store
             .clone();
-        let mut record_begin_addr: HashMap<usize, usize> = HashMap::new();
         for i in tmp {
-            record_begin_addr.insert(i.0, self.lex_function(&i.1)?);
+            let res = self.lex_function(&i.1)?;
+            self.self_scope
+                .as_ref()
+                .borrow_mut()
+                .function_address
+                .insert(i.0, res);
         }
         let tmp = self
             .self_scope
@@ -991,8 +987,23 @@ impl<'a> AstBuilder<'a> {
             .clone();
         for i in tmp {
             let func_id = self.staticdata.inst[i].operand;
-            self.staticdata.inst[i].operand = record_begin_addr[&func_id];
+            self.staticdata.inst[i].operand = self
+                .self_scope
+                .as_ref()
+                .borrow()
+                .get_head_addr(func_id)
+                .unwrap();
+            if cfg!(debug_assertions) {
+                assert_eq!(self.staticdata.inst[i].opcode, Opcode::CallCustom);
+            }
         }
+        Ok(())
+    }
+
+    pub fn generate_code(&mut self) -> RunResult<()> {
+        self.lex_until(TokenType::EndOfFile)?;
+        // 结束一个作用域的代码解析后再解析这里面的函数
+        self.generate_func_in_scope()?;
         Ok(())
     }
 
@@ -1356,7 +1367,17 @@ if a<8{
 
     #[test]
     fn test_func_def_easy1() {
-        gen_test_env!(r#"func f() { print("hello world") }"#, t);
+        gen_test_env!(
+            r#"
+func f1() {
+    print("i am function that is called")
+}
+func f() {
+    print("hello world")
+    f1()
+}"#,
+            t
+        );
         t.generate_code().unwrap();
         assert_eq!(
             t.staticdata.inst,
@@ -1368,6 +1389,14 @@ if a<8{
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
                 ),
+                Inst::new(Opcode::PopFrame, NO_ARG),
+                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::CallCustom, 1),
                 Inst::new(Opcode::PopFrame, NO_ARG)
             ]
         )

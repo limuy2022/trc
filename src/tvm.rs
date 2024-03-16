@@ -700,4 +700,20 @@ t()
         );
         vm.run().unwrap()
     }
+
+    #[test]
+    fn test_call_custom_function2() {
+        gen_test_env!(
+            r#"func tt() {
+  println("I am function2")
+}
+func t() {
+  println("I am function1")
+  tt()
+}
+t()"#,
+            vm
+        );
+        vm.run().unwrap()
+    }
 }

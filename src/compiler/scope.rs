@@ -160,6 +160,8 @@ pub struct SymScope {
     // 作用域暂时储存的函数token
     pub funcs_temp_store: Vec<(FuncIdxTy, Vec<(Token, usize)>)>,
     pub custom_call_store: Vec<usize>,
+    // 生成函数的代码时记录每个函数的首地址的
+    pub function_address: HashMap<usize, usize>,
 }
 
 impl SymScope {
@@ -258,6 +260,16 @@ impl SymScope {
             Some(v) => Some(*v),
             None => match self.prev_scope {
                 Some(ref prev_scope) => prev_scope.as_ref().borrow().get_var(id),
+                None => None,
+            },
+        }
+    }
+
+    pub fn get_head_addr(&self, id: FuncIdxTy) -> Option<usize> {
+        match self.function_address.get(&id) {
+            Some(v) => Some(*v),
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_head_addr(id),
                 None => None,
             },
         }

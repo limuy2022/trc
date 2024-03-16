@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::usize;
 
 pub fn kmp(main_string: &str, pattern: &str) -> usize {
     // 首先对模式串构建next数组
@@ -39,47 +39,9 @@ pub fn kmp_next(pattern: &str) -> Vec<i64> {
     ret
 }
 
-pub fn sa(s: &str) -> Vec<usize> {
-    let mut sa: Vec<usize> = Vec::new();
-    let mut cntt: BTreeMap<char, usize> = BTreeMap::new();
-    let mut rk: HashMap<char, usize> = HashMap::new();
-    let mut cnt = 1;
-    for i in s.chars() {
-        rk.insert(i, cnt);
-        cnt += 1;
-        let tmp = cntt.entry(i).or_insert(0);
-        *tmp += 1;
-    }
-
-    cnt = 1;
-    for i in &cntt {
-        sa.push(*i.0 as usize);
-    }
-    let mut rk: Vec<usize> = Vec::new();
-    rk.resize(sa.len(), 0);
-    for i in &sa {
-        let _tmp = cntt.entry(char::from_u32(*i as u32).unwrap());
-        // rk[]
-    }
-    sa
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn sa_1() {
-        let s = "dkodkoe";
-        let sarray = sa(s);
-    }
-
-    #[test]
-    fn sa_2() {
-        let s = "ababa";
-        let sarray = vec![5, 3, 1, 4, 2];
-        assert_eq!(sa(s), sarray);
-    }
-
     #[test]
     fn kmp_1() {
         assert_eq!(kmp("ABABABC", "ABA"), 2);

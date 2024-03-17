@@ -6,6 +6,7 @@ use colored::*;
 use rust_i18n::t;
 use rustyline::{config::Configurer, history::FileHistory, Editor};
 
+use crate::base::codegen::{Opcode, NO_ARG};
 use crate::{
     base::{codegen::StaticData, error::RunResult},
     compiler::{self, token::TokenType},
@@ -27,6 +28,7 @@ pub fn tshell() -> RunResult<()> {
     let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
     let mut should_exit = false;
     let mut function_list = vec![];
+    let mut function_defined_num = 0;
     'stop_repl: loop {
         let mut line = String::new();
         let mut cnt = 0;
@@ -88,11 +90,18 @@ pub fn tshell() -> RunResult<()> {
         ast.token_lexer.modify_input(source);
         ast.clear_inst();
         ast.token_lexer.clear_error();
-        ast.generate_code().unwrap_or_else(|e| {
+        if let Err(e) = ast.generate_code() {
             eprintln!("{}", e);
-        });
+            continue;
+        }
         // 将之前的函数添加进去
-        ast.staticdata.inst.extend(function_list.clone());
+        if !function_list.is_empty() {
+            ast.add_bycode(Opcode::Stop, NO_ARG);
+            for i in 0..function_defined_num {
+                ast.staticdata.funcs[i].func_addr += ast.staticdata.get_next_opcode_id();
+            }
+            ast.staticdata.inst.extend(function_list.clone());
+        }
         vm.set_static_data(unsafe { &*(ast.prepare_get_static() as *const StaticData) });
         match vm.run() {
             Ok(_) => {}
@@ -102,7 +111,21 @@ pub fn tshell() -> RunResult<()> {
         }
         // 切分之前定义的函数
         if let Some(func_split) = ast.staticdata.function_split {
-            function_list = ast.staticdata.inst[func_split + 1..].to_vec()
+            function_list = ast.staticdata.inst[func_split + 1..].to_vec();
+            function_defined_num = ast.staticdata.funcs.len();
+            for i in &mut ast.staticdata.funcs {
+                i.func_addr -= func_split + 1;
+            }
+        } else {
+            let mut basis = usize::MAX;
+            for i in &ast.staticdata.funcs {
+                if i.func_addr < basis {
+                    basis = i.func_addr;
+                }
+            }
+            for i in &mut ast.staticdata.funcs {
+                i.func_addr -= basis;
+            }
         }
         io::stdout().flush().unwrap();
         should_exit = false;

@@ -1,12 +1,3 @@
-use std::{
-    borrow::{Borrow, BorrowMut},
-    cell::RefCell,
-    collections::HashMap,
-    rc::Rc,
-};
-
-use rust_i18n::t;
-
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
@@ -14,6 +5,8 @@ use crate::base::{
     stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use crate::compiler::token::TokenType::RightBigBrace;
+use rust_i18n::t;
+use std::{cell::RefCell, rc::Rc};
 
 use super::{
     scope::*,
@@ -158,6 +151,7 @@ impl<'a> AstBuilder<'a> {
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
         self.staticdata.function_split = None;
+        self.first_func = false
     }
 
     fn report_error<T>(&self, info: ErrorInfo) -> AstError<T> {
@@ -963,12 +957,11 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn generate_func_in_scope(&mut self) -> AstError<()> {
-        let tmp = self
-            .self_scope
-            .as_ref()
-            .borrow_mut()
-            .funcs_temp_store
-            .clone();
+        let mut tmp = vec![];
+        std::mem::swap(
+            &mut tmp,
+            &mut self.self_scope.as_ref().borrow_mut().funcs_temp_store,
+        );
         for i in tmp {
             let code_begin = self.lex_function(&i.1)?;
             self.staticdata.funcs.push(func::Func::new(code_begin))
@@ -983,7 +976,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
+    pub fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
         self.staticdata.inst.push(Inst::new(opty, opnum));
         if !self.token_lexer.compiler_data.option.optimize {
             // 不生成行号表了

@@ -17,7 +17,6 @@ pub fn tshell() -> RunResult<()> {
     let config = rustyline::config::Config::builder()
         .check_cursor_position(true)
         .build();
-    // let mut rl = rustyline::DefaultEditor::new().unwrap();
     let mut rl: Editor<(), FileHistory> = rustyline::Editor::with_config(config).unwrap();
     rl.set_max_history_size(1000).unwrap();
     let mut compiler = compiler::Compiler::new_string_compiler(
@@ -27,6 +26,7 @@ pub fn tshell() -> RunResult<()> {
     let mut ast = compiler.lex()?;
     let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
     let mut should_exit = false;
+    let mut function_list = vec![];
     'stop_repl: loop {
         let mut line = String::new();
         let mut cnt = 0;
@@ -91,12 +91,18 @@ pub fn tshell() -> RunResult<()> {
         ast.generate_code().unwrap_or_else(|e| {
             eprintln!("{}", e);
         });
+        // 将之前的函数添加进去
+        ast.staticdata.inst.extend(function_list.clone());
         vm.set_static_data(unsafe { &*(ast.prepare_get_static() as *const StaticData) });
         match vm.run() {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("{}", e);
             }
+        }
+        // 切分之前定义的函数
+        if let Some(func_split) = ast.staticdata.function_split {
+            function_list = ast.staticdata.inst[func_split + 1..].to_vec()
         }
         io::stdout().flush().unwrap();
         should_exit = false;

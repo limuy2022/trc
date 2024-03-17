@@ -170,6 +170,7 @@ pub struct StaticData {
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,
     pub type_list: Vec<Vec<VmStackType>>,
+    pub function_split: Option<usize>,
 }
 
 impl StaticData {

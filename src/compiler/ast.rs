@@ -10,6 +10,7 @@ use rust_i18n::t;
 use crate::base::{
     codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
     error::*,
+    func,
     stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
 use crate::compiler::token::TokenType::RightBigBrace;
@@ -77,7 +78,7 @@ impl Cache {
 
 pub struct AstBuilder<'a> {
     pub token_lexer: TokenLex<'a>,
-    staticdata: StaticData,
+    pub staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
     process_info: LexProcess,
     cache: Cache,
@@ -156,6 +157,7 @@ macro_rules! expr_gen {
 impl<'a> AstBuilder<'a> {
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
+        self.staticdata.function_split = None;
     }
 
     fn report_error<T>(&self, info: ErrorInfo) -> AstError<T> {
@@ -456,11 +458,6 @@ impl<'a> AstBuilder<'a> {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
                 } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
                     self.add_bycode(Opcode::CallCustom, obj.custom_id);
-                    self.self_scope
-                        .as_ref()
-                        .borrow_mut()
-                        .custom_call_store
-                        .push(self.staticdata.get_last_opcode_id())
                 }
                 Ok(func_obj.get_io().return_type.clone())
             } else {
@@ -933,6 +930,7 @@ impl<'a> AstBuilder<'a> {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             self.first_func = true;
             self.add_bycode(Opcode::Stop, NO_ARG);
+            self.staticdata.function_split = Some(self.staticdata.get_last_opcode_id());
         }
         let begin_inst_idx = self.staticdata.get_next_opcode_id();
         let tmp = self.self_scope.clone();
@@ -972,30 +970,8 @@ impl<'a> AstBuilder<'a> {
             .funcs_temp_store
             .clone();
         for i in tmp {
-            let res = self.lex_function(&i.1)?;
-            self.self_scope
-                .as_ref()
-                .borrow_mut()
-                .function_address
-                .insert(i.0, res);
-        }
-        let tmp = self
-            .self_scope
-            .as_ref()
-            .borrow_mut()
-            .custom_call_store
-            .clone();
-        for i in tmp {
-            let func_id = self.staticdata.inst[i].operand;
-            self.staticdata.inst[i].operand = self
-                .self_scope
-                .as_ref()
-                .borrow()
-                .get_head_addr(func_id)
-                .unwrap();
-            if cfg!(debug_assertions) {
-                assert_eq!(self.staticdata.inst[i].opcode, Opcode::CallCustom);
-            }
+            let code_begin = self.lex_function(&i.1)?;
+            self.staticdata.funcs.push(func::Func::new(code_begin))
         }
         Ok(())
     }
@@ -1396,7 +1372,7 @@ func f() {
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
                 ),
-                Inst::new(Opcode::CallCustom, 1),
+                Inst::new(Opcode::CallCustom, 0),
                 Inst::new(Opcode::PopFrame, NO_ARG)
             ]
         )
@@ -1416,7 +1392,7 @@ f()"#,
         assert_eq!(
             t.staticdata.inst,
             vec![
-                Inst::new(Opcode::CallCustom, 2),
+                Inst::new(Opcode::CallCustom, 0),
                 Inst::new(Opcode::Stop, NO_ARG),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),

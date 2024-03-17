@@ -1,10 +1,10 @@
 #[derive(Clone)]
 pub struct Func {
-    pub name: String,
+    pub func_addr: usize,
 }
 
 impl Func {
-    fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: usize) -> Self {
+        Self { func_addr: name }
     }
 }

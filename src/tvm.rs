@@ -210,7 +210,7 @@ impl<'a> Vm<'a> {
     }
 
     #[inline]
-    pub fn run_opcode(&mut self, pc: &mut usize) -> Result<(), RuntimeError> {
+    fn run_opcode(&mut self, pc: &mut usize) -> Result<(), RuntimeError> {
         match self.static_data.inst[*pc].opcode {
             Opcode::Add => operator_opcode!(add, self),
             Opcode::Sub => operator_opcode!(sub, self),
@@ -569,7 +569,7 @@ impl<'a> Vm<'a> {
             }
             Opcode::CallCustom => {
                 self.dynadata.frames_stack.push(Frame::new(*pc));
-                *pc = self.static_data.inst[*pc].operand;
+                *pc = self.static_data.funcs[self.static_data.inst[*pc].operand].func_addr;
                 return Ok(());
             }
         };

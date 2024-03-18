@@ -1,7 +1,7 @@
 //! reference iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
 //! reference float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
 
-mod ast;
+pub mod ast;
 pub mod llvm_convent;
 pub mod scope;
 pub mod token;
@@ -244,9 +244,7 @@ impl TokenIo for StringSource {
         }
         self.pos -= self.prev_size;
         // check if match the right char
-        if cfg!(debug_assertions) {
-            assert_eq!(self.text[self.pos..].chars().next().unwrap(), c);
-        }
+        debug_assert_eq!(self.text[self.pos..].chars().next().unwrap(), c);
     }
 
     fn read(&mut self) -> char {

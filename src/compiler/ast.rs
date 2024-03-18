@@ -1,23 +1,29 @@
-use crate::base::{
-    codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
-    error::*,
-    func,
-    stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
-};
 use crate::compiler::token::TokenType::RightBigBrace;
+use crate::{
+    base::{
+        codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
+        error::*,
+        func,
+        stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
+    },
+    tvm::get_trcobj_sz,
+};
 use rust_i18n::t;
+use std::mem::size_of;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
     scope::*,
-    token::{Token, TokenType},
+    token::{ConstPoolIndexTy, Token, TokenType},
     InputSource, TokenLex, ValuePool,
 };
+use crate::base::stdlib::FunctionInterface;
 
 /// 过程间分析用的结构
 #[derive(Default)]
 struct LexProcess {
     stack_type: Vec<TyIdxTy>,
+    pub is_global: bool,
 }
 
 impl LexProcess {
@@ -164,6 +170,18 @@ impl<'a> AstBuilder<'a> {
             Err(LightFakeError::new().into())
         } else {
             self.report_error(info)
+        }
+    }
+
+    /// 获取对应类型的真实大小（内存对齐后）
+    pub fn get_ty_sz(&self, id: TyIdxTy) -> usize {
+        match self.convert_id_to_vm_ty(id) {
+            VmStackType::Int => size_of::<i64>(),
+            VmStackType::Float => size_of::<f64>(),
+            VmStackType::Str => size_of::<*mut String>(),
+            VmStackType::Char => size_of::<char>(),
+            VmStackType::Bool => size_of::<bool>(),
+            VmStackType::Object => get_trcobj_sz(),
         }
     }
 
@@ -410,6 +428,28 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
+    fn load_var(&mut self, ty: TyIdxTy) -> Opcode {
+        if self.process_info.is_global {
+            match self.convert_id_to_vm_ty(ty) {
+                VmStackType::Int => Opcode::LoadGlobalVarInt,
+                VmStackType::Float => Opcode::LoadGlobalVarFloat,
+                VmStackType::Str => Opcode::LoadGlobalVarStr,
+                VmStackType::Char => Opcode::LoadGlobalVarChar,
+                VmStackType::Bool => Opcode::LoadGlobalVarBool,
+                VmStackType::Object => Opcode::LoadGlobalVarObj,
+            }
+        } else {
+            match self.convert_id_to_vm_ty(ty) {
+                VmStackType::Int => Opcode::LoadLocalVarInt,
+                VmStackType::Float => Opcode::LoadLocalVarFloat,
+                VmStackType::Str => Opcode::LoadLocalVarStr,
+                VmStackType::Char => Opcode::LoadLocalVarChar,
+                VmStackType::Bool => Opcode::LoadLocalVarBool,
+                VmStackType::Object => Opcode::LoadLocalVarObj,
+            }
+        }
+    }
+
     fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
@@ -456,7 +496,7 @@ impl<'a> AstBuilder<'a> {
                 Ok(func_obj.get_io().return_type.clone())
             } else {
                 self.token_lexer.next_back(nxt);
-                let var = match self.self_scope.as_ref().borrow().get_var(token_data) {
+                let var = match self.self_scope.as_ref().borrow().get_var(idx) {
                     None => self.try_err(
                         istry,
                         ErrorInfo::new(
@@ -469,19 +509,10 @@ impl<'a> AstBuilder<'a> {
                     )?,
                     Some(v) => v,
                 };
-                self.add_bycode(
-                    match self.convert_id_to_vm_ty(var.0) {
-                        VmStackType::Int => Opcode::LoadVarInt,
-                        VmStackType::Float => Opcode::LoadVarFloat,
-                        VmStackType::Str => Opcode::LoadVarStr,
-                        VmStackType::Char => Opcode::LoadVarChar,
-                        VmStackType::Bool => Opcode::LoadVarBool,
-                        VmStackType::Object => Opcode::LoadLocal,
-                    },
-                    var.1,
-                );
-                self.process_info.new_type(var.0);
-                Ok(TypeAllowNull::Yes(var.0))
+                let tmp = self.load_var(var.ty);
+                self.add_bycode(tmp, var.addr);
+                self.process_info.new_type(var.ty);
+                Ok(TypeAllowNull::Yes(var.ty))
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -640,9 +671,11 @@ impl<'a> AstBuilder<'a> {
             if t.tp == TokenType::RightSmallBrace {
                 break;
             }
+            if t.tp != TokenType::Comma {
+                self.token_lexer.next_back(t);
+            }
             let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
-            let s = self.token_lexer.const_pool.id_name[name_id].clone();
-            argname.push(s);
+            argname.push(name_id);
             self.get_token_checked(TokenType::Colon)?;
             ty_list.push(self.get_ty(false)?);
         }
@@ -723,28 +756,34 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy) {
+    /// 生成修改变量的指令
+    fn modify_var(&mut self, varty: TyIdxTy, var_addr: usize, is_global: bool) {
         self.add_bycode(
-            match self.convert_id_to_vm_ty(varty) {
-                VmStackType::Int => Opcode::StoreInt,
-                VmStackType::Float => Opcode::StoreFloat,
-                VmStackType::Str => Opcode::StoreStr,
-                VmStackType::Char => Opcode::StoreChar,
-                VmStackType::Bool => Opcode::StoreBool,
-                VmStackType::Object => Opcode::StoreLocal,
+            if !is_global {
+                match self.convert_id_to_vm_ty(varty) {
+                    VmStackType::Int => Opcode::StoreLocalInt,
+                    VmStackType::Float => Opcode::StoreLocalFloat,
+                    VmStackType::Str => Opcode::StoreLocalStr,
+                    VmStackType::Char => Opcode::StoreLocalChar,
+                    VmStackType::Bool => Opcode::StoreLocalBool,
+                    VmStackType::Object => Opcode::StoreLocalObj,
+                }
+            } else {
+                match self.convert_id_to_vm_ty(varty) {
+                    VmStackType::Int => Opcode::StoreGlobalInt,
+                    VmStackType::Float => Opcode::StoreGlobalFloat,
+                    VmStackType::Str => Opcode::StoreGlobalStr,
+                    VmStackType::Char => Opcode::StoreGlobalChar,
+                    VmStackType::Bool => Opcode::StoreGlobalBool,
+                    VmStackType::Object => Opcode::StoreGlobalObj,
+                }
             },
-            var_idx,
+            var_addr,
         );
     }
 
-    fn store_var(&mut self, name: usize) -> RunResult<()> {
-        self.expr(false)?;
-        let var_type = match self.process_info.get_last_ty() {
-            Some(v) => v,
-            None => {
-                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
-            }
-        };
+    /// 生成新建变量的指令
+    fn new_var(&mut self, name: ConstPoolIndexTy, varty: ScopeAllocClassId) -> AstError<()> {
         let sym_idx = match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
             Some(v) => v,
             None => {
@@ -757,14 +796,26 @@ impl<'a> AstBuilder<'a> {
                 ));
             }
         };
-        let var_sym = self
-            .self_scope
-            .as_ref()
-            .borrow_mut()
-            .add_var(sym_idx, var_type);
-        self.modify_var(var_type, var_sym);
+        let (var_sym, var_addr) =
+            self.self_scope
+                .as_ref()
+                .borrow_mut()
+                .add_var(sym_idx, varty, self.get_ty_sz(varty));
+        self.modify_var(varty, var_addr, self.process_info.is_global);
         self.staticdata
-            .update_sym_table_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
+            .update_var_table_mem_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
+        Ok(())
+    }
+
+    fn store_var(&mut self, name: usize) -> RunResult<()> {
+        self.expr(false)?;
+        let var_type = match self.process_info.get_last_ty() {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+        };
+        self.new_var(name, var_type)?;
         Ok(())
     }
 
@@ -788,10 +839,10 @@ impl<'a> AstBuilder<'a> {
                 ))
             }
         };
-        if var.0 != var_type {
+        if var.ty != var_type {
             return self.report_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
         }
-        self.modify_var(var.0, var.1);
+        self.modify_var(var.ty, var.addr, self.process_info.is_global);
         Ok(())
     }
 
@@ -919,7 +970,7 @@ impl<'a> AstBuilder<'a> {
 
     /// # Return
     /// 返回函数的首地址
-    fn lex_function(&mut self, body: &FuncBodyTy) -> RunResult<usize> {
+    fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RunResult<(usize, usize)> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             self.first_func = true;
@@ -927,8 +978,27 @@ impl<'a> AstBuilder<'a> {
             self.staticdata.function_split = Some(self.staticdata.get_last_opcode_id());
         }
         let begin_inst_idx = self.staticdata.get_next_opcode_id();
+        let func_obj = self
+            .self_scope
+            .as_ref()
+            .borrow()
+            .get_function(funcid)
+            .unwrap()
+            .downcast::<CustomFunction>()
+            .expect("Expect Custom Function");
+        let io = func_obj.get_io();
         let tmp = self.self_scope.clone();
+        // 解析参数
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
+        debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
+        for (argty, argname) in io
+            .argvs_type
+            .iter()
+            .rev()
+            .zip(func_obj.args_names.iter().rev())
+        {
+            self.new_var(*argname, *argty).unwrap();
+        }
         for i in body.iter().rev() {
             self.token_lexer.next_back(i.0.clone());
         }
@@ -952,8 +1022,9 @@ impl<'a> AstBuilder<'a> {
             self.add_bycode(Opcode::PopFrame, NO_ARG);
         }
         self.generate_func_in_scope()?;
+        let mem_sz = self.self_scope.as_ref().borrow().get_var_table_sz();
         self.self_scope = tmp.clone();
-        Ok(begin_inst_idx)
+        Ok((begin_inst_idx, mem_sz))
     }
 
     fn generate_func_in_scope(&mut self) -> AstError<()> {
@@ -963,15 +1034,19 @@ impl<'a> AstBuilder<'a> {
             &mut self.self_scope.as_ref().borrow_mut().funcs_temp_store,
         );
         for i in tmp {
-            let code_begin = self.lex_function(&i.1)?;
-            self.staticdata.funcs.push(func::Func::new(code_begin))
+            let (code_begin, var_mem_sz) = self.lex_function(i.0, &i.1)?;
+            self.staticdata
+                .funcs
+                .push(func::Func::new(code_begin, var_mem_sz))
         }
         Ok(())
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
+        self.process_info.is_global = true;
         self.lex_until(TokenType::EndOfFile)?;
         // 结束一个作用域的代码解析后再解析这里面的函数
+        self.process_info.is_global = false;
         self.generate_func_in_scope()?;
         Ok(())
     }
@@ -1006,12 +1081,18 @@ mod tests {
         };
     }
 
+    /// 前面有int_nums个int时的首地址
+    fn get_offset(int_nums: usize) -> usize {
+        size_of::<i64>() * int_nums
+    }
+
     #[test]
     fn test_assign() {
         gen_test_env!(
             r#"a:=10
         a=10
-        print("{}", a)"#,
+        b:=90
+        print("{}{}", a, b)"#,
             t
         );
         t.generate_code().unwrap();
@@ -1019,13 +1100,17 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(1)),
                 Inst::new(Opcode::LoadString, 0),
-                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
-                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, 4),
                 Inst::new(
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
@@ -1241,13 +1326,13 @@ if a<8{
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
-                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
                 Inst::new(Opcode::LoadInt, 3),
                 Inst::new(Opcode::LtInt, 0),
                 Inst::new(Opcode::JumpIfFalse, 6),
                 Inst::new(Opcode::Jump, 17),
-                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
                 Inst::new(Opcode::LoadInt, 4),
                 Inst::new(Opcode::GtInt, 0),
                 Inst::new(Opcode::JumpIfFalse, 11),
@@ -1314,8 +1399,8 @@ if a<8{
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::StoreInt, 0),
-                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LtInt, NO_ARG),
                 Inst::new(Opcode::JumpIfFalse, 14),
@@ -1325,10 +1410,10 @@ if a<8{
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
                 ),
-                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::AddInt, NO_ARG),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::Jump, 2)
             ]
         )
@@ -1389,6 +1474,59 @@ f()"#,
                 Inst::new(Opcode::Stop, NO_ARG),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::PopFrame, NO_ARG)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_func_call_with_args() {
+        gen_test_env!(
+            r#"
+func a1(a: int, b: int) {
+    print("{}{}", a, b)
+}
+a1(0, 1)
+a:=1
+b:=0
+print("{}{}", a, b)
+        "#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallCustom, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(1)),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::StoreLocalInt, get_offset(0)),
+                Inst::new(Opcode::StoreLocalInt, get_offset(1)),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadLocalVarInt, get_offset(1)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadLocalVarInt, get_offset(0)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, 2),
                 Inst::new(
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id

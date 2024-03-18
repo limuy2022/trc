@@ -21,39 +21,41 @@ struct Args {
     mode: Commands,
 }
 
-#[derive(Debug, Subcommand)]
-enum Commands {
-    Build {
-        #[arg(short, long, default_value_t = false)]
-        optimize: bool,
-        #[arg()]
-        files: Vec<String>,
-        #[arg(long, default_value_t = false)]
-        dev: bool,
-    },
-    Tshell {},
-    Update {},
-    Run {
-        #[arg(short, long, default_value_t = false)]
-        optimize: bool,
-        #[arg()]
-        files: Vec<String>,
-    },
+macro_rules! make_commands {
+    ($struct_name:ident, $($repeat_compile_command:ident, )* | $($other_command: tt)*) => {
+        #[derive(Debug, Subcommand)]
+        enum $struct_name {
+            $(
+            $repeat_compile_command {
+                #[arg(short, long, default_value_t = false)]
+                optimize: bool,
+                #[arg()]
+                files: Vec<String>,
+            },
+            )*
+            $(
+                $other_command
+            )*
+        }
+    };
 }
+
+make_commands!(Commands, Build, Run, Dis, | Tshell {}, Update{});
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
     match cli.mode {
-        Commands::Build {
-            optimize: opt,
-            files,
-            dev,
-        } => {
+        Commands::Build { optimize, files } => {
             for i in files {
-                tools::compile(
-                    compiler::Option::new(opt, compiler::InputSource::File(i)),
-                    dev,
-                );
+                match tools::compile(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
+                    Ok(_) => {}
+                    Err(c) => {
+                        eprintln!("{}", c);
+                    }
+                };
             }
         }
         Commands::Tshell {} => {
@@ -64,12 +66,25 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 println!("{}", e);
             }
         }
-        Commands::Run {
-            optimize: opt,
-            files,
-        } => {
+        Commands::Run { optimize, files } => {
             for i in files {
-                match tools::run::run(compiler::Option::new(opt, compiler::InputSource::File(i))) {
+                match tools::run::run(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
+                    Ok(_) => {}
+                    Err(c) => {
+                        eprintln!("{}", c);
+                    }
+                }
+            }
+        }
+        Commands::Dis { files, optimize } => {
+            for i in files {
+                match tools::dis::dis(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);

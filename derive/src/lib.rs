@@ -46,12 +46,14 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                         if_enable_var_params = parse_str("true").unwrap();
                         let mut var_lex_tmp: Vec<Stmt> = vec![
                             parse_str("let mut va_list = vec![];").unwrap(),
-                            parse_str("let args_num = dydata.int_stack.pop().unwrap() as usize;")
-                                .unwrap(),
+                            parse_str(
+                                "let args_num = dydata.pop_data::<TrcIntInternal>() as usize;",
+                            )
+                            .unwrap(),
                             parse_str("va_list.reserve(args_num);").unwrap(),
                             parse_str(
                                 r#"for i in 0..args_num {
-                            va_list.push(dydata.obj_stack.pop().unwrap());
+                            va_list.push(dydata.pop_data::<*mut dyn TrcObj>());
                         }"#,
                             )
                             .expect("Err on lex loop"),

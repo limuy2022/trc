@@ -1,0 +1,8 @@
+func t1(a: int, b: int, c: int) {
+  println("{}{}{}", a, b, c)
+}
+t1(90, 89, 77)
+a:=9
+b:=8
+c:=7
+print("{}{}{}", a, b, c)

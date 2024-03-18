@@ -1,5 +1,5 @@
 use super::func;
-use core::cmp::max;
+use core::{cmp::max, fmt};
 use std::{fmt::Display, usize};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -76,15 +76,21 @@ pub enum Opcode {
     LoadString,
     // Load a bigint from const pool
     LoadBigInt,
-    // Load a local var to the stack
     LoadChar,
     LoadBool,
-    LoadLocal,
-    LoadVarBool,
-    LoadVarInt,
-    LoadVarFloat,
-    LoadVarStr,
-    LoadVarChar,
+    // Load a local var to the stack
+    LoadLocalVarObj,
+    LoadLocalVarBool,
+    LoadLocalVarInt,
+    LoadLocalVarFloat,
+    LoadLocalVarStr,
+    LoadLocalVarChar,
+    LoadGlobalVarObj,
+    LoadGlobalVarBool,
+    LoadGlobalVarInt,
+    LoadGlobalVarFloat,
+    LoadGlobalVarStr,
+    LoadGlobalVarChar,
     // Move a value into the stack
     MoveInt,
     MoveFloat,
@@ -92,12 +98,18 @@ pub enum Opcode {
     MoveBool,
     MoveStr,
     // Store a local var
-    StoreLocal,
-    StoreInt,
-    StoreFloat,
-    StoreChar,
-    StoreBool,
-    StoreStr,
+    StoreLocalObj,
+    StoreLocalInt,
+    StoreLocalFloat,
+    StoreLocalChar,
+    StoreLocalBool,
+    StoreLocalStr,
+    StoreGlobalObj,
+    StoreGlobalInt,
+    StoreGlobalFloat,
+    StoreGlobalChar,
+    StoreGlobalBool,
+    StoreGlobalStr,
     // Do Nothing
     Empty,
     // a = -a
@@ -148,6 +160,12 @@ impl Inst {
     }
 }
 
+impl fmt::Display for Inst {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {}", self.opcode, self.operand)
+    }
+}
+
 #[derive(Clone, Copy)]
 pub enum VmStackType {
     Int,
@@ -181,7 +199,7 @@ impl StaticData {
     }
 
     #[inline]
-    pub fn update_sym_table_sz(&mut self, newsz: usize) {
+    pub fn update_var_table_mem_sz(&mut self, newsz: usize) {
         self.sym_table_sz = max(self.sym_table_sz, newsz);
     }
 

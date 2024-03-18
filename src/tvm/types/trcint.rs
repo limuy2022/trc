@@ -15,14 +15,16 @@ use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
+pub type TrcIntInternal = i64;
+
 #[trc_class]
 #[derive(Debug, Clone)]
 pub struct TrcInt {
-    pub _value: i64,
+    pub _value: TrcIntInternal,
 }
 
 impl TrcInt {
-    pub fn new(value: i64) -> TrcInt {
+    pub fn new(value: TrcIntInternal) -> TrcInt {
         TrcInt { _value: value }
     }
 
@@ -51,7 +53,7 @@ impl TrcInt {
     }
 }
 
-pub fn exact_div_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
+pub fn exact_div_int(a: TrcIntInternal, b: TrcIntInternal) -> Result<TrcIntInternal, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),

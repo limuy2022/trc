@@ -37,7 +37,7 @@ impl Display for TypeAllowNull {
 #[derive(Clone, Debug)]
 pub struct CustomFunction {
     io: IOType,
-    args_names: ArgsNameTy,
+    pub args_names: ArgsNameTy,
     pub custom_id: FuncIdxTy,
     name: String,
 }
@@ -135,6 +135,19 @@ pub type VarIdxTy = ScopeAllocIdTy;
 pub type FuncIdxTy = ScopeAllocIdTy;
 pub type FuncBodyTy = Vec<(Token, usize)>;
 
+#[derive(Clone, Debug, Copy)]
+pub struct VarInfo {
+    pub ty: TyIdxTy,
+    pub var_idx: usize,
+    pub addr: usize,
+}
+
+impl VarInfo {
+    pub fn new(ty: TyIdxTy, var_idx: usize, addr: usize) -> Self {
+        Self { ty, var_idx, addr }
+    }
+}
+
 #[derive(Default)]
 pub struct SymScope {
     // 父作用域
@@ -148,7 +161,7 @@ pub struct SymScope {
     // ID到函数的映射
     funcs: HashMap<ScopeAllocIdTy, Box<dyn FunctionInterface>>,
     // id到变量类型的映射
-    vars: HashMap<ScopeAllocIdTy, (TyIdxTy, VarIdxTy)>,
+    vars: HashMap<ScopeAllocIdTy, VarInfo>,
     // 由token id到模块的映射
     modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
@@ -158,7 +171,9 @@ pub struct SymScope {
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ScopeAllocClassId, CustomType>,
     // 作用域暂时储存的函数token
-    pub funcs_temp_store: Vec<(FuncIdxTy, Vec<(Token, usize)>)>,
+    pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
+    // 计算当前需要最少多大的空间来保存变量
+    pub var_sz: usize,
 }
 
 impl SymScope {
@@ -171,12 +186,10 @@ impl SymScope {
             Some(prev_scope) => {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
                 ret.types_id = prev_scope.as_ref().borrow().types_id;
-                ret.vars_id = prev_scope.as_ref().borrow().vars_id;
                 ret.funcs_custom_id = prev_scope.as_ref().borrow().funcs_custom_id;
             }
             None => {
                 ret.types_id = get_stdclass_end();
-                ret.vars_id = 0;
                 ret.funcs_custom_id = 0;
             }
         }
@@ -190,7 +203,7 @@ impl SymScope {
         body: Vec<(Token, usize)>,
     ) -> FuncIdxTy {
         let ret = self.funcs_custom_id;
-        self.funcs_temp_store.push((ret, body));
+        self.funcs_temp_store.push((id, body));
         f.custom_id = ret;
         self.add_func(id, Box::new(f));
         self.funcs_custom_id += 1;
@@ -252,7 +265,8 @@ impl SymScope {
         }
     }
 
-    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<(TyIdxTy, VarIdxTy)> {
+    /// 返回变量的类型，索引和内存地址
+    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<VarInfo> {
         match self.vars.get(&id) {
             Some(v) => Some(*v),
             None => match self.prev_scope {
@@ -277,11 +291,19 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy) -> VarIdxTy {
-        self.vars.insert(id, (ty, self.vars_id));
+    /// 返回变量的索引和内存地址
+    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> (VarIdxTy, usize) {
+        let ret_addr = self.var_sz;
+        self.vars
+            .insert(id, VarInfo::new(ty, self.vars_id, ret_addr));
         let ret = self.vars_id;
         self.vars_id += 1;
-        ret
+        self.var_sz += var_sz;
+        (ret, ret_addr)
+    }
+
+    pub fn get_var_table_sz(&self) -> usize {
+        self.var_sz
     }
 
     pub fn add_type(&mut self, id: usize, t: usize) {
@@ -302,7 +324,7 @@ impl SymScope {
         self.scope_sym_id
     }
 
-    pub fn get_var_table_sz(&self) -> usize {
+    pub fn get_var_table_len(&self) -> usize {
         self.vars_id
     }
 

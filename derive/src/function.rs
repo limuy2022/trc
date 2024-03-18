@@ -31,7 +31,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
     // 第一个参数是self
     if !input_args.is_empty() {
         if let FnArg::Receiver(_) = &input_args[0] {
-            panic!("don't use self, use fn(DynaData) instead.")
+            panic!("don't use self, use fn(DataTy) instead.")
         }
     }
     let mut args_type_required = vec![];
@@ -51,7 +51,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("AnyType").unwrap());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
-                            r#"let mut {} = dydata.obj_stack.pop().expect("any empty");"#,
+                            r#"let mut {} = dydata.pop_data::<*mut dyn TrcObj>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -60,7 +60,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("TrcStr").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.str_stack.pop().expect("str empty");"#,
+                            r#"let mut {} = dydata.pop_data::<TrcStrInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -69,7 +69,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("TrcInt").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.int_stack.pop().expect("int empty");"#,
+                            r#"let mut {} = dydata.pop_data::<TrcIntInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -78,7 +78,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("TrcBool").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.bool_stack.pop().expect("bool empty");"#,
+                            r#"let mut {} = dydata.pop_data::<bool>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -87,7 +87,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("TrcChar").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.char_stack.pop().expect("char empty"");"#,
+                            r#"let mut {} = dydata.pop_data::<TrcCharInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -96,7 +96,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     args_type_required.push(parse_str("TrcFloat").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.float_stack.pop().expect("float empty");"#,
+                            r#"let mut {} = dydata.pop_data::<TrcFloatInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
@@ -106,7 +106,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
                             r#"let mut {} = unsafe{{
-                                (&mut *dydata.obj_stack.pop().unwrap()).downcast_mut::<{}>().expect("obj empty")
+                                (&mut *dydata.pop_data::<*mut dyn TrcObj>()).downcast_mut::<{}>().expect("obj empty")
                             }};"#,
                             arg_name, path.to_token_stream()
                         ))

@@ -28,7 +28,7 @@ pub struct IOType {
     pub return_type: TypeAllowNull,
 }
 
-pub type ArgsNameTy = Vec<String>;
+pub type ArgsNameTy = Vec<ConstPoolIndexTy>;
 
 #[derive(Clone, Debug)]
 pub struct RustFunction {
@@ -82,7 +82,7 @@ where
     }
 }
 
-pub trait FunctionInterface: Downcast + FunctionClone {
+pub trait FunctionInterface: Downcast + FunctionClone + Debug {
     fn get_io(&self) -> &IOType;
     fn get_name(&self) -> &str;
 }

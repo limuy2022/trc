@@ -37,7 +37,7 @@ impl Display for TypeAllowNull {
 #[derive(Clone, Debug)]
 pub struct CustomFunction {
     io: IOType,
-    args_names: ArgsNameTy,
+    pub args_names: ArgsNameTy,
     pub custom_id: FuncIdxTy,
     name: String,
 }
@@ -158,7 +158,7 @@ pub struct SymScope {
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ScopeAllocClassId, CustomType>,
     // 作用域暂时储存的函数token
-    pub funcs_temp_store: Vec<(FuncIdxTy, Vec<(Token, usize)>)>,
+    pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
 }
 
 impl SymScope {
@@ -190,7 +190,7 @@ impl SymScope {
         body: Vec<(Token, usize)>,
     ) -> FuncIdxTy {
         let ret = self.funcs_custom_id;
-        self.funcs_temp_store.push((ret, body));
+        self.funcs_temp_store.push((id, body));
         f.custom_id = ret;
         self.add_func(id, Box::new(f));
         self.funcs_custom_id += 1;

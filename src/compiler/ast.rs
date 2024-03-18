@@ -6,13 +6,14 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::{cell::RefCell, rc::Rc};
+use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
 
 use super::{
     scope::*,
-    token::{Token, TokenType},
+    token::{ConstPoolIndexTy, Token, TokenType},
     InputSource, TokenLex, ValuePool,
 };
+use crate::base::stdlib::FunctionInterface;
 
 /// 过程间分析用的结构
 #[derive(Default)]
@@ -640,9 +641,11 @@ impl<'a> AstBuilder<'a> {
             if t.tp == TokenType::RightSmallBrace {
                 break;
             }
+            if t.tp != TokenType::Comma {
+                self.token_lexer.next_back(t);
+            }
             let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
-            let s = self.token_lexer.const_pool.id_name[name_id].clone();
-            argname.push(s);
+            argname.push(name_id);
             self.get_token_checked(TokenType::Colon)?;
             ty_list.push(self.get_ty(false)?);
         }
@@ -723,6 +726,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    /// 生成修改变量的指令
     fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy) {
         self.add_bycode(
             match self.convert_id_to_vm_ty(varty) {
@@ -737,14 +741,8 @@ impl<'a> AstBuilder<'a> {
         );
     }
 
-    fn store_var(&mut self, name: usize) -> RunResult<()> {
-        self.expr(false)?;
-        let var_type = match self.process_info.get_last_ty() {
-            Some(v) => v,
-            None => {
-                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
-            }
-        };
+    /// 生成新建变量的指令
+    fn new_var(&mut self, name: ConstPoolIndexTy, varty: ScopeAllocClassId) -> AstError<()> {
         let sym_idx = match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
             Some(v) => v,
             None => {
@@ -761,10 +759,22 @@ impl<'a> AstBuilder<'a> {
             .self_scope
             .as_ref()
             .borrow_mut()
-            .add_var(sym_idx, var_type);
-        self.modify_var(var_type, var_sym);
+            .add_var(sym_idx, varty);
+        self.modify_var(varty, var_sym);
         self.staticdata
             .update_sym_table_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
+        Ok(())
+    }
+
+    fn store_var(&mut self, name: usize) -> RunResult<()> {
+        self.expr(false)?;
+        let var_type = match self.process_info.get_last_ty() {
+            Some(v) => v,
+            None => {
+                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+        };
+        self.new_var(name, var_type)?;
         Ok(())
     }
 
@@ -919,7 +929,7 @@ impl<'a> AstBuilder<'a> {
 
     /// # Return
     /// 返回函数的首地址
-    fn lex_function(&mut self, body: &FuncBodyTy) -> RunResult<usize> {
+    fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RunResult<usize> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             self.first_func = true;
@@ -927,7 +937,21 @@ impl<'a> AstBuilder<'a> {
             self.staticdata.function_split = Some(self.staticdata.get_last_opcode_id());
         }
         let begin_inst_idx = self.staticdata.get_next_opcode_id();
+        let func_obj = self
+            .self_scope
+            .as_ref()
+            .borrow()
+            .get_function(funcid)
+            .unwrap()
+            .downcast::<CustomFunction>()
+            .expect("Expect Custom Function");
+        let io = func_obj.get_io();
         let tmp = self.self_scope.clone();
+        // 解析参数
+        debug_assert!(io.argvs_type.len() == func_obj.args_names.len());
+        for (argty, argname) in io.argvs_type.iter().zip(func_obj.args_names.iter()) {
+            self.new_var(*argname, *argty).unwrap();
+        }
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
         for i in body.iter().rev() {
             self.token_lexer.next_back(i.0.clone());
@@ -963,7 +987,7 @@ impl<'a> AstBuilder<'a> {
             &mut self.self_scope.as_ref().borrow_mut().funcs_temp_store,
         );
         for i in tmp {
-            let code_begin = self.lex_function(&i.1)?;
+            let code_begin = self.lex_function(i.0, &i.1)?;
             self.staticdata.funcs.push(func::Func::new(code_begin))
         }
         Ok(())
@@ -1389,6 +1413,42 @@ f()"#,
                 Inst::new(Opcode::Stop, NO_ARG),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::PopFrame, NO_ARG)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_func_call_with_args() {
+        gen_test_env!(
+            r#"
+func a1(a: int, b: int) {
+    print("{}", a, b)
+}
+a1(0, 1)
+        "#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallCustom, 0),
+                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreInt, 1),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadVarInt, 0),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadVarInt, 1),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, 2),
                 Inst::new(
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id

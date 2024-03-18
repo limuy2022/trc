@@ -1,0 +1,4 @@
+func t1(a: int, b: int) {
+  println("{}{}", a, b)
+}
+t1(90, 89)

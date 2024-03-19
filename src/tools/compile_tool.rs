@@ -1,18 +1,8 @@
-use crate::compiler;
-use std::process::exit;
+use crate::compiler::ast::AstBuilder;
+use crate::{base::error::RunResult, compiler};
 
-pub fn compile(opt: compiler::Option, dev: bool) {
+pub fn compile(opt: compiler::Option) -> RunResult<()> {
     let mut compiler = compiler::Compiler::new(opt);
-    let tmp = compiler.lex();
-    match tmp {
-        Ok(data) => {}
-        Err(e) => {
-            if dev {
-                Err::<(), _>(e).unwrap();
-            } else {
-                eprintln!("{}", e);
-                exit(1)
-            }
-        }
-    }
+    compiler.lex()?;
+    Ok(())
 }

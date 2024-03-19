@@ -948,11 +948,11 @@ impl<'a> AstBuilder<'a> {
         let io = func_obj.get_io();
         let tmp = self.self_scope.clone();
         // 解析参数
-        debug_assert!(io.argvs_type.len() == func_obj.args_names.len());
+        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
+        debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
         for (argty, argname) in io.argvs_type.iter().zip(func_obj.args_names.iter()) {
             self.new_var(*argname, *argty).unwrap();
         }
-        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
         for i in body.iter().rev() {
             self.token_lexer.next_back(i.0.clone());
         }

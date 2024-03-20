@@ -14,10 +14,12 @@ use crate::tvm::GcMgr;
 
 use super::TrcObj;
 
+pub type TrcStrInternal = *mut String;
+
 #[trc_class]
 #[derive(Debug, Clone)]
 pub struct TrcStr {
-    pub _value: *mut String,
+    pub _value: TrcStrInternal,
 }
 
 fn cat_string(a: &String, b: &String) -> String {

@@ -16,10 +16,12 @@ use rust_i18n::t;
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
 
+pub type TrcFloatInteral = f64;
+
 #[trc_class]
 #[derive(Debug, Clone)]
 pub struct TrcFloat {
-    pub _value: f64,
+    pub _value: TrcFloatInteral,
 }
 
 impl TrcFloat {

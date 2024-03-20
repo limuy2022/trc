@@ -1430,6 +1430,9 @@ func a1(a: int, b: int) {
     print("{}", a, b)
 }
 a1(0, 1)
+a:=1
+b:=0
+print("{}{}", a, b)
         "#,
             t
         );
@@ -1440,13 +1443,27 @@ a1(0, 1)
                 Inst::new(Opcode::LoadInt, 0),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::CallCustom, 0),
-                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(Opcode::StoreInt, 1),
-                Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadVarInt, 1),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+                Inst::new(Opcode::Stop, NO_ARG),
+                Inst::new(Opcode::StoreInt, 2),
+                Inst::new(Opcode::StoreInt, 3),
+                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::LoadVarInt, 3),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadVarInt, 2),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(

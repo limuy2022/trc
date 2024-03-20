@@ -1,16 +1,19 @@
-pub fn dis(path: &str) {
-    let dis = std::fs::read_to_string(path).unwrap();
-    // let mut compiler = compiler::Compiler::new(opt);
-    // let tmp = compiler.lex();
-    // match tmp {
-    //     Ok(data) => {}
-    //     Err(e) => {
-    //         if dev {
-    //             Err::<(), _>(e).unwrap();
-    //         } else {
-    //             eprintln!("{}", e);
-    //             exit(1)
-    //         }
-    //     }
-    // }
+use crate::base::codegen::Opcode::*;
+use crate::base::error::RunResult;
+
+pub fn dis(opt: crate::compiler::Option) -> RunResult<()> {
+    let mut compiler = crate::compiler::Compiler::new(opt);
+    let mut ast = compiler.lex()?;
+    let static_data = ast.prepare_get_static();
+    for i in &static_data.inst {
+        print!("{}", i);
+        match i.opcode {
+            LoadInt => print!("({})", static_data.constpool.intpool[i.operand]),
+            LoadString => print!("({})", static_data.constpool.stringpool[i.operand]),
+            LoadFloat => print!("({})", static_data.constpool.floatpool[i.operand]),
+            _ => {}
+        }
+        println!();
+    }
+    Ok(())
 }

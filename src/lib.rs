@@ -45,12 +45,12 @@ make_commands!(Commands, Build, Run, Dis, | Tshell {}, Update{});
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
     match cli.mode {
-        Commands::Build {
-            optimize: opt,
-            files,
-        } => {
+        Commands::Build { optimize, files } => {
             for i in files {
-                match tools::compile(compiler::Option::new(opt, compiler::InputSource::File(i))) {
+                match tools::compile(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);
@@ -66,12 +66,12 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 println!("{}", e);
             }
         }
-        Commands::Run {
-            optimize: opt,
-            files,
-        } => {
+        Commands::Run { optimize, files } => {
             for i in files {
-                match tools::run::run(compiler::Option::new(opt, compiler::InputSource::File(i))) {
+                match tools::run::run(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);
@@ -79,7 +79,19 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
-        Commands::Dis { files, optimize } => for i in files {},
+        Commands::Dis { files, optimize } => {
+            for i in files {
+                match tools::dis::dis(compiler::Option::new(
+                    optimize,
+                    compiler::InputSource::File(i),
+                )) {
+                    Ok(_) => {}
+                    Err(c) => {
+                        eprintln!("{}", c);
+                    }
+                }
+            }
+        }
     };
     Ok(())
 }

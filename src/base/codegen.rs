@@ -1,5 +1,5 @@
 use super::func;
-use core::cmp::max;
+use core::{cmp::max, fmt};
 use std::{fmt::Display, usize};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -145,6 +145,12 @@ pub struct Inst {
 impl Inst {
     pub fn new(opcode: Opcode, operand: usize) -> Self {
         Self { opcode, operand }
+    }
+}
+
+impl fmt::Display for Inst {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {}", self.opcode, self.operand)
     }
 }
 

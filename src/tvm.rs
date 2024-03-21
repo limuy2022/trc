@@ -5,7 +5,7 @@ mod gc;
 pub mod stdlib;
 mod types;
 
-use std::{mem::size_of, ptr};
+use std::{any::TypeId, mem::size_of, ptr};
 
 use self::{
     function::Frame,
@@ -43,8 +43,8 @@ pub struct DynaData {
     bool_store: Vec<bool>,
     char_store: Vec<TrcCharInternal>,
     stack_ptr: usize,
-    #[cfg(any(debug_assertions))]
-    type_used: Vec<usize>,
+    #[cfg(debug_assertions)]
+    type_used: Vec<(TypeId, &'static str)>,
 }
 
 impl DynaData {
@@ -66,16 +66,33 @@ impl DynaData {
         self.char_store.resize(cap, '0');
     }
 
-    pub fn push_data<T>(&mut self, data: T) {
+    pub fn push_data<T: 'static>(&mut self, data: T) {
         unsafe {
             *(&mut self.run_stack[self.stack_ptr] as *mut char as *mut T) = data;
         }
         self.stack_ptr += size_of::<T>();
+        #[cfg(debug_assertions)]
+        {
+            self.type_used
+                .push((std::any::TypeId::of::<T>(), std::any::type_name::<T>()));
+        }
     }
 
-    pub fn pop_data<T: Copy>(&mut self) -> T {
+    pub fn pop_data<T: Copy + 'static>(&mut self) -> T {
         let sz = size_of::<T>();
-        debug_assert!(self.stack_ptr as i64 - sz as i64 >= 0);
+        #[cfg(debug_assertions)]
+        {
+            let info = std::any::TypeId::of::<T>();
+            let info_stack = self.type_used.pop().unwrap();
+            if info_stack.0 != info {
+                panic!(
+                    "pop data type error.Expected get {}.Actually has {}",
+                    std::any::type_name::<T>(),
+                    info_stack.1
+                );
+            }
+            debug_assert!(self.stack_ptr as i64 - sz as i64 >= 0);
+        }
         self.stack_ptr -= sz;
         unsafe { *(&self.run_stack[self.stack_ptr] as *const char as *const T) }
     }
@@ -481,28 +498,28 @@ impl<'a> Vm<'a> {
             Opcode::MoveInt => {
                 let tmp = TrcInt::new(self.dynadata.pop_data());
                 let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr);
+                self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveFloat => {
                 let tmp = TrcFloat::new(self.dynadata.pop_data());
                 let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr);
+                self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveChar => {
                 let tmp = TrcChar::new(self.dynadata.pop_data());
                 let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr);
+                self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveBool => {
                 let tmp = TrcBool::new(self.dynadata.pop_data());
                 let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr);
+                self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveStr => {
                 // todo:inmprove performance
                 let tmp = TrcStr::new(self.dynadata.pop_data());
                 let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr);
+                self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::StoreInt => {
                 self.dynadata.int_store[self.static_data.inst[*pc].operand] =

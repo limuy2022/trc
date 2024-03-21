@@ -9,8 +9,10 @@ use std::fmt::Display;
 #[trc_class]
 #[derive(Debug, Clone)]
 pub struct TrcChar {
-    pub _value: char,
+    pub _value: TrcCharInternal,
 }
+
+pub type TrcCharInternal = char;
 
 #[trc_method]
 impl TrcObj for TrcChar {

@@ -21,3 +21,7 @@ jobs:
         run: cargo test
       - name: Run tests Release
         run: cargo test --release
+      - name: Install miri
+        run: rustup component add miri
+      - name: Run miri test
+        run: cargo miri test

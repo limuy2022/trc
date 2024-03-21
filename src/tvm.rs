@@ -275,7 +275,7 @@ impl<'a> Vm<'a> {
                 self.dynadata
                     .push_data(self.dynadata.var_store[self.static_data.inst[*pc].operand]);
             }
-            Opcode::StoreLocal => {
+            Opcode::StoreLocalObj => {
                 self.dynadata.var_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
@@ -521,23 +521,23 @@ impl<'a> Vm<'a> {
                 let ptr = self.dynadata.gc.alloc(tmp);
                 self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
-            Opcode::StoreInt => {
+            Opcode::StoreLocalInt => {
                 self.dynadata.int_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
-            Opcode::StoreFloat => {
+            Opcode::StoreLocalFloat => {
                 self.dynadata.float_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
-            Opcode::StoreChar => {
+            Opcode::StoreLocalChar => {
                 self.dynadata.char_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
-            Opcode::StoreBool => {
+            Opcode::StoreLocalBool => {
                 self.dynadata.bool_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
-            Opcode::StoreStr => {
+            Opcode::StoreLocalStr => {
                 self.dynadata.str_store[self.static_data.inst[*pc].operand] =
                     self.dynadata.pop_data();
             }
@@ -570,6 +570,12 @@ impl<'a> Vm<'a> {
                 *pc = self.static_data.funcs[self.static_data.inst[*pc].operand].func_addr;
                 return Ok(());
             }
+            Opcode::StoreGlobalObj => todo!(),
+            Opcode::StoreGlobalInt => todo!(),
+            Opcode::StoreGlobalFloat => todo!(),
+            Opcode::StoreGlobalChar => todo!(),
+            Opcode::StoreGlobalBool => todo!(),
+            Opcode::StoreGlobalStr => todo!(),
         };
         *pc += 1;
         Ok(())

@@ -6,7 +6,7 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use super::{
     scope::*,
@@ -19,6 +19,7 @@ use crate::base::stdlib::FunctionInterface;
 #[derive(Default)]
 struct LexProcess {
     stack_type: Vec<TyIdxTy>,
+    pub is_global: bool,
 }
 
 impl LexProcess {
@@ -727,15 +728,27 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 生成修改变量的指令
-    fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy) {
+    fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy, is_global: bool) {
+        if is_global {
+            
+        }
         self.add_bycode(
-            match self.convert_id_to_vm_ty(varty) {
-                VmStackType::Int => Opcode::StoreInt,
-                VmStackType::Float => Opcode::StoreFloat,
-                VmStackType::Str => Opcode::StoreStr,
-                VmStackType::Char => Opcode::StoreChar,
-                VmStackType::Bool => Opcode::StoreBool,
-                VmStackType::Object => Opcode::StoreLocal,
+            if global {match self.convert_id_to_vm_ty(varty) {
+                VmStackType::Int => Opcode::StoreLocalInt,
+                VmStackType::Float => Opcode::StoreLocalFloat,
+                VmStackType::Str => Opcode::StoreLocalStr,
+                VmStackType::Char => Opcode::StoreLocalChar,
+                VmStackType::Bool => Opcode::StoreLocalBool,
+                VmStackType::Object => Opcode::StoreLocalObj,
+            }} else {
+match self.convert_id_to_vm_ty(varty) {
+                VmStackType::Int => Opcode::StoreGlobalInt,
+                VmStackType::Float => Opcode::StoreGlobalFloat,
+                VmStackType::Str => Opcode::StoreGlobalStr,
+                VmStackType::Char => Opcode::StoreLocalChar,
+                VmStackType::Bool => Opcode::StoreLocalBool,
+                VmStackType::Object => Opcode::StoreLocalObj,
+            }
             },
             var_idx,
         );
@@ -994,8 +1007,10 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn generate_code(&mut self) -> RunResult<()> {
+        self.process_info.is_global = false;
         self.lex_until(TokenType::EndOfFile)?;
         // 结束一个作用域的代码解析后再解析这里面的函数
+        self.process_info.is_global = true;
         self.generate_func_in_scope()?;
         Ok(())
     }
@@ -1043,9 +1058,9 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::MoveInt, NO_ARG),
@@ -1265,7 +1280,7 @@ if a<8{
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::LoadInt, 3),
                 Inst::new(Opcode::LtInt, 0),
@@ -1338,7 +1353,7 @@ if a<8{
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LtInt, NO_ARG),
@@ -1352,7 +1367,7 @@ if a<8{
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::AddInt, NO_ARG),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::Jump, 2)
             ]
         )
@@ -1444,9 +1459,9 @@ print("{}{}", a, b)
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::CallCustom, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
-                Inst::new(Opcode::StoreInt, 0),
+                Inst::new(Opcode::StoreLocalInt, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-                Inst::new(Opcode::StoreInt, 1),
+                Inst::new(Opcode::StoreLocalInt, 1),
                 Inst::new(Opcode::LoadVarInt, 0),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadVarInt, 1),
@@ -1458,8 +1473,8 @@ print("{}{}", a, b)
                     get_prelude_function("print").unwrap().buildin_id
                 ),
                 Inst::new(Opcode::Stop, NO_ARG),
-                Inst::new(Opcode::StoreInt, 2),
-                Inst::new(Opcode::StoreInt, 3),
+                Inst::new(Opcode::StoreLocalInt, 2),
+                Inst::new(Opcode::StoreLocalInt, 3),
                 Inst::new(Opcode::LoadString, 1),
                 Inst::new(Opcode::LoadVarInt, 3),
                 Inst::new(Opcode::MoveInt, NO_ARG),

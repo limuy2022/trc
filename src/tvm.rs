@@ -48,6 +48,8 @@ pub struct DynaData {
     frames_stack: Vec<function::Frame>,
     var_store: Vec<Byte>,
     stack_ptr: usize,
+    // 变量已经使用的内存空间大小
+    var_used: usize,
     #[cfg(debug_assertions)]
     type_used: Vec<(TypeId, &'static str)>,
 }
@@ -58,11 +60,15 @@ impl DynaData {
             ..Default::default()
         };
         ret.run_stack.resize(MAX_STACK_SIZE, 0u8);
+        ret.var_store.resize(MAX_STACK_SIZE, 0u8);
         ret
     }
 
-    pub fn resize_var_store(&mut self, cap: usize) {
-        // 最少也要这么多，递归需要的会更多
+    pub fn init_global_var_store(&mut self, cap: usize) {
+        self.var_used = cap;
+        if self.var_store.len() > cap {
+            return;
+        }
         self.var_store.resize(cap, 0u8);
     }
 
@@ -105,6 +111,19 @@ impl DynaData {
 
     pub fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
         unsafe { *(&self.var_store[addr] as *const Byte as *const T) }
+    }
+
+    pub fn alloc_var_space(&mut self, need_sz: usize) -> *mut Byte {
+        let ret = &mut self.var_store[self.var_used - need_sz] as *mut Byte;
+        self.var_used += need_sz;
+        if self.var_used > self.var_store.len() {
+            self.var_store.resize(self.var_used, 0u8);
+        }
+        ret
+    }
+
+    pub fn dealloc_var_space(&mut self, need_sz: usize) {
+        self.var_used -= need_sz;
     }
 }
 
@@ -236,7 +255,7 @@ impl<'a> Vm<'a> {
 
     pub fn reset(&mut self) {
         self.dynadata
-            .resize_var_store(self.static_data.sym_table_sz);
+            .init_global_var_store(self.static_data.sym_table_sz);
     }
 
     #[inline]
@@ -532,28 +551,58 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::StoreLocalInt => {
-                // self.dynadata.[self.static_data.inst[*pc].operand] =
-                //     self.dynadata.pop_data();
+                let data = self.dynadata.pop_data::<TrcIntInternal>();
+                let addr = self.static_data.inst[*pc].operand;
+                self.dynadata
+                    .frames_stack
+                    .last_mut()
+                    .unwrap()
+                    .set_var(addr, data)
             }
             Opcode::StoreLocalFloat => {
-                // self.dynadata.float_store[self.static_data.inst[*pc].operand] =
-                //     self.dynadata.pop_data();
+                let data = self.dynadata.pop_data::<TrcFloatInteral>();
+                let addr = self.static_data.inst[*pc].operand;
+                self.dynadata
+                    .frames_stack
+                    .last_mut()
+                    .unwrap()
+                    .set_var(addr, data)
             }
             Opcode::StoreLocalChar => {
-                // self.dynadata.char_store[self.static_data.inst[*pc].operand] =
-                //     self.dynadata.pop_data();
+                let data = self.dynadata.pop_data::<TrcCharInternal>();
+                let addr = self.static_data.inst[*pc].operand;
+                self.dynadata
+                    .frames_stack
+                    .last_mut()
+                    .unwrap()
+                    .set_var(addr, data)
             }
             Opcode::StoreLocalBool => {
-                // self.dynadata.bool_store[self.static_data.inst[*pc].operand] =
-                //     self.dynadata.pop_data();
+                let data = self.dynadata.pop_data::<bool>();
+                let addr = self.static_data.inst[*pc].operand;
+                self.dynadata
+                    .frames_stack
+                    .last_mut()
+                    .unwrap()
+                    .set_var(addr, data)
             }
             Opcode::StoreLocalStr => {
-                // self.dynadata.str_store[self.static_data.inst[*pc].operand] =
-                //     self.dynadata.pop_data();
+                let data = self.dynadata.pop_data::<TrcStrInternal>();
+                let addr = self.static_data.inst[*pc].operand;
+                self.dynadata
+                    .frames_stack
+                    .last_mut()
+                    .unwrap()
+                    .set_var(addr, data)
             }
             Opcode::LoadLocalVarBool => {
-                // self.dynadata
-                //     .push_data(self.dynadata.bool_store[self.static_data.inst[*pc].operand]);
+                let data = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_var::<bool>(self.static_data.inst[*pc].operand);
+                self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarInt => {
                 // self.dynadata
@@ -576,7 +625,10 @@ impl<'a> Vm<'a> {
                 return Ok(());
             }
             Opcode::CallCustom => {
-                self.dynadata.frames_stack.push(Frame::new(*pc));
+                let var_table_mem_sz =
+                    self.static_data.funcs[self.static_data.inst[*pc].operand].var_table_sz;
+                let space = self.dynadata.alloc_var_space(var_table_mem_sz);
+                self.dynadata.frames_stack.push(Frame::new(*pc, space));
                 *pc = self.static_data.funcs[self.static_data.inst[*pc].operand].func_addr;
                 return Ok(());
             }

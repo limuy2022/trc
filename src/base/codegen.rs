@@ -76,15 +76,21 @@ pub enum Opcode {
     LoadString,
     // Load a bigint from const pool
     LoadBigInt,
-    // Load a local var to the stack
     LoadChar,
     LoadBool,
-    LoadLocal,
-    LoadVarBool,
-    LoadVarInt,
-    LoadVarFloat,
-    LoadVarStr,
-    LoadVarChar,
+    // Load a local var to the stack
+    LoadLocalVarObj,
+    LoadLocalVarBool,
+    LoadLocalVarInt,
+    LoadLocalVarFloat,
+    LoadLocalVarStr,
+    LoadLocalVarChar,
+    LoadGlobalVarObj,
+    LoadGlobalVarBool,
+    LoadGlobalVarInt,
+    LoadGlobalVarFloat,
+    LoadGlobalVarStr,
+    LoadGlobalVarChar,
     // Move a value into the stack
     MoveInt,
     MoveFloat,
@@ -193,7 +199,7 @@ impl StaticData {
     }
 
     #[inline]
-    pub fn update_sym_table_sz(&mut self, newsz: usize) {
+    pub fn update_var_table_mem_sz(&mut self, newsz: usize) {
         self.sym_table_sz = max(self.sym_table_sz, newsz);
     }
 

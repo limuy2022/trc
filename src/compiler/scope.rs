@@ -159,6 +159,8 @@ pub struct SymScope {
     types_custom_store: HashMap<ScopeAllocClassId, CustomType>,
     // 作用域暂时储存的函数token
     pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
+    // 计算当前需要最少多大的空间来保存变量
+    pub var_sz: usize,
 }
 
 impl SymScope {
@@ -171,12 +173,10 @@ impl SymScope {
             Some(prev_scope) => {
                 ret.scope_sym_id = prev_scope.as_ref().borrow().scope_sym_id;
                 ret.types_id = prev_scope.as_ref().borrow().types_id;
-                ret.vars_id = prev_scope.as_ref().borrow().vars_id;
                 ret.funcs_custom_id = prev_scope.as_ref().borrow().funcs_custom_id;
             }
             None => {
                 ret.types_id = get_stdclass_end();
-                ret.vars_id = 0;
                 ret.funcs_custom_id = 0;
             }
         }
@@ -277,11 +277,16 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy) -> VarIdxTy {
+    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> VarIdxTy {
         self.vars.insert(id, (ty, self.vars_id));
         let ret = self.vars_id;
         self.vars_id += 1;
+        self.var_sz += var_sz;
         ret
+    }
+
+    pub fn get_var_table_sz(&self) -> usize {
+        self.var_sz
     }
 
     pub fn add_type(&mut self, id: usize, t: usize) {
@@ -302,7 +307,7 @@ impl SymScope {
         self.scope_sym_id
     }
 
-    pub fn get_var_table_sz(&self) -> usize {
+    pub fn get_var_table_len(&self) -> usize {
         self.vars_id
     }
 

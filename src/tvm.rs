@@ -114,12 +114,15 @@ impl DynaData {
     }
 
     pub fn alloc_var_space(&mut self, need_sz: usize) -> *mut Byte {
-        let ret = &mut self.var_store[self.var_used - need_sz] as *mut Byte;
         self.var_used += need_sz;
         if self.var_used > self.var_store.len() {
             self.var_store.resize(self.var_used, 0u8);
         }
-        ret
+        unsafe {
+            self.var_store
+                .as_mut_ptr()
+                .byte_offset((self.var_used - need_sz) as isize)
+        }
     }
 
     pub fn dealloc_var_space(&mut self, need_sz: usize) {
@@ -605,20 +608,40 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarInt => {
-                // self.dynadata
-                //     .push_data(self.dynadata.int_store[self.static_data.inst[*pc].operand]);
+                let data = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_var::<TrcIntInternal>(self.static_data.inst[*pc].operand);
+                self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarFloat => {
-                // self.dynadata
-                //     .push_data(self.dynadata.float_store[self.static_data.inst[*pc].operand]);
+                let data = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_var::<TrcFloatInteral>(self.static_data.inst[*pc].operand);
+                self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarStr => {
-                // self.dynadata
-                //     .push_data(self.dynadata.str_store[self.static_data.inst[*pc].operand]);
+                let data = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_var::<TrcStrInternal>(self.static_data.inst[*pc].operand);
+                self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarChar => {
-                // self.dynadata
-                //     .push_data(self.dynadata.char_store[self.static_data.inst[*pc].operand]);
+                let data = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_var::<TrcCharInternal>(self.static_data.inst[*pc].operand);
+                self.dynadata.push_data(data);
             }
             Opcode::Stop => {
                 *pc = self.static_data.inst.len();

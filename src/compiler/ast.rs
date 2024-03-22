@@ -9,8 +9,7 @@ use crate::{
     tvm::get_trcobj_sz,
 };
 use rust_i18n::t;
-use std::borrow::Borrow;
-use std::mem::{align_of, align_of_val};
+use std::mem::align_of;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
@@ -1077,6 +1076,11 @@ mod tests {
         };
     }
 
+    /// 前面有int_nums个int时的首地址
+    fn get_offset(int_nums: usize) -> usize {
+        return align_of::<i64>() * int_nums;
+    }
+
     #[test]
     fn test_assign() {
         gen_test_env!(
@@ -1090,11 +1094,11 @@ mod tests {
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 2),
-                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadString, 0),
-                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
                 Inst::new(
@@ -1385,8 +1389,8 @@ if a<8{
             t.staticdata.inst,
             vec![
                 Inst::new(Opcode::LoadInt, 0),
-                Inst::new(Opcode::StoreGlobalInt, 0),
-                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::LtInt, NO_ARG),
                 Inst::new(Opcode::JumpIfFalse, 14),
@@ -1396,10 +1400,10 @@ if a<8{
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
                 ),
-                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::AddInt, NO_ARG),
-                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::Jump, 2)
             ]
         )
@@ -1491,10 +1495,10 @@ print("{}{}", a, b)
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::CallCustom, 0),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
-                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-                Inst::new(Opcode::StoreGlobalInt, 1),
-                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(1)),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadGlobalVarInt, 1),
                 Inst::new(Opcode::MoveInt, NO_ARG),

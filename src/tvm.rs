@@ -6,7 +6,7 @@ pub mod stdlib;
 mod types;
 
 use core::panic;
-use std::{any::TypeId, sync::OnceLock};
+use std::{any::TypeId, mem::size_of, sync::OnceLock};
 
 use self::{
     function::Frame,
@@ -30,11 +30,14 @@ use crate::{
 use libloading::Library;
 use rust_i18n::t;
 
-const MAX_STACK_SIZE: usize = 1024 * 1024 * 2;
+pub fn get_max_stack_sz() -> usize {
+    static T: OnceLock<usize> = OnceLock::new();
+    *T.get_or_init(|| 1024 * 1024 * 2 / size_of::<Byte>())
+}
 
 pub fn get_trcobj_sz() -> usize {
-    let t: OnceLock<usize> = OnceLock::new();
-    *t.get_or_init(std::mem::size_of::<*mut dyn TrcObj>)
+    static T: OnceLock<usize> = OnceLock::new();
+    *T.get_or_init(std::mem::size_of::<*mut dyn TrcObj>)
 }
 
 type Byte = u64;
@@ -55,14 +58,14 @@ pub struct DynaData {
 impl DynaData {
     pub fn new() -> Self {
         let mut ret = Self {
-            run_stack: Vec::with_capacity(MAX_STACK_SIZE),
-            var_store: Vec::with_capacity(MAX_STACK_SIZE),
+            run_stack: Vec::with_capacity(get_max_stack_sz()),
+            var_store: Vec::with_capacity(get_max_stack_sz()),
             stack_ptr: 0,
             ..Default::default()
         };
         unsafe {
-            ret.run_stack.set_len(MAX_STACK_SIZE);
-            ret.var_store.set_len(MAX_STACK_SIZE);
+            ret.run_stack.set_len(get_max_stack_sz());
+            ret.var_store.set_len(get_max_stack_sz());
         }
         ret
     }
@@ -764,6 +767,8 @@ mod tests {
         data.push_data(30i64);
         data.push_data(null_mut::<i32>());
         data.push_data(50);
+        data.push_data(false);
+        assert_eq!(data.pop_data::<bool>(), false);
         assert_eq!(data.pop_data::<i32>(), 50);
         assert_eq!(data.pop_data::<*mut i32>(), null_mut::<i32>());
         assert_eq!(data.pop_data::<i64>(), 30);

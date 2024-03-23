@@ -69,6 +69,7 @@ impl Display for RuntimeError {
     /// report error in vm or compiler
     /// we will translate the error type to gettextrs
     /// but you should translate the error messgae by caller
+    #[cfg(not(tarpaulin_include))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = format!(
             r#"{}

@@ -37,7 +37,7 @@ pub fn get_max_stack_sz() -> usize {
 
 pub fn get_trcobj_sz() -> usize {
     static T: OnceLock<usize> = OnceLock::new();
-    *T.get_or_init(std::mem::size_of::<*mut dyn TrcObj>)
+    *T.get_or_init(size_of::<*mut dyn TrcObj>)
 }
 
 type Byte = u64;
@@ -86,19 +86,19 @@ impl DynaData {
                 .byte_offset(self.stack_ptr as isize) as *mut T)
                 .write(data);
         }
-        self.stack_ptr += std::mem::size_of::<T>();
+        self.stack_ptr += size_of::<T>();
         #[cfg(debug_assertions)]
         {
             self.type_used
-                .push((std::any::TypeId::of::<T>(), std::any::type_name::<T>()));
+                .push((TypeId::of::<T>(), std::any::type_name::<T>()));
         }
     }
 
     pub fn pop_data<T: Copy + 'static>(&mut self) -> T {
-        let sz = std::mem::size_of::<T>();
+        let sz = size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            let info = std::any::TypeId::of::<T>();
+            let info = TypeId::of::<T>();
             let info_stack = self.type_used.pop().unwrap();
             if info_stack.0 != info {
                 panic!(
@@ -178,7 +178,7 @@ impl Context {
 
 /// Load libc
 fn load_libc() -> Option<&'static Library> {
-    static LIBC: std::sync::OnceLock<Option<Library>> = std::sync::OnceLock::new();
+    static LIBC: OnceLock<Option<Library>> = OnceLock::new();
     #[cfg(target_os = "linux")]
     {
         let tmp = LIBC.get_or_init(|| unsafe {

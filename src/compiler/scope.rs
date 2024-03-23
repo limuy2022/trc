@@ -135,6 +135,19 @@ pub type VarIdxTy = ScopeAllocIdTy;
 pub type FuncIdxTy = ScopeAllocIdTy;
 pub type FuncBodyTy = Vec<(Token, usize)>;
 
+#[derive(Clone, Debug, Copy)]
+pub struct VarInfo {
+    pub ty: TyIdxTy,
+    pub var_idx: usize,
+    pub addr: usize,
+}
+
+impl VarInfo {
+    pub fn new(ty: TyIdxTy, var_idx: usize, addr: usize) -> Self {
+        Self { ty, var_idx, addr }
+    }
+}
+
 #[derive(Default)]
 pub struct SymScope {
     // 父作用域
@@ -148,7 +161,7 @@ pub struct SymScope {
     // ID到函数的映射
     funcs: HashMap<ScopeAllocIdTy, Box<dyn FunctionInterface>>,
     // id到变量类型的映射
-    vars: HashMap<ScopeAllocIdTy, (TyIdxTy, VarIdxTy)>,
+    vars: HashMap<ScopeAllocIdTy, VarInfo>,
     // 由token id到模块的映射
     modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
@@ -252,7 +265,8 @@ impl SymScope {
         }
     }
 
-    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<(TyIdxTy, VarIdxTy)> {
+    /// 返回变量的类型，索引和内存地址
+    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<VarInfo> {
         match self.vars.get(&id) {
             Some(v) => Some(*v),
             None => match self.prev_scope {
@@ -277,12 +291,15 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> VarIdxTy {
-        self.vars.insert(id, (ty, self.vars_id));
+    /// 返回变量的索引和内存地址
+    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> (VarIdxTy, usize) {
+        let ret_addr = self.var_sz;
+        self.vars
+            .insert(id, VarInfo::new(ty, self.vars_id, ret_addr));
         let ret = self.vars_id;
         self.vars_id += 1;
         self.var_sz += var_sz;
-        ret
+        (ret, ret_addr)
     }
 
     pub fn get_var_table_sz(&self) -> usize {

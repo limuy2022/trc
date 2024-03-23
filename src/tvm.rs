@@ -5,6 +5,7 @@ mod gc;
 pub mod stdlib;
 mod types;
 
+use core::panic;
 use std::{any::TypeId, sync::OnceLock};
 
 use self::{
@@ -33,19 +34,16 @@ const MAX_STACK_SIZE: usize = 1024 * 1024 * 2;
 
 pub fn get_trcobj_sz() -> usize {
     let t: OnceLock<usize> = OnceLock::new();
-    *t.get_or_init(|| {
-        let ret = std::mem::size_of::<*mut dyn TrcObj>();
-        ret
-    })
+    *t.get_or_init(std::mem::size_of::<*mut dyn TrcObj>)
 }
 
-type Byte = u8;
+type Byte = u64;
 
 #[derive(Default)]
 pub struct DynaData {
     gc: GcMgr,
     run_stack: Vec<Byte>,
-    frames_stack: Vec<function::Frame>,
+    frames_stack: Vec<Frame>,
     var_store: Vec<Byte>,
     stack_ptr: usize,
     // 变量已经使用的内存空间大小
@@ -57,10 +55,15 @@ pub struct DynaData {
 impl DynaData {
     pub fn new() -> Self {
         let mut ret = Self {
+            run_stack: Vec::with_capacity(MAX_STACK_SIZE),
+            var_store: Vec::with_capacity(MAX_STACK_SIZE),
+            stack_ptr: 0,
             ..Default::default()
         };
-        ret.run_stack.resize(MAX_STACK_SIZE, 0u8);
-        ret.var_store.resize(MAX_STACK_SIZE, 0u8);
+        unsafe {
+            ret.run_stack.set_len(MAX_STACK_SIZE);
+            ret.var_store.set_len(MAX_STACK_SIZE);
+        }
         ret
     }
 
@@ -69,14 +72,18 @@ impl DynaData {
         if self.var_store.len() > cap {
             return;
         }
-        self.var_store.resize(cap, 0u8);
+        self.var_store.resize(cap, Byte::default());
     }
 
     pub fn push_data<T: 'static>(&mut self, data: T) {
         unsafe {
-            *(&mut self.run_stack[self.stack_ptr] as *mut Byte as *mut T) = data;
+            (self
+                .run_stack
+                .as_mut_ptr()
+                .byte_offset(self.stack_ptr as isize) as *mut T)
+                .write(data);
         }
-        self.stack_ptr += std::mem::align_of::<T>();
+        self.stack_ptr += std::mem::size_of::<T>();
         #[cfg(debug_assertions)]
         {
             self.type_used
@@ -85,7 +92,7 @@ impl DynaData {
     }
 
     pub fn pop_data<T: Copy + 'static>(&mut self) -> T {
-        let sz = std::mem::align_of::<T>();
+        let sz = std::mem::size_of::<T>();
         #[cfg(debug_assertions)]
         {
             let info = std::any::TypeId::of::<T>();
@@ -97,26 +104,27 @@ impl DynaData {
                     info_stack.1
                 );
             }
-            debug_assert!(self.stack_ptr as i64 - sz as i64 >= 0);
+            debug_assert!(self.stack_ptr >= sz);
         }
         self.stack_ptr -= sz;
-        unsafe { *(&self.run_stack[self.stack_ptr] as *const Byte as *const T) }
+        unsafe { *(self.run_stack.as_ptr().byte_offset(self.stack_ptr as isize) as *const T) }
     }
 
     pub fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
         unsafe {
-            *(&mut self.var_store[addr] as *mut Byte as *mut T) = data;
+            *(self.var_store.as_mut_ptr().byte_offset(addr as isize) as *mut T) = data;
         }
     }
 
     pub fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
-        unsafe { *(&self.var_store[addr] as *const Byte as *const T) }
+        debug_assert!(addr < self.var_used);
+        unsafe { *(self.var_store.as_ptr().byte_offset(addr as isize) as *const T) }
     }
 
     pub fn alloc_var_space(&mut self, need_sz: usize) -> *mut Byte {
         self.var_used += need_sz;
         if self.var_used > self.var_store.len() {
-            self.var_store.resize(self.var_used, 0u8);
+            self.var_store.resize(self.var_used, Byte::default());
         }
         unsafe {
             self.var_store
@@ -741,6 +749,27 @@ impl<'a> Vm<'a> {
 mod tests {
     use super::*;
     use crate::compiler::*;
+    use std::ptr::null_mut;
+
+    #[test]
+    fn test_dyna_data() {
+        // panic!("deojfoejfoe");
+        let mut data = DynaData::new();
+        data.alloc_var_space(10);
+        assert_eq!(data.var_used, 10);
+        data.dealloc_var_space(10);
+        assert_eq!(data.var_used, 0);
+        data.push_data(10i64);
+        data.push_data(20.0f64);
+        data.push_data(30i64);
+        data.push_data(null_mut::<i32>());
+        data.push_data(50);
+        assert_eq!(data.pop_data::<i32>(), 50);
+        assert_eq!(data.pop_data::<*mut i32>(), null_mut::<i32>());
+        assert_eq!(data.pop_data::<i64>(), 30);
+        assert_eq!(data.pop_data::<f64>(), 20.0);
+        assert_eq!(data.pop_data::<i64>(), 10);
+    }
 
     macro_rules! gen_test_env {
         ($code:expr, $var:ident) => {

@@ -9,7 +9,7 @@ use crate::{
     tvm::get_trcobj_sz,
 };
 use rust_i18n::t;
-use std::mem::align_of;
+use std::mem::size_of;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
@@ -176,11 +176,11 @@ impl<'a> AstBuilder<'a> {
     /// 获取对应类型的真实大小（内存对齐后）
     pub fn get_ty_sz(&self, id: TyIdxTy) -> usize {
         match self.convert_id_to_vm_ty(id) {
-            VmStackType::Int => align_of::<i64>(),
-            VmStackType::Float => align_of::<f64>(),
-            VmStackType::Str => align_of::<*mut String>(),
-            VmStackType::Char => align_of::<char>(),
-            VmStackType::Bool => align_of::<bool>(),
+            VmStackType::Int => size_of::<i64>(),
+            VmStackType::Float => size_of::<f64>(),
+            VmStackType::Str => size_of::<*mut String>(),
+            VmStackType::Char => size_of::<char>(),
+            VmStackType::Bool => size_of::<bool>(),
             VmStackType::Object => get_trcobj_sz(),
         }
     }
@@ -509,10 +509,10 @@ impl<'a> AstBuilder<'a> {
                     )?,
                     Some(v) => v,
                 };
-                let tmp = self.load_var(var.0);
-                self.add_bycode(tmp, var.1);
-                self.process_info.new_type(var.0);
-                Ok(TypeAllowNull::Yes(var.0))
+                let tmp = self.load_var(var.ty);
+                self.add_bycode(tmp, var.addr);
+                self.process_info.new_type(var.ty);
+                Ok(TypeAllowNull::Yes(var.ty))
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -757,7 +757,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 生成修改变量的指令
-    fn modify_var(&mut self, varty: TyIdxTy, var_idx: VarIdxTy, is_global: bool) {
+    fn modify_var(&mut self, varty: TyIdxTy, var_addr: usize, is_global: bool) {
         self.add_bycode(
             if !is_global {
                 match self.convert_id_to_vm_ty(varty) {
@@ -778,7 +778,7 @@ impl<'a> AstBuilder<'a> {
                     VmStackType::Object => Opcode::StoreGlobalObj,
                 }
             },
-            var_idx,
+            var_addr,
         );
     }
 
@@ -796,12 +796,12 @@ impl<'a> AstBuilder<'a> {
                 ));
             }
         };
-        let var_sym =
+        let (var_sym, var_addr) =
             self.self_scope
                 .as_ref()
                 .borrow_mut()
                 .add_var(sym_idx, varty, self.get_ty_sz(varty));
-        self.modify_var(varty, var_sym, self.process_info.is_global);
+        self.modify_var(varty, var_addr, self.process_info.is_global);
         self.staticdata
             .update_var_table_mem_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
         Ok(())
@@ -839,10 +839,10 @@ impl<'a> AstBuilder<'a> {
                 ))
             }
         };
-        if var.0 != var_type {
+        if var.ty != var_type {
             return self.report_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
         }
-        self.modify_var(var.0, var.1, self.process_info.is_global);
+        self.modify_var(var.ty, var.addr, self.process_info.is_global);
         Ok(())
     }
 
@@ -1078,7 +1078,7 @@ mod tests {
 
     /// 前面有int_nums个int时的首地址
     fn get_offset(int_nums: usize) -> usize {
-        return align_of::<i64>() * int_nums;
+        size_of::<i64>() * int_nums
     }
 
     #[test]
@@ -1086,7 +1086,8 @@ mod tests {
         gen_test_env!(
             r#"a:=10
         a=10
-        print("{}", a)"#,
+        b:=90
+        print("{}{}", a, b)"#,
             t
         );
         t.generate_code().unwrap();
@@ -1097,10 +1098,14 @@ mod tests {
                 Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, 2),
                 Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(1)),
                 Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
-                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, 4),
                 Inst::new(
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id

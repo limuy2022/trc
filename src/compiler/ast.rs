@@ -496,7 +496,7 @@ impl<'a> AstBuilder<'a> {
                 Ok(func_obj.get_io().return_type.clone())
             } else {
                 self.token_lexer.next_back(nxt);
-                let var = match self.self_scope.as_ref().borrow().get_var(token_data) {
+                let var = match self.self_scope.as_ref().borrow().get_var(idx) {
                     None => self.try_err(
                         istry,
                         ErrorInfo::new(
@@ -991,7 +991,12 @@ impl<'a> AstBuilder<'a> {
         // 解析参数
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
         debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
-        for (argty, argname) in io.argvs_type.iter().zip(func_obj.args_names.iter()) {
+        for (argty, argname) in io
+            .argvs_type
+            .iter()
+            .rev()
+            .zip(func_obj.args_names.iter().rev())
+        {
             self.new_var(*argname, *argty).unwrap();
         }
         for i in body.iter().rev() {
@@ -1483,7 +1488,7 @@ f()"#,
         gen_test_env!(
             r#"
 func a1(a: int, b: int) {
-    print("{}", a, b)
+    print("{}{}", a, b)
 }
 a1(0, 1)
 a:=1
@@ -1503,12 +1508,12 @@ print("{}{}", a, b)
                 Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
                 Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
                 Inst::new(Opcode::StoreGlobalInt, get_offset(1)),
+                Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
-                Inst::new(Opcode::LoadString, 0),
-                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+                Inst::new(Opcode::LoadInt, 2),
                 Inst::new(
                     Opcode::CallNative,
                     get_prelude_function("print").unwrap().buildin_id
@@ -1516,7 +1521,7 @@ print("{}{}", a, b)
                 Inst::new(Opcode::Stop, NO_ARG),
                 Inst::new(Opcode::StoreLocalInt, get_offset(0)),
                 Inst::new(Opcode::StoreLocalInt, get_offset(1)),
-                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::LoadString, 0),
                 Inst::new(Opcode::LoadLocalVarInt, get_offset(1)),
                 Inst::new(Opcode::MoveInt, NO_ARG),
                 Inst::new(Opcode::LoadLocalVarInt, get_offset(0)),

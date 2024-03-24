@@ -176,6 +176,11 @@ pub struct SymScope {
     pub var_sz: usize,
     // 保存当前环境下的function io，global环境无
     pub func_io: Option<TypeAllowNull>,
+    // 保存当前for的所有break
+    pub for_break: Vec<usize>,
+    // 保存当前for所有的continue
+    pub for_continue: Vec<usize>,
+    pub in_loop: bool,
 }
 
 impl SymScope {

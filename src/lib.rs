@@ -22,7 +22,7 @@ struct Args {
 }
 
 macro_rules! make_commands {
-    ($struct_name:ident, $($repeat_compile_command:ident, )* | $($other_command: tt)*) => {
+    ($struct_name:ident, $($repeat_compile_command:ident {$($commands_compile_other: tt)*}, )* | $($other_command: tt)*) => {
         #[derive(Debug, Subcommand)]
         enum $struct_name {
             $(
@@ -31,6 +31,7 @@ macro_rules! make_commands {
                 optimize: bool,
                 #[arg()]
                 files: Vec<String>,
+                $($commands_compile_other)*
             },
             )*
             $(
@@ -40,7 +41,10 @@ macro_rules! make_commands {
     };
 }
 
-make_commands!(Commands, Build, Run, Dis, | Tshell {}, Update{});
+make_commands!(Commands, Build {}, Run {}, Dis {
+    #[arg(short, long, default_value_t = false)]
+    rustcode: bool
+}, | Tshell {}, Update{});
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
@@ -79,12 +83,16 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
-        Commands::Dis { files, optimize } => {
+        Commands::Dis {
+            files,
+            optimize,
+            rustcode,
+        } => {
             for i in files {
-                match tools::dis::dis(compiler::Option::new(
-                    optimize,
-                    compiler::InputSource::File(i),
-                )) {
+                match tools::dis::dis(
+                    compiler::Option::new(optimize, compiler::InputSource::File(i)),
+                    rustcode,
+                ) {
                     Ok(_) => {}
                     Err(c) => {
                         eprintln!("{}", c);

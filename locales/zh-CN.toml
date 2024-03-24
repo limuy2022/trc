@@ -24,6 +24,7 @@ prefix_float = "前缀%{0}不能对浮点数使用"
 unexpected_token = "token %{0}不是被期望的"
 expected_expr = "期望表达式"
 return_should_in_function = "return必须在函数内部"
+should_in_loop = "%{0}必须在循环内部"
 
 [compiler.symbolerror]
 not_found_sym = "未找到符号%{0}"

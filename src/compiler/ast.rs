@@ -13,7 +13,7 @@ use crate::{
 };
 use rust_i18n::t;
 use std::borrow::{Borrow, BorrowMut};
-use std::mem::size_of;
+use std::mem::{size_of, swap};
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
@@ -200,6 +200,11 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn while_lex(&mut self) -> AstError<()> {
+        let mut prev_loop_state = true;
+        swap(
+            &mut prev_loop_state,
+            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+        );
         let condit_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
         self.get_token_checked(TokenType::LeftBigBrace)?;
@@ -207,18 +212,45 @@ impl<'a> AstBuilder<'a> {
         let jump_false_id = self.staticdata.get_last_opcode_id();
         self.lex_until(RightBigBrace)?;
         self.add_bycode(Opcode::Jump, condit_id);
-        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
+        let opcode_after_while = self.staticdata.get_next_opcode_id();
+        self.staticdata.inst[jump_false_id].operand = opcode_after_while;
+        let mut break_record = vec![];
+        swap(
+            &mut break_record,
+            &mut self.self_scope.as_ref().borrow_mut().for_break,
+        );
+        for i in break_record {
+            self.staticdata.inst[i].operand = opcode_after_while;
+        }
+        let mut continue_record = vec![];
+        swap(
+            &mut continue_record,
+            &mut self.self_scope.as_ref().borrow_mut().for_continue,
+        );
+        for i in continue_record {
+            self.staticdata.inst[i].operand = condit_id;
+        }
+        swap(
+            &mut prev_loop_state,
+            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+        );
         Ok(())
     }
 
     fn for_lex(&mut self) -> AstError<()> {
         // init
+        let mut prev_loop_state = true;
+        swap(
+            &mut prev_loop_state,
+            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+        );
         self.statement()?;
         self.get_token_checked(TokenType::Semicolon)?;
         // condit
         let conid_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
         self.get_token_checked(TokenType::Semicolon)?;
+        // 记录当前的头
         // action
         let mut token_save = vec![];
         loop {
@@ -238,15 +270,44 @@ impl<'a> AstBuilder<'a> {
         }
         // loop
         self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
+        // 这里是条件判断，是否越出循环
         let jump_false_id = self.staticdata.get_last_opcode_id();
+        // 解析循环体
         self.lex_until(RightBigBrace)?;
+        // 将先前储存的循环控制语句恢复
         token_save.reverse();
         for i in token_save {
             self.token_lexer.next_back(i);
         }
+        let opcode_goto = self.staticdata.get_next_opcode_id();
+        // 解析循环控制语句
         self.statement()?;
+        // 跳转到条件判断语句
         self.add_bycode(Opcode::Jump, conid_id);
-        self.staticdata.inst[jump_false_id].operand = self.staticdata.get_next_opcode_id();
+        let next_opcode_after_for = self.staticdata.get_next_opcode_id();
+        self.staticdata.inst[jump_false_id].operand = next_opcode_after_for;
+        // 开始处理所有的break
+        let mut break_record = vec![];
+        swap(
+            &mut break_record,
+            &mut self.self_scope.as_ref().borrow_mut().for_break,
+        );
+        for i in break_record {
+            self.staticdata.inst[i].operand = next_opcode_after_for;
+        }
+        let mut continue_record = vec![];
+        swap(
+            &mut continue_record,
+            &mut self.self_scope.as_ref().borrow_mut().for_continue,
+        );
+        for i in continue_record {
+            self.staticdata.inst[i].operand = opcode_goto;
+        }
+        // 重置循环状态
+        swap(
+            &mut prev_loop_state,
+            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+        );
         Ok(())
     }
 
@@ -766,8 +827,36 @@ impl<'a> AstBuilder<'a> {
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
-            TokenType::Continue => {}
-            TokenType::Break => {}
+            TokenType::Continue => {
+                if !self.self_scope.as_ref().borrow().in_loop {
+                    return self.gen_error(ErrorInfo::new(
+                        t!(SHOULD_IN_LOOP, "0" = "continue"),
+                        t!(SYNTAX_ERROR),
+                    ));
+                }
+                self.add_bycode(Opcode::Jump, ARG_WRONG);
+                self.self_scope
+                    .as_ref()
+                    .borrow_mut()
+                    .for_continue
+                    .push(self.staticdata.get_last_opcode_id());
+                return Ok(());
+            }
+            TokenType::Break => {
+                if !self.self_scope.as_ref().borrow().in_loop {
+                    return self.gen_error(ErrorInfo::new(
+                        t!(SHOULD_IN_LOOP, "0" = "break"),
+                        t!(SYNTAX_ERROR),
+                    ));
+                }
+                self.add_bycode(Opcode::Jump, ARG_WRONG);
+                self.self_scope
+                    .as_ref()
+                    .borrow_mut()
+                    .for_break
+                    .push(self.staticdata.get_last_opcode_id());
+                return Ok(());
+            }
             TokenType::Return => {
                 if self.process_info.is_global {
                     return self.gen_error(ErrorInfo::new(
@@ -1447,5 +1536,91 @@ print("{}{}", a, b)
                 Inst::new(Opcode::PopFrame, NO_ARG)
             ]
         )
+    }
+
+    #[test]
+    fn test_for_break() {
+        gen_test_env!(
+            r#"for i:=0;i<=10;i=i+1{
+  if i==3{
+    continue
+  }
+  if i==5{
+    break
+  }
+  println("{}", i)
+}
+a:=0
+while a<10{
+  a=a+1
+  if a==3{
+    continue
+  }
+  println("{}", a)
+  if a==5{
+    break
+  }
+}
+"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LeInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 26),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::EqInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 11),
+                Inst::new(Opcode::Jump, 21),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadInt, 4),
+                Inst::new(Opcode::EqInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 16),
+                Inst::new(Opcode::Jump, 26),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::MoveInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::AddInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::Jump, 2),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, 8),
+                Inst::new(Opcode::LoadGlobalVarInt, 8),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::LtInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 52),
+                Inst::new(Opcode::LoadGlobalVarInt, 8),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::AddInt, 0),
+                Inst::new(Opcode::StoreGlobalInt, 8),
+                Inst::new(Opcode::LoadGlobalVarInt, 8),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::EqInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 41),
+                Inst::new(Opcode::Jump, 28),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 8),
+                Inst::new(Opcode::MoveInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::LoadGlobalVarInt, 8),
+                Inst::new(Opcode::LoadInt, 4),
+                Inst::new(Opcode::EqInt, 0),
+                Inst::new(Opcode::JumpIfFalse, 51),
+                Inst::new(Opcode::Jump, 52),
+                Inst::new(Opcode::Jump, 28),
+            ]
+        );
     }
 }

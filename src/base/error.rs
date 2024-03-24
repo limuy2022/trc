@@ -37,6 +37,7 @@ pub const ARGUMENT_CANNOT_BE_VOID: &str = "compiler.argumenterror.void_argu";
 pub const JUST_ACCEPT_BOOL: &str = "compiler.typerror.if_while_accept_bool";
 pub const RETURN_SHOULD_IN_FUNCTION: &str = "compiler.syntaxerror.return_should_in_function";
 pub const RETURN_TYPE_ERROR: &str = "compiler.typerror.return_type";
+pub const SHOULD_IN_LOOP: &str = "compiler.syntaxerror.should_in_loop";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

@@ -45,24 +45,28 @@ println("hello world!")
 a := int(input())
 while a > 0 {
     if a %2 == 0{
-        println(a)
+        println("{}", a)
     }
     a = a- 1
 }
 ```
 
-### Big num calculation
+### fast pow
 
 ```go
-a := 1231234561234
-b := a
-println(a)
-println(b)
-println(a + b)
-c := a - b
-println(c)
-del "c"
-println(a * b)
+func fastpow(a: int, b: int) int {
+  if b == 0 {
+    return 1
+  }
+  tmp := fastpow(a, b // 2)
+  tmp = tmp * tmp
+  if b % 2 != 0 {
+   tmp = tmp * a
+  }
+  return tmp
+}
+
+print("{}", fastpow(2, 3))
 ```
 
 ## project website

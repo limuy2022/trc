@@ -857,8 +857,9 @@ impl<'a> AstBuilder<'a> {
         {
             self.new_var(*argname, *argty).unwrap();
         }
+        // 回退函数体
         for i in body.iter().rev() {
-            self.token_lexer.next_back(i.0.clone());
+            self.token_lexer.next_back_with_line(i.0.clone(), i.1);
         }
         loop {
             let t = self.token_lexer.next_token()?;

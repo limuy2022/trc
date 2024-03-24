@@ -52,7 +52,7 @@ impl Context {
     pub fn new(module_name: &str) -> Self {
         Self {
             module_name: String::from(module_name),
-            line: 1,
+            line: 0,
         }
     }
 

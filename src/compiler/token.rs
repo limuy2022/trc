@@ -224,7 +224,8 @@ impl BraceRecord {
 pub struct TokenLex<'code> {
     pub compiler_data: &'code mut Compiler,
     braces_check: Vec<BraceRecord>,
-    unget_token: Vec<Token>,
+    // token和当前行号
+    unget_token: Vec<(Token, usize)>,
     pub const_pool: ValuePool,
 }
 
@@ -783,7 +784,8 @@ impl<'a> TokenLex<'a> {
     pub fn next_token(&mut self) -> RunResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
-            return Ok(tmp);
+            self.compiler_data.context.set_line(tmp.1);
+            return Ok(tmp.0);
         }
         let presecnt_lex = self.compiler_data.input.read();
         match presecnt_lex {
@@ -828,7 +830,14 @@ impl<'a> TokenLex<'a> {
     }
 
     pub fn next_back(&mut self, t: Token) {
-        self.unget_token.push(t);
+        self.unget_token
+            .push((t, self.compiler_data.context.get_line()));
+    }
+
+    /// 回退并重新设置行号
+    pub fn next_back_with_line(&mut self, t: Token, line_num: usize) {
+        self.next_back(t);
+        self.compiler_data.context.set_line(line_num);
     }
 
     pub fn check(&mut self) -> Result<(), RuntimeError> {

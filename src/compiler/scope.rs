@@ -174,6 +174,8 @@ pub struct SymScope {
     pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
     // 计算当前需要最少多大的空间来保存变量
     pub var_sz: usize,
+    // 保存当前环境下的function io，global环境无
+    pub func_io: Option<TypeAllowNull>,
 }
 
 impl SymScope {

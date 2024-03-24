@@ -12,6 +12,7 @@ use crate::{
     tvm::get_trcobj_sz,
 };
 use rust_i18n::t;
+use std::borrow::{Borrow, BorrowMut};
 use std::mem::size_of;
 use std::{cell::RefCell, rc::Rc};
 
@@ -765,6 +766,8 @@ impl<'a> AstBuilder<'a> {
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
+            TokenType::Continue => {}
+            TokenType::Break => {}
             TokenType::Return => {
                 if self.process_info.is_global {
                     return self.gen_error(ErrorInfo::new(
@@ -774,7 +777,38 @@ impl<'a> AstBuilder<'a> {
                 }
                 // ignore the result
                 // for return and return expr both
-                self.expr(true).ok();
+                let ret_type = self
+                    .self_scope
+                    .as_ref()
+                    .borrow()
+                    .func_io
+                    .clone()
+                    .unwrap()
+                    .clone();
+                match ret_type {
+                    TypeAllowNull::Yes(ty) => {
+                        self.expr(true)?;
+                        let actual_ty = self.process_info.get_last_ty().unwrap();
+                        if ty != actual_ty {
+                            let s1 = self.get_ty_name(ty);
+                            let s2 = self.get_ty_name(actual_ty);
+                            return self.gen_error(ErrorInfo::new(
+                                t!(RETURN_TYPE_ERROR, "0" = s1, "1" = s2),
+                                t!(TYPE_ERROR),
+                            ));
+                        }
+                    }
+                    TypeAllowNull::No => {
+                        if self.expr(true).is_ok() {
+                            let actual_ty = self.process_info.get_last_ty().unwrap();
+                            let name = self.get_ty_name(actual_ty);
+                            return self.gen_error(ErrorInfo::new(
+                                t!(RETURN_TYPE_ERROR, "0" = "void", "1" = name),
+                                t!(TYPE_ERROR),
+                            ));
+                        }
+                    }
+                }
                 self.add_bycode(Opcode::PopFrame, NO_ARG);
                 return Ok(());
             }
@@ -814,6 +848,13 @@ impl<'a> AstBuilder<'a> {
                         self.store_var(name)?;
                         return Ok(());
                     }
+                    TokenType::SelfAdd => {}
+                    TokenType::SelfSub => {}
+                    TokenType::SelfMul => {}
+                    TokenType::SelfDiv => {}
+                    TokenType::SelfMod => {}
+                    TokenType::SelfOr => {}
+                    TokenType::SelfAnd => {}
                     _ => {
                         self.token_lexer.next_back(tt);
                     }
@@ -848,6 +889,7 @@ impl<'a> AstBuilder<'a> {
         let tmp = self.self_scope.clone();
         // 解析参数
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
+        self.self_scope.as_ref().borrow_mut().func_io = Some(io.return_type.clone());
         debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
         for (argty, argname) in io
             .argvs_type

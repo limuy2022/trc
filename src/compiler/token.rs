@@ -125,6 +125,8 @@ pub enum TokenType {
     // 不会被使用到的自反运算符，仅仅当标识重载运算符使用
     SelfNegative,
     EndOfFile,
+    Continue,
+    Break,
 }
 
 pub type ConstPoolIndexTy = usize;
@@ -199,6 +201,8 @@ impl Display for TokenType {
             TokenType::SelfNegative => "-",
             TokenType::CharValue => "char",
             TokenType::BoolValue => "bool",
+            TokenType::Continue => "continue",
+            TokenType::Break => "break",
         };
         write!(f, "{}", res)
     }
@@ -270,7 +274,9 @@ fn get_keywords() -> &'static HashMap<String, TokenType> {
             "func".to_string() => TokenType::Func,
             "match".to_string() => TokenType::Match,
             "return".to_string() => TokenType::Return,
-            "import".to_string() => TokenType::Import
+            "import".to_string() => TokenType::Import,
+            "continue".to_string() => TokenType::Continue,
+            "break".to_string() => TokenType::Break
         ]
     })
 }

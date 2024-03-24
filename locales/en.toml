@@ -41,6 +41,7 @@ unclosed_format = "unmatched {"
 operator_unsupport = "operator %{0} is not supported for type %{1}"
 type_not_same = "Type %{0} and %{1} are not the same"
 if_while_accept_bool = "if/while accept only bool type"
+return_type = "function return type should be %{0}, but given %{1}"
 
 [compiler.report]
 in_module = "In module %{name}"

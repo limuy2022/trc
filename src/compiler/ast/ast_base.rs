@@ -52,7 +52,7 @@ impl<'a> AstBuilder<'a> {
             VmStackType::Str => self.cache.strty_id,
             VmStackType::Char => self.cache.charty_id,
             VmStackType::Bool => self.cache.boolty_id,
-            VmStackType::Object => unreachable!(),
+            VmStackType::Object => panic!("Error Type"),
         }
     }
 
@@ -148,29 +148,16 @@ impl<'a> AstBuilder<'a> {
 
     pub fn gen_args_error(&mut self, info: ArguError) -> ErrorInfo {
         match info {
-            crate::base::stdlib::ArguError::TypeNotMatch(ArgumentError {
-                expected: exp,
-                actual: act,
-            }) => ErrorInfo::new(
-                t!(
-                    EXPECT_TYPE,
-                    "0" = self
-                        .self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_class(exp)
-                        .unwrap()
-                        .get_name(),
-                    "1" = self
-                        .self_scope
-                        .as_ref()
-                        .borrow()
-                        .get_class(act)
-                        .unwrap()
-                        .get_name()
-                ),
-                t!(ARGUMENT_ERROR),
-            ),
+            crate::base::stdlib::ArguError::TypeNotMatch(ArgumentError { expected, actual }) => {
+                ErrorInfo::new(
+                    t!(
+                        EXPECT_TYPE,
+                        "0" = self.get_ty_name(expected),
+                        "1" = self.get_ty_name(actual)
+                    ),
+                    t!(ARGUMENT_ERROR),
+                )
+            }
             crate::base::stdlib::ArguError::NumNotMatch(ArgumentError { expected, actual }) => {
                 ErrorInfo::new(
                     t!(ARGU_NUMBER, "0" = expected, "1" = actual),
@@ -178,5 +165,15 @@ impl<'a> AstBuilder<'a> {
                 )
             }
         }
+    }
+
+    pub fn get_ty_name(&mut self, type_name: TyIdxTy) -> String {
+        self.self_scope
+            .as_ref()
+            .borrow()
+            .get_class(type_name)
+            .unwrap()
+            .get_name()
+            .to_string()
     }
 }

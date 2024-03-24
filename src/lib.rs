@@ -11,7 +11,7 @@ rust_i18n::i18n!("locales");
 #[derive(Debug, Parser)]
 #[command(
     author = "limuy",
-    version = "0.1",
+    version = crate::cfg::VERSION,
     about = "A powerful programming language",
     long_about = "This programming language is powerful, effective, safe, easy-to-learn"
 )]

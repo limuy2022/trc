@@ -20,7 +20,7 @@ use super::{
     token::{ConstPoolIndexTy, Token, TokenType},
     InputSource, TokenLex, ValuePool,
 };
-use crate::base::stdlib::FunctionInterface;
+use crate::base::stdlib::{ArgumentError, FunctionInterface};
 
 #[derive(Default)]
 struct Cache {
@@ -333,6 +333,7 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
+    /// 解析函数，变量等的读取
     fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
@@ -369,7 +370,8 @@ impl<'a> AstBuilder<'a> {
                 // 这是为了加速
                 // 可变参数的话，因为类型不确定，我们会将其生成指令移入obj栈中
                 if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
-                    self.try_err(istry, e)?
+                    let msg = self.gen_args_error(e);
+                    self.try_err(istry, msg)?
                 }
                 if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
                     self.add_bycode(Opcode::CallNative, obj.buildin_id);
@@ -407,9 +409,6 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn item(&mut self, istry: bool) -> AstError<TypeAllowNull> {
-        if let Ok(v) = self.val(true) {
-            return Ok(v);
-        }
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::IntValue => {
@@ -439,10 +438,7 @@ impl<'a> AstBuilder<'a> {
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
-                self.try_err(
-                    istry,
-                    ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
-                )?
+                Ok(self.val(istry)?)
             }
         }
     }
@@ -468,7 +464,10 @@ impl<'a> AstBuilder<'a> {
                         self.add_bycode(v.opcode.clone(), NO_ARG);
                         Ok(v.io.return_type.clone())
                     }
-                    Err(e) => self.try_err(istry, e)?,
+                    Err(e) => {
+                        let msg = self.gen_args_error(e);
+                        self.try_err(istry, msg)
+                    }
                 }
             }
             None => self.try_err(

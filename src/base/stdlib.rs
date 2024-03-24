@@ -38,6 +38,22 @@ pub struct RustFunction {
     pub io: IOType,
 }
 
+pub struct ArgumentError {
+    pub expected: usize,
+    pub actual: usize,
+}
+
+impl ArgumentError {
+    pub fn new(expected: usize, actual: usize) -> ArgumentError {
+        ArgumentError { expected, actual }
+    }
+}
+
+pub enum ArguError {
+    TypeNotMatch(ArgumentError),
+    NumNotMatch(ArgumentError),
+}
+
 impl IOType {
     pub fn new(argvs_type: Vec<usize>, return_type: TypeAllowNull, var_params: bool) -> IOType {
         IOType {
@@ -47,22 +63,22 @@ impl IOType {
         }
     }
 
-    pub fn check_argvs(&self, argvs: Vec<usize>) -> Result<(), ErrorInfo> {
+    pub fn check_argvs(&self, argvs: Vec<usize>) -> Result<(), ArguError> {
         if argvs.len() != self.argvs_type.len() {
-            return Err(ErrorInfo::new(
-                t!(ARGU_NUMBER, "0" = self.argvs_type.len(), "1" = argvs.len()),
-                t!(ARGUMENT_ERROR),
-            ));
+            return Err(ArguError::NumNotMatch(ArgumentError::new(
+                self.argvs_type.len(),
+                argvs.len(),
+            )));
         }
         for i in argvs.iter().enumerate().take(self.argvs_type.len()) {
             if self.argvs_type[i.0] == 0 {
                 continue;
             }
             if self.argvs_type[i.0] != *i.1 {
-                return Err(ErrorInfo::new(
-                    t!(EXPECT_TYPE, "0" = self.argvs_type[i.0], "1" = i.1),
-                    t!(ARGUMENT_ERROR),
-                ));
+                return Err(ArguError::TypeNotMatch(ArgumentError::new(
+                    self.argvs_type[i.0],
+                    *i.1,
+                )));
             }
         }
         Ok(())

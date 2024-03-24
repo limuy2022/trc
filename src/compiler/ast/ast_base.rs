@@ -5,6 +5,8 @@ use crate::base::codegen::Inst;
 use crate::base::codegen::Opcode;
 use crate::base::codegen::VmStackType;
 use crate::base::error::*;
+use crate::base::stdlib::ArguError;
+use crate::base::stdlib::ArgumentError;
 use crate::compiler::scope::TyIdxTy;
 use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
@@ -141,6 +143,40 @@ impl<'a> AstBuilder<'a> {
             self.staticdata
                 .line_table
                 .push(self.token_lexer.compiler_data.context.get_line())
+        }
+    }
+
+    pub fn gen_args_error(&mut self, info: ArguError) -> ErrorInfo {
+        match info {
+            crate::base::stdlib::ArguError::TypeNotMatch(ArgumentError {
+                expected: exp,
+                actual: act,
+            }) => ErrorInfo::new(
+                t!(
+                    EXPECT_TYPE,
+                    "0" = self
+                        .self_scope
+                        .as_ref()
+                        .borrow()
+                        .get_class(exp)
+                        .unwrap()
+                        .get_name(),
+                    "1" = self
+                        .self_scope
+                        .as_ref()
+                        .borrow()
+                        .get_class(act)
+                        .unwrap()
+                        .get_name()
+                ),
+                t!(ARGUMENT_ERROR),
+            ),
+            crate::base::stdlib::ArguError::NumNotMatch(ArgumentError { expected, actual }) => {
+                ErrorInfo::new(
+                    t!(ARGU_NUMBER, "0" = expected, "1" = actual),
+                    t!(ARGUMENT_ERROR),
+                )
+            }
         }
     }
 }

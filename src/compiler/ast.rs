@@ -518,7 +518,7 @@ impl<'a> AstBuilder<'a> {
         let name_id = match self.self_scope.as_ref().borrow_mut().insert_sym(funcname) {
             Some(v) => v,
             None => {
-                return self.report_error(ErrorInfo::new(
+                return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_REDEFINED,
                         "0" = self.token_lexer.const_pool.id_name[funcname]
@@ -544,22 +544,25 @@ impl<'a> AstBuilder<'a> {
             self.get_token_checked(TokenType::Colon)?;
             ty_list.push(self.get_ty(false)?);
         }
-        let tmp = self.token_lexer.next_token()?;
-        let return_ty = match tmp.tp {
-            TokenType::Arrow => TypeAllowNull::Yes(self.get_ty(false)?),
-            _ => {
-                self.token_lexer.next_back(tmp);
-                TypeAllowNull::No
-            }
+        // 返回值解析
+        let return_ty = match self.get_ty(true) {
+            Err(_) => TypeAllowNull::No,
+            Ok(ty) => TypeAllowNull::Yes(ty),
         };
         let io = IOType::new(ty_list, return_ty, false);
         self.get_token_checked(TokenType::LeftBigBrace)?;
         let mut function_body = vec![];
+        let mut cnt = 1;
         loop {
             let t = self.token_lexer.next_token()?;
             function_body.push((t.clone(), self.token_lexer.compiler_data.context.get_line()));
             if t.tp == RightBigBrace {
-                break;
+                cnt -= 1;
+                if cnt == 0 {
+                    break;
+                }
+            } else if t.tp == TokenType::LeftBigBrace {
+                cnt += 1;
             }
         }
         // self.self_scope = tmp.clone();
@@ -637,7 +640,7 @@ impl<'a> AstBuilder<'a> {
         let sym_idx = match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
             Some(v) => v,
             None => {
-                return self.report_error(ErrorInfo::new(
+                return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_REDEFINED,
                         "0" = self.token_lexer.const_pool.id_name[name]
@@ -662,7 +665,7 @@ impl<'a> AstBuilder<'a> {
         let var_type = match self.process_info.get_last_ty() {
             Some(v) => v,
             None => {
-                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+                return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
         };
         self.new_var(name, var_type)?;
@@ -674,13 +677,13 @@ impl<'a> AstBuilder<'a> {
         let var_type = match self.process_info.get_last_ty() {
             Some(v) => v,
             None => {
-                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+                return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
         };
         let var = match self.self_scope.as_ref().borrow().get_var(name) {
             Some(v) => v,
             None => {
-                return self.report_error(ErrorInfo::new(
+                return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
                         "0" = self.token_lexer.const_pool.id_name[name]
@@ -690,7 +693,7 @@ impl<'a> AstBuilder<'a> {
             }
         };
         if var.ty != var_type {
-            return self.report_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
+            return self.gen_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
         }
         self.modify_var(var.ty, var.addr, self.process_info.is_global);
         Ok(())
@@ -712,11 +715,11 @@ impl<'a> AstBuilder<'a> {
         self.expr(false)?;
         match self.process_info.stack_type.last() {
             None => {
-                return self.report_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+                return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
             Some(ty) => {
                 if *ty != self.cache.boolty_id {
-                    return self.report_error(ErrorInfo::new(t!(JUST_ACCEPT_BOOL), t!(TYPE_ERROR)));
+                    return self.gen_error(ErrorInfo::new(t!(JUST_ACCEPT_BOOL), t!(TYPE_ERROR)));
                 }
             }
         }
@@ -763,6 +766,19 @@ impl<'a> AstBuilder<'a> {
     fn statement(&mut self) -> RunResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
+            TokenType::Return => {
+                if self.process_info.is_global {
+                    return self.gen_error(ErrorInfo::new(
+                        t!(RETURN_SHOULD_IN_FUNCTION),
+                        t!(SYNTAX_ERROR),
+                    ));
+                }
+                // ignore the result
+                // for return and return expr both
+                self.expr(true).ok();
+                self.add_bycode(Opcode::PopFrame, NO_ARG);
+                return Ok(());
+            }
             TokenType::Func => {
                 self.def_func()?;
                 return Ok(());
@@ -845,23 +861,17 @@ impl<'a> AstBuilder<'a> {
         for i in body.iter().rev() {
             self.token_lexer.next_back(i.0.clone());
         }
-        let mut is_pop = false;
         loop {
             let t = self.token_lexer.next_token()?;
             if t.tp == RightBigBrace {
                 break;
             }
-            is_pop = false;
-            if t.tp == TokenType::Return {
-                self.expr(false)?;
-                self.add_bycode(Opcode::PopFrame, NO_ARG);
-                is_pop = true;
-            } else {
-                self.token_lexer.next_back(t);
-                self.statement()?;
-            }
+            self.token_lexer.next_back(t);
+            self.statement()?;
         }
-        if !is_pop {
+        if !self.staticdata.inst.is_empty()
+            && self.staticdata.inst.last().unwrap().opcode != Opcode::PopFrame
+        {
             self.add_bycode(Opcode::PopFrame, NO_ARG);
         }
         self.generate_func_in_scope()?;
@@ -1058,6 +1068,34 @@ mod tests {
                 Inst::new(Opcode::OrBool, NO_ARG),
             ]
         );
+    }
+
+    #[test]
+    fn test_expr_in_arg() {
+        gen_test_env!(
+            r#"
+a:=90
+print("{}", a+90)"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::AddInt, NO_ARG),
+                Inst::new(Opcode::MoveInt, NO_ARG),
+                Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_prelude_function("print").unwrap().buildin_id
+                ),
+            ]
+        )
     }
 
     #[test]

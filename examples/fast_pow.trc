@@ -3,13 +3,12 @@ func fastpow(a: int, b: int) int {
   if b == 0 {
     return 1
   }
-  if b == 1 {
-    return a
-  }
-  tmp := fastpow(a, b / 2);
-  tmp = tmp * tmp;
+  tmp := fastpow(a, b // 2)
+  tmp = tmp * tmp
   if b % 2 != 0 {
-    tmp = tmp * a
+   tmp = tmp * a
   }
-  return tmp;
+  return tmp
 }
+
+print("{}", fastpow(2, 3))

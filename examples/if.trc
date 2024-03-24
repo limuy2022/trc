@@ -2,6 +2,9 @@ a:=90
 if a==90 {
   println("i equal to 90")
 }
+if a==89 {
+  println("i equal to 89")
+}
 if a < 89 {
   println("i less than 90")
 } else {

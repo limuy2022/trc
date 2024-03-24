@@ -22,16 +22,12 @@ impl<'a> AstBuilder<'a> {
         self.first_func = false
     }
 
-    pub fn report_error<T>(&self, info: ErrorInfo) -> AstError<T> {
-        self.token_lexer.compiler_data.report_compiler_error(info)
-    }
-
     #[inline]
     pub fn try_err<T>(&self, istry: bool, info: ErrorInfo) -> AstError<T> {
         if istry {
             Err(LightFakeError::new().into())
         } else {
-            self.report_error(info)
+            self.gen_error(info)
         }
     }
 
@@ -116,12 +112,13 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn gen_error<T>(&self, e: ErrorInfo) -> AstError<T> {
-        self.try_err(false, e)
+        self.token_lexer.compiler_data.report_compiler_error(e)
     }
 
     pub fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
         let t = self.token_lexer.next_token()?;
         if t.tp != ty {
+            self.token_lexer.next_back(t.clone());
             self.gen_error(ErrorInfo::new(
                 t!(UNEXPECTED_TOKEN, "0" = t.tp),
                 t!(SYNTAX_ERROR),

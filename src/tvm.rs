@@ -523,6 +523,7 @@ impl<'a> Vm<'a> {
                 let condit = impl_opcode!(bool, self, 1);
                 if !condit {
                     *pc = self.static_data.inst[*pc].operand;
+                    return Ok(());
                 }
             }
             Opcode::Jump => {

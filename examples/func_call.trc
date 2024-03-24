@@ -1,6 +1,19 @@
 func t1(a: int, b: int, c: int) {
   println("{}{}{}", a, b, c)
 }
+
+func test_complex(a:int) {
+  if a==89 {
+   print("i am 89")
+  }
+  if a ==90{
+    print("i am 90")
+  }
+}
+
+func oo(p: int) {
+  oo(p/2)
+}
 t1(90, 89, 77)
 a:=9
 b:=8

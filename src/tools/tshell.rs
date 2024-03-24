@@ -59,6 +59,7 @@ pub fn tshell() -> RunResult<()> {
                 }
             };
             line += &tmp;
+            line.push('\n');
             check_lexer.modify_input(Box::new(compiler::StringSource::new(tmp)));
             loop {
                 let i = match check_lexer.next_token() {

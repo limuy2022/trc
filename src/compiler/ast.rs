@@ -1,27 +1,24 @@
 mod ast_base;
 mod lexprocess;
 
-use crate::compiler::token::TokenType::RightBigBrace;
-use crate::{
-    base::{
-        codegen::{Inst, Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
-        error::*,
-        func,
-        stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
-    },
-    tvm::get_trcobj_sz,
+use crate::base::{
+    codegen::{Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
+    error::*,
+    func,
+    stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
 };
+use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
 use std::borrow::{Borrow, BorrowMut};
-use std::mem::{size_of, swap};
+use std::mem::swap;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
     scope::*,
-    token::{ConstPoolIndexTy, Token, TokenType},
-    InputSource, TokenLex, ValuePool,
+    token::{ConstPoolIndexTy, TokenType},
+    InputSource, TokenLex,
 };
-use crate::base::stdlib::{ArgumentError, FunctionInterface};
+use crate::base::stdlib::FunctionInterface;
 
 #[derive(Default)]
 struct Cache {
@@ -1038,7 +1035,12 @@ impl<'a> AstBuilder<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{base::stdlib::get_prelude_function, compiler::*};
+    use std::mem::size_of;
+
+    use crate::{
+        base::{codegen::Inst, stdlib::get_prelude_function},
+        compiler::*,
+    };
 
     use super::*;
 

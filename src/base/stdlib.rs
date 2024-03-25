@@ -5,7 +5,6 @@ use std::{
 };
 
 use downcast_rs::{impl_downcast, Downcast};
-use rust_i18n::t;
 
 use crate::{
     compiler::{

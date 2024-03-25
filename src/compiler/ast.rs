@@ -655,7 +655,8 @@ impl<'a> AstBuilder<'a> {
         );
         // the standard library first
         let strpath = path.to_str().unwrap();
-        if strpath.get(0..3) == Some("std") {
+        if strpath.starts_with("std") {
+
         } else if let InputSource::File(now_module_path) =
             self.token_lexer.compiler_data.option.inputsource.clone()
         {

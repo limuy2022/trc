@@ -12,7 +12,7 @@ func test_complex(a:int) {
 }
 
 func oo(p: int) {
-  oo(p/2)
+  oo(p//2)
 }
 t1(90, 89, 77)
 a:=9

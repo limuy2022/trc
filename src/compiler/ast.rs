@@ -117,6 +117,13 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
+        let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
+        for i in &prelude.functions {
+            token_lexer.const_pool.add_id(i.0.clone());
+        }
+        for i in &prelude.classes {
+            token_lexer.const_pool.add_id(i.0.clone());
+        }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
         let optimize = token_lexer.compiler_data.option.optimize;
@@ -134,16 +141,14 @@ impl<'a> AstBuilder<'a> {
         cache.strty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, STR).unwrap();
         cache.boolty_id =
             Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
-        let mut ret = AstBuilder {
+        AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),
             self_scope: root_scope,
             process_info: lexprocess::LexProcess::new(),
             cache,
             first_func: false,
-        };
-        ret.import_module_sym(get_stdlib().sub_modules.get("prelude").unwrap());
-        ret
+        }
     }
 
     expr_gen!(expr9, expr9_, factor, TokenType::Power);
@@ -643,14 +648,14 @@ impl<'a> AstBuilder<'a> {
         let mut path = self.token_lexer.const_pool.id_str[tok].clone();
         // the standard library first
         if path.starts_with("std") {
-            let mut import_item_name = String::new();
-            loop {
-                let c = path.pop().unwrap();
-                if c == '.' {
-                    break;
-                }
-                import_item_name = format!("{}{}", c, import_item_name);
-            }
+            // let mut import_item_name = String::new();
+            // loop {
+            //     let c = path.pop().unwrap();
+            //     if c == '.' {
+            //         break;
+            //     }
+            //     import_item_name = format!("{}{}", c, import_item_name);
+            // }
             let mut items = path.split(".");
             // 删除std
             items.next();
@@ -659,10 +664,7 @@ impl<'a> AstBuilder<'a> {
                 None => {
                     return self.try_err(
                         istry,
-                        ErrorInfo::new(
-                            t!(SYMBOL_NOT_FOUND, "0" = import_item_name),
-                            t!(SYMBOL_ERROR),
-                        ),
+                        ErrorInfo::new(t!(SYMBOL_NOT_FOUND, "0" = path), t!(SYMBOL_ERROR)),
                     );
                 }
             };
@@ -1642,5 +1644,17 @@ while a<10{
                 Inst::new(Opcode::Jump, 28),
             ]
         );
+    }
+
+    #[test]
+    fn test_import_std() {
+        gen_test_env!(
+            r#"import "std.math"
+print("{}", sin(9.8))
+        "#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(t.staticdata.inst, vec![]);
     }
 }

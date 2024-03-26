@@ -2,6 +2,7 @@ use colored::Colorize;
 use rust_i18n::t;
 use std::error::Error;
 use std::fmt::{Debug, Display};
+use std::process::exit;
 
 pub const SYNTAX_ERROR: &str = "compiler.SyntaxError";
 pub const OPERATOR_ERROR: &str = "compiler.OperatorError";
@@ -103,6 +104,7 @@ impl Error for LightFakeError {}
 
 impl Display for LightFakeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        panic!("Error calling lightfakeerror");
         write!(f, "")
     }
 }

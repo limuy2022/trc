@@ -6,9 +6,9 @@ use syn::{
     TypePath,
 };
 
-pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, Type) {
+pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, syn::Expr) {
     let output = sig.output.clone();
-    let output: Type = match output {
+    let output: syn::Expr = match output {
         ReturnType::Default => parse_str("TypeAllowNull::No").unwrap(),
         ReturnType::Type(_, ty) => {
             if let Type::Path(name) = (*ty).clone() {
@@ -17,11 +17,26 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, T
                     parse_str("TypeAllowNull::No").unwrap()
                 } else if tyname == "any" {
                     parse_str("ANY_TYPE").unwrap()
+                } else if tyname.ends_with("str") {
+                    parse_str(r#"TypeAllowNull::Yes(crate::tvm::types::TrcStr::export_info())"#)
+                        .unwrap()
+                } else if tyname.ends_with("int") {
+                    parse_str("TypeAllowNull::Yes(crate::tvm::types::TrcInt::export_info())")
+                        .unwrap()
+                } else if tyname.ends_with("bool") {
+                    parse_str("TypeAllowNull::Yes(crate::tvm::types::TrcBool::export_info())")
+                        .unwrap()
+                } else if tyname.ends_with("char") {
+                    parse_str("TypeAllowNull::Yes(crate::tvm::types::TrcChar::export_info())")
+                        .unwrap()
+                } else if tyname.ends_with("float") {
+                    parse_str("TypeAllowNull::Yes(crate::tvm::types::TrcFloat::export_info())")
+                        .unwrap()
                 } else {
-                    (*ty).clone()
+                    panic!("error");
                 }
             } else {
-                (*ty).clone()
+                panic!("error");
             }
         }
     };

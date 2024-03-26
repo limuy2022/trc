@@ -6,7 +6,7 @@ use crate::tvm::TrcFloatInternal;
 use derive::{def_module, trc_function};
 
 #[trc_function]
-pub fn sin_t(x: float) {
+pub fn sin_t(x: float) -> float {
     return f64::sin(x);
 }
 

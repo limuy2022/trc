@@ -1,0 +1,4 @@
+import "std.math"
+
+a:=3.14 / 6.0
+print("{} {}", a, sin(a))

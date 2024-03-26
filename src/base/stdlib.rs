@@ -302,13 +302,13 @@ impl Stdlib {
         self.functions.insert(name, func);
     }
 
-    pub fn get_module<T: Iterator<Item = String>>(&self, mut path: T) -> Option<Stdlib> {
+    pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Stdlib> {
         let item = path.next();
         if item.is_none() {
             return Some(self.clone());
         }
         let item = item.unwrap();
-        let lock = self.sub_modules.get(&item).unwrap();
+        let lock = self.sub_modules.get(&item.into()).unwrap();
         lock.get_module(path)
     }
 }

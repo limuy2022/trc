@@ -7,6 +7,7 @@ use crate::base::codegen::VmStackType;
 use crate::base::error::*;
 use crate::base::stdlib::ArguError;
 use crate::base::stdlib::ArgumentError;
+use crate::base::stdlib::Stdlib;
 use crate::compiler::scope::TyIdxTy;
 use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
@@ -175,5 +176,14 @@ impl<'a> AstBuilder<'a> {
             .unwrap()
             .get_name()
             .to_string()
+    }
+
+    pub fn import_module_sym(&mut self, lib: &Stdlib) {
+        for i in &lib.functions {
+            self.token_lexer.const_pool.add_id(i.0.clone());
+        }
+        for i in &lib.classes {
+            self.token_lexer.const_pool.add_id(i.0.clone());
+        }
     }
 }

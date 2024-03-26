@@ -99,11 +99,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                 continue;
             }
             new_stmts.push(
-                parse_str::<Stmt>(&format!(
-                    "dydata.obj_stack.push(Box::new({}));",
-                    quote!(#reexpr)
-                ))
-                .unwrap(),
+                parse_str::<Stmt>(&format!("dydata.push_data({});", quote!(#reexpr))).unwrap(),
             );
             new_stmts.push(return_stmt.clone());
         } else {

@@ -163,7 +163,7 @@ pub struct SymScope {
     // id到变量类型的映射
     vars: HashMap<ScopeAllocIdTy, VarInfo>,
     // 由token id到模块的映射
-    modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
+    // modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
     types_id: ScopeAllocClassId,
     vars_id: ScopeAllocIdTy,
@@ -218,8 +218,23 @@ impl SymScope {
     }
 
     /// import the module defined in rust
-    pub fn import_native_module(&mut self, id: ScopeAllocIdTy, stdlib: &'static Stdlib) {
-        self.modules.insert(id, stdlib);
+    pub fn import_native_module(
+        &mut self,
+        id: ScopeAllocIdTy,
+        stdlib: &Stdlib,
+        const_pool: &ValuePool,
+    ) {
+        // self.modules.insert(id, stdlib);
+        let funcs = &stdlib.functions;
+        for i in funcs {
+            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
+            self.add_func(idx, Box::new(i.1.clone()));
+        }
+        let types = &stdlib.classes;
+        for i in types {
+            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
+            self.add_type(idx, *i.1);
+        }
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {

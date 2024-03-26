@@ -117,13 +117,6 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
-        let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
-        for i in &prelude.functions {
-            token_lexer.const_pool.add_id(i.0.clone());
-        }
-        for i in &prelude.classes {
-            token_lexer.const_pool.add_id(i.0.clone());
-        }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
         let optimize = token_lexer.compiler_data.option.optimize;
@@ -141,14 +134,16 @@ impl<'a> AstBuilder<'a> {
         cache.strty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, STR).unwrap();
         cache.boolty_id =
             Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
-        AstBuilder {
+        let mut ret = AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),
             self_scope: root_scope,
             process_info: lexprocess::LexProcess::new(),
             cache,
             first_func: false,
-        }
+        };
+        ret.import_module_sym(get_stdlib().sub_modules.get("prelude").unwrap());
+        ret
     }
 
     expr_gen!(expr9, expr9_, factor, TokenType::Power);
@@ -641,25 +636,47 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn import_module(&mut self, istry: bool) -> AstError<()> {
-        let path = self.token_lexer.next_token()?;
-        if path.tp != TokenType::StringValue {
-            self.try_err(
-                istry,
-                ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = path.tp), t!(SYNTAX_ERROR)),
-            )?
-        }
-        let path = std::path::PathBuf::from(
-            self.token_lexer.const_pool.id_str[path.data.unwrap()]
-                .clone()
-                .replace('.', "/"),
-        );
+        let tok = self
+            .get_token_checked(TokenType::StringValue)?
+            .data
+            .unwrap();
+        let mut path = self.token_lexer.const_pool.id_str[tok].clone();
         // the standard library first
-        let strpath = path.to_str().unwrap();
-        if strpath.starts_with("std") {
-
+        if path.starts_with("std") {
+            let mut import_item_name = String::new();
+            loop {
+                let c = path.pop().unwrap();
+                if c == '.' {
+                    break;
+                }
+                import_item_name = format!("{}{}", c, import_item_name);
+            }
+            let mut items = path.split(".");
+            // 删除std
+            items.next();
+            let now = match get_stdlib().get_module(items) {
+                Some(d) => d,
+                None => {
+                    return self.try_err(
+                        istry,
+                        ErrorInfo::new(
+                            t!(SYMBOL_NOT_FOUND, "0" = import_item_name),
+                            t!(SYMBOL_ERROR),
+                        ),
+                    );
+                }
+            };
+            self.import_module_sym(&now);
+            self.self_scope.as_ref().borrow_mut().import_native_module(
+                tok,
+                &now,
+                &self.token_lexer.const_pool,
+            );
         } else if let InputSource::File(now_module_path) =
             self.token_lexer.compiler_data.option.inputsource.clone()
         {
+            let path = std::path::PathBuf::from(path.replace('.', "/"));
+
             let mut now_module_path = std::path::PathBuf::from(now_module_path);
             now_module_path.pop();
             now_module_path = now_module_path.join(path);

@@ -13,7 +13,7 @@ use self::{
     gc::GcMgr,
     types::{
         trcchar::TrcCharInternal,
-        trcfloat::{div_float, exact_div_float, TrcFloat, TrcFloatInteral},
+        trcfloat::{div_float, exact_div_float, TrcFloat, TrcFloatInternal},
         trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt, TrcIntInternal},
         trcstr::{TrcStr, TrcStrInternal},
         TrcBool, TrcChar, TrcObj,
@@ -347,7 +347,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first + second);
             }
             Opcode::AddFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first + second);
             }
             Opcode::AddStr => {
@@ -363,7 +363,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first - second);
             }
             Opcode::SubFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first - second);
             }
             Opcode::MulInt => {
@@ -371,7 +371,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first * second);
             }
             Opcode::MulFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first * second);
             }
             Opcode::DivInt => {
@@ -380,7 +380,7 @@ impl<'a> Vm<'a> {
                     .push_data(self.throw_err_info(div_int(first, second))?);
             }
             Opcode::DivFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
                     .push_data(self.throw_err_info(div_float(first, second))?);
             }
@@ -390,7 +390,7 @@ impl<'a> Vm<'a> {
                     .push_data(self.throw_err_info(exact_div_int(first, second))?);
             }
             Opcode::ExtraDivFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
                     .push_data(self.throw_err_info(exact_div_float(first, second))?);
             }
@@ -408,7 +408,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first == second);
             }
             Opcode::EqFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first == second);
             }
             Opcode::EqStr => {
@@ -428,7 +428,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first != second);
             }
             Opcode::NeFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first != second);
             }
             Opcode::NeStr => {
@@ -448,7 +448,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first < second);
             }
             Opcode::LtFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first < second);
             }
             Opcode::LeInt => {
@@ -456,7 +456,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first <= second);
             }
             Opcode::LeFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first <= second);
             }
             Opcode::GtInt => {
@@ -464,7 +464,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first > second);
             }
             Opcode::GtFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first > second);
             }
             Opcode::GeInt => {
@@ -472,7 +472,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(first >= second);
             }
             Opcode::GeFloat => {
-                let (first, second) = impl_opcode!(TrcFloatInteral, self, 2);
+                let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata.push_data(first >= second);
             }
             Opcode::AndBool => {
@@ -516,7 +516,7 @@ impl<'a> Vm<'a> {
                 self.dynadata.push_data(-first);
             }
             Opcode::SelfNegativeFloat => {
-                let first = impl_opcode!(TrcFloatInteral, self, 1);
+                let first = impl_opcode!(TrcFloatInternal, self, 1);
                 self.dynadata.push_data(-first);
             }
             Opcode::JumpIfFalse => {
@@ -575,7 +575,7 @@ impl<'a> Vm<'a> {
                     .set_var(addr, data)
             }
             Opcode::StoreLocalFloat => {
-                let data = self.dynadata.pop_data::<TrcFloatInteral>();
+                let data = self.dynadata.pop_data::<TrcFloatInternal>();
                 let addr = self.static_data.inst[*pc].operand;
                 self.dynadata
                     .frames_stack
@@ -634,7 +634,7 @@ impl<'a> Vm<'a> {
                     .frames_stack
                     .last()
                     .unwrap()
-                    .get_var::<TrcFloatInteral>(self.static_data.inst[*pc].operand);
+                    .get_var::<TrcFloatInternal>(self.static_data.inst[*pc].operand);
                 self.dynadata.push_data(data);
             }
             Opcode::LoadLocalVarStr => {
@@ -679,7 +679,7 @@ impl<'a> Vm<'a> {
             }
             Opcode::StoreGlobalFloat => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<TrcFloatInteral>();
+                let data = self.dynadata.pop_data::<TrcFloatInternal>();
                 self.dynadata.set_var(addr, data);
             }
             Opcode::StoreGlobalChar => {
@@ -714,7 +714,7 @@ impl<'a> Vm<'a> {
             }
             Opcode::LoadGlobalVarFloat => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<TrcFloatInteral>(addr);
+                let data = self.dynadata.get_var::<TrcFloatInternal>(addr);
                 self.dynadata.push_data(data);
             }
             Opcode::LoadGlobalVarStr => {

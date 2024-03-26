@@ -17,7 +17,6 @@ pub fn lex_arrow(
             let mut control_which_put = false;
             let mut iter = x.stream().into_iter();
             while let Some(i) = iter.next() {
-                // println!("{}", i);
                 if let TokenTree::Punct(x) = i {
                     let x = x.to_string();
                     if x == "=" {
@@ -40,7 +39,13 @@ pub fn lex_arrow(
                     right_name.extend(std::iter::once(i));
                 }
             }
-            left_push.push(syn::parse(left_name).expect("left push break"));
+            if left_name.is_empty() && right_name.is_empty() {
+                return;
+            }
+            left_push.push(
+                syn::parse(left_name.clone())
+                    .expect(&format!("left push break, left name {}", left_name)),
+            );
             right_push.push(syn::parse(right_name).expect("right push break"));
         }
         _ => {

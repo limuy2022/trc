@@ -1655,6 +1655,16 @@ print("{}", sin(9.8))
             t
         );
         t.generate_code().unwrap();
-        assert_eq!(t.staticdata.inst, vec![]);
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::LoadFloat, 0),
+                Inst::new(Opcode::CallNative, 3),
+                Inst::new(Opcode::MoveFloat, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 0),
+            ]
+        );
     }
 }

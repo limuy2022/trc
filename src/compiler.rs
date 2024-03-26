@@ -87,8 +87,11 @@ impl Option {
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub struct Float {
+    // 小数点前的部分
     front: i64,
+    // 小数点后的部分
     back: i64,
+    // 小数点后紧跟着的0的个数
     zero: usize,
 }
 
@@ -101,9 +104,10 @@ impl Float {
         if tmp == 0 {
             return 1;
         }
-        let ret: u8 = 0;
+        let mut ret: u8 = 0;
         while tmp != 0 {
             tmp /= 10;
+            ret += 1;
         }
         ret
     }
@@ -448,5 +452,12 @@ mod tests {
         assert_eq!(pool.id_int[0], 0);
         assert_eq!(pool.id_float[0], Float::new(9, 0, 0));
         assert_eq!(pool.id_str[1], "vale");
+    }
+
+    #[test]
+    fn test_float() {
+        assert_eq!(Float::new(9, 0, 0).to_float(), 9f64);
+        assert_eq!(Float::new(9, 1, 0).to_float(), 9.1f64);
+        assert_eq!(Float::new(9, 5, 1).to_float(), 9.05f64);
     }
 }

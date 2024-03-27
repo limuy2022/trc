@@ -9,7 +9,6 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::borrow::{Borrow, BorrowMut};
 use std::mem::swap;
 use std::{cell::RefCell, rc::Rc};
 
@@ -749,11 +748,13 @@ impl<'a> AstBuilder<'a> {
                 }
                 Some(module) => {
                     self.import_module_sym(&module);
-                    self.self_scope.as_ref().borrow_mut().import_native_module(
+                    if let Err(e) = self.self_scope.as_ref().borrow_mut().import_native_module(
                         tok,
                         &module,
                         &self.token_lexer.const_pool,
-                    );
+                    ) {
+                        return self.try_err(istry, e);
+                    }
                 }
             }
         } else if let InputSource::File(now_module_path) =

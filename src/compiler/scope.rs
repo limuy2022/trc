@@ -2,7 +2,7 @@ use rust_i18n::t;
 
 use super::{
     token::{ConstPoolIndexTy, Token},
-    ErrorInfo, RunResult, ValuePool, SYMBOL_ERROR,
+    ErrorInfo, ValuePool, SYMBOL_ERROR,
 };
 use crate::base::{
     error::SYMBOL_REDEFINED,

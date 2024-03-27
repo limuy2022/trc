@@ -127,6 +127,8 @@ pub enum TokenType {
     EndOfFile,
     Continue,
     Break,
+    Var,
+    Pub,
 }
 
 pub type ConstPoolIndexTy = usize;
@@ -203,6 +205,8 @@ impl Display for TokenType {
             TokenType::BoolValue => "bool",
             TokenType::Continue => "continue",
             TokenType::Break => "break",
+            TokenType::Var => "var",
+            TokenType::Pub => "pub",
         };
         write!(f, "{}", res)
     }
@@ -276,7 +280,9 @@ fn get_keywords() -> &'static HashMap<String, TokenType> {
             "return".to_string() => TokenType::Return,
             "import".to_string() => TokenType::Import,
             "continue".to_string() => TokenType::Continue,
-            "break".to_string() => TokenType::Break
+            "break".to_string() => TokenType::Break,
+            "var".to_string() => TokenType::Var,
+            "pub".to_string() => TokenType::Pub
         ]
     })
 }

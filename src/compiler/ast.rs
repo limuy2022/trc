@@ -573,18 +573,7 @@ impl<'a> AstBuilder<'a> {
 
     fn def_func(&mut self) -> AstError<()> {
         let funcname = self.get_token_checked(TokenType::ID)?.data.unwrap();
-        let name_id = match self.self_scope.as_ref().borrow_mut().insert_sym(funcname) {
-            Some(v) => v,
-            None => {
-                return self.gen_error(ErrorInfo::new(
-                    t!(
-                        SYMBOL_REDEFINED,
-                        "0" = self.token_lexer.const_pool.id_name[funcname]
-                    ),
-                    t!(SYMBOL_ERROR),
-                ));
-            }
-        };
+        let name_id = self.insert_sym_with_error(funcname)?;
         // lex args
         self.get_token_checked(TokenType::LeftSmallBrace)?;
         let mut argname: ArgsNameTy = vec![];
@@ -636,7 +625,72 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn lex_class_item_loop(&mut self, class_obj: &mut CustomType) -> AstError<()> {
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::RightBigBrace {
+                break;
+            }
+            self.token_lexer.next_back(t);
+            self.lex_class_item(class_obj)?;
+        }
+        Ok(())
+    }
+
+    fn lex_class_item(&mut self, class_obj: &mut CustomType) -> AstError<()> {
+        let t = self.token_lexer.next_token()?;
+        match t.tp {
+            TokenType::Var => {
+                // 声明属性
+                let attr_name_tok = self.get_token_checked(TokenType::ID)?;
+                let attr_id = self.insert_sym_with_error(attr_name_tok.data.unwrap())?;
+                self.get_token_checked(TokenType::Colon)?;
+                self.get_ty(false)?;
+                class_obj.add_attr(attr_id, self.process_info.get_last_ty().unwrap());
+            }
+            TokenType::Pub => {
+                self.self_scope.as_ref().borrow_mut().is_pub = true;
+                self.get_token_checked(TokenType::LeftBigBrace)?;
+                self.lex_class_item_loop(class_obj)?;
+                self.get_token_checked(TokenType::RightBigBrace)?;
+                self.self_scope.as_ref().borrow_mut().is_pub = true;
+            }
+            TokenType::Func => {
+                self.def_func()?;
+            }
+            _ => {
+                self.gen_error(ErrorInfo::new(
+                    t!(UNEXPECTED_TOKEN, "0" = t.tp),
+                    t!(SYNTAX_ERROR),
+                ))?;
+            }
+        }
+        Ok(())
+    }
+
     fn def_class(&mut self) -> AstError<()> {
+        // new scope
+        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(self.self_scope.clone()))));
+        self.self_scope.as_ref().borrow_mut().in_class = true;
+        let name = self.get_token_checked(TokenType::ID)?.data.unwrap();
+        let name_id = self.insert_sym_with_error(name)?;
+        let mut class_obj =
+            CustomType::new(name_id, self.token_lexer.const_pool.id_name[name].clone());
+        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.lex_class_item_loop(&mut class_obj)?;
+        // 将作用域中剩下的函数加入作用域
+        self.self_scope
+            .as_ref()
+            .borrow_mut()
+            .add_custom_type(name_id, class_obj);
+        let prev_scope = self
+            .self_scope
+            .as_ref()
+            .borrow()
+            .prev_scope
+            .clone()
+            .unwrap();
+        self.self_scope = prev_scope;
         Ok(())
     }
 
@@ -715,18 +769,7 @@ impl<'a> AstBuilder<'a> {
 
     /// 生成新建变量的指令
     fn new_var(&mut self, name: ConstPoolIndexTy, varty: ScopeAllocClassId) -> AstError<()> {
-        let sym_idx = match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
-            Some(v) => v,
-            None => {
-                return self.gen_error(ErrorInfo::new(
-                    t!(
-                        SYMBOL_REDEFINED,
-                        "0" = self.token_lexer.const_pool.id_name[name]
-                    ),
-                    t!(SYMBOL_ERROR),
-                ));
-            }
-        };
+        let sym_idx = self.insert_sym_with_error(name)?;
         let (var_sym, var_addr) =
             self.self_scope
                 .as_ref()

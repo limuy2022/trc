@@ -151,7 +151,7 @@ impl VarInfo {
 #[derive(Default)]
 pub struct SymScope {
     // 父作用域
-    prev_scope: Option<Rc<RefCell<SymScope>>>,
+    pub prev_scope: Option<Rc<RefCell<SymScope>>>,
     // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
     sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
@@ -181,6 +181,8 @@ pub struct SymScope {
     // 保存当前for所有的continue
     pub for_continue: Vec<usize>,
     pub in_loop: bool,
+    pub in_class: bool,
+    pub is_pub: bool,
 }
 
 impl SymScope {
@@ -233,8 +235,12 @@ impl SymScope {
         let types = &stdlib.classes;
         for i in types {
             let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
-            self.add_type(idx, *i.1);
+            self.add_native_type(idx, *i.1);
         }
+    }
+
+    pub fn add_custom_type(&mut self, id: ScopeAllocIdTy, mut f: CustomType) {
+        self.types_custom_store.insert(id, f);
     }
 
     pub fn import_prelude(&mut self, const_pool: &ValuePool) {
@@ -246,7 +252,7 @@ impl SymScope {
         let types = &get_stdlib().sub_modules.get("prelude").unwrap().classes;
         for i in types {
             let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
-            self.add_type(idx, *i.1);
+            self.add_native_type(idx, *i.1);
         }
     }
 
@@ -328,7 +334,7 @@ impl SymScope {
         self.var_sz
     }
 
-    pub fn add_type(&mut self, id: usize, t: usize) {
+    pub fn add_native_type(&mut self, id: ScopeAllocIdTy, t: usize) {
         self.types.insert(id, t);
     }
 

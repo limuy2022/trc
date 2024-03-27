@@ -1,5 +1,6 @@
 use super::AstBuilder;
 use super::AstError;
+use super::ScopeAllocIdTy;
 use super::SymScope;
 use crate::base::codegen::Inst;
 use crate::base::codegen::Opcode;
@@ -9,6 +10,7 @@ use crate::base::stdlib::ArguError;
 use crate::base::stdlib::ArgumentError;
 use crate::base::stdlib::Stdlib;
 use crate::compiler::scope::TyIdxTy;
+use crate::compiler::token::ConstPoolIndexTy;
 use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
 use crate::compiler::ValuePool;
@@ -184,6 +186,19 @@ impl<'a> AstBuilder<'a> {
         }
         for i in &lib.classes {
             self.token_lexer.const_pool.add_id(i.0.clone());
+        }
+    }
+
+    pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocIdTy> {
+        match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
+            Some(v) => Ok(v),
+            None => self.gen_error(ErrorInfo::new(
+                t!(
+                    SYMBOL_REDEFINED,
+                    "0" = self.token_lexer.const_pool.id_name[name]
+                ),
+                t!(SYMBOL_ERROR),
+            ))?,
         }
     }
 }

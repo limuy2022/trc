@@ -74,6 +74,9 @@ impl Display for RuntimeError {
     /// but you should translate the error messgae by caller
     #[cfg(not(tarpaulin_include))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // for lightfakeerror
+        debug_assert!(!self.info.error_type.is_empty());
+        debug_assert!(!self.info.message.is_empty());
         let s = format!(
             r#"{}
 {}

@@ -333,6 +333,10 @@ impl<'a> TokenLex<'a> {
         }
     }
 
+    pub fn add_id_token(&mut self, id_name: &str) -> usize {
+        self.const_pool.add_id(id_name.to_string())
+    }
+
     fn check_braces_stack(&mut self, c: char) -> Result<(), RuntimeError> {
         let top = self.braces_check.pop();
         match top {
@@ -1055,7 +1059,7 @@ mod tests {
                 Token::new(TokenType::And, None),
                 Token::new(TokenType::DoubleColon, None),
                 Token::new(TokenType::Store, None),
-                Token::new(TokenType::Colon, None)
+                Token::new(TokenType::Colon, None),
             ],
         );
     }

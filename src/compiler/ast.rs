@@ -9,7 +9,10 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::mem::swap;
+use std::{
+    borrow::{Borrow, BorrowMut},
+    mem::swap,
+};
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
@@ -332,15 +335,13 @@ impl<'a> AstBuilder<'a> {
                     self.token_lexer.next_back(nextt);
                 }
             }
-            let t = self.expr(true)?;
+            let t = self.expr(false)?;
             match t {
                 TypeAllowNull::No => {
-                    self.token_lexer
-                        .compiler_data
-                        .report_compiler_error(ErrorInfo::new(
-                            t!(ARGUMENT_CANNOT_BE_VOID),
-                            t!(ARGUMENT_ERROR),
-                        ))?;
+                    self.gen_error(ErrorInfo::new(
+                        t!(ARGUMENT_CANNOT_BE_VOID),
+                        t!(ARGUMENT_ERROR),
+                    ))?;
                 }
                 TypeAllowNull::Yes(t) => {
                     // 如果是可变参数是需要将其转入obj_stack的
@@ -438,7 +439,23 @@ impl<'a> AstBuilder<'a> {
                 }
                 Ok(func_obj.get_io().return_type.clone())
             } else if nxt.tp == TokenType::DoubleColon {
-                todo!()
+                let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
+                    Some(m) => m,
+                    None => self.try_err(
+                        istry,
+                        ErrorInfo::new(
+                            t!(
+                                SYMBOL_NOT_FOUND,
+                                "0" = self.token_lexer.const_pool.id_name[token_data]
+                            ),
+                            t!(SYMBOL_ERROR),
+                        ),
+                    )?,
+                };
+                swap(&mut self.self_scope, &mut module);
+                let ret = self.val(istry);
+                swap(&mut self.self_scope, &mut module);
+                ret
             } else {
                 self.token_lexer.next_back(nxt);
                 let var = match self.self_scope.as_ref().borrow().get_var(idx) {
@@ -742,18 +759,32 @@ impl<'a> AstBuilder<'a> {
                             );
                         }
                         Some(func_item) => {
-                            // self.self_scope.as_ref().borrow_mut().add_func(id, f)
+                            let token_idx: ConstPoolIndexTy =
+                                self.token_lexer.add_id_token(func_item.get_name());
+                            // println!("{}", func_item.get_name());
+                            let func_id = self.insert_sym_with_error(token_idx)?;
+                            self.self_scope
+                                .as_ref()
+                                .borrow_mut()
+                                .add_func(func_id, Box::new(func_item.clone()));
                         }
                     }
                 }
                 Some(module) => {
+                    let tmp = self.token_lexer.add_id_token(&import_item_name);
+                    let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(&module);
-                    if let Err(e) = self.self_scope.as_ref().borrow_mut().import_native_module(
-                        tok,
+                    match self.self_scope.as_ref().borrow_mut().import_native_module(
+                        module_sym_idx,
                         &module,
                         &self.token_lexer.const_pool,
                     ) {
-                        return self.try_err(istry, e);
+                        Err(e) => {
+                            return self.try_err(istry, e);
+                        }
+                        Ok(sp) => {
+                            sp.as_ref().borrow_mut().prev_scope = Some(self.self_scope.clone());
+                        }
                     }
                 }
             }

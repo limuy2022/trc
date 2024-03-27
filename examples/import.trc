@@ -1,4 +1,5 @@
-import "std.math"
-
 a:=3.14 / 6.0
+import "std.math"
 print("{} {}", a, math::sin(a))
+#import "std.math.sin"
+#print("{} {}", a, sin(a))

@@ -11,7 +11,7 @@ use crate::base::{
         OverrideWrapper, Stdlib, STD_CLASS_TABLE,
     },
 };
-use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
+use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
 
 pub type ScopeAllocIdTy = usize;
 #[derive(Clone, Debug)]
@@ -188,7 +188,7 @@ pub struct SymScope {
     pub in_loop: bool,
     pub in_class: bool,
     pub is_pub: bool,
-    imported_modules: HashMap<ScopeAllocIdTy, *const Stdlib>,
+    imported_modules: HashMap<ScopeAllocIdTy, Rc<RefCell<SymScope>>>,
 }
 
 impl SymScope {
@@ -245,23 +245,29 @@ impl SymScope {
         id: ScopeAllocIdTy,
         stdlib: &Stdlib,
         const_pool: &ValuePool,
-    ) -> Result<(), ErrorInfo> {
-        self.imported_modules.insert(id, stdlib as *const Stdlib);
-        // self.modules.insert(id, stdlib);
+    ) -> Result<Rc<RefCell<SymScope>>, ErrorInfo> {
+        let module_scope = Rc::new(RefCell::new(SymScope::new(None)));
         let funcs = &stdlib.functions;
         for i in funcs {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
-            self.add_func(idx, Box::new(i.1.clone()));
+            let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
+            module_scope
+                .as_ref()
+                .borrow_mut()
+                .add_func(idx, Box::new(i.1.clone()));
         }
         let types = &stdlib.classes;
         for i in types {
             let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
-            self.add_native_type(idx, *i.1);
+            module_scope
+                .as_ref()
+                .borrow_mut()
+                .add_native_type(idx, *i.1);
         }
-        Ok(())
+        self.imported_modules.insert(id, module_scope.clone());
+        Ok(module_scope)
     }
 
-    pub fn add_custom_type(&mut self, id: ScopeAllocIdTy, mut f: CustomType) {
+    pub fn add_custom_type(&mut self, id: ScopeAllocIdTy, f: CustomType) {
         self.types_custom_store.insert(id, f);
     }
 
@@ -278,14 +284,14 @@ impl SymScope {
         }
     }
 
-    pub fn get_module(&mut self, id: ScopeAllocIdTy) -> Option<*const Stdlib> {
+    pub fn get_module(&self, id: ScopeAllocIdTy) -> Option<Rc<RefCell<SymScope>>> {
         let t = self.imported_modules.get(&id);
         match t {
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.as_ref().borrow_mut().get_module(id),
+                Some(ref prev_scope) => prev_scope.as_ref().borrow().get_module(id),
                 None => None,
             },
-            Some(v) => Some(*v),
+            Some(v) => Some(v.clone()),
         }
     }
 

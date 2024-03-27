@@ -129,6 +129,8 @@ pub enum TokenType {
     Break,
     Var,
     Pub,
+    // ::
+    DoubleColon,
 }
 
 pub type ConstPoolIndexTy = usize;
@@ -207,6 +209,7 @@ impl Display for TokenType {
             TokenType::Break => "break",
             TokenType::Var => "var",
             TokenType::Pub => "pub",
+            TokenType::DoubleColon => "::",
         };
         write!(f, "{}", res)
     }
@@ -522,7 +525,17 @@ impl<'a> TokenLex<'a> {
             ),
             '~' => Token::new(TokenType::BitNot, None),
             '^' => self.self_symbol(TokenType::Xor, TokenType::SelfXor),
-            ':' => self.binary_symbol(TokenType::Colon, TokenType::Store, '='),
+            ':' => {
+                let c = self.compiler_data.input.read();
+                if c == '=' {
+                    Token::new(TokenType::Store, None)
+                } else if c == ':' {
+                    Token::new(TokenType::DoubleColon, None)
+                } else {
+                    self.compiler_data.input.unread(c);
+                    Token::new(TokenType::Colon, None)
+                }
+            }
             ';' => Token::new(TokenType::Semicolon, None),
             '|' => self.double_symbol(
                 TokenType::BitOr,
@@ -1013,7 +1026,7 @@ mod tests {
     fn test_symbol_lex() {
         gen_test_token_env!(
             r#":{}[]()+=%=//= // /=** *=*,
-    >><< >>=||&&"#,
+    >><< >>=||&&:::=:"#,
             t
         );
         check(
@@ -1040,6 +1053,9 @@ mod tests {
                 Token::new(TokenType::SelfBitRightShift, None),
                 Token::new(TokenType::Or, None),
                 Token::new(TokenType::And, None),
+                Token::new(TokenType::DoubleColon, None),
+                Token::new(TokenType::Store, None),
+                Token::new(TokenType::Colon, None)
             ],
         );
     }

@@ -275,6 +275,7 @@ pub struct Stdlib {
     pub name: String,
     pub sub_modules: HashMap<String, Stdlib>,
     pub functions: HashMap<String, RustFunction>,
+    // class name 和class id
     pub classes: HashMap<String, usize>,
 }
 

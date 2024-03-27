@@ -438,6 +438,8 @@ impl<'a> AstBuilder<'a> {
                     self.add_bycode(Opcode::CallCustom, obj.custom_id);
                 }
                 Ok(func_obj.get_io().return_type.clone())
+            } else if nxt.tp == TokenType::DoubleColon {
+                todo!()
             } else {
                 self.token_lexer.next_back(nxt);
                 let var = match self.self_scope.as_ref().borrow().get_var(idx) {
@@ -649,11 +651,18 @@ impl<'a> AstBuilder<'a> {
                 class_obj.add_attr(attr_id, self.process_info.get_last_ty().unwrap());
             }
             TokenType::Pub => {
-                self.self_scope.as_ref().borrow_mut().is_pub = true;
+                let mut is_in_pub = true;
+                swap(
+                    &mut self.self_scope.as_ref().borrow_mut().is_pub,
+                    &mut is_in_pub,
+                );
                 self.get_token_checked(TokenType::LeftBigBrace)?;
                 self.lex_class_item_loop(class_obj)?;
                 self.get_token_checked(TokenType::RightBigBrace)?;
-                self.self_scope.as_ref().borrow_mut().is_pub = true;
+                swap(
+                    &mut self.self_scope.as_ref().borrow_mut().is_pub,
+                    &mut is_in_pub,
+                );
             }
             TokenType::Func => {
                 self.def_func()?;
@@ -702,14 +711,15 @@ impl<'a> AstBuilder<'a> {
         let mut path = self.token_lexer.const_pool.id_str[tok].clone();
         // the standard library first
         if path.starts_with("std") {
-            // let mut import_item_name = String::new();
-            // loop {
-            //     let c = path.pop().unwrap();
-            //     if c == '.' {
-            //         break;
-            //     }
-            //     import_item_name = format!("{}{}", c, import_item_name);
-            // }
+            // 导入对象可能是模块，也有可能是函数，类等，先单独截取出来
+            let mut import_item_name = String::new();
+            loop {
+                let c = path.pop().unwrap();
+                if c == '.' {
+                    break;
+                }
+                import_item_name = format!("{}{}", c, import_item_name);
+            }
             let mut items = path.split(".");
             // 删除std
             items.next();
@@ -722,12 +732,30 @@ impl<'a> AstBuilder<'a> {
                     );
                 }
             };
-            self.import_module_sym(&now);
-            self.self_scope.as_ref().borrow_mut().import_native_module(
-                tok,
-                &now,
-                &self.token_lexer.const_pool,
-            );
+            match now.sub_modules.get(&import_item_name) {
+                None => {
+                    // 不是模块
+                    match now.functions.get(&import_item_name) {
+                        None => {
+                            return self.try_err(
+                                istry,
+                                ErrorInfo::new(t!(SYMBOL_NOT_FOUND, "0" = path), t!(SYMBOL_ERROR)),
+                            );
+                        }
+                        Some(func_item) => {
+                            // self.self_scope.as_ref().borrow_mut().add_func(id, f)
+                        }
+                    }
+                }
+                Some(module) => {
+                    self.import_module_sym(&module);
+                    self.self_scope.as_ref().borrow_mut().import_native_module(
+                        tok,
+                        &module,
+                        &self.token_lexer.const_pool,
+                    );
+                }
+            }
         } else if let InputSource::File(now_module_path) =
             self.token_lexer.compiler_data.option.inputsource.clone()
         {
@@ -1693,7 +1721,7 @@ while a<10{
     fn test_import_std() {
         gen_test_env!(
             r#"import "std.math"
-print("{}", sin(9.8))
+print("{}", math::sin(9.8))
         "#,
             t
         );

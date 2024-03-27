@@ -1,10 +1,15 @@
+use rust_i18n::t;
+
 use super::{
     token::{ConstPoolIndexTy, Token},
-    ValuePool,
+    ErrorInfo, RunResult, ValuePool, SYMBOL_ERROR,
 };
-use crate::base::stdlib::{
-    get_stdclass_end, get_stdlib, ArgsNameTy, ClassInterface, FunctionInterface, IOType,
-    OverrideWrapper, Stdlib, STD_CLASS_TABLE,
+use crate::base::{
+    error::SYMBOL_REDEFINED,
+    stdlib::{
+        get_stdclass_end, get_stdlib, ArgsNameTy, ClassInterface, FunctionInterface, IOType,
+        OverrideWrapper, Stdlib, STD_CLASS_TABLE,
+    },
 };
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
 
@@ -183,6 +188,7 @@ pub struct SymScope {
     pub in_loop: bool,
     pub in_class: bool,
     pub is_pub: bool,
+    imported_modules: HashMap<ScopeAllocIdTy, *const Stdlib>,
 }
 
 impl SymScope {
@@ -219,13 +225,28 @@ impl SymScope {
         ret
     }
 
+    pub fn insert_sym_with_error(
+        &mut self,
+        sym_name: ConstPoolIndexTy,
+        str_name: &str,
+    ) -> Result<ScopeAllocIdTy, ErrorInfo> {
+        match self.insert_sym(sym_name) {
+            Some(v) => Ok(v),
+            None => Err(ErrorInfo::new(
+                t!(SYMBOL_REDEFINED, "0" = str_name),
+                t!(SYMBOL_ERROR),
+            )),
+        }
+    }
+
     /// import the module defined in rust
     pub fn import_native_module(
         &mut self,
         id: ScopeAllocIdTy,
         stdlib: &Stdlib,
         const_pool: &ValuePool,
-    ) {
+    ) -> Result<(), ErrorInfo> {
+        self.imported_modules.insert(id, stdlib as *const Stdlib);
         // self.modules.insert(id, stdlib);
         let funcs = &stdlib.functions;
         for i in funcs {
@@ -234,9 +255,10 @@ impl SymScope {
         }
         let types = &stdlib.classes;
         for i in types {
-            let idx = self.insert_sym(const_pool.name_pool[i.0]).unwrap();
+            let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
             self.add_native_type(idx, *i.1);
         }
+        Ok(())
     }
 
     pub fn add_custom_type(&mut self, id: ScopeAllocIdTy, mut f: CustomType) {
@@ -256,7 +278,16 @@ impl SymScope {
         }
     }
 
-    pub fn get_module(&mut self, id: usize) {}
+    pub fn get_module(&mut self, id: ScopeAllocIdTy) -> Option<*const Stdlib> {
+        let t = self.imported_modules.get(&id);
+        match t {
+            None => match self.prev_scope {
+                Some(ref prev_scope) => prev_scope.as_ref().borrow_mut().get_module(id),
+                None => None,
+            },
+            Some(v) => Some(*v),
+        }
+    }
 
     pub fn get_function(&self, id: usize) -> Option<Box<dyn FunctionInterface>> {
         match self.funcs.get(&id) {

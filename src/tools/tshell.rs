@@ -39,7 +39,12 @@ pub fn tshell() -> RunResult<()> {
         );
         let mut check_lexer = braces_lexer.get_token_lex();
         let mut flag = true;
+        let mut first_read = true;
         loop {
+            if !first_read {
+                line.push('\n');
+            }
+            first_read = false;
             let tip_msg = "....".repeat(cnt) + ">>>>";
             let tmp = match rl.readline(&tip_msg) {
                 Ok(val) => val,
@@ -59,7 +64,6 @@ pub fn tshell() -> RunResult<()> {
                 }
             };
             line += &tmp;
-            line.push('\n');
             check_lexer.modify_input(Box::new(compiler::StringSource::new(tmp)));
             loop {
                 let i = match check_lexer.next_token() {

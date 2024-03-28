@@ -9,10 +9,7 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::{
-    borrow::{Borrow, BorrowMut},
-    mem::swap,
-};
+use std::mem::swap;
 use std::{cell::RefCell, rc::Rc};
 
 use super::{

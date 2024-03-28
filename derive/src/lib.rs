@@ -251,3 +251,16 @@ pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
     // println!("{}", ret);
     ret.into()
 }
+
+#[proc_macro_attribute]
+pub fn trc_const(_: TokenStream, input: TokenStream) -> TokenStream {
+    let mut input = parse_macro_input!(input as syn::ItemConst);
+    // 将const a = c;改成 const a = stringify!(c);
+    input.ty = parse_str("&str").unwrap();
+    input.expr = parse_str(&format!(
+        "stringify!({})",
+        input.expr.to_token_stream().to_string(),
+    ))
+    .unwrap();
+    quote!(#input).into()
+}

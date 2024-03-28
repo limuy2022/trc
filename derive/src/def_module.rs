@@ -4,6 +4,7 @@ use quote::quote;
 
 use crate::function;
 
+/// 解析[a=>b,c=>d]
 pub fn lex_arrow(
     left_push: &mut Vec<syn::Ident>,
     right_push: &mut Vec<syn::Ident>,
@@ -64,6 +65,32 @@ pub fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
     }
 }
 
+/// lex [a,b,c]
+///
+/// # Panics
+///
+/// Panics if the structure is not like `[a,b,c]`.
+fn lex_group(mut iter: &mut IntoIter, container: &mut Vec<syn::Ident>) {
+    if let TokenTree::Group(x, ..) = iter.next().unwrap() {
+        // println!("{}", x);
+        let iter = x.stream().into_iter();
+        for i in iter {
+            if let TokenTree::Ident(x) = i {
+                container.push(syn::parse_str::<syn::Ident>(&(x.to_string())).unwrap());
+            } else if let TokenTree::Punct(x) = i {
+                let x = x.to_string();
+                if x != "," {
+                    panic!(r#"expected ",".get {}"#, x);
+                } else if x == "]" {
+                    break;
+                }
+            }
+        }
+    } else {
+        panic!("expected group")
+    }
+}
+
 pub fn def_impl(context: TokenStream) -> TokenStream {
     let mut module_ident = None;
     let mut iter = context.into_iter();
@@ -72,6 +99,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
     let mut left_class = vec![];
     let mut right_class = vec![];
     let mut submodules = vec![];
+    let mut consts = vec![];
     while let Some(i) = iter.next() {
         match i {
             TokenTree::Ident(x) => {
@@ -103,27 +131,12 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
                         &mut iter,
                         "classes are expected",
                     );
+                } else if x == "consts" {
+                    check_next_iter(&mut iter, "=");
+                    lex_group(&mut iter, &mut consts);
                 } else if x == "submodules" {
                     check_next_iter(&mut iter, "=");
-                    if let TokenTree::Group(x, ..) = iter.next().unwrap() {
-                        // println!("{}", x);
-                        let iter = x.stream().into_iter();
-                        for i in iter {
-                            if let TokenTree::Ident(x) = i {
-                                submodules
-                                    .push(syn::parse_str::<syn::Ident>(&(x.to_string())).unwrap());
-                            } else if let TokenTree::Punct(x) = i {
-                                let x = x.to_string();
-                                if x != "," {
-                                    panic!("expected ,.get {}", x);
-                                } else if x == "]" {
-                                    break;
-                                }
-                            }
-                        }
-                    } else {
-                        panic!("expected group")
-                    }
+                    lex_group(&mut iter, &mut submodules);
                 }
             }
             TokenTree::Punct(x) => {
@@ -147,6 +160,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
             let mut functions = HashMap::new();
             let mut classes = HashMap::new();
             let mut submodules = HashMap::new();
+            let mut consts_info = HashMap::new();
             #(
                 functions.insert(stringify!(#right_func).to_string(), #left_func());
             )*
@@ -159,11 +173,15 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
             #(
                 submodules.insert(stringify!(#submodules).to_string(), #submodules::init());
             )*
+            #(
+                consts_info.insert(stringify!(#consts).to_string(), #consts.to_string());
+            )*
             Stdlib::new(
                 stringify!(#module_ident),
                 submodules,
                 functions,
-                classes
+                classes,
+                consts_info
             )
         }
     );

@@ -277,6 +277,7 @@ pub struct Stdlib {
     pub functions: HashMap<String, RustFunction>,
     // class name 和class id
     pub classes: HashMap<String, usize>,
+    pub consts: HashMap<String, String>,
 }
 
 impl Stdlib {
@@ -285,12 +286,14 @@ impl Stdlib {
         sub_modules: HashMap<String, Stdlib>,
         functions: HashMap<String, RustFunction>,
         classes: HashMap<String, usize>,
+        consts: HashMap<String, String>,
     ) -> Stdlib {
         Stdlib {
             name: name.into(),
             sub_modules,
             functions,
             classes,
+            consts,
         }
     }
 
@@ -300,7 +303,8 @@ impl Stdlib {
     }
 
     pub fn add_function(&mut self, name: String, func: RustFunction) {
-        self.functions.insert(name, func);
+        let ret = self.functions.insert(name, func);
+        debug_assert!(ret.is_none());
     }
 
     pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Stdlib> {

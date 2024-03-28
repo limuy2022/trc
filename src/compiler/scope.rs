@@ -249,7 +249,10 @@ impl SymScope {
         let module_scope = Rc::new(RefCell::new(SymScope::new(None)));
         let funcs = &stdlib.functions;
         for i in funcs {
-            let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
+            let idx = module_scope
+                .as_ref()
+                .borrow_mut()
+                .insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
             module_scope
                 .as_ref()
                 .borrow_mut()
@@ -257,7 +260,10 @@ impl SymScope {
         }
         let types = &stdlib.classes;
         for i in types {
-            let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
+            let idx = module_scope
+                .as_ref()
+                .borrow_mut()
+                .insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
             module_scope
                 .as_ref()
                 .borrow_mut()
@@ -324,6 +330,7 @@ impl SymScope {
     pub fn insert_sym(&mut self, id: usize) -> Option<usize> {
         let t = self.sym_map.insert(id, self.scope_sym_id);
         self.scope_sym_id += 1;
+        // 先前不能存在
         match t {
             None => Some(self.scope_sym_id - 1),
             Some(_) => None,

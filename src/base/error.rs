@@ -107,7 +107,6 @@ impl Error for LightFakeError {}
 impl Display for LightFakeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         panic!("Error calling lightfakeerror");
-        write!(f, "")
     }
 }
 

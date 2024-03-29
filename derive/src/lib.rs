@@ -47,7 +47,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                         let mut var_lex_tmp: Vec<Stmt> = vec![
                             parse_str("let mut va_list = vec![];").unwrap(),
                             parse_str(
-                                "let args_num = dydata.pop_data::<TrcIntInternal>() as usize;",
+                                "let args_num = dydata.pop_data::<crate::tvm::TrcIntInternal>() as usize;",
                             )
                             .unwrap(),
                             parse_str("va_list.reserve(args_num);").unwrap(),
@@ -80,7 +80,8 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
         }
     }
-    input.sig.output = parse_str::<syn::ReturnType>("-> RuntimeResult<()>").expect("err1");
+    input.sig.output =
+        parse_str::<syn::ReturnType>("-> crate::base::error::RuntimeResult<()>").expect("err1");
     let return_stmt = parse_str::<Stmt>("return Ok(());").expect("err2");
     for i in input.block.stmts {
         if let Stmt::Expr(Expr::Return(reexpr), ..) = i.clone() {
@@ -114,7 +115,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     // println!("{}{:#?}", name.to_string(), info_function_self);
 
     let rettmp = quote!(#input
-        fn #info_func_name() -> RustFunction {
+        fn #info_func_name() -> crate::base::stdlib::RustFunction {
             use crate::base::stdlib::*;
             use crate::compiler::scope::TypeAllowNull;
             let ret_classes = vec![#(#args_type_required::export_info()),*];

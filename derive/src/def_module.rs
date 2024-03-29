@@ -154,7 +154,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
             .expect("name error");
     }
     let ret = quote!(
-        pub fn init() -> Stdlib {
+        pub fn init() -> crate::base::stdlib::Stdlib {
             use crate::base::stdlib::Stdlib;
             use std::collections::hash_map::HashMap;
             let mut functions = HashMap::new();

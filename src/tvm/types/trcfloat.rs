@@ -31,18 +31,18 @@ impl TrcFloat {
 
     fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![
-            TokenType::Add => OverrideWrapper::new(Opcode::AddFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::Sub => OverrideWrapper::new(Opcode::SubFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::Mul => OverrideWrapper::new(Opcode::MulFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::Div => OverrideWrapper::new(Opcode::DivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::ExactDiv => OverrideWrapper::new(Opcode::ExtraDivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcInt::export_info()), false)),
-            TokenType::Equal => OverrideWrapper::new(Opcode::EqFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::NotEqual => OverrideWrapper::new(Opcode::NeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::Less => OverrideWrapper::new(Opcode::LtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::LessEqual => OverrideWrapper::new(Opcode::LeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::Greater => OverrideWrapper::new(Opcode::GtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::GreaterEqual => OverrideWrapper::new(Opcode::GeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(TrcBool::export_info()), false)),
-            TokenType::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeFloat, IOType::new(vec![], TypeAllowNull::Yes(Self::export_info()), false))
+            TokenType::Add => OverrideWrapper::new(Opcode::AddFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::Sub => OverrideWrapper::new(Opcode::SubFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::Mul => OverrideWrapper::new(Opcode::MulFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::Div => OverrideWrapper::new(Opcode::DivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::ExactDiv => OverrideWrapper::new(Opcode::ExtraDivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcInt::export_info()), false)),
+            TokenType::Equal => OverrideWrapper::new(Opcode::EqFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::NotEqual => OverrideWrapper::new(Opcode::NeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::Less => OverrideWrapper::new(Opcode::LtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::LessEqual => OverrideWrapper::new(Opcode::LeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::Greater => OverrideWrapper::new(Opcode::GtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::GreaterEqual => OverrideWrapper::new(Opcode::GeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
+            TokenType::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeFloat, IOType::new(vec![], TypeAllowNull::Some(Self::export_info()), false))
         ]
     }
 }

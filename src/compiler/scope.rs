@@ -14,29 +14,7 @@ use crate::base::{
 use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
 
 pub type ScopeAllocIdTy = usize;
-#[derive(Clone, Debug)]
-pub enum TypeAllowNull {
-    Yes(ScopeAllocIdTy),
-    No,
-}
-
-impl TypeAllowNull {
-    pub fn unwrap(&self) -> usize {
-        match self {
-            TypeAllowNull::Yes(t) => *t,
-            TypeAllowNull::No => panic!("null"),
-        }
-    }
-}
-
-impl Display for TypeAllowNull {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TypeAllowNull::Yes(t) => write!(f, "{}", t),
-            TypeAllowNull::No => write!(f, "null"),
-        }
-    }
-}
+pub type TypeAllowNull = Option<TyIdxTy>;
 
 /// Manager of function
 #[derive(Clone, Debug)]

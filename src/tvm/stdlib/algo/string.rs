@@ -1,6 +1,10 @@
 use std::usize;
 
-pub fn kmp(main_string: &str, pattern: &str) -> usize {
+use derive::{def_module, trc_function};
+
+use crate::tvm::types::trcint::TrcIntInternal;
+
+pub fn kmp_impl(main_string: &str, pattern: &str) -> usize {
     // 首先对模式串构建next数组
     let next_arr = kmp_next(pattern);
     let mut j: i64 = -1;
@@ -20,6 +24,11 @@ pub fn kmp(main_string: &str, pattern: &str) -> usize {
         }
     }
     ans
+}
+
+#[trc_function]
+pub fn kmp(main_string: str, pattern: str) -> int {
+    return unsafe { kmp_impl(&*main_string, &*pattern) as TrcIntInternal };
 }
 
 pub fn kmp_next(pattern: &str) -> Vec<i64> {
@@ -44,16 +53,16 @@ mod tests {
     use super::*;
     #[test]
     fn kmp_1() {
-        assert_eq!(kmp("ABABABC", "ABA"), 2);
+        assert_eq!(kmp_impl("ABABABC", "ABA"), 2);
         assert_eq!(
-            kmp(
+            kmp_impl(
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             ),
             16
         );
         assert_eq!(
-            kmp(
+            kmp_impl(
                 "asdfasfababdababaadfasababdababagsdgababdababa",
                 "ababdababa"
             ),
@@ -66,3 +75,5 @@ mod tests {
         assert_eq!(kmp_next("ABA"), vec![-1, -1, 0]);
     }
 }
+
+def_module!(module_name = string, functions = [kmp => kmp]);

@@ -79,17 +79,17 @@ macro_rules! tmp_expe_function_gen {
                     let tyb = self.$tmpfuncname(istry, stage_ty)?;
                     self.process_info.cal_val(stage_ty);
                     match tyb {
-                        TypeAllowNull::No => {
-                            Ok(TypeAllowNull::Yes(stage_ty))
+                        TypeAllowNull::None => {
+                            Ok(TypeAllowNull::Some(stage_ty))
                         }
-                        TypeAllowNull::Yes(_) => {
+                        TypeAllowNull::Some(_) => {
                             Ok(tyb)
                         }
                     }
                 })*
                 _ => {
                     self.token_lexer.next_back(next_sym);
-                    Ok(TypeAllowNull::No)
+                    Ok(TypeAllowNull::None)
                 }
             }
         }
@@ -102,11 +102,11 @@ macro_rules! expr_gen {
         tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token),*);
         fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
             let t1 = self.$next_item_func(istry)?;
-            if let TypeAllowNull::No = t1 {
+            if let TypeAllowNull::None = t1 {
                 return Ok(t1);
             }
             let t2 = self.$tmpfuncname(istry, t1.unwrap())?;
-            if let TypeAllowNull::No = t2 {
+            if let TypeAllowNull::None = t2 {
                 return Ok(t1);
             }
             Ok(t2)
@@ -334,16 +334,17 @@ impl<'a> AstBuilder<'a> {
             }
             let t = self.expr(false)?;
             match t {
-                TypeAllowNull::No => {
+                TypeAllowNull::None => {
                     self.gen_error(ErrorInfo::new(
                         t!(ARGUMENT_CANNOT_BE_VOID),
                         t!(ARGUMENT_ERROR),
                     ))?;
                 }
-                TypeAllowNull::Yes(t) => {
+                TypeAllowNull::Some(t) => {
                     // 如果是可变参数是需要将其转入obj_stack的
                     if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
                         // the values that have been stored is more than exact requirement of function
+                        self.process_info.stack_type.push(t);
                         self.move_val_into_obj_stack();
                         self.process_info.pop_last_ty();
                         var_params_num += 1;
@@ -434,6 +435,7 @@ impl<'a> AstBuilder<'a> {
                 } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
                     self.add_bycode(Opcode::CallCustom, obj.custom_id);
                 }
+                // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
                 Ok(func_obj.get_io().return_type.clone())
             } else if nxt.tp == TokenType::DoubleColon {
                 let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
@@ -471,7 +473,7 @@ impl<'a> AstBuilder<'a> {
                 let tmp = self.load_var(var.ty);
                 self.add_bycode(tmp, var.addr);
                 self.process_info.new_type(var.ty);
-                Ok(TypeAllowNull::Yes(var.ty))
+                Ok(TypeAllowNull::Some(var.ty))
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -488,27 +490,27 @@ impl<'a> AstBuilder<'a> {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
                 self.process_info.new_type(self.cache.intty_id);
-                Ok(TypeAllowNull::Yes(self.cache.intty_id))
+                Ok(TypeAllowNull::Some(self.cache.intty_id))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
                 self.process_info.new_type(self.cache.floatty_id);
-                Ok(TypeAllowNull::Yes(self.cache.floatty_id))
+                Ok(TypeAllowNull::Some(self.cache.floatty_id))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
                 self.process_info.new_type(self.cache.strty_id);
-                Ok(TypeAllowNull::Yes(self.cache.strty_id))
+                Ok(TypeAllowNull::Some(self.cache.strty_id))
             }
             TokenType::CharValue => {
                 self.add_bycode(Opcode::LoadChar, t.data.unwrap());
                 self.process_info.new_type(self.cache.charty_id);
-                Ok(TypeAllowNull::Yes(self.cache.charty_id))
+                Ok(TypeAllowNull::Some(self.cache.charty_id))
             }
             TokenType::BoolValue => {
                 self.add_bycode(Opcode::LoadBool, t.data.unwrap());
                 self.process_info.new_type(self.cache.boolty_id);
-                Ok(TypeAllowNull::Yes(self.cache.boolty_id))
+                Ok(TypeAllowNull::Some(self.cache.boolty_id))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
@@ -608,8 +610,8 @@ impl<'a> AstBuilder<'a> {
         }
         // 返回值解析
         let return_ty = match self.get_ty(true) {
-            Err(_) => TypeAllowNull::No,
-            Ok(ty) => TypeAllowNull::Yes(ty),
+            Err(_) => TypeAllowNull::None,
+            Ok(ty) => TypeAllowNull::Some(ty),
         };
         let io = IOType::new(ty_list, return_ty, false);
         self.get_token_checked(TokenType::LeftBigBrace)?;
@@ -992,7 +994,7 @@ impl<'a> AstBuilder<'a> {
                     .unwrap()
                     .clone();
                 match ret_type {
-                    TypeAllowNull::Yes(ty) => {
+                    TypeAllowNull::Some(ty) => {
                         self.expr(true)?;
                         let actual_ty = self.process_info.get_last_ty().unwrap();
                         if ty != actual_ty {
@@ -1004,7 +1006,7 @@ impl<'a> AstBuilder<'a> {
                             ));
                         }
                     }
-                    TypeAllowNull::No => {
+                    TypeAllowNull::None => {
                         if self.expr(true).is_ok() {
                             let actual_ty = self.process_info.get_last_ty().unwrap();
                             let name = self.get_ty_name(actual_ty);
@@ -1069,7 +1071,12 @@ impl<'a> AstBuilder<'a> {
             _ => {}
         }
         self.token_lexer.next_back(t);
-        self.expr(false)?;
+        let val_ty = match self.expr(false)? {
+            Some(v) => {
+                self.process_info.stack_type.push(v);
+            }
+            None => {}
+        };
         Ok(())
     }
 
@@ -1760,7 +1767,10 @@ print("{}", math::sin(9.8))
             vec![
                 Inst::new(Opcode::LoadString, 1),
                 Inst::new(Opcode::LoadFloat, 0),
-                Inst::new(Opcode::CallNative, 3),
+                Inst::new(
+                    Opcode::CallNative,
+                    get_stdlib().sub_modules["math"].functions["sin"].buildin_id
+                ),
                 Inst::new(Opcode::MoveFloat, 0),
                 Inst::new(Opcode::LoadInt, 1),
                 Inst::new(Opcode::CallNative, 0),

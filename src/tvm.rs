@@ -1,4 +1,3 @@
-mod algo;
 mod def;
 mod function;
 mod gc;

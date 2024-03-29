@@ -15,6 +15,7 @@ use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
 use crate::compiler::ValuePool;
 use crate::tvm::get_trcobj_sz;
+use core::panic;
 use rust_i18n::t;
 use std::cell::RefCell;
 use std::mem::size_of;

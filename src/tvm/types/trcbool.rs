@@ -46,9 +46,9 @@ impl TrcBool {
 
     fn override_export() -> HashMap<TokenType, OverrideWrapper> {
         hash_map![
-            TokenType::And => OverrideWrapper::new(crate::base::codegen::Opcode::AndBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::Or => OverrideWrapper::new(crate::base::codegen::Opcode::OrBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false)),
-            TokenType::Not => OverrideWrapper::new(crate::base::codegen::Opcode::NotBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Yes(Self::export_info()), false))
+            TokenType::And => OverrideWrapper::new(crate::base::codegen::Opcode::AndBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::Or => OverrideWrapper::new(crate::base::codegen::Opcode::OrBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
+            TokenType::Not => OverrideWrapper::new(crate::base::codegen::Opcode::NotBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false))
         ]
     }
 }

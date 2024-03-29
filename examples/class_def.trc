@@ -1,0 +1,5 @@
+class a{
+  var b:int
+}
+
+p:=a()

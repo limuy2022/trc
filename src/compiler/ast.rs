@@ -407,72 +407,79 @@ impl<'a> AstBuilder<'a> {
             }
             let idx = idx.unwrap();
             let nxt = self.token_lexer.next_token()?;
-            if nxt.tp == TokenType::LeftSmallBrace {
-                let func_obj = self.self_scope.as_ref().borrow().get_function(idx).unwrap();
-                let argv_list = self.opt_args(&func_obj)?;
-                // match )
-                self.get_token_checked(TokenType::RightSmallBrace)?;
-                // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
-                // 第二种情况就是入参有明确的类型
-                // 接下来在这种情况的基础上再分两种情况
-                // 第一种情况是自定义函数，这种情况下我们会像cpp模板那样对应生成版本
-                // 第二种情况是rust函数，这种情况下我们只能记录类型，然后由rust函数自己判断从哪个栈中取出函数
-                // 还有一种情况是any类型传入到函数中
-                // 这种情况无论是哪种函数我们都会插入一条尝试转换类型的指令,将类型栈进行移动
-                // 但是仅仅提供将其它类型移动到TrcObj的指令和从TrcObj转换到类型栈的函数
-                // 类型之间会互相转换我们会以内置函数形式提供
-                // 这是为了加速
-                // 可变参数的话，因为类型不确定，我们会将其生成指令移入obj栈中
-                if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
-                    let msg = self.gen_args_error(e);
-                    self.try_err(istry, msg)?
+            match nxt.tp {
+                TokenType::LeftSmallBrace => {
+                    let func_obj = self.self_scope.as_ref().borrow().get_function(idx).unwrap();
+                    let argv_list = self.opt_args(&func_obj)?;
+                    // match )
+                    self.get_token_checked(TokenType::RightSmallBrace)?;
+                    // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
+                    // 第二种情况就是入参有明确的类型
+                    // 接下来在这种情况的基础上再分两种情况
+                    // 第一种情况是自定义函数，这种情况下我们会像cpp模板那样对应生成版本
+                    // 第二种情况是rust函数，这种情况下我们只能记录类型，然后由rust函数自己判断从哪个栈中取出函数
+                    // 还有一种情况是any类型传入到函数中
+                    // 这种情况无论是哪种函数我们都会插入一条尝试转换类型的指令,将类型栈进行移动
+                    // 但是仅仅提供将其它类型移动到TrcObj的指令和从TrcObj转换到类型栈的函数
+                    // 类型之间会互相转换我们会以内置函数形式提供
+                    // 这是为了加速
+                    // 可变参数的话，因为类型不确定，我们会将其生成指令移入obj栈中
+                    if let Err(e) = func_obj.get_io().check_argvs(argv_list) {
+                        let msg = self.gen_args_error(e);
+                        self.try_err(istry, msg)?
+                    }
+                    if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
+                        self.add_bycode(Opcode::CallNative, obj.buildin_id);
+                    } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
+                        self.add_bycode(Opcode::CallCustom, obj.custom_id);
+                    }
+                    // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
+                    match func_obj.get_io().return_type {
+                        None => {}
+                        Some(v) => self.process_info.new_type(v),
+                    }
                 }
-                if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
-                    self.add_bycode(Opcode::CallNative, obj.buildin_id);
-                } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
-                    self.add_bycode(Opcode::CallCustom, obj.custom_id);
-                }
-                // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
-                match func_obj.get_io().return_type {
-                    None => {}
-                    Some(v) => self.process_info.new_type(v),
-                }
-            } else if nxt.tp == TokenType::DoubleColon {
-                let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
-                    Some(m) => m,
-                    None => self.try_err(
-                        istry,
-                        ErrorInfo::new(
-                            t!(
-                                SYMBOL_NOT_FOUND,
-                                "0" = self.token_lexer.const_pool.id_name[token_data]
+                TokenType::DoubleColon => {
+                    let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
+                        Some(m) => m,
+                        None => self.try_err(
+                            istry,
+                            ErrorInfo::new(
+                                t!(
+                                    SYMBOL_NOT_FOUND,
+                                    "0" = self.token_lexer.const_pool.id_name[token_data]
+                                ),
+                                t!(SYMBOL_ERROR),
                             ),
-                            t!(SYMBOL_ERROR),
-                        ),
-                    )?,
-                };
-                swap(&mut self.self_scope, &mut module);
-                let ret = self.val(istry);
-                swap(&mut self.self_scope, &mut module);
-                return ret;
-            } else {
-                self.token_lexer.next_back(nxt);
-                let var = match self.self_scope.as_ref().borrow().get_var(idx) {
-                    None => self.try_err(
-                        istry,
-                        ErrorInfo::new(
-                            t!(
-                                SYMBOL_NOT_FOUND,
-                                "0" = self.token_lexer.const_pool.id_name[token_data]
+                        )?,
+                    };
+                    swap(&mut self.self_scope, &mut module);
+                    let ret = self.val(istry);
+                    swap(&mut self.self_scope, &mut module);
+                    return ret;
+                }
+                TokenType::LeftBigBrace => {
+                    // 定义类
+                }
+                _ => {
+                    self.token_lexer.next_back(nxt);
+                    let var = match self.self_scope.as_ref().borrow().get_var(idx) {
+                        None => self.try_err(
+                            istry,
+                            ErrorInfo::new(
+                                t!(
+                                    SYMBOL_NOT_FOUND,
+                                    "0" = self.token_lexer.const_pool.id_name[token_data]
+                                ),
+                                t!(SYMBOL_ERROR),
                             ),
-                            t!(SYMBOL_ERROR),
-                        ),
-                    )?,
-                    Some(v) => v,
-                };
-                let tmp = self.load_var(var.ty);
-                self.add_bycode(tmp, var.addr);
-                self.process_info.new_type(var.ty);
+                        )?,
+                        Some(v) => v,
+                    };
+                    let tmp = self.load_var(var.ty);
+                    self.add_bycode(tmp, var.addr);
+                    self.process_info.new_type(var.ty);
+                }
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -582,6 +589,38 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
+    fn lex_cases(&mut self) -> AstError<()> {
+        loop {
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::RightSmallBrace {
+                break;
+            }
+            self.token_lexer.next_back(t);
+            self.expr(false)?;
+            self.get_token_checked(TokenType::LeftSmallBrace)?;
+            self.lex_until(TokenType::RightBigBrace)?;
+        }
+        Ok(())
+    }
+
+    fn match_lex(&mut self) -> AstError<()> {
+        self.expr(false)?;
+        self.get_token_checked(TokenType::LeftSmallBrace)?;
+        // 对int特化
+        match self.process_info.stack_type.last().copied() {
+            None => {
+                return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+            }
+            Some(v) => {
+                if v == self.cache.intty_id {
+                    self.lex_cases()?;
+                } else {
+                }
+            }
+        }
+        Ok(())
+    }
+
     fn def_func(&mut self) -> AstError<()> {
         let funcname = self.get_token_checked(TokenType::ID)?.data.unwrap();
         let name_id = self.insert_sym_with_error(funcname)?;
@@ -656,8 +695,8 @@ impl<'a> AstBuilder<'a> {
                 let attr_name_tok = self.get_token_checked(TokenType::ID)?;
                 let attr_id = self.insert_sym_with_error(attr_name_tok.data.unwrap())?;
                 self.get_token_checked(TokenType::Colon)?;
-                self.get_ty(false)?;
-                class_obj.add_attr(attr_id, self.process_info.get_last_ty().unwrap());
+                let ty = self.get_ty(false)?;
+                class_obj.add_attr(attr_id, ty);
             }
             TokenType::Pub => {
                 let mut is_in_pub = true;
@@ -1036,6 +1075,10 @@ impl<'a> AstBuilder<'a> {
             }
             TokenType::Import => {
                 self.import_module(false)?;
+                return Ok(());
+            }
+            TokenType::Match => {
+                self.match_lex()?;
                 return Ok(());
             }
             TokenType::ID => {
@@ -1765,5 +1808,47 @@ print("{}", math::sin(9.8))
                 Inst::new(Opcode::CallNative, 0),
             ]
         );
+    }
+
+    #[test]
+    fn test_match_int() {
+        gen_test_env!(
+            r#"
+a:=90
+match a {
+1 -> {
+
+}
+2 -> {
+
+}
+3 | 4 -> {
+
+}
+_ -> {
+    
+}
+}"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(t.staticdata.inst, vec![])
+    }
+
+    #[test]
+    fn test_match_string() {
+        gen_test_env!(
+            r#"
+a:="hello"
+match a {
+"hello" -> {
+
+}
+"world" -> {
+}"#,
+            t
+        );
+        t.generate_code().unwrap();
+        assert_eq!(t.staticdata.inst, vec![])
     }
 }

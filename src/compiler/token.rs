@@ -1,12 +1,9 @@
+use super::{Compiler, Context, Float, TokenIo, ValuePool};
+use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
+use rust_i18n::t;
 use std::{collections::HashMap, fmt::Display, sync::OnceLock};
 
-use rust_i18n::t;
-
-use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
-
-use super::{Compiler, Context, Float, TokenIo, ValuePool};
-
-#[derive(PartialEq, Debug, Clone, Hash, Eq)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Copy)]
 pub enum TokenType {
     // ->
     Arrow,

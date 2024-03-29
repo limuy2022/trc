@@ -120,8 +120,21 @@ pub enum Opcode {
     CallNative,
     CallCustom,
     JumpIfFalse,
+    JumpIfTrue,
     Jump,
     Stop,
+    EqWithoutPop,
+    EqIntWithoutPop,
+    EqFloatWithoutPop,
+    EqStrWithoutPop,
+    EqCharWithoutPop,
+    EqBoolWithoutPop,
+    PopData,
+    PopDataInt,
+    PopDataFloat,
+    PopDataStr,
+    PopDataChar,
+    PopDataBool,
 }
 
 impl Display for Opcode {

@@ -121,14 +121,18 @@ impl<'a> AstBuilder<'a> {
         self.token_lexer.compiler_data.report_compiler_error(e)
     }
 
+    pub fn gen_unexpected_token_token<T>(&mut self, unexpcted: TokenType) -> AstError<T> {
+        self.gen_error(ErrorInfo::new(
+            t!(UNEXPECTED_TOKEN, "0" = unexpcted),
+            t!(SYNTAX_ERROR),
+        ))
+    }
+
     pub fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
         let t = self.token_lexer.next_token()?;
         if t.tp != ty {
             self.token_lexer.next_back(t.clone());
-            self.gen_error(ErrorInfo::new(
-                t!(UNEXPECTED_TOKEN, "0" = t.tp),
-                t!(SYNTAX_ERROR),
-            ))?;
+            self.gen_unexpected_token_token(t.tp)?;
         }
         Ok(t)
     }
@@ -152,22 +156,18 @@ impl<'a> AstBuilder<'a> {
 
     pub fn gen_args_error(&mut self, info: ArguError) -> ErrorInfo {
         match info {
-            crate::base::stdlib::ArguError::TypeNotMatch(ArgumentError { expected, actual }) => {
-                ErrorInfo::new(
-                    t!(
-                        EXPECT_TYPE,
-                        "0" = self.get_ty_name(expected),
-                        "1" = self.get_ty_name(actual)
-                    ),
-                    t!(ARGUMENT_ERROR),
-                )
-            }
-            crate::base::stdlib::ArguError::NumNotMatch(ArgumentError { expected, actual }) => {
-                ErrorInfo::new(
-                    t!(ARGU_NUMBER, "0" = expected, "1" = actual),
-                    t!(ARGUMENT_ERROR),
-                )
-            }
+            ArguError::TypeNotMatch(ArgumentError { expected, actual }) => ErrorInfo::new(
+                t!(
+                    EXPECT_TYPE,
+                    "0" = self.get_ty_name(expected),
+                    "1" = self.get_ty_name(actual)
+                ),
+                t!(ARGUMENT_ERROR),
+            ),
+            ArguError::NumNotMatch(ArgumentError { expected, actual }) => ErrorInfo::new(
+                t!(ARGU_NUMBER, "0" = expected, "1" = actual),
+                t!(ARGUMENT_ERROR),
+            ),
         }
     }
 
@@ -200,6 +200,17 @@ impl<'a> AstBuilder<'a> {
                 ),
                 t!(SYMBOL_ERROR),
             ))?,
+        }
+    }
+
+    pub fn eq_without_pop(&self, ty: ScopeAllocIdTy) -> Opcode {
+        match self.convert_id_to_vm_ty(ty) {
+            VmStackType::Int => Opcode::EqIntWithoutPop,
+            VmStackType::Float => Opcode::EqFloatWithoutPop,
+            VmStackType::Str => Opcode::EqStrWithoutPop,
+            VmStackType::Char => Opcode::EqCharWithoutPop,
+            VmStackType::Bool => Opcode::EqBoolWithoutPop,
+            VmStackType::Object => Opcode::EqWithoutPop,
         }
     }
 }

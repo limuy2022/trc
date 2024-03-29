@@ -98,6 +98,15 @@ macro_rules! gen_interface {
             dydata.push_data(tmp);
             Ok(())
         }
+        paste::paste!(
+        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> RuntimeResult<()> {
+            let t2 = dydata.pop_data::<*mut dyn TrcObj>();
+            let t1 = dydata.read_top_data::<*mut dyn TrcObj>();
+            let tmp = unsafe { (*t1).$funcname(t2, &mut dydata.gc)? };
+            dydata.push_data(tmp);
+            Ok(())
+        }
+        );
     };
     ($funcname:ident, 1) => {
         pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
@@ -106,6 +115,14 @@ macro_rules! gen_interface {
             dydata.push_data(tmp);
             Ok(())
         }
+        paste::paste!(
+        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> RuntimeResult<()> {
+            let t1 = dydata.read_top_data::<*mut dyn TrcObj>();
+            let tmp = unsafe { (*t1).$funcname(&mut dydata.gc)? };
+            dydata.push_data(tmp);
+            Ok(())
+        }
+        );
     };
 }
 

@@ -6,6 +6,7 @@ authors = ["limuy"]
 description = "a easy-learn programming language"
 homepage = "https://github.com/limuy2022/trc"
 repository = "https://github.com/limuy2022/trc"
+license = "GPL 3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,6 +24,7 @@ rust-i18n = "3.0"
 sys-locale = "0.3"
 rustyline = { version = "14.0", features = ["with-file-history"] }
 suffix_array = "0.5.0"
+paste = "1"
 
 [profile.release]
 panic = "abort"

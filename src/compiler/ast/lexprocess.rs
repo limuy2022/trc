@@ -3,7 +3,7 @@ use crate::compiler::scope::TyIdxTy;
 /// 过程间分析用的结构
 #[derive(Default)]
 pub struct LexProcess {
-    pub stack_type: Vec<TyIdxTy>,
+    stack_type: Vec<TyIdxTy>,
     pub is_global: bool,
 }
 

@@ -1,0 +1,13 @@
+a:=90
+match a{
+1 -> {
+println("{}", a)
+}
+2|90 -> {
+println("{}", a)
+}
+_ -> {
+println("final case")
+}
+}
+println("out of range")

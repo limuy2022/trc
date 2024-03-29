@@ -7,7 +7,10 @@ pub mod math;
 pub mod prelude;
 pub mod sys;
 
-def_module!(module_name = std, submodules = [prelude, ds, algo, math, sys]);
+def_module!(
+    module_name = std,
+    submodules = [prelude, ds, algo, math, sys]
+);
 
 /// 导入标准库
 /// # Warning

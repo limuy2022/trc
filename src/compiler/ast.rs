@@ -9,7 +9,7 @@ use crate::base::{
 };
 use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::mem::swap;
+use std::{borrow::BorrowMut, mem::swap};
 use std::{cell::RefCell, rc::Rc};
 
 use super::{
@@ -66,7 +66,7 @@ macro_rules! tmp_expe_function_gen {
                             )
                         )?,
                         Some(v) => {
-                            if let Ok(_) = v.io.check_argvs(vec![*self.process_info.stack_type.last().unwrap()]) {}
+                            if let Ok(_) = v.io.check_argvs(vec![self.process_info.get_last_ty().unwrap()]) {}
                             else {
                                 self.try_err(istry,
                                     ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()), t!(OPERATOR_ERROR)))?
@@ -78,12 +78,12 @@ macro_rules! tmp_expe_function_gen {
                     let stage_ty = io_check.io.return_type.unwrap();
                     self.$tmpfuncname(istry, stage_ty)?;
                     self.process_info.cal_val(stage_ty);
-                    match self.process_info.stack_type.last() {
+                    match self.process_info.get_last_ty() {
                         None => {
                             self.process_info.new_type(stage_ty);
                         }
                         Some(v) => {
-                            self.process_info.new_type(*v);
+                            self.process_info.new_type(v);
                         }
                     }
                 })*
@@ -102,10 +102,10 @@ macro_rules! expr_gen {
         tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token),*);
         fn $funcname(&mut self, istry: bool) -> AstError<()> {
             self.$next_item_func(istry)?;
-            match self.process_info.stack_type.last() {
+            match self.process_info.get_last_ty() {
                 None => {}
                 Some(v) => {
-                    self.$tmpfuncname(istry, *v)?;
+                    self.$tmpfuncname(istry, v)?;
                 }
             }
             Ok(())
@@ -332,7 +332,7 @@ impl<'a> AstBuilder<'a> {
                 }
             }
             self.expr(false)?;
-            match self.process_info.stack_type.last() {
+            match self.process_info.get_last_ty() {
                 None => {
                     self.gen_error(ErrorInfo::new(
                         t!(ARGUMENT_CANNOT_BE_VOID),
@@ -346,7 +346,7 @@ impl<'a> AstBuilder<'a> {
                         self.move_val_into_obj_stack();
                         var_params_num += 1;
                     } else {
-                        ret.push(*t)
+                        ret.push(t)
                     }
                 }
             }
@@ -354,7 +354,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn move_val_into_obj_stack(&mut self) {
-        let obj_top = self.process_info.stack_type.pop().unwrap();
+        let obj_top = self.process_info.pop_last_ty().unwrap();
         match self.convert_id_to_vm_ty(obj_top) {
             VmStackType::Int => self.add_bycode(Opcode::MoveInt, NO_ARG),
             VmStackType::Float => self.add_bycode(Opcode::MoveFloat, NO_ARG),
@@ -463,6 +463,7 @@ impl<'a> AstBuilder<'a> {
                         None => {}
                         Some(v) => self.process_info.new_type(v),
                     }
+                    return Ok(());
                 }
                 TokenType::DoubleColon => {
                     let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
@@ -485,16 +486,18 @@ impl<'a> AstBuilder<'a> {
                 }
                 TokenType::LeftBigBrace => {
                     // 定义类
+                    match self.self_scope.as_ref().borrow().get_class(idx) {
+                        None => {}
+                        Some(v) => return Ok(()),
+                    }
                 }
                 TokenType::Dot => {
                     // 访问类成员
-
                 }
-                _ => {
-                    self.token_lexer.next_back(nxt);
-                    self.load_var(idx, token_data, istry)?;
-                }
+                _ => {}
             }
+            self.token_lexer.next_back(nxt);
+            self.load_var(idx, token_data, istry)?;
         } else {
             self.token_lexer.next_back(t.clone());
             self.try_err(
@@ -541,7 +544,7 @@ impl<'a> AstBuilder<'a> {
             .self_scope
             .as_ref()
             .borrow()
-            .get_class(*self.process_info.stack_type.last().unwrap())
+            .get_class(self.process_info.pop_last_ty().unwrap())
             .unwrap();
         let oride = class_obj.get_override_func(optoken.clone());
         match oride {
@@ -603,32 +606,98 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn lex_cases(&mut self) -> AstError<()> {
+    fn lex_case(
+        &mut self,
+        expected_ty: ScopeAllocIdTy,
+        mut add_expr_addr: impl FnMut(usize),
+        mut add_case_final_addr: impl FnMut(usize),
+    ) -> AstError<bool> {
+        let mut is_end = false;
+        // 储存要跳进case的指令的地址
+        let mut jump_into_case = vec![];
         loop {
+            // 处理通配符
             let t = self.token_lexer.next_token()?;
-            if t.tp == TokenType::RightSmallBrace {
-                break;
+            if t.tp == TokenType::ID
+                && self.token_lexer.const_pool.id_name[unsafe { t.data.unwrap_unchecked() }] == "_"
+            {
+                is_end = true;
+                self.add_bycode(Opcode::Jump, ARG_WRONG);
+                jump_into_case.push(self.staticdata.get_last_opcode_id());
+            } else {
+                self.token_lexer.next_back(t);
+                self.factor(false)?;
+                match self.process_info.pop_last_ty() {
+                    None => {
+                        return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+                    }
+                    Some(v) => {
+                        if v != expected_ty {
+                            return self
+                                .gen_error(ErrorInfo::new(t!(TYPE_NOT_THE_SAME), t!(TYPE_ERROR)));
+                        }
+                        self.add_bycode(self.eq_without_pop(v), NO_ARG);
+                    }
+                }
+                // 添加跳转指令
+                self.add_bycode(Opcode::JumpIfTrue, ARG_WRONG);
+                jump_into_case.push(self.staticdata.get_last_opcode_id());
             }
-            self.token_lexer.next_back(t);
-            self.expr(false)?;
-            self.get_token_checked(TokenType::LeftSmallBrace)?;
-            self.lex_until(TokenType::RightBigBrace)?;
+            let t = self.token_lexer.next_token()?;
+            if t.tp == TokenType::BitOr {
+            } else if t.tp == TokenType::Arrow {
+                break;
+            } else {
+                self.gen_unexpected_token_token(t.tp)?;
+            }
         }
-        Ok(())
+        // 这个是跳转到下一个case的
+        self.add_bycode(Opcode::Jump, ARG_WRONG);
+        add_expr_addr(self.staticdata.get_last_opcode_id());
+        for i in &jump_into_case {
+            self.staticdata.inst[*i].operand = self.staticdata.get_next_opcode_id();
+        }
+        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.lex_until(RightBigBrace)?;
+        // 最后还需要跳转指令
+        self.add_bycode(Opcode::Jump, ARG_WRONG);
+        add_case_final_addr(self.staticdata.get_last_opcode_id());
+        Ok(is_end)
     }
 
     fn match_lex(&mut self) -> AstError<()> {
         self.expr(false)?;
-        self.get_token_checked(TokenType::LeftSmallBrace)?;
-        // 对int特化
-        match self.process_info.stack_type.last().copied() {
+        self.get_token_checked(TokenType::LeftBigBrace)?;
+        match self.process_info.pop_last_ty() {
             None => {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
             Some(v) => {
-                if v == self.cache.intty_id {
-                    self.lex_cases()?;
-                } else {
+                let mut jump_condit_save: Vec<usize> = vec![];
+                let mut jump_case_final = vec![];
+                let mut end = false;
+                loop {
+                    for i in &jump_condit_save {
+                        let t = self.staticdata.get_next_opcode_id();
+                        self.staticdata.inst[*i].operand = t;
+                    }
+                    jump_condit_save.clear();
+                    let t = self.token_lexer.next_token()?;
+                    if t.tp == RightBigBrace {
+                        break;
+                    }
+                    if end {
+                        break;
+                    }
+                    self.token_lexer.next_back(t);
+                    end = self.lex_case(
+                        v,
+                        |line_num| jump_condit_save.push(line_num),
+                        |line_num| jump_case_final.push(line_num),
+                    )?;
+                }
+                for i in jump_case_final {
+                    self.staticdata.inst[i].operand = self.staticdata.get_next_opcode_id();
                 }
             }
         }
@@ -657,8 +726,8 @@ impl<'a> AstBuilder<'a> {
         }
         // 返回值解析
         let return_ty = match self.get_ty(true) {
-            Err(_) => TypeAllowNull::None,
-            Ok(ty) => TypeAllowNull::Some(ty),
+            Err(_) => None,
+            Ok(ty) => Some(ty),
         };
         let io = IOType::new(ty_list, return_ty, false);
         self.get_token_checked(TokenType::LeftBigBrace)?;
@@ -692,7 +761,7 @@ impl<'a> AstBuilder<'a> {
     fn lex_class_item_loop(&mut self, class_obj: &mut CustomType) -> AstError<()> {
         loop {
             let t = self.token_lexer.next_token()?;
-            if t.tp == TokenType::RightBigBrace {
+            if t.tp == RightBigBrace {
                 break;
             }
             self.token_lexer.next_back(t);
@@ -720,7 +789,7 @@ impl<'a> AstBuilder<'a> {
                 );
                 self.get_token_checked(TokenType::LeftBigBrace)?;
                 self.lex_class_item_loop(class_obj)?;
-                self.get_token_checked(TokenType::RightBigBrace)?;
+                self.get_token_checked(RightBigBrace)?;
                 swap(
                     &mut self.self_scope.as_ref().borrow_mut().is_pub,
                     &mut is_in_pub,
@@ -889,7 +958,7 @@ impl<'a> AstBuilder<'a> {
 
     fn store_var(&mut self, name: usize) -> RunResult<()> {
         self.expr(false)?;
-        let var_type = match self.process_info.get_last_ty() {
+        let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
             None => {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
@@ -901,7 +970,7 @@ impl<'a> AstBuilder<'a> {
 
     fn assign_var(&mut self, name: usize) -> RunResult<()> {
         self.expr(false)?;
-        let var_type = match self.process_info.get_last_ty() {
+        let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
             None => {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
@@ -926,7 +995,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn lex_until(&mut self, end_state: TokenType) -> RunResult<()> {
+    fn lex_until(&mut self, end_state: TokenType) -> AstError<()> {
         loop {
             let t = self.token_lexer.next_token()?;
             if t.tp == end_state {
@@ -940,12 +1009,12 @@ impl<'a> AstBuilder<'a> {
 
     fn lex_condit(&mut self) -> RunResult<()> {
         self.expr(false)?;
-        match self.process_info.stack_type.last() {
+        match self.process_info.pop_last_ty() {
             None => {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
             Some(ty) => {
-                if *ty != self.cache.boolty_id {
+                if ty != self.cache.boolty_id {
                     return self.gen_error(ErrorInfo::new(t!(JUST_ACCEPT_BOOL), t!(TYPE_ERROR)));
                 }
             }
@@ -1032,18 +1101,11 @@ impl<'a> AstBuilder<'a> {
                 }
                 // ignore the result
                 // for return and return expr both
-                let ret_type = self
-                    .self_scope
-                    .as_ref()
-                    .borrow()
-                    .func_io
-                    .clone()
-                    .unwrap()
-                    .clone();
+                let ret_type = self.self_scope.as_ref().borrow().func_io.unwrap();
                 match ret_type {
-                    TypeAllowNull::Some(ty) => {
+                    Some(ty) => {
                         self.expr(true)?;
-                        let actual_ty = self.process_info.get_last_ty().unwrap();
+                        let actual_ty = self.process_info.pop_last_ty().unwrap();
                         if ty != actual_ty {
                             let s1 = self.get_ty_name(ty);
                             let s2 = self.get_ty_name(actual_ty);
@@ -1053,9 +1115,9 @@ impl<'a> AstBuilder<'a> {
                             ));
                         }
                     }
-                    TypeAllowNull::None => {
+                    None => {
                         if self.expr(true).is_ok() {
-                            let actual_ty = self.process_info.get_last_ty().unwrap();
+                            let actual_ty = self.process_info.pop_last_ty().unwrap();
                             let name = self.get_ty_name(actual_ty);
                             return self.gen_error(ErrorInfo::new(
                                 t!(RETURN_TYPE_ERROR, "0" = "void", "1" = name),
@@ -1183,7 +1245,7 @@ impl<'a> AstBuilder<'a> {
 
     fn generate_func_in_scope(&mut self) -> AstError<()> {
         let mut tmp = vec![];
-        std::mem::swap(
+        swap(
             &mut tmp,
             &mut self.self_scope.as_ref().borrow_mut().funcs_temp_store,
         );
@@ -1829,24 +1891,62 @@ print("{}", math::sin(9.8))
         gen_test_env!(
             r#"
 a:=90
-match a {
+match a{
 1 -> {
-
+println("{}", a)
 }
-2 -> {
-
-}
-3 | 4 -> {
-
+2|90 -> {
+println("{}", a)
 }
 _ -> {
-    
+println("final case")
 }
-}"#,
+}
+println("out of range")
+"#,
             t
         );
         t.generate_code().unwrap();
-        assert_eq!(t.staticdata.inst, vec![])
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::StoreGlobalInt, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::EqIntWithoutPop, 0),
+                Inst::new(Opcode::JumpIfTrue, 7),
+                Inst::new(Opcode::Jump, 13),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::MoveInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::Jump, 32),
+                Inst::new(Opcode::LoadInt, 3),
+                Inst::new(Opcode::EqIntWithoutPop, 0),
+                Inst::new(Opcode::JumpIfTrue, 20),
+                Inst::new(Opcode::LoadInt, 2),
+                Inst::new(Opcode::EqIntWithoutPop, 0),
+                Inst::new(Opcode::JumpIfTrue, 20),
+                Inst::new(Opcode::Jump, 26),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::LoadGlobalVarInt, 0),
+                Inst::new(Opcode::MoveInt, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::Jump, 32),
+                Inst::new(Opcode::Jump, 28),
+                Inst::new(Opcode::Jump, 32),
+                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::Jump, 32),
+                Inst::new(Opcode::LoadString, 2),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::CallNative, 1),
+            ]
+        )
     }
 
     #[test]
@@ -1854,15 +1954,44 @@ _ -> {
         gen_test_env!(
             r#"
 a:="hello"
-match a {
-"hello" -> {
-
+match a{
+"hello"|"world" -> {
+    println("{}", a)
 }
-"world" -> {
-}"#,
+_ -> {
+println("run final!")
+}
+}
+"#,
             t
         );
         t.generate_code().unwrap();
-        assert_eq!(t.staticdata.inst, vec![])
+        assert_eq!(
+            t.staticdata.inst,
+            vec![
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::StoreGlobalStr, 0),
+                Inst::new(Opcode::LoadGlobalVarStr, 0),
+                Inst::new(Opcode::LoadString, 0),
+                Inst::new(Opcode::EqStrWithoutPop, 0),
+                Inst::new(Opcode::JumpIfTrue, 10),
+                Inst::new(Opcode::LoadString, 1),
+                Inst::new(Opcode::EqStrWithoutPop, 0),
+                Inst::new(Opcode::JumpIfTrue, 10),
+                Inst::new(Opcode::Jump, 16),
+                Inst::new(Opcode::LoadString, 2),
+                Inst::new(Opcode::LoadGlobalVarStr, 0),
+                Inst::new(Opcode::MoveStr, 0),
+                Inst::new(Opcode::LoadInt, 1),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::Jump, 22),
+                Inst::new(Opcode::Jump, 18),
+                Inst::new(Opcode::Jump, 22),
+                Inst::new(Opcode::LoadString, 3),
+                Inst::new(Opcode::LoadInt, 0),
+                Inst::new(Opcode::CallNative, 1),
+                Inst::new(Opcode::Jump, 22),
+            ]
+        )
     }
 }

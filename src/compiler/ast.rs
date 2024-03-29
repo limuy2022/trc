@@ -50,11 +50,11 @@ type AstError<T> = RunResult<T>;
 
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
-        fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<TypeAllowNull> {
+        fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<()> {
             let next_sym = self.token_lexer.next_token()?;
             match next_sym.tp {
                 $($accepted_token => {
-                    let tya = self.$next_item_func(istry)?.unwrap();
+                    self.$next_item_func(istry)?;
                     // 读取IOType检查
                     let func_obj = self.self_scope.as_ref().borrow().get_class(extend).unwrap();
                     let io_check = func_obj.get_override_func($accepted_token);
@@ -66,7 +66,7 @@ macro_rules! tmp_expe_function_gen {
                             )
                         )?,
                         Some(v) => {
-                            if let Ok(_) = v.io.check_argvs(vec![tya]) {}
+                            if let Ok(_) = v.io.check_argvs(vec![*self.process_info.stack_type.last().unwrap()]) {}
                             else {
                                 self.try_err(istry,
                                     ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()), t!(OPERATOR_ERROR)))?
@@ -76,22 +76,22 @@ macro_rules! tmp_expe_function_gen {
                     let io_check = io_check.unwrap();
                     self.add_bycode(io_check.opcode.clone(), NO_ARG);
                     let stage_ty = io_check.io.return_type.unwrap();
-                    let tyb = self.$tmpfuncname(istry, stage_ty)?;
+                    self.$tmpfuncname(istry, stage_ty)?;
                     self.process_info.cal_val(stage_ty);
-                    match tyb {
-                        TypeAllowNull::None => {
-                            Ok(TypeAllowNull::Some(stage_ty))
+                    match self.process_info.stack_type.last() {
+                        None => {
+                            self.process_info.new_type(stage_ty);
                         }
-                        TypeAllowNull::Some(_) => {
-                            Ok(tyb)
+                        Some(v) => {
+                            self.process_info.new_type(*v);
                         }
                     }
                 })*
                 _ => {
                     self.token_lexer.next_back(next_sym);
-                    Ok(TypeAllowNull::None)
                 }
             }
+            Ok(())
         }
     };
 }
@@ -100,16 +100,15 @@ macro_rules! tmp_expe_function_gen {
 macro_rules! expr_gen {
     ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
         tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token),*);
-        fn $funcname(&mut self, istry: bool) -> AstError<TypeAllowNull> {
-            let t1 = self.$next_item_func(istry)?;
-            if let TypeAllowNull::None = t1 {
-                return Ok(t1);
+        fn $funcname(&mut self, istry: bool) -> AstError<()> {
+            self.$next_item_func(istry)?;
+            match self.process_info.stack_type.last() {
+                None => {}
+                Some(v) => {
+                    self.$tmpfuncname(istry, *v)?;
+                }
             }
-            let t2 = self.$tmpfuncname(istry, t1.unwrap())?;
-            if let TypeAllowNull::None = t2 {
-                return Ok(t1);
-            }
-            Ok(t2)
+            Ok(())
         }
     };
 }
@@ -332,24 +331,22 @@ impl<'a> AstBuilder<'a> {
                     self.token_lexer.next_back(nextt);
                 }
             }
-            let t = self.expr(false)?;
-            match t {
-                TypeAllowNull::None => {
+            self.expr(false)?;
+            match self.process_info.stack_type.last() {
+                None => {
                     self.gen_error(ErrorInfo::new(
                         t!(ARGUMENT_CANNOT_BE_VOID),
                         t!(ARGUMENT_ERROR),
                     ))?;
                 }
-                TypeAllowNull::Some(t) => {
+                Some(t) => {
                     // 如果是可变参数是需要将其转入obj_stack的
                     if io_tmp.var_params && io_tmp.argvs_type.len() <= ret.len() {
                         // the values that have been stored is more than exact requirement of function
-                        self.process_info.stack_type.push(t);
                         self.move_val_into_obj_stack();
-                        self.process_info.pop_last_ty();
                         var_params_num += 1;
                     } else {
-                        ret.push(t)
+                        ret.push(*t)
                     }
                 }
             }
@@ -357,7 +354,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn move_val_into_obj_stack(&mut self) {
-        let obj_top = self.process_info.stack_type.last().copied().unwrap();
+        let obj_top = self.process_info.stack_type.pop().unwrap();
         match self.convert_id_to_vm_ty(obj_top) {
             VmStackType::Int => self.add_bycode(Opcode::MoveInt, NO_ARG),
             VmStackType::Float => self.add_bycode(Opcode::MoveFloat, NO_ARG),
@@ -391,7 +388,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 解析函数，变量等的读取
-    fn val(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+    fn val(&mut self, istry: bool) -> AstError<()> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
@@ -436,7 +433,10 @@ impl<'a> AstBuilder<'a> {
                     self.add_bycode(Opcode::CallCustom, obj.custom_id);
                 }
                 // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
-                Ok(func_obj.get_io().return_type.clone())
+                match func_obj.get_io().return_type {
+                    None => {}
+                    Some(v) => self.process_info.new_type(v),
+                }
             } else if nxt.tp == TokenType::DoubleColon {
                 let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
                     Some(m) => m,
@@ -454,7 +454,7 @@ impl<'a> AstBuilder<'a> {
                 swap(&mut self.self_scope, &mut module);
                 let ret = self.val(istry);
                 swap(&mut self.self_scope, &mut module);
-                ret
+                return ret;
             } else {
                 self.token_lexer.next_back(nxt);
                 let var = match self.self_scope.as_ref().borrow().get_var(idx) {
@@ -473,7 +473,6 @@ impl<'a> AstBuilder<'a> {
                 let tmp = self.load_var(var.ty);
                 self.add_bycode(tmp, var.addr);
                 self.process_info.new_type(var.ty);
-                Ok(TypeAllowNull::Some(var.ty))
             }
         } else {
             self.token_lexer.next_back(t.clone());
@@ -482,54 +481,46 @@ impl<'a> AstBuilder<'a> {
                 ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
             )?
         }
+        Ok(())
     }
 
-    fn item(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+    fn item(&mut self, istry: bool) -> AstError<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
                 self.process_info.new_type(self.cache.intty_id);
-                Ok(TypeAllowNull::Some(self.cache.intty_id))
             }
             TokenType::FloatValue => {
                 self.add_bycode(Opcode::LoadFloat, t.data.unwrap());
                 self.process_info.new_type(self.cache.floatty_id);
-                Ok(TypeAllowNull::Some(self.cache.floatty_id))
             }
             TokenType::StringValue => {
                 self.add_bycode(Opcode::LoadString, t.data.unwrap());
                 self.process_info.new_type(self.cache.strty_id);
-                Ok(TypeAllowNull::Some(self.cache.strty_id))
             }
             TokenType::CharValue => {
                 self.add_bycode(Opcode::LoadChar, t.data.unwrap());
                 self.process_info.new_type(self.cache.charty_id);
-                Ok(TypeAllowNull::Some(self.cache.charty_id))
             }
             TokenType::BoolValue => {
                 self.add_bycode(Opcode::LoadBool, t.data.unwrap());
                 self.process_info.new_type(self.cache.boolty_id);
-                Ok(TypeAllowNull::Some(self.cache.boolty_id))
             }
             _ => {
                 self.token_lexer.next_back(t.clone());
-                Ok(self.val(istry)?)
+                self.val(istry)?
             }
         }
+        Ok(())
     }
 
-    fn unary_opcode_impl(
-        &mut self,
-        istry: bool,
-        optoken: TokenType,
-        valtype: usize,
-    ) -> AstError<TypeAllowNull> {
+    fn unary_opcode_impl(&mut self, istry: bool, optoken: TokenType) -> AstError<()> {
         let class_obj = self
             .self_scope
             .as_ref()
             .borrow()
-            .get_class(valtype)
+            .get_class(*self.process_info.stack_type.last().unwrap())
             .unwrap();
         let oride = class_obj.get_override_func(optoken.clone());
         match oride {
@@ -538,11 +529,11 @@ impl<'a> AstBuilder<'a> {
                 match tmp {
                     Ok(_) => {
                         self.add_bycode(v.opcode.clone(), NO_ARG);
-                        Ok(v.io.return_type.clone())
+                        self.process_info.new_type(v.io.return_type.unwrap())
                     }
                     Err(e) => {
                         let msg = self.gen_args_error(e);
-                        self.try_err(istry, msg)
+                        self.try_err(istry, msg)?
                     }
                 }
             }
@@ -558,34 +549,37 @@ impl<'a> AstBuilder<'a> {
                 ),
             )?,
         }
+        Ok(())
     }
 
-    fn factor(&mut self, istry: bool) -> AstError<TypeAllowNull> {
+    fn factor(&mut self, istry: bool) -> AstError<()> {
         let next_token = self.token_lexer.next_token()?;
         match next_token.tp {
             TokenType::Sub => {
-                let ret = self.factor(istry)?.unwrap();
-                self.unary_opcode_impl(istry, TokenType::SelfNegative, ret)
+                self.factor(istry)?;
+                self.unary_opcode_impl(istry, TokenType::SelfNegative);
             }
             TokenType::BitNot => {
-                let ret = self.factor(istry)?.unwrap();
-                self.unary_opcode_impl(istry, TokenType::BitNot, ret)
+                self.factor(istry)?;
+                self.unary_opcode_impl(istry, TokenType::BitNot);
             }
             TokenType::Not => {
-                let ret = self.factor(istry)?.unwrap();
-                self.unary_opcode_impl(istry, TokenType::Not, ret)
+                self.factor(istry)?;
+                self.unary_opcode_impl(istry, TokenType::Not);
             }
-            TokenType::Add => self.factor(istry),
+            TokenType::Add => {
+                self.factor(istry);
+            }
             TokenType::LeftSmallBrace => {
-                let ret = self.expr(istry)?;
+                self.expr(istry)?;
                 self.get_token_checked(TokenType::RightSmallBrace)?;
-                Ok(ret)
             }
             _ => {
                 self.token_lexer.next_back(next_token);
-                Ok(self.item(istry)?)
+                self.item(istry)?;
             }
         }
+        Ok(())
     }
 
     fn def_func(&mut self) -> AstError<()> {
@@ -1071,12 +1065,7 @@ impl<'a> AstBuilder<'a> {
             _ => {}
         }
         self.token_lexer.next_back(t);
-        let val_ty = match self.expr(false)? {
-            Some(v) => {
-                self.process_info.stack_type.push(v);
-            }
-            None => {}
-        };
+        self.expr(false)?;
         Ok(())
     }
 

@@ -557,18 +557,18 @@ impl<'a> AstBuilder<'a> {
         match next_token.tp {
             TokenType::Sub => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::SelfNegative);
+                self.unary_opcode_impl(istry, TokenType::SelfNegative)?;
             }
             TokenType::BitNot => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::BitNot);
+                self.unary_opcode_impl(istry, TokenType::BitNot)?;
             }
             TokenType::Not => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::Not);
+                self.unary_opcode_impl(istry, TokenType::Not)?;
             }
             TokenType::Add => {
-                self.factor(istry);
+                self.factor(istry)?;
             }
             TokenType::LeftSmallBrace => {
                 self.expr(istry)?;

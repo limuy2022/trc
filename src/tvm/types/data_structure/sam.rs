@@ -1,8 +1,6 @@
-use crate::base::error::*;
 use crate::base::stdlib::{OverrideWrapper, RustFunction};
 use crate::tvm::types::trcchar::TrcChar;
 use crate::tvm::types::TrcObj;
-use crate::tvm::DynaData;
 use crate::{compiler::token::TokenType, hash_map};
 use derive::{trc_class, trc_function, trc_method};
 use std::collections::HashMap;

@@ -365,7 +365,7 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    fn load_var(&mut self, ty: TyIdxTy) -> Opcode {
+    fn load_var_opcode(&mut self, ty: TyIdxTy) -> Opcode {
         if self.process_info.is_global {
             match self.convert_id_to_vm_ty(ty) {
                 VmStackType::Int => Opcode::LoadGlobalVarInt,
@@ -385,6 +385,31 @@ impl<'a> AstBuilder<'a> {
                 VmStackType::Object => Opcode::LoadLocalVarObj,
             }
         }
+    }
+
+    fn load_var(
+        &mut self,
+        idx: ScopeAllocIdTy,
+        name_token: ConstPoolIndexTy,
+        istry: bool,
+    ) -> AstError<()> {
+        let var = match self.self_scope.as_ref().borrow().get_var(idx) {
+            None => self.try_err(
+                istry,
+                ErrorInfo::new(
+                    t!(
+                        SYMBOL_NOT_FOUND,
+                        "0" = self.token_lexer.const_pool.id_name[name_token]
+                    ),
+                    t!(SYMBOL_ERROR),
+                ),
+            )?,
+            Some(v) => v,
+        };
+        let tmp = self.load_var_opcode(var.ty);
+        self.add_bycode(tmp, var.addr);
+        self.process_info.new_type(var.ty);
+        Ok(())
     }
 
     /// 解析函数，变量等的读取
@@ -461,24 +486,13 @@ impl<'a> AstBuilder<'a> {
                 TokenType::LeftBigBrace => {
                     // 定义类
                 }
+                TokenType::Dot => {
+                    // 访问类成员
+
+                }
                 _ => {
                     self.token_lexer.next_back(nxt);
-                    let var = match self.self_scope.as_ref().borrow().get_var(idx) {
-                        None => self.try_err(
-                            istry,
-                            ErrorInfo::new(
-                                t!(
-                                    SYMBOL_NOT_FOUND,
-                                    "0" = self.token_lexer.const_pool.id_name[token_data]
-                                ),
-                                t!(SYMBOL_ERROR),
-                            ),
-                        )?,
-                        Some(v) => v,
-                    };
-                    let tmp = self.load_var(var.ty);
-                    self.add_bycode(tmp, var.addr);
-                    self.process_info.new_type(var.ty);
+                    self.load_var(idx, token_data, istry)?;
                 }
             }
         } else {

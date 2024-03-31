@@ -145,8 +145,8 @@ pub struct ValuePool {
     id_name: Vec<String>,
 }
 
-const INT_VAL_POOL_ZERO: usize = 0;
-const INT_VAL_POOL_ONE: usize = 1;
+pub const INT_VAL_POOL_ZERO: usize = 0;
+pub const INT_VAL_POOL_ONE: usize = 1;
 
 macro_rules! gen_add_funcs {
     ($($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)),*) => {

@@ -12,6 +12,7 @@ pub const SYMBOL_ERROR: &str = "compiler.SymbolError";
 pub const TYPE_ERROR: &str = "compiler.TypeError";
 pub const ARGUMENT_ERROR: &str = "compiler.ArgumentError";
 pub const FORMAT_STR_ERROR: &str = "compiler.FormatStringError";
+pub const MODULE_NOT_FOUND_ERROR: &str = "compiler.ModuleNotFoundError";
 
 pub const STRING_WITHOUT_END: &str = "compiler.syntaxerror.str_error";
 pub const CHAR_FORMAT: &str = "compiler.syntaxerror.char_error";
@@ -38,6 +39,9 @@ pub const JUST_ACCEPT_BOOL: &str = "compiler.typerror.if_while_accept_bool";
 pub const RETURN_SHOULD_IN_FUNCTION: &str = "compiler.syntaxerror.return_should_in_function";
 pub const RETURN_TYPE_ERROR: &str = "compiler.typerror.return_type";
 pub const SHOULD_IN_LOOP: &str = "compiler.syntaxerror.should_in_loop";
+pub const CANNOT_IMPORT_MODULE_WITHOUT_FILE: &str =
+    "compiler.symbolerror.cannot_import_not_in_file";
+pub const MODULE_NOT_FOUND: &str = "compiler.modulenotfounderror.module_not_found";
 
 #[derive(Debug)]
 pub struct ErrorInfo {

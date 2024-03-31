@@ -53,7 +53,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     match cli.mode {
         Commands::Build { optimize, files } => {
             for i in files {
-                match tools::compile(compiler::Option::new(
+                match tools::compile(compiler::CompileOption::new(
                     optimize,
                     compiler::InputSource::File(i),
                 )) {
@@ -74,7 +74,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         }
         Commands::Run { optimize, files } => {
             for i in files {
-                match tools::run::run(compiler::Option::new(
+                match tools::run::run(compiler::CompileOption::new(
                     optimize,
                     compiler::InputSource::File(i),
                 )) {
@@ -92,7 +92,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         } => {
             for i in files {
                 match tools::dis::dis(
-                    compiler::Option::new(optimize, compiler::InputSource::File(i)),
+                    compiler::CompileOption::new(optimize, compiler::InputSource::File(i)),
                     rustcode,
                 ) {
                     Ok(_) => {}

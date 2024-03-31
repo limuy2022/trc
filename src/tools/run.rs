@@ -4,7 +4,7 @@ use crate::{
     tvm::Vm,
 };
 
-pub fn run(opt: compiler::Option) -> RunResult<()> {
+pub fn run(opt: compiler::CompileOption) -> RunResult<()> {
     let mut compiler = Compiler::new(opt);
     let static_data = compiler.lex()?;
     let tmp = static_data.return_static_data();

@@ -21,7 +21,7 @@ pub fn tshell() -> RunResult<()> {
     let mut rl: Editor<(), FileHistory> = rustyline::Editor::with_config(config).unwrap();
     rl.set_max_history_size(1000).unwrap();
     let mut compiler = compiler::Compiler::new_string_compiler(
-        compiler::Option::new(false, compiler::InputSource::StringInternal),
+        compiler::CompileOption::new(false, compiler::InputSource::StringInternal),
         "",
     );
     let mut ast = compiler.lex()?;
@@ -34,7 +34,7 @@ pub fn tshell() -> RunResult<()> {
         let mut cnt = 0;
         // 此处要引入compiler的词法分析器来解析大括号和小括号
         let mut braces_lexer = compiler::Compiler::new_string_compiler(
-            compiler::Option::new(false, compiler::InputSource::StringInternal),
+            compiler::CompileOption::new(false, compiler::InputSource::StringInternal),
             "",
         );
         let mut check_lexer = braces_lexer.get_token_lex();

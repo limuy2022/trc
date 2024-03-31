@@ -14,6 +14,7 @@ VmError = "虚拟机错误"
 ArgumentError = "参数错误"
 SyntaxError = "语法错误"
 OperatorError = "操作符错误"
+ModuleNotFoundError = "模块未找到错误"
 
 [compiler.syntaxerror]
 unmatched = "%{0}未匹配"
@@ -29,6 +30,10 @@ should_in_loop = "%{0}必须在循环内部"
 [compiler.symbolerror]
 not_found_sym = "未找到符号%{0}"
 redefined_sym = "符号%{0}重定义"
+cannot_import_not_in_file = "在非文件模式下运行，不能导入模块"
+
+[compiler.modulenotfounderror]
+module_not_found = "模块%{0}未找到"
 
 [compiler.argumenterror]
 void_argu = "参数不能为void"

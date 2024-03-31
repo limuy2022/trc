@@ -1,7 +1,7 @@
 use crate::base::codegen::Opcode::*;
 use crate::base::error::RunResult;
 
-pub fn dis(opt: crate::compiler::Option, rustcode: bool) -> RunResult<()> {
+pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RunResult<()> {
     let mut compiler = crate::compiler::Compiler::new(opt);
     let mut ast = compiler.lex()?;
     let static_data = ast.prepare_get_static();

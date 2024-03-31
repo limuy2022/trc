@@ -14,6 +14,7 @@ TypeError = "TypeError"
 OperatorError = "OperatorError"
 VmError = "VmError"
 SyntaxError = "SyntaxError"
+ModuleNotFoundError = "ModuleNotFoundError"
 
 [compiler.syntaxerror]
 str_error = "this string should be ended with \""
@@ -24,11 +25,15 @@ unclosed_comment = "unclosed comment"
 char_error = "char should be the format like 'x'."
 expected_expr = "expected expression"
 return_should_in_function = "return should in function"
-should_in_loop = "%{0}必须在循环内部"
+should_in_loop = "%{0} must inside loop"
 
 [compiler.symbolerror]
 not_found_sym = "Symbol %{0} not found"
 redefined_sym = "Symbol %{0} redefined"
+cannot_import_not_in_file = "Cannot import module when not running as file"
+
+[compiler.modulenotfounderror]
+module_not_found = "Module %{0} not found"
 
 [compiler.argumenterror]
 argu_num = "expect %{0}.But given %{1}"

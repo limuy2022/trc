@@ -916,14 +916,14 @@ impl<'a> TokenLex<'a> {
 mod tests {
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
-    use crate::compiler::{InputSource, Option, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
+    use crate::compiler::{CompileOption, InputSource, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     use super::*;
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {
             let mut env = Compiler::new_string_compiler(
-                Option::new(false, InputSource::StringInternal),
+                CompileOption::new(false, InputSource::StringInternal),
                 $test_string,
             );
             let mut $env_name = TokenLex::new(&mut env);

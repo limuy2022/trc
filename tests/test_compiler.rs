@@ -4,10 +4,10 @@ use trc::{base::codegen::*, compiler::*};
 
 macro_rules! gen_test_env {
     ($test_code:expr, $env_name:ident) => {
+        use trc::compiler::CompileOption;
         use trc::compiler::InputSource;
-        use trc::compiler::Option;
         let mut compiler = Compiler::new_string_compiler(
-            Option::new(false, InputSource::StringInternal),
+            CompileOption::new(false, InputSource::StringInternal),
             $test_code,
         );
         let token_lexer = trc::compiler::token::TokenLex::new(&mut compiler);

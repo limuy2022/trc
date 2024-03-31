@@ -16,7 +16,8 @@ fn test_dyna_data() {
     data.push_data(null_mut::<i32>());
     data.push_data(50);
     data.push_data(false);
-    assert_eq!(data.pop_data::<bool>(), false);
+    // assert_eq == false
+    assert!(!data.pop_data::<bool>());
     assert_eq!(data.pop_data::<i32>(), 50);
     assert_eq!(data.pop_data::<*mut i32>(), null_mut::<i32>());
     assert_eq!(data.pop_data::<i64>(), 30);
@@ -26,8 +27,10 @@ fn test_dyna_data() {
 
 macro_rules! gen_test_env {
     ($code:expr, $var:ident) => {
-        let mut compiler =
-            Compiler::new_string_compiler(Option::new(false, InputSource::StringInternal), $code);
+        let mut compiler = Compiler::new_string_compiler(
+            CompileOption::new(false, InputSource::StringInternal),
+            $code,
+        );
         let com_tmp = compiler.lex().unwrap();
         // println!("{:?}", com_tmp.inst);
         let tmp = com_tmp.return_static_data();

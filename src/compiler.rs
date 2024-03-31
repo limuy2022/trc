@@ -1,6 +1,3 @@
-//! reference iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
-//! reference float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
-
 pub mod ast;
 pub mod llvm_convent;
 pub mod scope;
@@ -22,12 +19,14 @@ use std::{
 };
 
 #[derive(Debug, Clone)]
+/// 不同的输入源
 pub enum InputSource {
     File(String),
     StringInternal,
 }
 
-pub struct Option {
+/// 编译器的参数控制
+pub struct CompileOption {
     optimize: bool,
     inputsource: InputSource,
 }
@@ -76,9 +75,9 @@ impl Context {
     }
 }
 
-impl Option {
+impl CompileOption {
     pub fn new(optimize: bool, source: InputSource) -> Self {
-        Option {
+        CompileOption {
             optimize,
             inputsource: source,
         }
@@ -86,6 +85,8 @@ impl Option {
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
+/// # Reference
+/// float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
 pub struct Float {
     // 小数点前的部分
     front: i64,
@@ -201,6 +202,8 @@ impl ValuePool {
 }
 
 #[derive(Debug)]
+/// # Reference
+/// reference iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
 pub struct StringSource {
     text: String,
     pos: usize,
@@ -332,12 +335,12 @@ impl TokenIo for FileSource {
 pub struct Compiler {
     // to support read from stdin and file
     input: Box<dyn TokenIo<Item = char>>,
-    option: Option,
+    option: CompileOption,
     context: Context,
 }
 
 impl Compiler {
-    pub fn new(option: Option) -> Self {
+    pub fn new(option: CompileOption) -> Self {
         match option.inputsource {
             InputSource::File(ref filename) => {
                 let f = match fs::File::open(filename) {
@@ -363,7 +366,7 @@ impl Compiler {
         }
     }
 
-    pub fn new_string_compiler(option: Option, source: &str) -> Self {
+    pub fn new_string_compiler(option: CompileOption, source: &str) -> Self {
         Compiler {
             input: Box::new(StringSource::new(String::from(source))),
             option,

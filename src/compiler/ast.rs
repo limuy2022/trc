@@ -16,7 +16,7 @@ use std::{cell::RefCell, mem::swap, rc::Rc};
 use super::{
     scope::*,
     token::{ConstPoolIndexTy, TokenType},
-    InputSource, TokenLex,
+    CompileOption, Compiler, InputSource, TokenLex,
 };
 use crate::base::stdlib::FunctionInterface;
 
@@ -904,15 +904,34 @@ impl<'a> AstBuilder<'a> {
                     }
                 }
             }
-        } else if let InputSource::File(now_module_path) =
-            self.token_lexer.compiler_data.option.inputsource.clone()
-        {
-            let path = std::path::PathBuf::from(path.replace('.', "/"));
-
-            let mut now_module_path = std::path::PathBuf::from(now_module_path);
-            now_module_path.pop();
-            now_module_path = now_module_path.join(path);
-            if now_module_path.exists() {}
+        } else {
+            match self.token_lexer.compiler_data.option.inputsource.clone() {
+                InputSource::File(now_module_path) => {
+                    let path = std::path::PathBuf::from(path.replace('.', "/"));
+                    let mut now_module_path = std::path::PathBuf::from(now_module_path);
+                    now_module_path.pop();
+                    // 找到想找到的文件
+                    now_module_path = now_module_path.join(path.clone());
+                    if now_module_path.exists() {
+                        // 创建新的compiler来编译模块
+                        // let mut new_compiler = Compiler::new(Option::new());
+                    } else {
+                        return self.try_err(
+                            istry,
+                            ErrorInfo::new(
+                                t!(MODULE_NOT_FOUND, "0" = path.to_str().unwrap()),
+                                t!(MODULE_NOT_FOUND_ERROR),
+                            ),
+                        );
+                    }
+                }
+                _ => {
+                    return self.try_err(
+                        istry,
+                        ErrorInfo::new(t!(CANNOT_IMPORT_MODULE_WITHOUT_FILE), t!(SYMBOL_ERROR)),
+                    );
+                }
+            }
         }
         Ok(())
     }

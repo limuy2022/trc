@@ -11,7 +11,7 @@ use crate::base::{
         OverrideWrapper, Stdlib, STD_CLASS_TABLE,
     },
 };
-use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, usize};
+use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
 
 pub type ScopeAllocIdTy = usize;
 pub type TypeAllowNull = Option<TyIdxTy>;
@@ -108,7 +108,7 @@ impl ClassInterface for CustomType {
         &self.origin_name
     }
 
-    fn get_override_func(&self, oper_token: super::token::TokenType) -> Option<&OverrideWrapper> {
+    fn get_override_func(&self, _oper_token: super::token::TokenType) -> Option<&OverrideWrapper> {
         None
     }
 }
@@ -230,7 +230,7 @@ impl SymScope {
             let idx = module_scope
                 .as_ref()
                 .borrow_mut()
-                .insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
+                .insert_sym_with_error(const_pool.name_pool[i.0], i.0)?;
             module_scope
                 .as_ref()
                 .borrow_mut()
@@ -241,7 +241,7 @@ impl SymScope {
             let idx = module_scope
                 .as_ref()
                 .borrow_mut()
-                .insert_sym_with_error(const_pool.name_pool[i.0], &i.0)?;
+                .insert_sym_with_error(const_pool.name_pool[i.0], i.0)?;
             module_scope
                 .as_ref()
                 .borrow_mut()

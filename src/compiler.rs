@@ -133,12 +133,13 @@ impl Display for Float {
 
 type Pool<T> = HashMap<T, usize>;
 
+#[derive(Default)]
 pub struct ValuePool {
     const_ints: Pool<i64>,
     const_strings: Pool<String>,
     const_floats: Pool<Float>,
     name_pool: Pool<String>,
-    const_big_int: Pool<String>,
+    _const_big_int: Pool<String>,
     id_int: Vec<i64>,
     id_float: Vec<Float>,
     id_str: Vec<String>,
@@ -166,15 +167,7 @@ macro_rules! gen_add_funcs {
 impl ValuePool {
     fn new() -> Self {
         let mut ret = Self {
-            const_ints: HashMap::new(),
-            const_floats: HashMap::new(),
-            const_strings: HashMap::new(),
-            name_pool: HashMap::new(),
-            const_big_int: HashMap::new(),
-            id_int: vec![],
-            id_float: vec![],
-            id_str: vec![],
-            id_name: vec![],
+            ..Default::default()
         };
         ret.add_int(0);
         ret.add_int(1);

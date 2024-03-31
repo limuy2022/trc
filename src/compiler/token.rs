@@ -370,7 +370,7 @@ impl<'a> TokenLex<'a> {
             }
             let tmp = get_keywords().get(&retname);
             match tmp {
-                Some(val) => Token::new((*val).clone(), None),
+                Some(val) => Token::new(*val, None),
                 None => {
                     if retname == "true" {
                         return Ok(Token::new(TokenType::BoolValue, Some(1)));

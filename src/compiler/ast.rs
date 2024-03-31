@@ -1,16 +1,17 @@
 mod ast_base;
 mod lexprocess;
 
-use crate::base::{
-    codegen::{Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
-    error::*,
-    func,
-    stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
+use crate::{
+    base::{
+        codegen::{Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
+        error::*,
+        func,
+        stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
+    },
+    compiler::token::TokenType::RightBigBrace,
 };
-use crate::compiler::token::TokenType::RightBigBrace;
 use rust_i18n::t;
-use std::{borrow::BorrowMut, mem::swap};
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, mem::swap, rc::Rc};
 
 use super::{
     scope::*,
@@ -124,7 +125,7 @@ impl<'a> AstBuilder<'a> {
         }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
         // 为root scope添加prelude
-        let optimize = token_lexer.compiler_data.option.optimize;
+        let _optimize = token_lexer.compiler_data.option.optimize;
         root_scope
             .as_ref()
             .borrow_mut()
@@ -488,7 +489,7 @@ impl<'a> AstBuilder<'a> {
                     // 定义类
                     match self.self_scope.as_ref().borrow().get_class(idx) {
                         None => {}
-                        Some(v) => return Ok(()),
+                        Some(_v) => return Ok(()),
                     }
                 }
                 TokenType::Dot => {
@@ -546,7 +547,7 @@ impl<'a> AstBuilder<'a> {
             .borrow()
             .get_class(self.process_info.pop_last_ty().unwrap())
             .unwrap();
-        let oride = class_obj.get_override_func(optoken.clone());
+        let oride = class_obj.get_override_func(optoken);
         match oride {
             Some(v) => {
                 let tmp = v.io.check_argvs(vec![]);
@@ -851,7 +852,7 @@ impl<'a> AstBuilder<'a> {
                 }
                 import_item_name = format!("{}{}", c, import_item_name);
             }
-            let mut items = path.split(".");
+            let mut items = path.split('.');
             // 删除std
             items.next();
             let now = match get_stdlib().get_module(items) {
@@ -888,10 +889,10 @@ impl<'a> AstBuilder<'a> {
                 Some(module) => {
                     let tmp = self.token_lexer.add_id_token(&import_item_name);
                     let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
-                    self.import_module_sym(&module);
+                    self.import_module_sym(module);
                     match self.self_scope.as_ref().borrow_mut().import_native_module(
                         module_sym_idx,
-                        &module,
+                        module,
                         &self.token_lexer.const_pool,
                     ) {
                         Err(e) => {
@@ -945,7 +946,7 @@ impl<'a> AstBuilder<'a> {
     /// 生成新建变量的指令
     fn new_var(&mut self, name: ConstPoolIndexTy, varty: ScopeAllocClassId) -> AstError<()> {
         let sym_idx = self.insert_sym_with_error(name)?;
-        let (var_sym, var_addr) =
+        let (_var_sym, var_addr) =
             self.self_scope
                 .as_ref()
                 .borrow_mut()
@@ -1210,7 +1211,7 @@ impl<'a> AstBuilder<'a> {
         let tmp = self.self_scope.clone();
         // 解析参数
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
-        self.self_scope.as_ref().borrow_mut().func_io = Some(io.return_type.clone());
+        self.self_scope.as_ref().borrow_mut().func_io = Some(io.return_type);
         debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
         for (argty, argname) in io
             .argvs_type

@@ -45,7 +45,7 @@ pub fn lex_arrow(
             }
             left_push.push(
                 syn::parse(left_name.clone())
-                    .expect(&format!("left push break, left name {}", left_name)),
+                    .unwrap_or_else(|_| panic!("left push break, left name {}", left_name)),
             );
             right_push.push(syn::parse(right_name).expect("right push break"));
         }
@@ -70,7 +70,7 @@ pub fn check_next_iter(iter: &mut IntoIter, check_str: &str) {
 /// # Panics
 ///
 /// Panics if the structure is not like `[a,b,c]`.
-fn lex_group(mut iter: &mut IntoIter, container: &mut Vec<syn::Ident>) {
+fn lex_group(iter: &mut IntoIter, container: &mut Vec<syn::Ident>) {
     if let TokenTree::Group(x, ..) = iter.next().unwrap() {
         // println!("{}", x);
         let iter = x.stream().into_iter();

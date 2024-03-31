@@ -44,7 +44,9 @@ macro_rules! make_commands {
 make_commands!(Commands, Build {}, Run {}, Dis {
     #[arg(short, long, default_value_t = false)]
     rustcode: bool
-}, | Tshell {}, Update{});
+}, | Tshell {}, Update{}, Version {});
+
+shadow_rs::shadow!(build);
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let cli = Args::parse();
@@ -99,6 +101,16 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                     }
                 }
             }
+        }
+        Commands::Version {} => {
+            println!(
+                "trc version {} {} {}\nbuild by {} at {} ",
+                crate::cfg::VERSION,
+                shadow_rs::branch(),
+                build::COMMIT_HASH,
+                build::RUST_VERSION,
+                build::BUILD_TIME
+            );
         }
     };
     Ok(())

@@ -44,7 +44,7 @@ macro_rules! make_commands {
 make_commands!(Commands, Build {}, Run {}, Dis {
     #[arg(short, long, default_value_t = false)]
     rustcode: bool
-}, | Tshell {}, Update{}, Version {});
+}, | Tshell {}, Version {});
 
 shadow_rs::shadow!(build);
 
@@ -66,11 +66,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         }
         Commands::Tshell {} => {
             tools::tshell::tshell()?;
-        }
-        Commands::Update {} => {
-            if let Err(e) = tools::update::update() {
-                println!("{}", e);
-            }
         }
         Commands::Run { optimize, files } => {
             for i in files {

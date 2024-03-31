@@ -914,7 +914,6 @@ impl<'a> AstBuilder<'a> {
                     now_module_path = now_module_path.join(path.clone());
                     if now_module_path.exists() {
                         // 创建新的compiler来编译模块
-                        // let mut new_compiler = Compiler::new(Option::new());
                     } else {
                         return self.try_err(
                             istry,

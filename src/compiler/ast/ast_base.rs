@@ -1,25 +1,11 @@
 use super::AstBuilder;
 use super::AstError;
-use super::ScopeAllocIdTy;
-use super::SymScope;
-use crate::base::codegen::Inst;
-use crate::base::codegen::Opcode;
-use crate::base::codegen::VmStackType;
-use crate::base::error::*;
-use crate::base::stdlib::ArguError;
-use crate::base::stdlib::ArgumentError;
-use crate::base::stdlib::Stdlib;
-use crate::compiler::scope::TyIdxTy;
 use crate::compiler::token::ConstPoolIndexTy;
 use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
-use crate::compiler::ValuePool;
-use crate::tvm::get_trcobj_sz;
-use core::panic;
+use libcore::*;
 use rust_i18n::t;
-use std::cell::RefCell;
 use std::mem::size_of;
-use std::rc::Rc;
 
 impl<'a> AstBuilder<'a> {
     pub fn clear_inst(&mut self) {
@@ -80,28 +66,19 @@ impl<'a> AstBuilder<'a> {
         VmStackType::Object
     }
 
-    pub fn get_type_id_internel(
-        scope: Rc<RefCell<SymScope>>,
-        const_pool: &ValuePool,
-        ty_name: &str,
-    ) -> Option<usize> {
-        scope
-            .as_ref()
-            .borrow()
-            .get_type(*const_pool.name_pool.get(ty_name).unwrap())
-    }
-
     pub fn get_type_id(&self, ty_name: &str) -> Option<usize> {
-        Self::get_type_id_internel(
-            self.self_scope.clone(),
-            &self.token_lexer.const_pool,
-            ty_name,
-        )
+        self.self_scope
+            .borrow()
+            .get_type_id_by_token(self.token_lexer.const_pool.name_pool[ty_name])
     }
 
     pub fn get_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
         let t = self.get_token_checked(TokenType::ID)?;
-        let ty = match self.self_scope.as_ref().borrow().get_type(t.data.unwrap()) {
+        let ty = match self
+            .self_scope
+            .borrow()
+            .get_type_id_by_token(t.data.unwrap())
+        {
             None => self.try_err(
                 istry,
                 ErrorInfo::new(
@@ -137,10 +114,10 @@ impl<'a> AstBuilder<'a> {
         Ok(t)
     }
 
-    pub fn del_opcode(&mut self) -> Result<(), ()> {
+    pub fn del_opcode(&mut self) -> Result<(), &'static str> {
         match self.staticdata.inst.pop() {
             Some(_) => Ok(()),
-            None => Err(()),
+            None => Err("stack empty"),
         }
     }
 
@@ -173,7 +150,6 @@ impl<'a> AstBuilder<'a> {
 
     pub fn get_ty_name(&mut self, type_name: TyIdxTy) -> String {
         self.self_scope
-            .as_ref()
             .borrow()
             .get_class(type_name)
             .unwrap()
@@ -181,7 +157,7 @@ impl<'a> AstBuilder<'a> {
             .to_string()
     }
 
-    pub fn import_module_sym(&mut self, lib: &Stdlib) {
+    pub fn import_module_sym(&mut self, lib: &Module) {
         for i in &lib.functions {
             self.token_lexer.const_pool.add_id(i.0.clone());
         }
@@ -191,7 +167,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocIdTy> {
-        match self.self_scope.as_ref().borrow_mut().insert_sym(name) {
+        match self.self_scope.borrow_mut().insert_sym(name) {
             Some(v) => Ok(v),
             None => self.gen_error(ErrorInfo::new(
                 t!(

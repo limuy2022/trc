@@ -1,8 +1,8 @@
 use crate::{
-    base::error::RunResult,
     compiler::{self, Compiler},
     tvm::Vm,
 };
+use libcore::*;
 
 pub fn run(opt: compiler::CompileOption) -> RunResult<()> {
     let mut compiler = Compiler::new(opt);

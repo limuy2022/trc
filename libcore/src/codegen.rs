@@ -1,8 +1,22 @@
-use super::func;
 use core::{cmp::max, fmt};
 use std::{fmt::Display, usize};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Clone)]
+pub struct FuncStorage {
+    pub func_addr: usize,
+    pub var_table_sz: usize,
+}
+
+impl FuncStorage {
+    pub fn new(name: usize, var_table_sz: usize) -> Self {
+        Self {
+            func_addr: name,
+            var_table_sz,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Opcode {
     Add,
     AddInt,
@@ -198,7 +212,7 @@ pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,
     // 储存函数的位置
-    pub funcs: Vec<func::Func>,
+    pub funcs: Vec<FuncStorage>,
     // 符号表需要的长度
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,

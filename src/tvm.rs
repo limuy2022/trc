@@ -1,187 +1,17 @@
 mod def;
 mod function;
-mod gc;
-pub mod stdlib;
-mod types;
 
-use core::panic;
-use std::{any::TypeId, mem::size_of, sync::OnceLock};
-
-use self::{
-    function::Frame,
-    gc::GcMgr,
-    types::{
-        trcchar::TrcCharInternal,
-        trcfloat::{div_float, exact_div_float, TrcFloat, TrcFloatInternal},
-        trcint::{div_int, exact_div_int, mod_int, power_int, TrcInt, TrcIntInternal},
-        trcstr::{TrcStr, TrcStrInternal},
-        TrcBool, TrcChar, TrcObj,
-    },
-};
-use crate::{
-    base::{
-        codegen::{Opcode, StaticData},
-        error::*,
-        stdlib::STD_FUNC_TABLE,
-    },
-    cfg,
-};
+use self::function::Frame;
+use crate::cfg;
+use libcore::*;
 use libloading::Library;
 use rust_i18n::t;
-
-pub fn get_max_stack_sz() -> usize {
-    static T: OnceLock<usize> = OnceLock::new();
-    *T.get_or_init(|| 1024 * 1024 * 2 / size_of::<Byte>())
-}
-
-pub fn get_trcobj_sz() -> usize {
-    static T: OnceLock<usize> = OnceLock::new();
-    *T.get_or_init(size_of::<*mut dyn TrcObj>)
-}
-
-type Byte = u64;
-
-#[derive(Default)]
-pub struct DynaData {
-    gc: GcMgr,
-    run_stack: Vec<Byte>,
-    frames_stack: Vec<Frame>,
-    var_store: Vec<Byte>,
-    stack_ptr: usize,
-    // 变量已经使用的内存空间大小
-    var_used: usize,
-    #[cfg(debug_assertions)]
-    type_used: Vec<(TypeId, &'static str)>,
-}
-
-impl DynaData {
-    pub fn new() -> Self {
-        let mut ret = Self {
-            run_stack: Vec::with_capacity(get_max_stack_sz()),
-            var_store: Vec::with_capacity(get_max_stack_sz()),
-            stack_ptr: 0,
-            ..Default::default()
-        };
-        unsafe {
-            ret.run_stack.set_len(get_max_stack_sz());
-            ret.var_store.set_len(get_max_stack_sz());
-        }
-        ret
-    }
-
-    pub fn init_global_var_store(&mut self, cap: usize) {
-        self.var_used = cap;
-        if self.var_store.len() > cap {
-            return;
-        }
-        self.var_store.resize(cap, Byte::default());
-    }
-
-    /// Push data of this [`DynaData`].
-    pub fn push_data<T: 'static>(&mut self, data: T) {
-        unsafe {
-            (self
-                .run_stack
-                .as_mut_ptr()
-                .byte_offset(self.stack_ptr as isize) as *mut T)
-                .write(data);
-        }
-        self.stack_ptr += size_of::<T>();
-        #[cfg(debug_assertions)]
-        {
-            self.type_used
-                .push((TypeId::of::<T>(), std::any::type_name::<T>()));
-        }
-    }
-
-    /// Pop data of the data stack
-    ///
-    /// # Panics
-    ///
-    /// Panics if in debug mode and the type of `T` is wrong.
-    pub fn pop_data<T: Copy + 'static>(&mut self) -> T {
-        let sz = size_of::<T>();
-        #[cfg(debug_assertions)]
-        {
-            let info = TypeId::of::<T>();
-            let info_stack = self.type_used.pop().unwrap();
-            if info_stack.0 != info {
-                panic!(
-                    "pop data type error.Expected get {}.Actually has {}",
-                    std::any::type_name::<T>(),
-                    info_stack.1
-                );
-            }
-            debug_assert!(self.stack_ptr >= sz);
-        }
-        self.stack_ptr -= sz;
-        unsafe { *(self.run_stack.as_ptr().byte_offset(self.stack_ptr as isize) as *const T) }
-    }
-
-    /// Returns the top data of the data stack.
-    ///
-    /// # Panics
-    ///
-    /// Panics if .
-    pub fn read_top_data<T: Copy + 'static>(&self) -> T {
-        let sz = size_of::<T>();
-        #[cfg(debug_assertions)]
-        {
-            let info = TypeId::of::<T>();
-            let info_stack = self.type_used.last().unwrap();
-            if info_stack.0 != info {
-                panic!(
-                    "pop data type error.Expected get {}.Actually has {}",
-                    std::any::type_name::<T>(),
-                    info_stack.1
-                );
-            }
-            debug_assert!(self.stack_ptr >= sz);
-        }
-        unsafe {
-            *(self
-                .run_stack
-                .as_ptr()
-                .byte_offset((self.stack_ptr - sz) as isize) as *const T)
-        }
-    }
-
-    pub fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
-        unsafe {
-            *(self.var_store.as_mut_ptr().byte_offset(addr as isize) as *mut T) = data;
-        }
-    }
-
-    pub fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
-        debug_assert!(addr < self.var_used);
-        unsafe { *(self.var_store.as_ptr().byte_offset(addr as isize) as *const T) }
-    }
-
-    pub fn alloc_var_space(&mut self, need_sz: usize) -> *mut Byte {
-        self.var_used += need_sz;
-        if self.var_used > self.var_store.len() {
-            self.var_store.resize(self.var_used, Byte::default());
-        }
-        unsafe {
-            self.var_store
-                .as_mut_ptr()
-                .byte_offset((self.var_used - need_sz) as isize)
-        }
-    }
-
-    pub fn dealloc_var_space(&mut self, need_sz: usize) {
-        self.var_used -= need_sz;
-    }
-
-    pub fn get_var_used(&self) -> usize {
-        self.var_used
-    }
-}
+use std::sync::OnceLock;
 
 pub struct Vm<'a> {
     run_context: Context,
-    dynadata: DynaData,
-    static_data: &'a StaticData,
+    dynadata: DydataWrap,
+    static_data: &'a libcore::codegen::StaticData,
 }
 
 #[derive(Debug, Clone)]
@@ -260,13 +90,30 @@ fn load_libc() -> Option<&'static Library> {
     }
 }
 
+pub struct DydataWrap {
+    frames_stack: Vec<Frame>,
+    dydata: DynaData,
+}
+
+impl DydataWrap {
+    fn new() -> Self {
+        Self {
+            frames_stack: Vec::new(),
+            dydata: DynaData::new(),
+        }
+    }
+}
+
 /// reduce the duplicate code to solve the operator running
 macro_rules! operator_opcode {
     ($trait_used:ident, $sself:expr) => {{
-        let ret = types::$trait_used(&mut $sself.dynadata);
+        let ret = libcore::types::$trait_used(&mut $sself.dynadata.dydata);
         match ret {
             Err(e) => {
-                return Err(RuntimeError::new(Box::new($sself.run_context.clone()), e));
+                return Err(libcore::error::RuntimeError::new(
+                    Box::new($sself.run_context.clone()),
+                    e,
+                ));
             }
             Ok(_) => {}
         }
@@ -275,12 +122,12 @@ macro_rules! operator_opcode {
 
 macro_rules! impl_opcode {
     ($obj_ty:path, $sself:expr, 2) => {{
-        let second = $sself.dynadata.pop_data::<$obj_ty>();
-        let first = $sself.dynadata.pop_data::<$obj_ty>();
+        let second = $sself.dynadata.dydata.pop_data::<$obj_ty>();
+        let first = $sself.dynadata.dydata.pop_data::<$obj_ty>();
         (first, second)
     }};
     ($obj_ty:path, $sself:expr, 1) => {{
-        let first = $sself.dynadata.pop_data::<$obj_ty>();
+        let first = $sself.dynadata.dydata.pop_data::<$obj_ty>();
         (first)
     }};
 }
@@ -288,15 +135,15 @@ macro_rules! impl_opcode {
 /// 生成不会pop数据的运算指令
 macro_rules! impl_opcode_without_pop_first_data {
     ($obj_ty:path, $sself:expr) => {{
-        let second = $sself.dynadata.pop_data::<$obj_ty>();
-        let first = $sself.dynadata.read_top_data::<$obj_ty>();
+        let second = $sself.dynadata.dydata.pop_data::<$obj_ty>();
+        let first = $sself.dynadata.dydata.read_top_data::<$obj_ty>();
         (first, second)
     }};
 }
 
 macro_rules! impl_store_local_var {
     ($ty:path, $pc:expr, $sself:expr) => {{
-        let data = $sself.dynadata.pop_data::<$ty>();
+        let data = $sself.dynadata.dydata.pop_data::<$ty>();
         let addr = $sself.static_data.inst[$pc].operand;
         $sself
             .dynadata
@@ -315,14 +162,14 @@ macro_rules! impl_load_local_var {
             .last()
             .unwrap()
             .get_var::<$ty>($sself.static_data.inst[$pc].operand);
-        $sself.dynadata.push_data(data);
+        $sself.dynadata.dydata.push_data(data);
     };
 }
 
 impl<'a> Vm<'a> {
     pub fn new(static_data: &'a StaticData) -> Self {
         Self {
-            dynadata: DynaData::new(),
+            dynadata: DydataWrap::new(),
             run_context: Context::new(cfg::MAIN_MODULE_NAME),
             static_data,
         }
@@ -341,6 +188,7 @@ impl<'a> Vm<'a> {
 
     pub fn reset(&mut self) {
         self.dynadata
+            .dydata
             .init_global_var_store(self.static_data.sym_table_sz);
     }
 
@@ -377,7 +225,7 @@ impl<'a> Vm<'a> {
                 *pc = ret.prev_addr;
             }
             Opcode::LoadInt => {
-                self.dynadata.push_data(
+                self.dynadata.dydata.push_data(
                     self.static_data.constpool.intpool[self.static_data.inst[*pc].operand],
                 );
             }
@@ -388,20 +236,21 @@ impl<'a> Vm<'a> {
             Opcode::BitRightShift => operator_opcode!(bit_right_shift, self),
             Opcode::LoadLocalVarObj => {
                 self.dynadata
-                    .push_data(self.dynadata.var_store[self.static_data.inst[*pc].operand]);
+                    .dydata
+                    .push_data(self.dynadata.dydata.var_store[self.static_data.inst[*pc].operand]);
             }
             Opcode::StoreLocalObj => {
-                self.dynadata.var_store[self.static_data.inst[*pc].operand] =
-                    self.dynadata.pop_data();
+                self.dynadata.dydata.var_store[self.static_data.inst[*pc].operand] =
+                    self.dynadata.dydata.pop_data();
             }
             Opcode::LoadString => {
                 let tmp = self.static_data.inst[*pc].operand;
                 let tmp = self.static_data.constpool.stringpool[tmp].clone();
-                let tmp = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(tmp);
+                let tmp = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(tmp);
             }
             Opcode::LoadFloat => {
-                self.dynadata.push_data(
+                self.dynadata.dydata.push_data(
                     self.static_data.constpool.floatpool[self.static_data.inst[*pc].operand],
                 );
             }
@@ -411,185 +260,192 @@ impl<'a> Vm<'a> {
                 operator_opcode!(self_negative, self);
             }
             Opcode::CallNative => unsafe {
-                let tmp = STD_FUNC_TABLE[self.static_data.inst[*pc].operand](&mut self.dynadata);
-                self.throw_err_info(tmp)?;
+                // let tmp =
+                //     STD_FUNC_TABLE[self.static_data.inst[*pc].operand](&mut self.dynadata.dydata);
+                // self.throw_err_info(tmp)?;
             },
             Opcode::AddInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first + second);
+                self.dynadata.dydata.push_data(first + second);
             }
             Opcode::AddFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first + second);
+                self.dynadata.dydata.push_data(first + second);
             }
             Opcode::AddStr => {
                 let (first, second) = impl_opcode!(TrcStrInternal, self, 2);
                 let tmp = self
                     .dynadata
+                    .dydata
                     .gc
                     .alloc(unsafe { format!("{}{}", *first, *second) });
-                self.dynadata.push_data(tmp);
+                self.dynadata.dydata.push_data(tmp);
             }
             Opcode::SubInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first - second);
+                self.dynadata.dydata.push_data(first - second);
             }
             Opcode::SubFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first - second);
+                self.dynadata.dydata.push_data(first - second);
             }
             Opcode::MulInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first * second);
+                self.dynadata.dydata.push_data(first * second);
             }
             Opcode::MulFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first * second);
+                self.dynadata.dydata.push_data(first * second);
             }
             Opcode::DivInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
+                    .dydata
                     .push_data(self.throw_err_info(div_int(first, second))?);
             }
             Opcode::DivFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
+                    .dydata
                     .push_data(self.throw_err_info(div_float(first, second))?);
             }
             Opcode::ExactDivInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
+                    .dydata
                     .push_data(self.throw_err_info(exact_div_int(first, second))?);
             }
             Opcode::ExtraDivFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
+                    .dydata
                     .push_data(self.throw_err_info(exact_div_float(first, second))?);
             }
             Opcode::ModInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
+                    .dydata
                     .push_data(self.throw_err_info(mod_int(first, second))?);
             }
             Opcode::PowerInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(power_int(first, second));
+                self.dynadata.dydata.push_data(power_int(first, second));
             }
             Opcode::EqInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqStr => {
                 let (first, second) = impl_opcode!(TrcStrInternal, self, 2);
-                self.dynadata.push_data(unsafe { *first == *second });
+                self.dynadata.dydata.push_data(unsafe { *first == *second });
             }
             Opcode::EqChar => {
                 let (first, second) = impl_opcode!(TrcCharInternal, self, 2);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqBool => {
                 let (first, second) = impl_opcode!(bool, self, 2);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::NeInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first != second);
+                self.dynadata.dydata.push_data(first != second);
             }
             Opcode::NeFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first != second);
+                self.dynadata.dydata.push_data(first != second);
             }
             Opcode::NeStr => {
                 let (first, second) = impl_opcode!(TrcStrInternal, self, 2);
-                self.dynadata.push_data(unsafe { *first != *second });
+                self.dynadata.dydata.push_data(unsafe { *first != *second });
             }
             Opcode::NeChar => {
                 let (first, second) = impl_opcode!(TrcCharInternal, self, 2);
-                self.dynadata.push_data(first != second);
+                self.dynadata.dydata.push_data(first != second);
             }
             Opcode::NeBool => {
                 let (first, second) = impl_opcode!(bool, self, 2);
-                self.dynadata.push_data(first != second);
+                self.dynadata.dydata.push_data(first != second);
             }
             Opcode::LtInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first < second);
+                self.dynadata.dydata.push_data(first < second);
             }
             Opcode::LtFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first < second);
+                self.dynadata.dydata.push_data(first < second);
             }
             Opcode::LeInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first <= second);
+                self.dynadata.dydata.push_data(first <= second);
             }
             Opcode::LeFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first <= second);
+                self.dynadata.dydata.push_data(first <= second);
             }
             Opcode::GtInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first > second);
+                self.dynadata.dydata.push_data(first > second);
             }
             Opcode::GtFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first > second);
+                self.dynadata.dydata.push_data(first > second);
             }
             Opcode::GeInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first >= second);
+                self.dynadata.dydata.push_data(first >= second);
             }
             Opcode::GeFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
-                self.dynadata.push_data(first >= second);
+                self.dynadata.dydata.push_data(first >= second);
             }
             Opcode::AndBool => {
                 let (first, second) = impl_opcode!(bool, self, 2);
-                self.dynadata.push_data(first && second);
+                self.dynadata.dydata.push_data(first && second);
             }
             Opcode::OrBool => {
                 let (first, second) = impl_opcode!(bool, self, 2);
-                self.dynadata.push_data(first || second);
+                self.dynadata.dydata.push_data(first || second);
             }
             Opcode::NotBool => {
                 let first = impl_opcode!(bool, self, 1);
-                self.dynadata.push_data(!first);
+                self.dynadata.dydata.push_data(!first);
             }
             Opcode::XorInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first ^ second);
+                self.dynadata.dydata.push_data(first ^ second);
             }
             Opcode::BitNotInt => {
                 let first = impl_opcode!(TrcIntInternal, self, 1);
-                self.dynadata.push_data(!first);
+                self.dynadata.dydata.push_data(!first);
             }
             Opcode::BitAndInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first & second);
+                self.dynadata.dydata.push_data(first & second);
             }
             Opcode::BitOrInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first | second);
+                self.dynadata.dydata.push_data(first | second);
             }
             Opcode::BitLeftShiftInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first << second);
+                self.dynadata.dydata.push_data(first << second);
             }
             Opcode::BitRightShiftInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
-                self.dynadata.push_data(first >> second);
+                self.dynadata.dydata.push_data(first >> second);
             }
             Opcode::SelfNegativeInt => {
                 let first = impl_opcode!(TrcIntInternal, self, 1);
-                self.dynadata.push_data(-first);
+                self.dynadata.dydata.push_data(-first);
             }
             Opcode::SelfNegativeFloat => {
                 let first = impl_opcode!(TrcFloatInternal, self, 1);
-                self.dynadata.push_data(-first);
+                self.dynadata.dydata.push_data(-first);
             }
             Opcode::JumpIfFalse => {
                 let condit = impl_opcode!(bool, self, 1);
@@ -603,39 +459,40 @@ impl<'a> Vm<'a> {
                 return Ok(());
             }
             Opcode::LoadChar => unsafe {
-                self.dynadata.push_data(char::from_u32_unchecked(
+                self.dynadata.dydata.push_data(char::from_u32_unchecked(
                     self.static_data.inst[*pc].operand as u32,
                 ));
             },
             Opcode::LoadBool => {
                 self.dynadata
+                    .dydata
                     .push_data(self.static_data.inst[*pc].operand != 0);
             }
             Opcode::MoveInt => {
-                let tmp = TrcInt::new(self.dynadata.pop_data());
-                let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr as *mut dyn TrcObj);
+                let tmp = TrcInt::new(self.dynadata.dydata.pop_data());
+                let ptr = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveFloat => {
-                let tmp = TrcFloat::new(self.dynadata.pop_data());
-                let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr as *mut dyn TrcObj);
+                let tmp = TrcFloat::new(self.dynadata.dydata.pop_data());
+                let ptr = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveChar => {
-                let tmp = TrcChar::new(self.dynadata.pop_data());
-                let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr as *mut dyn TrcObj);
+                let tmp = TrcChar::new(self.dynadata.dydata.pop_data());
+                let ptr = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveBool => {
-                let tmp = TrcBool::new(self.dynadata.pop_data());
-                let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr as *mut dyn TrcObj);
+                let tmp = TrcBool::new(self.dynadata.dydata.pop_data());
+                let ptr = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::MoveStr => {
                 // todo:inmprove performance
-                let tmp = TrcStr::new(self.dynadata.pop_data());
-                let ptr = self.dynadata.gc.alloc(tmp);
-                self.dynadata.push_data(ptr as *mut dyn TrcObj);
+                let tmp = TrcStr::new(self.dynadata.dydata.pop_data());
+                let ptr = self.dynadata.dydata.gc.alloc(tmp);
+                self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
             Opcode::StoreLocalInt => {
                 impl_store_local_var!(TrcIntInternal, *pc, self);
@@ -674,112 +531,112 @@ impl<'a> Vm<'a> {
             Opcode::CallCustom => {
                 let var_table_mem_sz =
                     self.static_data.funcs[self.static_data.inst[*pc].operand].var_table_sz;
-                let space = self.dynadata.alloc_var_space(var_table_mem_sz);
+                let space = self.dynadata.dydata.alloc_var_space(var_table_mem_sz);
                 self.dynadata.frames_stack.push(Frame::new(*pc, space));
                 *pc = self.static_data.funcs[self.static_data.inst[*pc].operand].func_addr;
                 return Ok(());
             }
             Opcode::StoreGlobalObj => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<*mut dyn TrcObj>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<*mut dyn TrcObj>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::StoreGlobalInt => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<TrcIntInternal>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<TrcIntInternal>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::StoreGlobalFloat => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<TrcFloatInternal>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<TrcFloatInternal>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::StoreGlobalChar => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<TrcCharInternal>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<TrcCharInternal>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::StoreGlobalBool => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<bool>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<bool>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::StoreGlobalStr => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.pop_data::<TrcStrInternal>();
-                self.dynadata.set_var(addr, data);
+                let data = self.dynadata.dydata.pop_data::<TrcStrInternal>();
+                self.dynadata.dydata.set_var(addr, data);
             }
             Opcode::LoadGlobalVarObj => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<*mut dyn TrcObj>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<*mut dyn TrcObj>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::LoadGlobalVarBool => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<bool>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<bool>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::LoadGlobalVarInt => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<TrcIntInternal>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<TrcIntInternal>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::LoadGlobalVarFloat => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<TrcFloatInternal>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<TrcFloatInternal>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::LoadGlobalVarStr => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<TrcStrInternal>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<TrcStrInternal>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::LoadGlobalVarChar => {
                 let addr = self.static_data.inst[*pc].operand;
-                let data = self.dynadata.get_var::<TrcCharInternal>(addr);
-                self.dynadata.push_data(data);
+                let data = self.dynadata.dydata.get_var::<TrcCharInternal>(addr);
+                self.dynadata.dydata.push_data(data);
             }
             Opcode::EqWithoutPop => {
                 // let (first, second) = impl_opcode_without_pop_first_data!(*mut dyn TrcObj, self);
-                // self.dynadata.push_data(first == second);
+                // self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqIntWithoutPop => {
                 let (first, second) = impl_opcode_without_pop_first_data!(TrcIntInternal, self);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqFloatWithoutPop => {
                 let (first, second) = impl_opcode_without_pop_first_data!(TrcFloatInternal, self);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqStrWithoutPop => {
                 let (first, second) = impl_opcode_without_pop_first_data!(TrcStrInternal, self);
-                self.dynadata.push_data(unsafe { *first == *second });
+                self.dynadata.dydata.push_data(unsafe { *first == *second });
             }
             Opcode::EqCharWithoutPop => {
                 let (first, second) = impl_opcode_without_pop_first_data!(TrcCharInternal, self);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::EqBoolWithoutPop => {
                 let (first, second) = impl_opcode_without_pop_first_data!(bool, self);
-                self.dynadata.push_data(first == second);
+                self.dynadata.dydata.push_data(first == second);
             }
             Opcode::PopData => {
-                self.dynadata.pop_data::<*mut dyn TrcObj>();
+                self.dynadata.dydata.pop_data::<*mut dyn TrcObj>();
             }
             Opcode::PopDataInt => {
-                self.dynadata.pop_data::<TrcIntInternal>();
+                self.dynadata.dydata.pop_data::<TrcIntInternal>();
             }
             Opcode::PopDataFloat => {
-                self.dynadata.pop_data::<TrcFloatInternal>();
+                self.dynadata.dydata.pop_data::<TrcFloatInternal>();
             }
             Opcode::PopDataStr => {
-                self.dynadata.pop_data::<TrcStrInternal>();
+                self.dynadata.dydata.pop_data::<TrcStrInternal>();
             }
             Opcode::PopDataChar => {
-                self.dynadata.pop_data::<TrcCharInternal>();
+                self.dynadata.dydata.pop_data::<TrcCharInternal>();
             }
             Opcode::PopDataBool => {
-                self.dynadata.pop_data::<bool>();
+                self.dynadata.dydata.pop_data::<bool>();
             }
             Opcode::JumpIfTrue => {
                 let condit = impl_opcode!(bool, self, 1);

@@ -1,4 +1,5 @@
 use derive::{def_module, trc_function};
+use libcore::*;
 
 #[trc_function]
 pub fn exit(val: int) -> void {

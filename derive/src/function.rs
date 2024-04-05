@@ -7,29 +7,24 @@ use syn::{
 pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, syn::Expr) {
     let output = sig.output.clone();
     let output: syn::Expr = match output {
-        ReturnType::Default => parse_str("TypeAllowNull::None").unwrap(),
+        ReturnType::Default => parse_str("None").unwrap(),
         ReturnType::Type(_, ty) => {
             if let Type::Path(name) = (*ty).clone() {
                 let tyname = name.path.segments[0].ident.to_string();
                 if tyname == "void" {
-                    parse_str("TypeAllowNull::None").unwrap()
+                    parse_str("None").unwrap()
                 } else if tyname == "any" {
                     parse_str("ANY_TYPE").unwrap()
                 } else if tyname.ends_with("str") {
-                    parse_str(r#"TypeAllowNull::Some(crate::tvm::types::TrcStr::export_info())"#)
-                        .unwrap()
+                    parse_str(r#"TypeAllowNull::Some(libcore::TrcStr::export_info())"#).unwrap()
                 } else if tyname.ends_with("int") {
-                    parse_str("TypeAllowNull::Some(crate::tvm::types::TrcInt::export_info())")
-                        .unwrap()
+                    parse_str("TypeAllowNull::Some(libcore::TrcInt::export_info())").unwrap()
                 } else if tyname.ends_with("bool") {
-                    parse_str("TypeAllowNull::Some(crate::tvm::types::TrcBool::export_info())")
-                        .unwrap()
+                    parse_str("TypeAllowNull::Some(libcore::TrcBool::export_info())").unwrap()
                 } else if tyname.ends_with("char") {
-                    parse_str("TypeAllowNull::Some(crate::tvm::types::TrcChar::export_info())")
-                        .unwrap()
+                    parse_str("TypeAllowNull::Some(libcore::TrcChar::export_info())").unwrap()
                 } else if tyname.ends_with("float") {
-                    parse_str("TypeAllowNull::Some(crate::tvm::types::TrcFloat::export_info())")
-                        .unwrap()
+                    parse_str("TypeAllowNull::Some(libcore::TrcFloat::export_info())").unwrap()
                 } else {
                     panic!("error");
                 }
@@ -49,7 +44,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
     }
     let mut args_type_required = vec![];
 
-    new_args.push(parse_str::<FnArg>("dydata: &mut crate::tvm::DynaData").unwrap());
+    new_args.push(parse_str::<FnArg>("dydata: &mut libcore::DynaData").unwrap());
     sig.inputs = new_args;
     for i in &input_args {
         if let FnArg::Typed(PatType { pat, ty, .. }, ..) = i {
@@ -70,25 +65,25 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                         .unwrap(),
                     );
                 } else if typename.ends_with("str") {
-                    args_type_required.push(parse_str("crate::tvm::TrcStr").unwrap());
+                    args_type_required.push(parse_str("libcore::TrcStr").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<crate::tvm::TrcStrInternal>();"#,
+                            r#"let mut {} = dydata.pop_data::<libcore::TrcStrInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
                     );
                 } else if typename.ends_with("int") {
-                    args_type_required.push(parse_str("crate::tvm::TrcInt").unwrap());
+                    args_type_required.push(parse_str("libcore::TrcInt").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<crate::tvm::TrcIntInternal>();"#,
+                            r#"let mut {} = dydata.pop_data::<libcore::TrcIntInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
                     );
                 } else if typename.ends_with("bool") {
-                    args_type_required.push(parse_str("crate::tvm::TrcBool").unwrap());
+                    args_type_required.push(parse_str("libcore::TrcBool").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
                             r#"let mut {} = dydata.pop_data::<bool>();"#,
@@ -97,19 +92,19 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                         .unwrap(),
                     );
                 } else if typename.ends_with("char") {
-                    args_type_required.push(parse_str("crate::tvm::TrcChar").unwrap());
+                    args_type_required.push(parse_str("libcore::TrcChar").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<crate::tvm::TrcCharInternal>();"#,
+                            r#"let mut {} = dydata.pop_data::<libcore::TrcCharInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),
                     );
                 } else if typename.ends_with("float") {
-                    args_type_required.push(parse_str("crate::tvm::TrcFloat").unwrap());
+                    args_type_required.push(parse_str("libcore::TrcFloat").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<crate::tvm::TrcFloatInternal>();"#,
+                            r#"let mut {} = dydata.pop_data::<libcore::TrcFloatInternal>();"#,
                             arg_name
                         ))
                         .unwrap(),

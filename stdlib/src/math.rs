@@ -1,5 +1,6 @@
 use derive::trc_const;
 use derive::{def_module, trc_function};
+use libcore::*;
 
 #[trc_function]
 pub fn sin(x: float) -> float {

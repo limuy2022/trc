@@ -1,11 +1,11 @@
-use crate::base::stdlib::{OverrideWrapper, RustFunction};
-use crate::tvm::types::trcchar::TrcChar;
-use crate::tvm::types::TrcObj;
-use crate::{compiler::token::TokenType, hash_map};
+use collection_literals::collection;
 use derive::{trc_class, trc_function, trc_method};
+use libcore::error::*;
+use libcore::libbasic::*;
+use libcore::types::trcchar::TrcChar;
+use libcore::types::TrcObj;
 use std::collections::HashMap;
 use std::fmt::Display;
-use std::usize;
 
 #[derive(Debug, Clone)]
 pub struct Node {
@@ -32,8 +32,8 @@ pub struct Sam {
 }
 
 impl Sam {
-    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
-        hash_map![]
+    fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
+        collection_literals::hash![]
     }
 
     pub fn new() -> Sam {

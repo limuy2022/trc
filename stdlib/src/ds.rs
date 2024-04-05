@@ -16,3 +16,9 @@ pub mod stack;
 pub mod trie;
 pub mod union;
 pub mod vec;
+
+use derive::def_module;
+use libcore::*;
+use sam::Sam;
+
+def_module!(module_name=ds, classes=[Sam => sam]);

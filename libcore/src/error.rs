@@ -43,6 +43,10 @@ pub const CANNOT_IMPORT_MODULE_WITHOUT_FILE: &str =
     "compiler.symbolerror.cannot_import_not_in_file";
 pub const MODULE_NOT_FOUND: &str = "compiler.modulenotfounderror.module_not_found";
 
+pub fn symbol_redefined(name: &str) -> ErrorInfo {
+    ErrorInfo::new(t!(SYMBOL_REDEFINED, "0" = name), t!(SYMBOL_ERROR))
+}
+
 #[derive(Debug)]
 pub struct ErrorInfo {
     pub message: String,
@@ -96,9 +100,7 @@ impl Display for RuntimeError {
 
 impl RuntimeError {
     pub fn new(context: Box<dyn ErrorContext>, info: ErrorInfo) -> RuntimeError {
-        // if info.message != "" {
-        // panic!("develop debug use");
-        // }
+        debug_assert!(!info.message.is_empty());
         RuntimeError { context, info }
     }
 }
@@ -109,7 +111,7 @@ pub struct LightFakeError {}
 impl Error for LightFakeError {}
 
 impl Display for LightFakeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         panic!("Error calling lightfakeerror");
     }
 }

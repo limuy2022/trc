@@ -1,13 +1,12 @@
 pub mod ast;
+pub mod linker;
 pub mod llvm_convent;
 pub mod scope;
 pub mod token;
 
 use self::{ast::AstBuilder, token::TokenLex};
-use crate::{
-    base::{codegen::ConstPool, error::*},
-    cfg,
-};
+use crate::cfg;
+use libcore::*;
 use rust_i18n::t;
 use std::{
     collections::HashMap,

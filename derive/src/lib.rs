@@ -47,7 +47,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                         let mut var_lex_tmp: Vec<Stmt> = vec![
                             parse_str("let mut va_list = vec![];").unwrap(),
                             parse_str(
-                                "let args_num = dydata.pop_data::<crate::tvm::TrcIntInternal>() as usize;",
+                                "let args_num = dydata.pop_data::<libcore::TrcIntInternal>() as usize;",
                             )
                             .unwrap(),
                             parse_str("va_list.reserve(args_num);").unwrap(),
@@ -80,8 +80,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
         }
     }
-    input.sig.output =
-        parse_str::<syn::ReturnType>("-> crate::base::error::RuntimeResult<()>").expect("err1");
+    input.sig.output = parse_str::<syn::ReturnType>("-> RuntimeResult<()>").expect("err1");
     let return_stmt = parse_str::<Stmt>("return Ok(());").expect("err2");
     for i in input.block.stmts {
         if let Stmt::Expr(Expr::Return(reexpr), ..) = i.clone() {
@@ -115,11 +114,9 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     // println!("{}{:#?}", name.to_string(), info_function_self);
 
     let rettmp = quote!(#input
-        fn #info_func_name() -> crate::base::stdlib::RustFunction {
-            use crate::base::stdlib::*;
-            use crate::compiler::scope::TypeAllowNull;
+        fn #info_func_name(storage: &mut ModuleStorage) -> RustFunction {
             let ret_classes = vec![#(#args_type_required::export_info()),*];
-            return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output, #if_enable_var_params));
+            return RustFunction::new(stringify!(#name), #function_path, IOType::new(ret_classes, #output, #if_enable_var_params), storage);
         }
     );
     // println!("{}", rettmp.to_token_stream());
@@ -163,53 +160,42 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     // 目前的实现策略是先提供一个由once_cell储存的usize数，表示在类型表中的索引，里面储存该类型的Rc指针
     // 因为很可能某个函数的参数就是标准库中的某个类型，所以我们需要先将类型导入到class_table中
     let ret = quote!(#input
-        use crate::base::stdlib::{RustClass, new_class_id, STD_CLASS_TABLE};
         use std::sync::OnceLock;
         impl #name {
-            pub fn init_info() -> usize {
+            pub fn init_info(storage: Option<&mut ModuleStorage>) -> usize {
                 use std::collections::hash_map::HashMap;
-                let mut members = HashMap::new();
-                #(
-                    members.insert(stringify!(#members_ty), stringify!(#members_ident));
-                )*
-                let classid = new_class_id();
-                let mut ret = RustClass::new(
-                    "",
-                    members,
-                    None,
-                    None,
-                    classid
-                );
-                unsafe {
-                    STD_CLASS_TABLE.push(ret);
-                }
-                classid
+                static CLASS_ID: OnceLock<usize> = OnceLock::new();
+                *CLASS_ID.get_or_init(|| {
+                    let mut members = HashMap::new();
+                    #(
+                        members.insert(stringify!(#members_ty), stringify!(#members_ident));
+                    )*
+                    let tmp = RustClass::new_in_storage(
+                        "",
+                        members,
+                        None,
+                        None,
+                        storage.expect("class info is called without initing")
+                    );
+                    //println!("init id");
+                    tmp
+                })
             }
 
-            pub fn gen_funcs_info() {
-                unsafe {
-                    STD_CLASS_TABLE[Self::export_info()].functions = Self::function_export();
-                }
+            pub fn gen_funcs_info(storage: &mut ModuleStorage) {
+                storage.class_table[Self::export_info()].functions = Self::function_export(storage);
             }
 
-            pub fn gen_overrides_info() {
-                unsafe {
-                    STD_CLASS_TABLE[Self::export_info()].overrides = Self::override_export();
-                }
+            pub fn gen_overrides_info(storage: &mut ModuleStorage) {
+                storage.class_table[Self::export_info()].overrides = Self::override_export();
             }
 
-            pub fn modify_shadow_name(name: &'static str) {
-                unsafe {
-                    STD_CLASS_TABLE[Self::export_info()].name = name;
-                }
+            pub fn modify_shadow_name(storage: &mut ModuleStorage, name: &'static str) {
+                storage.class_table[Self::export_info()].name = name;
             }
 
             pub fn export_info() -> usize {
-                static ID: OnceLock<usize> = OnceLock::new();
-                *ID.get_or_init(|| {
-                    let id = Self::init_info();
-                    id
-                })
+                Self::init_info(None)
             }
         }
     );
@@ -240,10 +226,10 @@ pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
     let ret = quote!(
     #input
     impl #name {
-        fn function_export() -> HashMap<String, RustFunction> {
+        fn function_export(storage: &mut ModuleStorage) -> HashMap<String, RustFunction> {
             let mut ret = HashMap::new();
             #(
-                ret.insert(stringify!(#funcs).to_string(), Self::#funcs());
+                ret.insert(stringify!(#funcs).to_string(), Self::#funcs(storage));
             )*
             ret
         }

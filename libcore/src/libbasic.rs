@@ -1,23 +1,18 @@
-use std::sync::OnceLock;
+use crate::dynadata::DynaData;
+use downcast_rs::{impl_downcast, Downcast};
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
 };
 
-use downcast_rs::{impl_downcast, Downcast};
-
-use crate::{
-    compiler::{
-        scope::{TyIdxTy, TypeAllowNull},
-        token::{ConstPoolIndexTy, TokenType},
-    },
-    tvm::DynaData,
-};
-
 use super::{codegen::Opcode, error::*};
 
 type StdlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
-const ANY_TYPE_ID: usize = 0;
+
+pub type ScopeAllocIdTy = usize;
+pub type TypeAllowNull = Option<TyIdxTy>;
+pub type TyIdxTy = ScopeAllocIdTy;
+type ConstPoolIndexTy = usize;
 
 #[derive(Clone, Debug)]
 pub struct IOType {
@@ -25,6 +20,33 @@ pub struct IOType {
     pub var_params: bool,
     pub argvs_type: Vec<usize>,
     pub return_type: TypeAllowNull,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum OverrideOperations {
+    Add,
+    Not,
+    And,
+    Or,
+    Sub,
+    SelfNegative,
+    GreaterEqual,
+    Greater,
+    LessEqual,
+    Less,
+    Equal,
+    NotEqual,
+    Mul,
+    Div,
+    ExactDiv,
+    Mod,
+    BitNot,
+    BitRightShift,
+    BitLeftShift,
+    BitAnd,
+    BitOr,
+    Xor,
+    Power,
 }
 
 pub type ArgsNameTy = Vec<ConstPoolIndexTy>;
@@ -70,9 +92,9 @@ impl IOType {
             )));
         }
         for i in argvs.iter().enumerate().take(self.argvs_type.len()) {
-            if self.argvs_type[i.0] == 0 {
-                continue;
-            }
+            // if self.argvs_type[i.0] == 0 {
+            //     continue;
+            // }
             if self.argvs_type[i.0] != *i.1 {
                 return Err(ArguError::TypeNotMatch(ArgumentError::new(
                     self.argvs_type[i.0],
@@ -84,37 +106,15 @@ impl IOType {
     }
 }
 
-pub trait FunctionClone {
-    fn clone_box(&self) -> Box<dyn FunctionInterface>;
-}
-
-impl<T> FunctionClone for T
-where
-    T: 'static + FunctionInterface + Clone,
-{
-    fn clone_box(&self) -> Box<dyn FunctionInterface> {
-        Box::new(self.clone())
-    }
-}
-
-pub trait FunctionInterface: Downcast + FunctionClone + Debug {
+pub trait FunctionInterface: Downcast + Debug {
     fn get_io(&self) -> &IOType;
     fn get_name(&self) -> &str;
-}
-
-impl Clone for Box<dyn FunctionInterface> {
-    fn clone(&self) -> Self {
-        self.clone_box()
-    }
+    fn get_io_mut(&mut self) -> &mut IOType;
 }
 
 impl_downcast!(FunctionInterface);
 
-pub trait ClassClone {
-    fn clone_box(&self) -> Box<dyn ClassInterface>;
-}
-
-pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display {
+pub trait ClassInterface: Downcast + Sync + Send + Debug + Display {
     fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>>;
 
     fn has_attr(&self, attrname: usize) -> bool;
@@ -127,22 +127,7 @@ pub trait ClassInterface: Downcast + Sync + Send + ClassClone + Debug + Display 
         self.get_id() == 0
     }
 
-    fn get_override_func(&self, oper_token: TokenType) -> Option<&OverrideWrapper>;
-}
-
-impl<T> ClassClone for T
-where
-    T: 'static + ClassInterface + Clone,
-{
-    fn clone_box(&self) -> Box<dyn ClassInterface> {
-        Box::new(self.clone())
-    }
-}
-
-impl Clone for Box<dyn ClassInterface> {
-    fn clone(&self) -> Self {
-        self.clone_box()
-    }
+    fn get_override_func(&self, oper_token: OverrideOperations) -> Option<&OverrideWrapper>;
 }
 
 impl_downcast!(ClassInterface);
@@ -150,6 +135,10 @@ impl_downcast!(ClassInterface);
 impl FunctionInterface for RustFunction {
     fn get_io(&self) -> &IOType {
         &self.io
+    }
+
+    fn get_io_mut(&mut self) -> &mut IOType {
+        &mut self.io
     }
 
     fn get_name(&self) -> &str {
@@ -173,7 +162,7 @@ impl OverrideWrapper {
 pub struct RustClass {
     pub members: HashMap<String, String>,
     pub functions: HashMap<String, RustFunction>,
-    pub overrides: HashMap<TokenType, OverrideWrapper>,
+    pub overrides: HashMap<OverrideOperations, OverrideWrapper>,
     pub id: usize,
     pub name: &'static str,
     pub id_to_var: HashMap<ConstPoolIndexTy, TyIdxTy>,
@@ -181,21 +170,22 @@ pub struct RustClass {
 
 /// 约定，0号id是any类型
 impl RustClass {
-    pub fn new(
+    pub fn new_in_storage(
         name: &'static str,
         members: HashMap<String, String>,
         functions: Option<HashMap<String, RustFunction>>,
-        overrides: Option<HashMap<TokenType, OverrideWrapper>>,
-        id: usize,
-    ) -> RustClass {
-        RustClass {
+        overrides: Option<HashMap<OverrideOperations, OverrideWrapper>>,
+        storage: &mut ModuleStorage,
+    ) -> usize {
+        let ret = RustClass {
             members,
             functions: functions.unwrap_or_default(),
             overrides: overrides.unwrap_or_default(),
-            id,
+            id: storage.class_table.len(),
             name,
             ..Default::default()
-        }
+        };
+        storage.add_class(ret)
     }
 
     pub fn add_function(&mut self, name: impl Into<String>, func: RustFunction) {
@@ -229,7 +219,7 @@ impl ClassInterface for RustClass {
         self.name
     }
 
-    fn get_override_func(&self, oper_token: TokenType) -> Option<&OverrideWrapper> {
+    fn get_override_func(&self, oper_token: OverrideOperations) -> Option<&OverrideWrapper> {
         match self.overrides.get(&oper_token) {
             Some(i) => Some(i),
             None => None,
@@ -243,24 +233,45 @@ impl Display for RustClass {
     }
 }
 
-pub static mut STD_FUNC_TABLE: Vec<StdlibFunc> = vec![];
-pub static mut STD_CLASS_TABLE: Vec<RustClass> = vec![];
-
-pub fn get_stdlib() -> &'static Stdlib {
-    static INIT: OnceLock<Stdlib> = OnceLock::new();
-    INIT.get_or_init(crate::tvm::stdlib::import_stdlib)
+/// 最基础的储存一个动态链接库中的函数和类的地方
+#[derive(Default)]
+pub struct ModuleStorage {
+    pub func_table: Vec<StdlibFunc>,
+    pub class_table: Vec<RustClass>,
 }
 
-pub fn new_class_id() -> usize {
-    unsafe { STD_CLASS_TABLE.len() }
+impl ModuleStorage {
+    pub fn new() -> Self {
+        Self {
+            func_table: Vec::new(),
+            class_table: Vec::new(),
+        }
+    }
+
+    pub fn add_func(&mut self, f: StdlibFunc) -> usize {
+        self.func_table.push(f);
+        self.func_table.len() - 1
+    }
+
+    /// 获取类的个数
+    pub fn get_class_end(&self) -> usize {
+        self.class_table.len()
+    }
+
+    pub fn add_class(&mut self, c: RustClass) -> usize {
+        self.class_table.push(c);
+        self.class_table.len() - 1
+    }
 }
 
 impl RustFunction {
-    pub fn new(name: impl Into<String>, ptr: StdlibFunc, io: IOType) -> RustFunction {
-        let buildin_id = unsafe {
-            STD_FUNC_TABLE.push(ptr);
-            STD_FUNC_TABLE.len()
-        } - 1;
+    pub fn new(
+        name: impl Into<String>,
+        ptr: StdlibFunc,
+        io: IOType,
+        storage: &mut ModuleStorage,
+    ) -> RustFunction {
+        let buildin_id = storage.add_func(ptr);
         Self {
             name: name.into(),
             buildin_id,
@@ -271,24 +282,24 @@ impl RustFunction {
 }
 
 #[derive(Debug, Clone)]
-pub struct Stdlib {
+pub struct Module {
     pub name: String,
-    pub sub_modules: HashMap<String, Stdlib>,
+    pub sub_modules: HashMap<String, Module>,
     pub functions: HashMap<String, RustFunction>,
     // class name 和class id
     pub classes: HashMap<String, usize>,
     pub consts: HashMap<String, String>,
 }
 
-impl Stdlib {
+impl Module {
     pub fn new(
         name: impl Into<String>,
-        sub_modules: HashMap<String, Stdlib>,
+        sub_modules: HashMap<String, Module>,
         functions: HashMap<String, RustFunction>,
         classes: HashMap<String, usize>,
         consts: HashMap<String, String>,
-    ) -> Stdlib {
-        Stdlib {
+    ) -> Module {
+        Module {
             name: name.into(),
             sub_modules,
             functions,
@@ -297,7 +308,7 @@ impl Stdlib {
         }
     }
 
-    pub fn add_module(&mut self, name: String, module: Stdlib) {
+    pub fn add_module(&mut self, name: String, module: Module) {
         let ret = self.sub_modules.insert(name, module);
         debug_assert!(ret.is_none());
     }
@@ -307,7 +318,7 @@ impl Stdlib {
         debug_assert!(ret.is_none());
     }
 
-    pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Stdlib> {
+    pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Module> {
         let item = path.next();
         if item.is_none() {
             return Some(self.clone());
@@ -316,34 +327,6 @@ impl Stdlib {
         let lock = self.sub_modules.get(&item.into()).unwrap();
         lock.get_module(path)
     }
-}
-
-pub fn get_any_type() -> &'static RustClass {
-    static ANY_TYPE: OnceLock<RustClass> = OnceLock::new();
-    ANY_TYPE.get_or_init(|| RustClass::new("any", HashMap::new(), None, None, ANY_TYPE_ID))
-}
-
-pub struct AnyType {}
-
-impl AnyType {
-    pub fn export_info() -> usize {
-        ANY_TYPE_ID
-    }
-}
-
-/// 获取到标准库的类的个数，从而区分标准库和用户自定义的类，其实也相当于获取第一个用户可以定义的类的ID
-pub fn get_stdclass_end() -> usize {
-    static STD_NUM: OnceLock<usize> = OnceLock::new();
-    *STD_NUM.get_or_init(|| unsafe { STD_CLASS_TABLE.len() })
-}
-
-pub fn get_prelude_function(func_name: &str) -> Option<&'static RustFunction> {
-    get_stdlib()
-        .sub_modules
-        .get("prelude")
-        .unwrap()
-        .functions
-        .get(func_name)
 }
 
 pub const INT: &str = "int";

@@ -1,17 +1,14 @@
 //! the read execute print loop for trc
 
-use std::io::{self, Write};
-
-use colored::*;
-use rust_i18n::t;
-use rustyline::{config::Configurer, history::FileHistory, Editor};
-
-use crate::base::codegen::{Opcode, NO_ARG};
 use crate::{
-    base::{codegen::StaticData, error::RunResult},
     compiler::{self, token::TokenType},
     tvm::Vm,
 };
+use colored::*;
+use libcore::{codegen::StaticData, *};
+use rust_i18n::t;
+use rustyline::{config::Configurer, history::FileHistory, Editor};
+use std::io::{self, Write};
 
 pub fn tshell() -> RunResult<()> {
     println!("{}\n", t!("tshell.welcome").bold());

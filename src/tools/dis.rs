@@ -1,5 +1,4 @@
-use crate::base::codegen::Opcode::*;
-use crate::base::error::RunResult;
+use libcore::*;
 
 pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RunResult<()> {
     let mut compiler = crate::compiler::Compiler::new(opt);
@@ -11,9 +10,9 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RunResult<()>
         } else {
             print!("{} {}", i.0, i.1);
             match i.1.opcode {
-                LoadInt => print!("({})", static_data.constpool.intpool[i.1.operand]),
-                LoadString => print!("({})", static_data.constpool.stringpool[i.1.operand]),
-                LoadFloat => print!("({})", static_data.constpool.floatpool[i.1.operand]),
+                Opcode::LoadInt => print!("({})", static_data.constpool.intpool[i.1.operand]),
+                Opcode::LoadString => print!("({})", static_data.constpool.stringpool[i.1.operand]),
+                Opcode::LoadFloat => print!("({})", static_data.constpool.floatpool[i.1.operand]),
                 _ => {}
             }
             println!();

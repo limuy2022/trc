@@ -1,4 +1,4 @@
-use crate::base::codegen::StaticData;
+use libcore::*;
 
 // use llvm_sys::core::{
 //     LLVMAddFunction, LLVMContextCreate, LLVMCreateBuilderInContext, LLVMFunctionType,

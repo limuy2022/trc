@@ -1,4 +1,4 @@
-use crate::compiler::scope::TyIdxTy;
+use libcore::*;
 
 /// 过程间分析用的结构
 #[derive(Default)]

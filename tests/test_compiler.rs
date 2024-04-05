@@ -1,6 +1,6 @@
+use libcore::*;
 use std::mem::size_of;
-use trc::base::stdlib::*;
-use trc::{base::codegen::*, compiler::*};
+use trc::compiler::*;
 
 macro_rules! gen_test_env {
     ($test_code:expr, $env_name:ident) => {
@@ -47,7 +47,7 @@ fn test_assign() {
             Inst::new(Opcode::LoadInt, 4),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
         ],
     )
@@ -183,7 +183,7 @@ print("{}", a+90)"#,
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
         ]
     )
@@ -200,7 +200,7 @@ fn test_call_builtin_function() {
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
         ]
     )
@@ -219,6 +219,7 @@ fn test_wrong_type() {
 fn test_wrong_type2() {
     gen_test_env!(r#"1+"90""#, t);
     t.generate_code().unwrap();
+    println!("{:?}", t.staticdata.inst);
 }
 
 #[test]
@@ -226,6 +227,7 @@ fn test_wrong_type2() {
 fn test_wrong_type3() {
     gen_test_env!(r#""90"+28"#, t);
     t.generate_code().unwrap();
+    println!("{:?}", t.staticdata.inst);
 }
 
 #[test]
@@ -243,7 +245,7 @@ fn test_if_easy() {
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
         ]
     )
@@ -325,7 +327,7 @@ fn test_var_params() {
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
         ]
     )
@@ -346,7 +348,7 @@ fn test_while_1() {
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::Jump, 0)
         ]
@@ -370,7 +372,7 @@ fn test_for_1() {
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
             Inst::new(Opcode::LoadInt, 1),
@@ -403,14 +405,14 @@ func f() {
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::PopFrame, NO_ARG),
             Inst::new(Opcode::LoadString, 1),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::CallCustom, 0),
             Inst::new(Opcode::PopFrame, NO_ARG)
@@ -438,7 +440,7 @@ f()"#,
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::PopFrame, NO_ARG)
         ]
@@ -478,7 +480,7 @@ print("{}{}", a, b)
             Inst::new(Opcode::LoadInt, 2),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::Stop, NO_ARG),
             Inst::new(Opcode::StoreLocalInt, get_offset(0)),
@@ -491,7 +493,7 @@ print("{}{}", a, b)
             Inst::new(Opcode::LoadInt, 2),
             Inst::new(
                 Opcode::CallNative,
-                get_prelude_function("print").unwrap().buildin_id
+                stdlib::get_prelude_function("print").unwrap().buildin_id
             ),
             Inst::new(Opcode::PopFrame, NO_ARG)
         ]
@@ -600,7 +602,7 @@ print("{}", math::sin(9.8))
             Inst::new(Opcode::LoadFloat, 0),
             Inst::new(
                 Opcode::CallNative,
-                get_stdlib().sub_modules["math"].functions["sin"].buildin_id
+                stdlib::get_stdlib().sub_modules["math"].functions["sin"].buildin_id
             ),
             Inst::new(Opcode::MoveFloat, 0),
             Inst::new(Opcode::LoadInt, 1),

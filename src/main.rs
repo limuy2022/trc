@@ -1,4 +1,3 @@
-use shadow_rs::shadow;
 use trc::run;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

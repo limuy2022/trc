@@ -154,29 +154,31 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
             .expect("name error");
     }
     let ret = quote!(
-        pub fn init() -> crate::base::stdlib::Stdlib {
-            use crate::base::stdlib::Stdlib;
+        pub fn module_init(storage: &mut ModuleStorage) -> libcore::libbasic::Module {
+            use libcore::libbasic::Module;
             use std::collections::hash_map::HashMap;
             let mut functions = HashMap::new();
             let mut classes = HashMap::new();
             let mut submodules = HashMap::new();
             let mut consts_info = HashMap::new();
             #(
-                functions.insert(stringify!(#right_func).to_string(), #left_func());
+                classes.insert(stringify!(#right_class).to_string(), #left_class::init_info(Some(storage)));
             )*
             #(
-                classes.insert(stringify!(#right_class).to_string(), #left_class::export_info());
-                #left_class::gen_funcs_info();
-                #left_class::gen_overrides_info();
-                #left_class::modify_shadow_name(stringify!(#right_class));
-            )*
-            #(
-                submodules.insert(stringify!(#submodules).to_string(), #submodules::init());
+                #left_class::gen_funcs_info(storage);
+                #left_class::gen_overrides_info(storage);
+                #left_class::modify_shadow_name(storage, stringify!(#right_class));
             )*
             #(
                 consts_info.insert(stringify!(#consts).to_string(), #consts.to_string());
             )*
-            Stdlib::new(
+            #(
+                functions.insert(stringify!(#right_func).to_string(), #left_func(storage));
+            )*
+            #(
+                submodules.insert(stringify!(#submodules).to_string(), #submodules::module_init(storage));
+            )*
+            Module::new(
                 stringify!(#module_ident),
                 submodules,
                 functions,

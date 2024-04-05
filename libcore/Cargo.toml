@@ -1,15 +1,16 @@
 [package]
-name = "stdlib"
+name = "libcore"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-derive = { path = "../derive" }
-downcast-rs = "1"
-libcore = { path = "../libcore" }
-collection_literals = "1"
 rust-i18n = "3"
+colored = "2"
+downcast-rs = "1"
+paste = "1"
+collection_literals = "1"
+derive = { path = "../derive" }
 
 [lib]
-name = "stdlib"
+name = "libcore"
 crate-type = ["dylib"]

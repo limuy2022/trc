@@ -1,7 +1,6 @@
 use super::TrcObj;
-use crate::base::stdlib::*;
-use crate::compiler::token::TokenType;
-use crate::hash_map;
+use crate::libbasic::*;
+use collection_literals::collection;
 use derive::{trc_class, trc_method};
 use std::collections::hash_map::HashMap;
 use std::fmt::Display;
@@ -32,7 +31,7 @@ impl TrcChar {
         Self { _value: value }
     }
 
-    fn override_export() -> HashMap<TokenType, OverrideWrapper> {
-        hash_map![]
+    fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
+        collection_literals::hash![]
     }
 }

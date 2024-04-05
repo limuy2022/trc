@@ -1,8 +1,6 @@
-use std::usize;
-
 use derive::{def_module, trc_function};
-
-use crate::tvm::types::trcint::TrcIntInternal;
+use libcore::*;
+use std::usize;
 
 pub fn kmp_impl(main_string: &str, pattern: &str) -> usize {
     // 首先对模式串构建next数组

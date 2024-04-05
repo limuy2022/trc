@@ -1,24 +1,16 @@
 mod ast_base;
 mod lexprocess;
 
-use crate::{
-    base::{
-        codegen::{Opcode, StaticData, VmStackType, ARG_WRONG, NO_ARG},
-        error::*,
-        func,
-        stdlib::{get_stdlib, ArgsNameTy, IOType, RustFunction, BOOL, CHAR, FLOAT, INT, STR},
-    },
-    compiler::token::TokenType::RightBigBrace,
-};
+use crate::compiler::token::TokenType::RightBigBrace;
+use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, mem::swap, rc::Rc};
 
 use super::{
     scope::*,
     token::{ConstPoolIndexTy, TokenType},
-    CompileOption, Compiler, InputSource, TokenLex,
+    InputSource, TokenLex,
 };
-use crate::base::stdlib::FunctionInterface;
 
 #[derive(Default)]
 struct Cache {
@@ -57,9 +49,14 @@ macro_rules! tmp_expe_function_gen {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     // 读取IOType检查
-                    let func_obj = self.self_scope.as_ref().borrow().get_class(extend).unwrap();
-                    let io_check = func_obj.get_override_func($accepted_token);
-                    match io_check {
+                    let func_obj = self.self_scope.borrow().get_class_by_class_id(extend).expect("Class empty");
+                    let io_check = func_obj.get_override_func(match $accepted_token.convert_to_override() {
+                        Some(v) => v,
+                        None => {
+                            panic!("error token {}", $accepted_token);
+                        }
+                    });
+                    let io_check = match io_check {
                         None => self.try_err(istry,
                             ErrorInfo::new(
                                 t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()),
@@ -67,15 +64,14 @@ macro_rules! tmp_expe_function_gen {
                             )
                         )?,
                         Some(v) => {
-                            if let Ok(_) = v.io.check_argvs(vec![self.process_info.get_last_ty().unwrap()]) {}
-                            else {
+                            if v.io.check_argvs(vec![self.process_info.get_last_ty().expect("type stack is empty")]).is_err() {
                                 self.try_err(istry,
                                     ErrorInfo::new(t!(OPERATOR_IS_NOT_SUPPORT, "0"=$accepted_token, "1"=func_obj.get_name()), t!(OPERATOR_ERROR)))?
                             }
+                            v
                         }
-                    }
-                    let io_check = io_check.unwrap();
-                    self.add_bycode(io_check.opcode.clone(), NO_ARG);
+                    };
+                    self.add_bycode(io_check.opcode, NO_ARG);
                     let stage_ty = io_check.io.return_type.unwrap();
                     self.$tmpfuncname(istry, stage_ty)?;
                     self.process_info.cal_val(stage_ty);
@@ -116,7 +112,7 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
-        let prelude = get_stdlib().sub_modules.get("prelude").unwrap();
+        let prelude = stdlib::get_stdlib().sub_modules.get("prelude").unwrap();
         for i in &prelude.functions {
             token_lexer.const_pool.add_id(i.0.clone());
         }
@@ -127,19 +123,35 @@ impl<'a> AstBuilder<'a> {
         // 为root scope添加prelude
         let _optimize = token_lexer.compiler_data.option.optimize;
         root_scope
-            .as_ref()
             .borrow_mut()
-            .import_prelude(&token_lexer.const_pool);
+            .import_prelude(&token_lexer.const_pool)
+            .expect("Import prelude but failed");
         let mut cache = Cache::new();
         let val_pool_ref = &token_lexer.const_pool;
-        cache.intty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, INT).unwrap();
-        cache.floatty_id =
-            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, FLOAT).unwrap();
-        cache.charty_id =
-            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, CHAR).unwrap();
-        cache.strty_id = Self::get_type_id_internel(root_scope.clone(), val_pool_ref, STR).unwrap();
-        cache.boolty_id =
-            Self::get_type_id_internel(root_scope.clone(), val_pool_ref, BOOL).unwrap();
+        cache.intty_id = root_scope
+            .borrow()
+            .get_type_id_by_token(val_pool_ref.name_pool[INT])
+            .unwrap();
+        cache.floatty_id = root_scope
+            .borrow()
+            .get_type_id_by_token(val_pool_ref.name_pool[FLOAT])
+            .unwrap();
+        cache.charty_id = root_scope
+            .borrow()
+            .get_type_id_by_token(val_pool_ref.name_pool[CHAR])
+            .unwrap();
+        cache.strty_id = root_scope
+            .borrow()
+            .get_type_id_by_token(val_pool_ref.name_pool[STR])
+            .unwrap();
+        cache.boolty_id = root_scope
+            .borrow()
+            .get_type_id_by_token(val_pool_ref.name_pool[BOOL])
+            .unwrap();
+        println!(
+            "{} {} {} {} {}",
+            cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
+        );
         AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),
@@ -199,7 +211,7 @@ impl<'a> AstBuilder<'a> {
         let mut prev_loop_state = true;
         swap(
             &mut prev_loop_state,
-            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+            &mut self.self_scope.borrow_mut().in_loop,
         );
         let condit_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
@@ -213,7 +225,7 @@ impl<'a> AstBuilder<'a> {
         let mut break_record = vec![];
         swap(
             &mut break_record,
-            &mut self.self_scope.as_ref().borrow_mut().for_break,
+            &mut self.self_scope.borrow_mut().for_break,
         );
         for i in break_record {
             self.staticdata.inst[i].operand = opcode_after_while;
@@ -221,14 +233,14 @@ impl<'a> AstBuilder<'a> {
         let mut continue_record = vec![];
         swap(
             &mut continue_record,
-            &mut self.self_scope.as_ref().borrow_mut().for_continue,
+            &mut self.self_scope.borrow_mut().for_continue,
         );
         for i in continue_record {
             self.staticdata.inst[i].operand = condit_id;
         }
         swap(
             &mut prev_loop_state,
-            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+            &mut self.self_scope.borrow_mut().in_loop,
         );
         Ok(())
     }
@@ -238,7 +250,7 @@ impl<'a> AstBuilder<'a> {
         let mut prev_loop_state = true;
         swap(
             &mut prev_loop_state,
-            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+            &mut self.self_scope.borrow_mut().in_loop,
         );
         self.statement()?;
         self.get_token_checked(TokenType::Semicolon)?;
@@ -286,7 +298,7 @@ impl<'a> AstBuilder<'a> {
         let mut break_record = vec![];
         swap(
             &mut break_record,
-            &mut self.self_scope.as_ref().borrow_mut().for_break,
+            &mut self.self_scope.borrow_mut().for_break,
         );
         for i in break_record {
             self.staticdata.inst[i].operand = next_opcode_after_for;
@@ -294,7 +306,7 @@ impl<'a> AstBuilder<'a> {
         let mut continue_record = vec![];
         swap(
             &mut continue_record,
-            &mut self.self_scope.as_ref().borrow_mut().for_continue,
+            &mut self.self_scope.borrow_mut().for_continue,
         );
         for i in continue_record {
             self.staticdata.inst[i].operand = opcode_goto;
@@ -302,7 +314,7 @@ impl<'a> AstBuilder<'a> {
         // 重置循环状态
         swap(
             &mut prev_loop_state,
-            &mut self.self_scope.as_ref().borrow_mut().in_loop,
+            &mut self.self_scope.borrow_mut().in_loop,
         );
         Ok(())
     }
@@ -313,7 +325,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 解析出函数参数
-    fn opt_args(&mut self, lex_func_obj: &Func) -> AstError<Vec<usize>> {
+    fn opt_args(&mut self, lex_func_obj: &Rc<dyn FunctionInterface>) -> AstError<Vec<usize>> {
         let mut ret = vec![];
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();
@@ -394,7 +406,7 @@ impl<'a> AstBuilder<'a> {
         name_token: ConstPoolIndexTy,
         istry: bool,
     ) -> AstError<()> {
-        let var = match self.self_scope.as_ref().borrow().get_var(idx) {
+        let var = match self.self_scope.borrow().get_var(idx) {
             None => self.try_err(
                 istry,
                 ErrorInfo::new(
@@ -418,7 +430,7 @@ impl<'a> AstBuilder<'a> {
         let t = self.token_lexer.next_token()?;
         if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
-            let idx = self.self_scope.as_ref().borrow().get_sym(token_data);
+            let idx = self.self_scope.borrow().get_sym(token_data);
             if idx.is_none() {
                 self.try_err(
                     istry,
@@ -435,7 +447,7 @@ impl<'a> AstBuilder<'a> {
             let nxt = self.token_lexer.next_token()?;
             match nxt.tp {
                 TokenType::LeftSmallBrace => {
-                    let func_obj = self.self_scope.as_ref().borrow().get_function(idx).unwrap();
+                    let func_obj = self.self_scope.borrow().get_function(idx).unwrap();
                     let argv_list = self.opt_args(&func_obj)?;
                     // match )
                     self.get_token_checked(TokenType::RightSmallBrace)?;
@@ -467,7 +479,7 @@ impl<'a> AstBuilder<'a> {
                     return Ok(());
                 }
                 TokenType::DoubleColon => {
-                    let mut module = match self.self_scope.as_ref().borrow().get_module(idx) {
+                    let mut module = match self.self_scope.borrow().get_module(idx) {
                         Some(m) => m,
                         None => self.try_err(
                             istry,
@@ -487,7 +499,7 @@ impl<'a> AstBuilder<'a> {
                 }
                 TokenType::LeftBigBrace => {
                     // 定义类
-                    match self.self_scope.as_ref().borrow().get_class(idx) {
+                    match self.self_scope.borrow().get_class(idx) {
                         None => {}
                         Some(_v) => return Ok(()),
                     }
@@ -543,17 +555,16 @@ impl<'a> AstBuilder<'a> {
     fn unary_opcode_impl(&mut self, istry: bool, optoken: TokenType) -> AstError<()> {
         let class_obj = self
             .self_scope
-            .as_ref()
             .borrow()
-            .get_class(self.process_info.pop_last_ty().unwrap())
+            .get_class_by_class_id(self.process_info.pop_last_ty().unwrap())
             .unwrap();
-        let oride = class_obj.get_override_func(optoken);
+        let oride = class_obj.get_override_func(optoken.convert_to_override().unwrap());
         match oride {
             Some(v) => {
                 let tmp = v.io.check_argvs(vec![]);
                 match tmp {
                     Ok(_) => {
-                        self.add_bycode(v.opcode.clone(), NO_ARG);
+                        self.add_bycode(v.opcode, NO_ARG);
                         self.process_info.new_type(v.io.return_type.unwrap())
                     }
                     Err(e) => {
@@ -747,7 +758,7 @@ impl<'a> AstBuilder<'a> {
             }
         }
         // self.self_scope = tmp.clone();
-        self.self_scope.as_ref().borrow_mut().add_custom_function(
+        self.self_scope.borrow_mut().add_custom_function(
             name_id,
             CustomFunction::new(
                 io,
@@ -784,17 +795,11 @@ impl<'a> AstBuilder<'a> {
             }
             TokenType::Pub => {
                 let mut is_in_pub = true;
-                swap(
-                    &mut self.self_scope.as_ref().borrow_mut().is_pub,
-                    &mut is_in_pub,
-                );
+                swap(&mut self.self_scope.borrow_mut().is_pub, &mut is_in_pub);
                 self.get_token_checked(TokenType::LeftBigBrace)?;
                 self.lex_class_item_loop(class_obj)?;
                 self.get_token_checked(RightBigBrace)?;
-                swap(
-                    &mut self.self_scope.as_ref().borrow_mut().is_pub,
-                    &mut is_in_pub,
-                );
+                swap(&mut self.self_scope.borrow_mut().is_pub, &mut is_in_pub);
             }
             TokenType::Func => {
                 self.def_func()?;
@@ -812,7 +817,7 @@ impl<'a> AstBuilder<'a> {
     fn def_class(&mut self) -> AstError<()> {
         // new scope
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(self.self_scope.clone()))));
-        self.self_scope.as_ref().borrow_mut().in_class = true;
+        self.self_scope.borrow_mut().in_class = true;
         let name = self.get_token_checked(TokenType::ID)?.data.unwrap();
         let name_id = self.insert_sym_with_error(name)?;
         let mut class_obj =
@@ -821,16 +826,10 @@ impl<'a> AstBuilder<'a> {
         self.lex_class_item_loop(&mut class_obj)?;
         // 将作用域中剩下的函数加入作用域
         self.self_scope
-            .as_ref()
             .borrow_mut()
-            .add_custom_type(name_id, class_obj);
-        let prev_scope = self
-            .self_scope
-            .as_ref()
-            .borrow()
-            .prev_scope
-            .clone()
+            .add_type(name_id, Rc::new(class_obj))
             .unwrap();
+        let prev_scope = self.self_scope.borrow().prev_scope.clone().unwrap();
         self.self_scope = prev_scope;
         Ok(())
     }
@@ -855,7 +854,7 @@ impl<'a> AstBuilder<'a> {
             let mut items = path.split('.');
             // 删除std
             items.next();
-            let now = match get_stdlib().get_module(items) {
+            let now = match stdlib::get_stdlib().get_module(items) {
                 Some(d) => d,
                 None => {
                     return self.try_err(
@@ -880,9 +879,8 @@ impl<'a> AstBuilder<'a> {
                             // println!("{}", func_item.get_name());
                             let func_id = self.insert_sym_with_error(token_idx)?;
                             self.self_scope
-                                .as_ref()
                                 .borrow_mut()
-                                .add_func(func_id, Box::new(func_item.clone()));
+                                .add_func(func_id, Rc::new(func_item.clone()));
                         }
                     }
                 }
@@ -890,21 +888,22 @@ impl<'a> AstBuilder<'a> {
                     let tmp = self.token_lexer.add_id_token(&import_item_name);
                     let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(module);
-                    match self.self_scope.as_ref().borrow_mut().import_native_module(
-                        module_sym_idx,
+                    let sub_module =
+                        Rc::new(RefCell::new(SymScope::new(Some(self.self_scope.clone()))));
+                    self.self_scope
+                        .borrow_mut()
+                        .add_imported_module(module_sym_idx, sub_module.clone());
+                    if let Err(e) = sub_module.borrow_mut().import_native_module(
                         module,
+                        stdlib::get_storage(),
                         &self.token_lexer.const_pool,
                     ) {
-                        Err(e) => {
-                            return self.try_err(istry, e);
-                        }
-                        Ok(sp) => {
-                            sp.as_ref().borrow_mut().prev_scope = Some(self.self_scope.clone());
-                        }
-                    }
+                        return self.try_err(istry, e);
+                    };
                 }
             }
         } else {
+            // custom module
             match self.token_lexer.compiler_data.option.inputsource.clone() {
                 InputSource::File(now_module_path) => {
                     let path = std::path::PathBuf::from(path.replace('.', "/"));
@@ -914,6 +913,7 @@ impl<'a> AstBuilder<'a> {
                     now_module_path = now_module_path.join(path.clone());
                     if now_module_path.exists() {
                         // 创建新的compiler来编译模块
+                        // self.self_scope.as_any().borrow_mut().import_module();
                     } else {
                         return self.try_err(
                             istry,
@@ -966,12 +966,11 @@ impl<'a> AstBuilder<'a> {
         let sym_idx = self.insert_sym_with_error(name)?;
         let (_var_sym, var_addr) =
             self.self_scope
-                .as_ref()
                 .borrow_mut()
                 .add_var(sym_idx, varty, self.get_ty_sz(varty));
         self.modify_var(varty, var_addr, self.process_info.is_global);
         self.staticdata
-            .update_var_table_mem_sz(self.self_scope.as_ref().borrow().get_var_table_sz());
+            .update_var_table_mem_sz(self.self_scope.borrow().get_var_table_sz());
         Ok(())
     }
 
@@ -995,7 +994,7 @@ impl<'a> AstBuilder<'a> {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
             }
         };
-        let var = match self.self_scope.as_ref().borrow().get_var(name) {
+        let var = match self.self_scope.borrow().get_var(name) {
             Some(v) => v,
             None => {
                 return self.gen_error(ErrorInfo::new(
@@ -1082,7 +1081,7 @@ impl<'a> AstBuilder<'a> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::Continue => {
-                if !self.self_scope.as_ref().borrow().in_loop {
+                if !self.self_scope.borrow().in_loop {
                     return self.gen_error(ErrorInfo::new(
                         t!(SHOULD_IN_LOOP, "0" = "continue"),
                         t!(SYNTAX_ERROR),
@@ -1090,14 +1089,13 @@ impl<'a> AstBuilder<'a> {
                 }
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
                 self.self_scope
-                    .as_ref()
                     .borrow_mut()
                     .for_continue
                     .push(self.staticdata.get_last_opcode_id());
                 return Ok(());
             }
             TokenType::Break => {
-                if !self.self_scope.as_ref().borrow().in_loop {
+                if !self.self_scope.borrow().in_loop {
                     return self.gen_error(ErrorInfo::new(
                         t!(SHOULD_IN_LOOP, "0" = "break"),
                         t!(SYNTAX_ERROR),
@@ -1105,7 +1103,6 @@ impl<'a> AstBuilder<'a> {
                 }
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
                 self.self_scope
-                    .as_ref()
                     .borrow_mut()
                     .for_break
                     .push(self.staticdata.get_last_opcode_id());
@@ -1120,7 +1117,7 @@ impl<'a> AstBuilder<'a> {
                 }
                 // ignore the result
                 // for return and return expr both
-                let ret_type = self.self_scope.as_ref().borrow().func_io.unwrap();
+                let ret_type = self.self_scope.borrow().func_io.unwrap();
                 match ret_type {
                     Some(ty) => {
                         self.expr(true)?;
@@ -1204,6 +1201,7 @@ impl<'a> AstBuilder<'a> {
         }
         self.token_lexer.next_back(t);
         self.expr(false)?;
+        self.process_info.clear();
         Ok(())
     }
 
@@ -1219,17 +1217,16 @@ impl<'a> AstBuilder<'a> {
         let begin_inst_idx = self.staticdata.get_next_opcode_id();
         let func_obj = self
             .self_scope
-            .as_ref()
             .borrow()
             .get_function(funcid)
             .unwrap()
-            .downcast::<CustomFunction>()
+            .downcast_rc::<CustomFunction>()
             .expect("Expect Custom Function");
         let io = func_obj.get_io();
         let tmp = self.self_scope.clone();
         // 解析参数
         self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
-        self.self_scope.as_ref().borrow_mut().func_io = Some(io.return_type);
+        self.self_scope.borrow_mut().func_io = Some(io.return_type);
         debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
         for (argty, argname) in io
             .argvs_type
@@ -1257,22 +1254,19 @@ impl<'a> AstBuilder<'a> {
             self.add_bycode(Opcode::PopFrame, NO_ARG);
         }
         self.generate_func_in_scope()?;
-        let mem_sz = self.self_scope.as_ref().borrow().get_var_table_sz();
+        let mem_sz = self.self_scope.borrow().get_var_table_sz();
         self.self_scope = tmp.clone();
         Ok((begin_inst_idx, mem_sz))
     }
 
     fn generate_func_in_scope(&mut self) -> AstError<()> {
         let mut tmp = vec![];
-        swap(
-            &mut tmp,
-            &mut self.self_scope.as_ref().borrow_mut().funcs_temp_store,
-        );
+        swap(&mut tmp, &mut self.self_scope.borrow_mut().funcs_temp_store);
         for i in tmp {
             let (code_begin, var_mem_sz) = self.lex_function(i.0, &i.1)?;
             self.staticdata
                 .funcs
-                .push(func::Func::new(code_begin, var_mem_sz))
+                .push(libcore::FuncStorage::new(code_begin, var_mem_sz))
         }
         Ok(())
     }

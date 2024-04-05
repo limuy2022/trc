@@ -1,5 +1,6 @@
 use super::{Compiler, Context, Float, TokenIo, ValuePool};
-use crate::{base::error::*, cfg::FLOAT_OVER_FLOW_LIMIT, hash_map};
+use crate::cfg::FLOAT_OVER_FLOW_LIMIT;
+use libcore::*;
 use rust_i18n::t;
 use std::{collections::HashMap, fmt::Display, sync::OnceLock};
 
@@ -128,6 +129,37 @@ pub enum TokenType {
     Pub,
     // ::
     DoubleColon,
+}
+
+impl TokenType {
+    pub fn convert_to_override(&self) -> Option<libcore::OverrideOperations> {
+        Some(match *self {
+            TokenType::Add => libcore::OverrideOperations::Add,
+            TokenType::Sub => libcore::OverrideOperations::Sub,
+            TokenType::Mul => libcore::OverrideOperations::Mul,
+            TokenType::Div => libcore::OverrideOperations::Div,
+            TokenType::Mod => libcore::OverrideOperations::Mod,
+            TokenType::ExactDiv => libcore::OverrideOperations::ExactDiv,
+            TokenType::Power => libcore::OverrideOperations::Power,
+            TokenType::Not => libcore::OverrideOperations::Not,
+            TokenType::And => libcore::OverrideOperations::And,
+            TokenType::Or => libcore::OverrideOperations::Or,
+            TokenType::SelfNegative => libcore::OverrideOperations::SelfNegative,
+            TokenType::GreaterEqual => libcore::OverrideOperations::GreaterEqual,
+            TokenType::Greater => libcore::OverrideOperations::Greater,
+            TokenType::LessEqual => libcore::OverrideOperations::LessEqual,
+            TokenType::Less => libcore::OverrideOperations::Less,
+            TokenType::Equal => libcore::OverrideOperations::Equal,
+            TokenType::NotEqual => libcore::OverrideOperations::NotEqual,
+            TokenType::BitNot => libcore::OverrideOperations::BitNot,
+            TokenType::BitRightShift => libcore::OverrideOperations::BitRightShift,
+            TokenType::BitLeftShift => libcore::OverrideOperations::BitLeftShift,
+            TokenType::BitAnd => libcore::OverrideOperations::BitAnd,
+            TokenType::BitOr => libcore::OverrideOperations::BitOr,
+            TokenType::Xor => libcore::OverrideOperations::Xor,
+            _ => return None,
+        })
+    }
 }
 
 pub type ConstPoolIndexTy = usize;
@@ -269,7 +301,7 @@ macro_rules! check_braces_match {
 fn get_keywords() -> &'static HashMap<String, TokenType> {
     static KEYWORDS: OnceLock<HashMap<String, TokenType>> = OnceLock::new();
     KEYWORDS.get_or_init(|| {
-        hash_map![
+        collection_literals::hash![
             "while".to_string() => TokenType::While,
             "for".to_string() => TokenType::For,
             "if".to_string() => TokenType::If,
@@ -290,7 +322,7 @@ fn get_keywords() -> &'static HashMap<String, TokenType> {
 fn get_redix_to_prefix() -> &'static HashMap<usize, &'static str> {
     static RADIX_TO_PREFIX: OnceLock<HashMap<usize, &'static str>> = OnceLock::new();
     RADIX_TO_PREFIX.get_or_init(|| {
-        hash_map![
+        collection_literals::hash![
             2 => "0b",
             8 => "0o",
             16 => "0x"

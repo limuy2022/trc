@@ -1,3 +1,4 @@
+use libcore::*;
 use std::ptr::null_mut;
 use trc::compiler::*;
 use trc::tvm::*;

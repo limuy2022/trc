@@ -645,6 +645,7 @@ impl<'a> Vm<'a> {
                     return Ok(());
                 }
             }
+            Opcode::ImportNativeModule => todo!(),
         };
         *pc += 1;
         Ok(())

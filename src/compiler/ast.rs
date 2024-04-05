@@ -148,10 +148,10 @@ impl<'a> AstBuilder<'a> {
             .borrow()
             .get_type_id_by_token(val_pool_ref.name_pool[BOOL])
             .unwrap();
-        println!(
-            "{} {} {} {} {}",
-            cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
-        );
+        // println!(
+        //     "{} {} {} {} {}",
+        //     cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
+        // );
         AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),

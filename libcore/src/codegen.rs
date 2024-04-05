@@ -149,6 +149,7 @@ pub enum Opcode {
     PopDataStr,
     PopDataChar,
     PopDataBool,
+    ImportNativeModule,
 }
 
 impl Display for Opcode {

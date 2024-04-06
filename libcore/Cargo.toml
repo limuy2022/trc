@@ -13,4 +13,3 @@ derive = { path = "../derive" }
 
 [lib]
 name = "libcore"
-crate-type = ["dylib"]

@@ -1,11 +1,11 @@
 use super::AstBuilder;
 use super::AstError;
-use crate::compiler::token::ConstPoolIndexTy;
 use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
+use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
 use libcore::*;
 use rust_i18n::t;
-use std::mem::size_of;
+use std::{cell::RefCell, mem::size_of, rc::Rc};
 
 impl<'a> AstBuilder<'a> {
     pub fn clear_inst(&mut self) {
@@ -158,10 +158,10 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn import_module_sym(&mut self, lib: &Module) {
-        for i in &lib.functions {
+        for i in lib.functions() {
             self.token_lexer.const_pool.add_id(i.0.clone());
         }
-        for i in &lib.classes {
+        for i in lib.classes() {
             self.token_lexer.const_pool.add_id(i.0.clone());
         }
     }
@@ -188,5 +188,9 @@ impl<'a> AstBuilder<'a> {
             VmStackType::Bool => Opcode::EqBoolWithoutPop,
             VmStackType::Object => Opcode::EqWithoutPop,
         }
+    }
+
+    pub fn get_scope(&self) -> Rc<RefCell<SymScope>> {
+        self.self_scope.clone()
     }
 }

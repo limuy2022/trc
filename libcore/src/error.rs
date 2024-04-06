@@ -47,6 +47,13 @@ pub fn symbol_redefined(name: &str) -> ErrorInfo {
     ErrorInfo::new(t!(SYMBOL_REDEFINED, "0" = name), t!(SYMBOL_ERROR))
 }
 
+pub fn module_not_found(module_name: &str) -> ErrorInfo {
+    ErrorInfo::new(
+        t!(MODULE_NOT_FOUND, "0" = module_name),
+        t!(MODULE_NOT_FOUND_ERROR),
+    )
+}
+
 #[derive(Debug)]
 pub struct ErrorInfo {
     pub message: String,

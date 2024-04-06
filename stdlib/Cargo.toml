@@ -12,3 +12,4 @@ rust-i18n = "3"
 
 [lib]
 name = "stdlib"
+crate-type = ["dylib"]

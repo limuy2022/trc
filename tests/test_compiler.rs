@@ -1,6 +1,6 @@
 use libcore::*;
 use std::mem::size_of;
-use trc::compiler::*;
+use trc::compiler::{ast::AstBuilder, *};
 
 macro_rules! gen_test_env {
     ($test_code:expr, $env_name:ident) => {
@@ -20,6 +20,47 @@ fn get_offset(int_nums: usize) -> usize {
     size_of::<i64>() * int_nums
 }
 
+fn get_func_id(scope: &mut AstBuilder, name: &str) -> usize {
+    let idstr = scope
+        .token_lexer
+        .const_pool
+        .get_id(&name.to_string())
+        .unwrap();
+    let symid = scope
+        .get_scope()
+        .borrow()
+        .get_sym(idstr)
+        .expect("sym not found");
+    scope
+        .get_scope()
+        .borrow()
+        .get_function(symid)
+        .unwrap()
+        .downcast_rc::<RustFunction>()
+        .unwrap()
+        .buildin_id
+}
+
+const SEPCIAL_FUNC_ID: usize = usize::MAX;
+
+fn opcode_assert_eq(expect: Vec<Inst>, acual: Vec<Inst>) {
+    for (i, j) in expect.iter().zip(acual.iter()) {
+        assert_eq!(
+            i.opcode, j.opcode,
+            "\nexpected:{:?}\nactual:{:?}",
+            expect, acual
+        );
+        if i.opcode == Opcode::CallNative && j.operand == SEPCIAL_FUNC_ID {
+            continue;
+        }
+        assert_eq!(
+            i.operand, j.operand,
+            "\nexpected:{:?}\nactual:{:?}",
+            expect, acual
+        );
+    }
+}
+
 #[test]
 fn test_assign() {
     gen_test_env!(
@@ -30,7 +71,8 @@ fn test_assign() {
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
@@ -45,10 +87,7 @@ fn test_assign() {
             Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
             Inst::new(Opcode::MoveInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 4),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
+            Inst::new(Opcode::CallNative, fid),
         ],
     )
 }
@@ -57,9 +96,9 @@ fn test_assign() {
 fn test_expr_easy1() {
     gen_test_env!(r#"(1)"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
-        vec![Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE)]
+        vec![Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE)],
     );
 }
 
@@ -67,14 +106,14 @@ fn test_expr_easy1() {
 fn test_expr_easy2() {
     gen_test_env!(r#"5+~6"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(Opcode::BitNotInt, NO_ARG),
-            Inst::new(Opcode::AddInt, NO_ARG)
-        ]
+            Inst::new(Opcode::AddInt, NO_ARG),
+        ],
     );
 }
 
@@ -82,15 +121,15 @@ fn test_expr_easy2() {
 fn text_expr_easy3() {
     gen_test_env!(r#"9-8-8"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(Opcode::SubInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 3),
-            Inst::new(Opcode::SubInt, NO_ARG)
-        ]
+            Inst::new(Opcode::SubInt, NO_ARG),
+        ],
     )
 }
 
@@ -98,15 +137,15 @@ fn text_expr_easy3() {
 fn test_expr_easy4() {
     gen_test_env!(r#"(8-9)*7"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(Opcode::SubInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 4),
-            Inst::new(Opcode::MulInt, NO_ARG)
-        ]
+            Inst::new(Opcode::MulInt, NO_ARG),
+        ],
     )
 }
 
@@ -114,7 +153,7 @@ fn test_expr_easy4() {
 fn test_expr() {
     gen_test_env!(r#"1+9-10*7**6"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
@@ -126,7 +165,7 @@ fn test_expr() {
             Inst::new(Opcode::PowerInt, NO_ARG),
             Inst::new(Opcode::MulInt, NO_ARG),
             Inst::new(Opcode::SubInt, NO_ARG),
-        ]
+        ],
     );
 }
 
@@ -134,7 +173,7 @@ fn test_expr() {
 fn test_expr_final() {
     gen_test_env!(r#"(1+-2)*3//4**(5**6)==1||7==(8&9)"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
@@ -157,7 +196,7 @@ fn test_expr_final() {
             Inst::new(Opcode::BitAndInt, NO_ARG),
             Inst::new(Opcode::EqInt, NO_ARG),
             Inst::new(Opcode::OrBool, NO_ARG),
-        ]
+        ],
     );
 }
 
@@ -170,7 +209,8 @@ print("{}", a+90)"#,
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
@@ -181,11 +221,8 @@ print("{}", a+90)"#,
             Inst::new(Opcode::AddInt, NO_ARG),
             Inst::new(Opcode::MoveInt, NO_ARG),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ONE),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     )
 }
 
@@ -193,16 +230,14 @@ print("{}", a+90)"#,
 fn test_call_builtin_function() {
     gen_test_env!(r#"print("hello world!")"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     )
 }
 
@@ -234,7 +269,8 @@ fn test_wrong_type3() {
 fn test_if_easy() {
     gen_test_env!(r#"if 1==1 { print("hello world") }"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 1),
@@ -243,11 +279,8 @@ fn test_if_easy() {
             Inst::new(Opcode::JumpIfFalse, 7),
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     )
 }
 
@@ -286,7 +319,7 @@ if a<8{
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
@@ -305,8 +338,8 @@ if a<8{
             Inst::new(Opcode::LoadInt, 5),
             Inst::new(Opcode::EqInt, 0),
             Inst::new(Opcode::JumpIfFalse, 16),
-            Inst::new(Opcode::Jump, 17)
-        ]
+            Inst::new(Opcode::Jump, 17),
+        ],
     )
 }
 
@@ -314,7 +347,8 @@ if a<8{
 fn test_var_params() {
     gen_test_env!(r#"print("{}{}{}", 1, 2, 3)"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadString, 0),
@@ -325,11 +359,8 @@ fn test_var_params() {
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(Opcode::MoveInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 3),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     )
 }
 
@@ -337,7 +368,8 @@ fn test_var_params() {
 fn test_while_1() {
     gen_test_env!(r#"while 1==1 { print("hello world") }"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 1),
@@ -346,12 +378,9 @@ fn test_while_1() {
             Inst::new(Opcode::JumpIfFalse, 8),
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-            Inst::new(Opcode::Jump, 0)
-        ]
+            Inst::new(Opcode::CallNative, fid),
+            Inst::new(Opcode::Jump, 0),
+        ],
     )
 }
 
@@ -359,7 +388,8 @@ fn test_while_1() {
 fn test_for_1() {
     gen_test_env!(r#"for i:=0; i<10; i=i+1 { print("hello world") }"#, t);
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 0),
@@ -370,16 +400,13 @@ fn test_for_1() {
             Inst::new(Opcode::JumpIfFalse, 14),
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::LoadGlobalVarInt, get_offset(0)),
             Inst::new(Opcode::LoadInt, 1),
             Inst::new(Opcode::AddInt, NO_ARG),
             Inst::new(Opcode::StoreGlobalInt, get_offset(0)),
-            Inst::new(Opcode::Jump, 2)
-        ]
+            Inst::new(Opcode::Jump, 2),
+        ],
     )
 }
 
@@ -397,26 +424,21 @@ func f() {
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::Stop, NO_ARG),
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::PopFrame, NO_ARG),
             Inst::new(Opcode::LoadString, 1),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::CallCustom, 0),
-            Inst::new(Opcode::PopFrame, NO_ARG)
-        ]
+            Inst::new(Opcode::PopFrame, NO_ARG),
+        ],
     )
 }
 
@@ -431,19 +453,17 @@ f()"#,
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::CallCustom, 0),
             Inst::new(Opcode::Stop, NO_ARG),
             Inst::new(Opcode::LoadString, 0),
             Inst::new(Opcode::LoadInt, INT_VAL_POOL_ZERO),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-            Inst::new(Opcode::PopFrame, NO_ARG)
-        ]
+            Inst::new(Opcode::CallNative, fid),
+            Inst::new(Opcode::PopFrame, NO_ARG),
+        ],
     )
 }
 
@@ -462,7 +482,8 @@ print("{}{}", a, b)
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 0),
@@ -478,10 +499,7 @@ print("{}{}", a, b)
             Inst::new(Opcode::LoadGlobalVarInt, get_offset(1)),
             Inst::new(Opcode::MoveInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 2),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Stop, NO_ARG),
             Inst::new(Opcode::StoreLocalInt, get_offset(0)),
             Inst::new(Opcode::StoreLocalInt, get_offset(1)),
@@ -491,12 +509,9 @@ print("{}{}", a, b)
             Inst::new(Opcode::LoadLocalVarInt, get_offset(0)),
             Inst::new(Opcode::MoveInt, NO_ARG),
             Inst::new(Opcode::LoadInt, 2),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_prelude_function("print").unwrap().buildin_id
-            ),
-            Inst::new(Opcode::PopFrame, NO_ARG)
-        ]
+            Inst::new(Opcode::CallNative, fid),
+            Inst::new(Opcode::PopFrame, NO_ARG),
+        ],
     )
 }
 
@@ -527,7 +542,8 @@ while a<10{
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "println");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 0),
@@ -550,7 +566,7 @@ while a<10{
             Inst::new(Opcode::LoadGlobalVarInt, 0),
             Inst::new(Opcode::MoveInt, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::LoadGlobalVarInt, 0),
             Inst::new(Opcode::LoadInt, 1),
             Inst::new(Opcode::AddInt, 0),
@@ -575,14 +591,14 @@ while a<10{
             Inst::new(Opcode::LoadGlobalVarInt, 8),
             Inst::new(Opcode::MoveInt, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::LoadGlobalVarInt, 8),
             Inst::new(Opcode::LoadInt, 4),
             Inst::new(Opcode::EqInt, 0),
             Inst::new(Opcode::JumpIfFalse, 51),
             Inst::new(Opcode::Jump, 52),
             Inst::new(Opcode::Jump, 28),
-        ]
+        ],
     );
 }
 
@@ -595,19 +611,17 @@ print("{}", math::sin(9.8))
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "print");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadString, 1),
             Inst::new(Opcode::LoadFloat, 0),
-            Inst::new(
-                Opcode::CallNative,
-                stdlib::get_stdlib().sub_modules["math"].functions["sin"].buildin_id
-            ),
+            Inst::new(Opcode::CallNative, SEPCIAL_FUNC_ID),
             Inst::new(Opcode::MoveFloat, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 0),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     );
 }
 
@@ -632,7 +646,8 @@ println("out of range")
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "println");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadInt, 2),
@@ -646,7 +661,7 @@ println("out of range")
             Inst::new(Opcode::LoadGlobalVarInt, 0),
             Inst::new(Opcode::MoveInt, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Jump, 32),
             Inst::new(Opcode::LoadInt, 3),
             Inst::new(Opcode::EqIntWithoutPop, 0),
@@ -659,18 +674,18 @@ println("out of range")
             Inst::new(Opcode::LoadGlobalVarInt, 0),
             Inst::new(Opcode::MoveInt, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Jump, 32),
             Inst::new(Opcode::Jump, 28),
             Inst::new(Opcode::Jump, 32),
             Inst::new(Opcode::LoadString, 1),
             Inst::new(Opcode::LoadInt, 0),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Jump, 32),
             Inst::new(Opcode::LoadString, 2),
             Inst::new(Opcode::LoadInt, 0),
-            Inst::new(Opcode::CallNative, 1),
-        ]
+            Inst::new(Opcode::CallNative, fid),
+        ],
     )
 }
 
@@ -691,7 +706,8 @@ println("run final!")
         t
     );
     t.generate_code().unwrap();
-    assert_eq!(
+    let fid = get_func_id(&mut t, "println");
+    opcode_assert_eq(
         t.staticdata.inst,
         vec![
             Inst::new(Opcode::LoadString, 0),
@@ -708,14 +724,14 @@ println("run final!")
             Inst::new(Opcode::LoadGlobalVarStr, 0),
             Inst::new(Opcode::MoveStr, 0),
             Inst::new(Opcode::LoadInt, 1),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Jump, 22),
             Inst::new(Opcode::Jump, 18),
             Inst::new(Opcode::Jump, 22),
             Inst::new(Opcode::LoadString, 3),
             Inst::new(Opcode::LoadInt, 0),
-            Inst::new(Opcode::CallNative, 1),
+            Inst::new(Opcode::CallNative, fid),
             Inst::new(Opcode::Jump, 22),
-        ]
+        ],
     )
 }

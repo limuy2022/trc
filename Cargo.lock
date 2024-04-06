@@ -1151,7 +1151,6 @@ dependencies = [
  "rust-i18n",
  "rustyline",
  "shadow-rs",
- "stdlib",
  "suffix_array",
  "sys-locale",
  "thiserror",

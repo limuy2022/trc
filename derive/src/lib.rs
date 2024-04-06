@@ -160,11 +160,10 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     // 目前的实现策略是先提供一个由once_cell储存的usize数，表示在类型表中的索引，里面储存该类型的Rc指针
     // 因为很可能某个函数的参数就是标准库中的某个类型，所以我们需要先将类型导入到class_table中
     let ret = quote!(#input
-        use std::sync::OnceLock;
         impl #name {
             pub fn init_info(storage: Option<&mut ModuleStorage>) -> usize {
                 use std::collections::hash_map::HashMap;
-                static CLASS_ID: OnceLock<usize> = OnceLock::new();
+                static CLASS_ID: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
                 *CLASS_ID.get_or_init(|| {
                     let mut members = HashMap::new();
                     #(
@@ -246,4 +245,32 @@ pub fn trc_const(_: TokenStream, input: TokenStream) -> TokenStream {
     input.ty = parse_str("&str").unwrap();
     input.expr = parse_str(&format!("stringify!({})", input.expr.to_token_stream(),)).unwrap();
     quote!(#input).into()
+}
+
+#[proc_macro]
+pub fn def_module_export(_t: TokenStream) -> TokenStream {
+    quote!(
+        fn import_lib() -> (&'static libcore::Module, &'static libcore::ModuleStorage) {
+            // this is for any type
+            static STDLIB_STORAGE: std::sync::OnceLock<ModuleStorage> = std::sync::OnceLock::new();
+            static RETURN_VAL: std::sync::OnceLock<Module> = std::sync::OnceLock::new();
+            let stro = STDLIB_STORAGE.get_or_init(|| {
+                let mut storage = libcore::ModuleStorage::new();
+                RETURN_VAL.get_or_init(|| module_init(&mut storage));
+                storage
+            });
+            (RETURN_VAL.get().unwrap(), stro)
+        }
+
+        #[no_mangle]
+        pub fn get_lib() -> &'static libcore::Module {
+            import_lib().0
+        }
+
+        #[no_mangle]
+        pub fn get_storage() -> &'static libcore::ModuleStorage {
+            import_lib().1
+        }
+    )
+    .into()
 }

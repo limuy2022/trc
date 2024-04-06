@@ -7,7 +7,7 @@ use std::{
 
 use super::{codegen::Opcode, error::*};
 
-type StdlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
+pub type RustlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
 
 pub type ScopeAllocIdTy = usize;
 pub type TypeAllowNull = Option<TyIdxTy>;
@@ -55,7 +55,7 @@ pub type ArgsNameTy = Vec<ConstPoolIndexTy>;
 pub struct RustFunction {
     pub name: String,
     pub buildin_id: usize,
-    pub ptr: StdlibFunc,
+    pub ptr: RustlibFunc,
     pub io: IOType,
 }
 
@@ -110,6 +110,7 @@ pub trait FunctionInterface: Downcast + Debug {
     fn get_io(&self) -> &IOType;
     fn get_name(&self) -> &str;
     fn get_io_mut(&mut self) -> &mut IOType;
+    fn get_func_id(&self) -> usize;
 }
 
 impl_downcast!(FunctionInterface);
@@ -143,6 +144,10 @@ impl FunctionInterface for RustFunction {
 
     fn get_name(&self) -> &str {
         &self.name
+    }
+
+    fn get_func_id(&self) -> usize {
+        self.buildin_id
     }
 }
 
@@ -235,8 +240,9 @@ impl Display for RustClass {
 
 /// 最基础的储存一个动态链接库中的函数和类的地方
 #[derive(Default)]
+#[repr(C)]
 pub struct ModuleStorage {
-    pub func_table: Vec<StdlibFunc>,
+    pub func_table: Vec<RustlibFunc>,
     pub class_table: Vec<RustClass>,
 }
 
@@ -248,7 +254,7 @@ impl ModuleStorage {
         }
     }
 
-    pub fn add_func(&mut self, f: StdlibFunc) -> usize {
+    pub fn add_func(&mut self, f: RustlibFunc) -> usize {
         self.func_table.push(f);
         self.func_table.len() - 1
     }
@@ -267,7 +273,7 @@ impl ModuleStorage {
 impl RustFunction {
     pub fn new(
         name: impl Into<String>,
-        ptr: StdlibFunc,
+        ptr: RustlibFunc,
         io: IOType,
         storage: &mut ModuleStorage,
     ) -> RustFunction {
@@ -282,13 +288,14 @@ impl RustFunction {
 }
 
 #[derive(Debug, Clone)]
+#[repr(C)]
 pub struct Module {
-    pub name: String,
-    pub sub_modules: HashMap<String, Module>,
-    pub functions: HashMap<String, RustFunction>,
+    name: String,
+    sub_modules: HashMap<String, Module>,
+    functions: HashMap<String, RustFunction>,
     // class name 和class id
-    pub classes: HashMap<String, usize>,
-    pub consts: HashMap<String, String>,
+    classes: HashMap<String, usize>,
+    consts: HashMap<String, String>,
 }
 
 impl Module {
@@ -326,6 +333,46 @@ impl Module {
         let item = item.unwrap();
         let lock = self.sub_modules.get(&item.into()).unwrap();
         lock.get_module(path)
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
+    }
+
+    pub fn sub_modules(&self) -> &HashMap<String, Module> {
+        &self.sub_modules
+    }
+
+    pub fn set_sub_modules(&mut self, sub_modules: HashMap<String, Module>) {
+        self.sub_modules = sub_modules;
+    }
+
+    pub fn functions(&self) -> &HashMap<String, RustFunction> {
+        &self.functions
+    }
+
+    pub fn set_functions(&mut self, functions: HashMap<String, RustFunction>) {
+        self.functions = functions;
+    }
+
+    pub fn classes(&self) -> &HashMap<String, usize> {
+        &self.classes
+    }
+
+    pub fn consts(&self) -> &HashMap<String, String> {
+        &self.consts
+    }
+
+    pub fn set_consts(&mut self, consts: HashMap<String, String>) {
+        self.consts = consts;
+    }
+
+    pub fn set_classes(&mut self, classes: HashMap<String, usize>) {
+        self.classes = classes;
     }
 }
 

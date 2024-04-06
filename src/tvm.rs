@@ -4,9 +4,7 @@ mod function;
 use self::function::Frame;
 use crate::cfg;
 use libcore::*;
-use libloading::Library;
 use rust_i18n::t;
-use std::sync::OnceLock;
 
 pub struct Vm<'a> {
     run_context: Context,
@@ -43,56 +41,10 @@ impl Context {
     }
 }
 
-/// Load libc
-fn load_libc() -> Option<&'static Library> {
-    static LIBC: OnceLock<Option<Library>> = OnceLock::new();
-    #[cfg(target_os = "linux")]
-    {
-        let tmp = LIBC.get_or_init(|| unsafe {
-            let lib: Result<Library, libloading::Error> = Library::new("");
-            match lib {
-                Err(_) => None,
-                Ok(val) => Some(val),
-            }
-        });
-        match tmp {
-            None => None,
-            Some(val) => Some(val),
-        }
-    }
-    #[cfg(target_os = "windows")]
-    {
-        let tmp = LIBC.get_or_init(|| unsafe {
-            let lib: Result<Library, libloading::Error> = libloading::Library::new("msvcrt.dll");
-            match lib {
-                Err(_) => None,
-                Ok(val) => Some(val),
-            }
-        });
-        match tmp {
-            None => None,
-            Some(val) => Some(&val),
-        }
-    }
-    #[cfg(target_os = "macos")]
-    {
-        let tmp = LIBC.get_or_init(|| unsafe {
-            let lib: Result<Library, libloading::Error> = libloading::Library::new("libc.dylib");
-            match lib {
-                Err(_) => None,
-                Ok(val) => Some(val),
-            }
-        });
-        match tmp {
-            None => None,
-            Some(val) => Some(&val),
-        }
-    }
-}
-
 pub struct DydataWrap {
     frames_stack: Vec<Frame>,
     dydata: DynaData,
+    imported_func: Vec<libcore::RustlibFunc>,
 }
 
 impl DydataWrap {
@@ -100,6 +52,7 @@ impl DydataWrap {
         Self {
             frames_stack: Vec::new(),
             dydata: DynaData::new(),
+            imported_func: Vec::new(),
         }
     }
 }

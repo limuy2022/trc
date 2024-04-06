@@ -45,6 +45,10 @@ impl FunctionInterface for CustomFunction {
     fn get_io_mut(&mut self) -> &mut IOType {
         &mut self.io
     }
+
+    fn get_func_id(&self) -> usize {
+        self.custom_id
+    }
 }
 
 /// Manager of type
@@ -110,7 +114,7 @@ impl ClassInterface for CustomType {
     }
 }
 
-pub type ScopeAllocClassId = usize;
+pub type ClassIdxId = usize;
 pub type VarIdxTy = ScopeAllocIdTy;
 pub type FuncIdxTy = ScopeAllocIdTy;
 pub type FuncBodyTy = Vec<(Token, usize)>;
@@ -137,7 +141,7 @@ pub struct SymScope {
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
     scope_sym_id: ScopeAllocIdTy,
     // ID到class id的映射
-    types: HashMap<ScopeAllocIdTy, ScopeAllocClassId>,
+    types: HashMap<ScopeAllocIdTy, ClassIdxId>,
     // ID到函数的映射
     funcs: HashMap<ScopeAllocIdTy, Rc<dyn FunctionInterface>>,
     // id到变量类型的映射
@@ -145,11 +149,12 @@ pub struct SymScope {
     // 由token id到模块的映射
     // modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
     // 当前作用域可以分配的下一个class id
-    types_id: ScopeAllocClassId,
+    types_id: ClassIdxId,
     vars_id: ScopeAllocIdTy,
-    funcs_custom_id: ScopeAllocIdTy,
+    funcs_custom_id: FuncIdxTy,
+    funcs_extern_id: FuncIdxTy,
     // 用户自定义的类型储存位置
-    types_custom_store: HashMap<ScopeAllocClassId, Rc<dyn ClassInterface>>,
+    types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
     // 作用域暂时储存的函数token
     pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
     // 计算当前需要最少多大的空间来保存变量
@@ -164,6 +169,7 @@ pub struct SymScope {
     pub in_class: bool,
     pub is_pub: bool,
     imported_modules: HashMap<ScopeAllocIdTy, Rc<RefCell<SymScope>>>,
+    imported_native: HashMap<String, Rc<libloading::Library>>,
 }
 
 impl SymScope {
@@ -176,6 +182,7 @@ impl SymScope {
             ret.scope_sym_id = prev_scope.borrow().scope_sym_id;
             ret.types_id = prev_scope.borrow().types_id;
             ret.funcs_custom_id = prev_scope.borrow().funcs_custom_id;
+            ret.funcs_extern_id = prev_scope.borrow().funcs_extern_id;
         }
         ret
     }
@@ -233,7 +240,7 @@ impl SymScope {
         libstorage: &ModuleStorage,
         const_pool: &ValuePool,
     ) -> Result<(), ErrorInfo> {
-        let types = &stdlib.classes;
+        let types = stdlib.classes();
         // println!("{:?}", types);
         let mut obj_vec = vec![];
         for i in types {
@@ -257,30 +264,15 @@ impl SymScope {
             self.insert_type(i.0, Rc::new(i.1))
                 .expect("type symbol conflict");
         }
-        let funcs = &stdlib.functions;
+        let funcs = stdlib.functions();
         for i in funcs {
             let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], i.0)?;
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);
-            let fobj = Rc::new(fobj);
-            self.add_func(idx, fobj.clone());
+            self.add_extern_func(idx, fobj);
         }
         // 改写类的重载方法
-        Ok(())
-    }
-
-    /// import the prelude of stdlib
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if can insert the symbol to scope.
-    ///
-    /// # Panics
-    /// When submodule prelude is not here
-    pub fn import_prelude(&mut self, const_pool: &ValuePool) -> Result<(), ErrorInfo> {
-        let lib = &stdlib::get_stdlib().sub_modules["prelude"];
-        self.import_native_module(lib, stdlib::get_storage(), const_pool)?;
         Ok(())
     }
 
@@ -295,7 +287,7 @@ impl SymScope {
         }
     }
 
-    pub fn get_function(&self, id: usize) -> Option<Rc<dyn FunctionInterface>> {
+    pub fn get_function(&self, id: ScopeAllocIdTy) -> Option<Rc<dyn FunctionInterface>> {
         match self.funcs.get(&id) {
             Some(f) => Some(f.clone()),
             None => match self.prev_scope {
@@ -353,8 +345,20 @@ impl SymScope {
         }
     }
 
-    pub fn add_func(&mut self, id: usize, f: Rc<dyn FunctionInterface>) {
+    fn add_func(&mut self, id: ScopeAllocIdTy, f: Rc<dyn FunctionInterface>) {
         self.funcs.insert(id, f);
+    }
+
+    pub fn add_extern_func(&mut self, id: ScopeAllocIdTy, mut f: RustFunction) {
+        let funcid = self.alloc_extern_func_id();
+        f.buildin_id = funcid;
+        self.add_func(id, Rc::new(f))
+    }
+
+    pub fn alloc_extern_func_id(&mut self) -> FuncIdxTy {
+        let ret = self.funcs_extern_id;
+        self.funcs_extern_id += 1;
+        ret
     }
 
     /// 返回变量的索引和内存地址
@@ -372,7 +376,7 @@ impl SymScope {
         self.var_sz
     }
 
-    pub fn get_type_id(&self, id: ScopeAllocIdTy) -> Option<ScopeAllocClassId> {
+    pub fn get_type_id(&self, id: ScopeAllocIdTy) -> Option<ClassIdxId> {
         match self.types.get(&id) {
             None => match self.prev_scope {
                 Some(ref prev_scope) => prev_scope.borrow().get_type_id(id),
@@ -390,10 +394,7 @@ impl SymScope {
         self.vars_id
     }
 
-    pub fn get_class_by_class_id(
-        &self,
-        classid: ScopeAllocClassId,
-    ) -> Option<Rc<dyn ClassInterface>> {
+    pub fn get_class_by_class_id(&self, classid: ClassIdxId) -> Option<Rc<dyn ClassInterface>> {
         // 不存在的类
         if classid >= self.types_id {
             return None;
@@ -421,11 +422,7 @@ impl SymScope {
         Ok(ret)
     }
 
-    fn insert_type(
-        &mut self,
-        id: ScopeAllocClassId,
-        f: Rc<dyn ClassInterface>,
-    ) -> Result<(), ScopeError> {
+    fn insert_type(&mut self, id: ClassIdxId, f: Rc<dyn ClassInterface>) -> Result<(), ScopeError> {
         self.types_custom_store.insert(id, f);
         Ok(())
     }
@@ -434,15 +431,23 @@ impl SymScope {
         &mut self,
         idx: ScopeAllocIdTy,
         obj: Rc<dyn ClassInterface>,
-    ) -> Result<ScopeAllocClassId, ScopeError> {
+    ) -> Result<ClassIdxId, ScopeError> {
         let ret = self.alloc_type_id(idx)?;
         self.insert_type(ret, obj)?;
         Ok(ret)
     }
 
-    pub fn get_type_id_by_token(&self, ty_name: ConstPoolIndexTy) -> Option<ScopeAllocClassId> {
+    pub fn get_type_id_by_token(&self, ty_name: ConstPoolIndexTy) -> Option<ClassIdxId> {
         let ty_idx_id = self.get_sym(ty_name).unwrap();
         self.get_type_id(ty_idx_id)
+    }
+
+    pub fn add_imported_native_dll(&mut self, dll_name: String, lib: Rc<libloading::Library>) {
+        self.imported_native.insert(dll_name, lib);
+    }
+
+    pub fn get_dll(&self, name: &str) -> Option<Rc<libloading::Library>> {
+        self.imported_native.get(name).map(|v| (*v).clone())
     }
 }
 

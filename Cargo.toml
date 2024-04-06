@@ -19,7 +19,7 @@ num-bigint = "0.4"
 # llvm-sys = "170.0.1"
 derive = { path = "./derive" }
 libloading = "0.8"
-stdlib = { path = "./stdlib" }
+# stdlib = { path = "./stdlib" }
 rust-i18n = "3.0"
 sys-locale = "0.3"
 rustyline = { version = "14.0", features = ["with-file-history"] }

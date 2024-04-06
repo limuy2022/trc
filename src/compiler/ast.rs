@@ -1,16 +1,15 @@
 mod ast_base;
 mod lexprocess;
 
-use crate::compiler::token::TokenType::RightBigBrace;
-use libcore::*;
-use rust_i18n::t;
-use std::{cell::RefCell, mem::swap, rc::Rc};
-
 use super::{
     scope::*,
     token::{ConstPoolIndexTy, TokenType},
     InputSource, TokenLex,
 };
+use crate::{base::dll::load_module_storage, compiler::token::TokenType::RightBigBrace};
+use libcore::*;
+use rust_i18n::t;
+use std::{cell::RefCell, mem::swap, path::PathBuf, rc::Rc};
 
 #[derive(Default)]
 struct Cache {
@@ -112,20 +111,28 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
-        let prelude = stdlib::get_stdlib().sub_modules.get("prelude").unwrap();
-        for i in &prelude.functions {
-            token_lexer.const_pool.add_id(i.0.clone());
-        }
-        for i in &prelude.classes {
-            token_lexer.const_pool.add_id(i.0.clone());
-        }
         let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
+        let stdlib_dll = unsafe {
+            libloading::Library::new(libloading::library_filename("stdlib"))
+                .expect("without stdlib")
+        };
+        let (stdlib, stdstorage) = load_module_storage(&stdlib_dll);
+        let prelude = stdlib.sub_modules().get("prelude").unwrap();
+        for i in prelude.functions() {
+            token_lexer.const_pool.add_id(i.0.clone());
+        }
+        for i in prelude.classes() {
+            token_lexer.const_pool.add_id(i.0.clone());
+        }
         // 为root scope添加prelude
         let _optimize = token_lexer.compiler_data.option.optimize;
         root_scope
             .borrow_mut()
-            .import_prelude(&token_lexer.const_pool)
+            .import_native_module(prelude, stdstorage, &token_lexer.const_pool)
             .expect("Import prelude but failed");
+        root_scope
+            .borrow_mut()
+            .add_imported_native_dll("std".to_string(), Rc::new(stdlib_dll));
         let mut cache = Cache::new();
         let val_pool_ref = &token_lexer.const_pool;
         cache.intty_id = root_scope
@@ -839,38 +846,96 @@ impl<'a> AstBuilder<'a> {
             .get_token_checked(TokenType::StringValue)?
             .data
             .unwrap();
-        let mut path = self.token_lexer.const_pool.id_str[tok].clone();
-        // the standard library first
-        if path.starts_with("std") {
+        let mut path_with_dot = self.token_lexer.const_pool.id_str[tok].clone();
+        let mut import_file_path = String::new();
+        let mut is_dll = false;
+        if path_with_dot.starts_with("std") {
+            // std特殊对待
+            import_file_path = "std".to_string();
+            is_dll = true;
+        } else {
+            // 判断是dll还是普通模块
+            match self.token_lexer.compiler_data.option.inputsource.clone() {
+                InputSource::File(now_module_path) => {
+                    let path = PathBuf::from(path_with_dot.replace('.', "/"));
+                    let mut now_module_path = PathBuf::from(now_module_path);
+                    now_module_path.pop();
+                    now_module_path = now_module_path.join(path.clone());
+                    let tmp = now_module_path.clone();
+                    let file_name = match tmp.file_name() {
+                        None => {
+                            return self.try_err(istry, module_not_found(path.to_str().unwrap()))
+                        }
+                        Some(v) => v,
+                    };
+                    let file_name_dll = libloading::library_filename(file_name);
+                    // 优先判断dll
+                    now_module_path.set_file_name(file_name_dll);
+                    if now_module_path.exists() {
+                        is_dll = true;
+                        now_module_path
+                            .to_str()
+                            .unwrap()
+                            .clone_into(&mut import_file_path);
+                    } else {
+                        let file_name_trc = format!("{}{}", file_name.to_str().unwrap(), ".trc");
+                        now_module_path.set_file_name(file_name_trc);
+                        // now_module_path.ex
+                        if now_module_path.exists() {
+                            // 创建新的compiler来编译模块
+                            // self.self_scope.as_any().borrow_mut().import_module();
+                        } else {
+                            return self.try_err(istry, module_not_found(path.to_str().unwrap()));
+                        }
+                    }
+                }
+                _ => {
+                    return self.try_err(
+                        istry,
+                        ErrorInfo::new(t!(CANNOT_IMPORT_MODULE_WITHOUT_FILE), t!(SYMBOL_ERROR)),
+                    );
+                }
+            }
+        }
+        if is_dll {
             // 导入对象可能是模块，也有可能是函数，类等，先单独截取出来
             let mut import_item_name = String::new();
             loop {
-                let c = path.pop().unwrap();
+                let c = path_with_dot.pop().unwrap();
                 if c == '.' {
                     break;
                 }
                 import_item_name = format!("{}{}", c, import_item_name);
             }
-            let mut items = path.split('.');
+            let mut items = path_with_dot.split('.');
+            let dll_lib = self
+                .self_scope
+                .borrow_mut()
+                .get_dll(&import_file_path)
+                .expect("error not found dll");
+            let (lib_module, lib_storage) = load_module_storage(dll_lib.as_ref());
             // 删除std
             items.next();
-            let now = match stdlib::get_stdlib().get_module(items) {
+            let now = match lib_module.get_module(items) {
                 Some(d) => d,
                 None => {
                     return self.try_err(
                         istry,
-                        ErrorInfo::new(t!(SYMBOL_NOT_FOUND, "0" = path), t!(SYMBOL_ERROR)),
+                        ErrorInfo::new(t!(SYMBOL_NOT_FOUND, "0" = path_with_dot), t!(SYMBOL_ERROR)),
                     );
                 }
             };
-            match now.sub_modules.get(&import_item_name) {
+            match now.sub_modules().get(&import_item_name) {
                 None => {
                     // 不是模块
-                    match now.functions.get(&import_item_name) {
+                    match now.functions().get(&import_item_name) {
                         None => {
                             return self.try_err(
                                 istry,
-                                ErrorInfo::new(t!(SYMBOL_NOT_FOUND, "0" = path), t!(SYMBOL_ERROR)),
+                                ErrorInfo::new(
+                                    t!(SYMBOL_NOT_FOUND, "0" = path_with_dot),
+                                    t!(SYMBOL_ERROR),
+                                ),
                             );
                         }
                         Some(func_item) => {
@@ -880,7 +945,7 @@ impl<'a> AstBuilder<'a> {
                             let func_id = self.insert_sym_with_error(token_idx)?;
                             self.self_scope
                                 .borrow_mut()
-                                .add_func(func_id, Rc::new(func_item.clone()));
+                                .add_extern_func(func_id, func_item.clone());
                         }
                     }
                 }
@@ -895,7 +960,7 @@ impl<'a> AstBuilder<'a> {
                         .add_imported_module(module_sym_idx, sub_module.clone());
                     if let Err(e) = sub_module.borrow_mut().import_native_module(
                         module,
-                        stdlib::get_storage(),
+                        lib_storage,
                         &self.token_lexer.const_pool,
                     ) {
                         return self.try_err(istry, e);
@@ -903,34 +968,7 @@ impl<'a> AstBuilder<'a> {
                 }
             }
         } else {
-            // custom module
-            match self.token_lexer.compiler_data.option.inputsource.clone() {
-                InputSource::File(now_module_path) => {
-                    let path = std::path::PathBuf::from(path.replace('.', "/"));
-                    let mut now_module_path = std::path::PathBuf::from(now_module_path);
-                    now_module_path.pop();
-                    // 找到想找到的文件
-                    now_module_path = now_module_path.join(path.clone());
-                    if now_module_path.exists() {
-                        // 创建新的compiler来编译模块
-                        // self.self_scope.as_any().borrow_mut().import_module();
-                    } else {
-                        return self.try_err(
-                            istry,
-                            ErrorInfo::new(
-                                t!(MODULE_NOT_FOUND, "0" = path.to_str().unwrap()),
-                                t!(MODULE_NOT_FOUND_ERROR),
-                            ),
-                        );
-                    }
-                }
-                _ => {
-                    return self.try_err(
-                        istry,
-                        ErrorInfo::new(t!(CANNOT_IMPORT_MODULE_WITHOUT_FILE), t!(SYMBOL_ERROR)),
-                    );
-                }
-            }
+            todo!()
         }
         Ok(())
     }
@@ -962,7 +1000,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     /// 生成新建变量的指令
-    fn new_var(&mut self, name: ConstPoolIndexTy, varty: ScopeAllocClassId) -> AstError<()> {
+    fn new_var(&mut self, name: ConstPoolIndexTy, varty: ClassIdxId) -> AstError<()> {
         let sym_idx = self.insert_sym_with_error(name)?;
         let (_var_sym, var_addr) =
             self.self_scope

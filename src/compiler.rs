@@ -140,25 +140,30 @@ pub struct ValuePool {
     const_floats: Pool<Float>,
     name_pool: Pool<String>,
     _const_big_int: Pool<String>,
-    id_int: Vec<i64>,
-    id_float: Vec<Float>,
-    id_str: Vec<String>,
-    id_name: Vec<String>,
+    pub id_int: Vec<i64>,
+    pub id_float: Vec<Float>,
+    pub id_str: Vec<String>,
+    pub id_name: Vec<String>,
 }
 
 pub const INT_VAL_POOL_ZERO: usize = 0;
 pub const INT_VAL_POOL_ONE: usize = 1;
 
-macro_rules! gen_add_funcs {
+macro_rules! gen_getter_setter {
     ($($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)),*) => {
         $(
-            fn $func_name(&mut self, val: $type) -> usize {
+            paste::paste!{
+            pub fn [<add_ $func_name>](&mut self, val: $type) -> usize {
                 let len_tmp = self.$const_pool.len();
                 let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
                 if len_tmp != self.$const_pool.len() {
                     self.$id_pool.push(val);
                 }
                 ret
+            }
+            pub fn [<get_ $func_name>](&self, val: &$type) -> Option<usize> {
+                self.$const_pool.get(val).copied()
+            }
             }
         )*
     };
@@ -174,11 +179,11 @@ impl ValuePool {
         ret
     }
 
-    gen_add_funcs!(
-        add_int => (const_ints, id_int, i64),
-        add_float => (const_floats, id_float, Float),
-        add_string => (const_strings, id_str, String),
-        add_id => (name_pool, id_name, String)
+    gen_getter_setter!(
+        int => (const_ints, id_int, i64),
+        float => (const_floats, id_float, Float),
+        string => (const_strings, id_str, String),
+        id => (name_pool, id_name, String)
     );
 
     fn store_val_to_vm(&mut self) -> ConstPool {

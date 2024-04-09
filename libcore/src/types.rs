@@ -21,7 +21,7 @@ pub use trcstr::*;
 macro_rules! batch_unsupported_operators {
     ($($traie_name:ident => $oper_name:expr),*) => {
         $(
-        fn $traie_name(&self, _:*mut dyn TrcObj, _: &mut $crate::gc::GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+        fn $traie_name(&self, _:*mut dyn TrcObj, _: &mut $crate::gc::GcMgr) -> ErrorInfoResult<*mut dyn TrcObj> {
             return Err(ErrorInfo::new(
                 t!(
                     OPERATOR_IS_NOT_SUPPORT,
@@ -39,7 +39,7 @@ macro_rules! impl_oper {
     // for unsupported operator in rust
     ($trait_oper_fn_name:ident, $oper:ident, $error_oper_name:expr, $self_type:ident, $newtype:ident, $whether_throw_error:tt) => {
         #[allow(clippy::not_unsafe_ptr_arg_deref)]
-        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut $crate::gc::GcMgr) -> $crate::error::RuntimeResult<*mut dyn TrcObj> {
+        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut $crate::gc::GcMgr) -> $crate::error::ErrorInfoResult<*mut dyn TrcObj> {
         unsafe {
         match (*other).downcast_ref::<$self_type>() {
                 Some(v) => {
@@ -55,7 +55,7 @@ macro_rules! impl_oper {
     // for supported operator in rust
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
         #[allow(clippy::not_unsafe_ptr_arg_deref)]
-        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut $crate::gc::GcMgr) -> $crate::error::RuntimeResult<*mut dyn TrcObj> {
+        fn $trait_oper_fn_name(&self, other:*mut dyn TrcObj, gc: &mut $crate::gc::GcMgr) -> $crate::error::ErrorInfoResult<*mut dyn TrcObj> {
         unsafe {
         match (*other).downcast_ref::<$self_type>() {
                 Some(v) => {
@@ -82,7 +82,7 @@ macro_rules! batch_impl_opers {
 #[macro_export]
 macro_rules! impl_single_oper {
     ($trait_oper_fn_name:ident, $oper:tt, $error_oper_name:expr, $self_type:ident, $newtype:ident) => {
-        fn $trait_oper_fn_name(&self, gc: &mut $crate::gc::GcMgr) -> $crate::error::RuntimeResult<*mut dyn TrcObj> {
+        fn $trait_oper_fn_name(&self, gc: &mut $crate::gc::GcMgr) -> $crate::error::ErrorInfoResult<*mut dyn TrcObj> {
             return Ok(gc.alloc($newtype::new($oper self._value)));
         }
     };
@@ -90,7 +90,7 @@ macro_rules! impl_single_oper {
 
 macro_rules! gen_interface {
     ($funcname:ident, 2) => {
-        pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
+        pub fn $funcname(dydata: &mut DynaData) -> ErrorInfoResult<()> {
             let t2 = dydata.pop_data::<*mut dyn TrcObj>();
             let t1 = dydata.pop_data::<*mut dyn TrcObj>();
             let tmp = unsafe { (*t1).$funcname(t2, dydata.get_gc())? };
@@ -98,7 +98,7 @@ macro_rules! gen_interface {
             Ok(())
         }
         paste::paste!(
-        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> RuntimeResult<()> {
+        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> ErrorInfoResult<()> {
             let t2 = dydata.pop_data::<*mut dyn TrcObj>();
             let t1 = dydata.read_top_data::<*mut dyn TrcObj>();
             let tmp = unsafe { (*t1).$funcname(t2, dydata.get_gc())? };
@@ -108,14 +108,14 @@ macro_rules! gen_interface {
         );
     };
     ($funcname:ident, 1) => {
-        pub fn $funcname(dydata: &mut DynaData) -> RuntimeResult<()> {
+        pub fn $funcname(dydata: &mut DynaData) -> ErrorInfoResult<()> {
             let t1 = dydata.pop_data::<*mut dyn TrcObj>();
             let tmp = unsafe { (*t1).$funcname(dydata.get_gc())? };
             dydata.push_data(tmp);
             Ok(())
         }
         paste::paste!(
-        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> RuntimeResult<()> {
+        pub fn [<$funcname _without_pop>](dydata: &mut DynaData) -> ErrorInfoResult<()> {
             let t1 = dydata.read_top_data::<*mut dyn TrcObj>();
             let tmp = unsafe { (*t1).$funcname(dydata.get_gc())? };
             dydata.push_data(tmp);
@@ -168,7 +168,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug + TrcObjClone {
         bit_right_shift => ">>"
     );
 
-    fn not(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+    fn not(&self, _: &mut GcMgr) -> ErrorInfoResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,
@@ -179,7 +179,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug + TrcObjClone {
         ))
     }
 
-    fn bit_not(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+    fn bit_not(&self, _: &mut GcMgr) -> ErrorInfoResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,
@@ -190,7 +190,7 @@ pub trait TrcObj: Downcast + std::fmt::Display + Debug + TrcObjClone {
         ))
     }
 
-    fn self_negative(&self, _: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+    fn self_negative(&self, _: &mut GcMgr) -> ErrorInfoResult<*mut dyn TrcObj> {
         Err(ErrorInfo::new(
             t!(
                 OPERATOR_IS_NOT_SUPPORT,

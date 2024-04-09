@@ -10,7 +10,7 @@ use rust_i18n::t;
 use rustyline::{config::Configurer, history::FileHistory, Editor};
 use std::io::{self, Write};
 
-pub fn tshell() -> RunResult<()> {
+pub fn tshell() -> RuntimeResult<()> {
     println!("{}\n", t!("tshell.welcome").bold());
     let config = rustyline::config::Config::builder()
         .check_cursor_position(true)

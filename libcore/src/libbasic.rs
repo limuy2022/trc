@@ -7,7 +7,7 @@ use std::{
 
 use super::{codegen::Opcode, error::*};
 
-pub type RustlibFunc = fn(&mut DynaData) -> RuntimeResult<()>;
+pub type RustlibFunc = fn(&mut DynaData) -> ErrorInfoResult<()>;
 
 pub type ScopeAllocIdTy = usize;
 pub type TypeAllowNull = Option<TyIdxTy>;

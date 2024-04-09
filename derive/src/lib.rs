@@ -80,7 +80,8 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
         }
     }
-    input.sig.output = parse_str::<syn::ReturnType>("-> RuntimeResult<()>").expect("err1");
+    input.sig.output =
+        parse_str::<syn::ReturnType>("-> libcore::ErrorInfoResult<()>").expect("err1");
     let return_stmt = parse_str::<Stmt>("return Ok(());").expect("err2");
     for i in input.block.stmts {
         if let Stmt::Expr(Expr::Return(reexpr), ..) = i.clone() {

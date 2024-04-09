@@ -4,7 +4,7 @@ use crate::{
 };
 use libcore::*;
 
-pub fn run(opt: compiler::CompileOption) -> RunResult<()> {
+pub fn run(opt: compiler::CompileOption) -> RuntimeResult<()> {
     let mut compiler = Compiler::new(opt);
     let static_data = compiler.lex()?;
     let tmp = static_data.return_static_data();

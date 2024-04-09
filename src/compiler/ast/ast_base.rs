@@ -193,4 +193,10 @@ impl<'a> AstBuilder<'a> {
     pub fn get_scope(&self) -> Rc<RefCell<SymScope>> {
         self.self_scope.clone()
     }
+
+    pub fn add_module(&mut self, module_name: String) {
+        if self.modules_dll_dup.insert(module_name.clone()) {
+            self.modules_dll.push(module_name);
+        }
+    }
 }

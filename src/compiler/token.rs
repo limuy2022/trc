@@ -388,7 +388,7 @@ impl<'a> TokenLex<'a> {
         self.compiler_data.input = source;
     }
 
-    fn lex_id(&mut self, c: char) -> RunResult<Token> {
+    fn lex_id(&mut self, c: char) -> RuntimeResult<Token> {
         Ok({
             let mut retname: String = String::from(c);
             loop {
@@ -458,7 +458,7 @@ impl<'a> TokenLex<'a> {
             || Self::is_useless_char(c))
     }
 
-    fn lex_symbol(&mut self, c: char) -> RunResult<Token> {
+    fn lex_symbol(&mut self, c: char) -> RuntimeResult<Token> {
         Ok(match c {
             '.' => Token::new(TokenType::Dot, None),
             ',' => Token::new(TokenType::Comma, None),
@@ -609,7 +609,7 @@ impl<'a> TokenLex<'a> {
         s
     }
 
-    fn lex_int_float(&mut self, mut c: char) -> RunResult<NumValue> {
+    fn lex_int_float(&mut self, mut c: char) -> RuntimeResult<NumValue> {
         // the radix of result
         let mut radix = 10;
         if c == '0' {
@@ -689,7 +689,7 @@ impl<'a> TokenLex<'a> {
         zero
     }
 
-    fn lex_num(&mut self, mut c: char) -> RunResult<Token> {
+    fn lex_num(&mut self, mut c: char) -> RuntimeResult<Token> {
         let tmp = self.lex_int_float(c)?;
         c = self.compiler_data.input.read();
         if c == 'e' || c == 'E' {
@@ -784,7 +784,7 @@ impl<'a> TokenLex<'a> {
         }
     }
 
-    fn lex_str(&mut self) -> RunResult<Token> {
+    fn lex_str(&mut self) -> RuntimeResult<Token> {
         let mut s = String::new();
         let mut c = self.compiler_data.input.read();
         while c != '"' {
@@ -815,7 +815,7 @@ impl<'a> TokenLex<'a> {
         ))
     }
 
-    fn lex_char(&mut self) -> RunResult<Token> {
+    fn lex_char(&mut self) -> RuntimeResult<Token> {
         let c = self.compiler_data.input.read();
         let end = self.compiler_data.input.read();
         if end != '\'' {
@@ -839,7 +839,7 @@ impl<'a> TokenLex<'a> {
         self.unget_token.clear();
     }
 
-    pub fn next_token(&mut self) -> RunResult<Token> {
+    pub fn next_token(&mut self) -> RuntimeResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
             self.compiler_data.context.set_line(tmp.1);

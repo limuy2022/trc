@@ -153,5 +153,5 @@ impl From<LightFakeError> for RuntimeError {
     }
 }
 
-pub type RunResult<T> = Result<T, RuntimeError>;
-pub type RuntimeResult<T> = Result<T, ErrorInfo>;
+pub type RuntimeResult<T> = Result<T, RuntimeError>;
+pub type ErrorInfoResult<T> = Result<T, ErrorInfo>;

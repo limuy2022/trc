@@ -7,9 +7,10 @@ use super::{
     InputSource, TokenLex,
 };
 use crate::{base::dll::load_module_storage, compiler::token::TokenType::RightBigBrace};
+use collection_literals::collection;
 use libcore::*;
 use rust_i18n::t;
-use std::{cell::RefCell, mem::swap, path::PathBuf, rc::Rc};
+use std::{cell::RefCell, collections::HashSet, mem::swap, path::PathBuf, rc::Rc};
 
 #[derive(Default)]
 struct Cache {
@@ -36,9 +37,11 @@ pub struct AstBuilder<'a> {
     cache: Cache,
     // record if the fisrt func is defined
     first_func: bool,
+    modules_dll_dup: HashSet<String>,
+    modules_dll: Vec<String>,
 }
 
-type AstError<T> = RunResult<T>;
+type AstError<T> = RuntimeResult<T>;
 
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
@@ -111,11 +114,10 @@ macro_rules! expr_gen {
 
 impl<'a> AstBuilder<'a> {
     pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
-        let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
-        let stdlib_dll = unsafe {
-            libloading::Library::new(libloading::library_filename("stdlib"))
-                .expect("without stdlib")
-        };
+        let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
+        let stdlib_dll_name = libloading::library_filename("stdlib");
+        let stdlib_dll =
+            unsafe { libloading::Library::new(stdlib_dll_name.clone()).expect("without stdlib") };
         let (stdlib, stdstorage) = load_module_storage(&stdlib_dll);
         let prelude = stdlib.sub_modules().get("prelude").unwrap();
         for i in prelude.functions() {
@@ -159,6 +161,7 @@ impl<'a> AstBuilder<'a> {
         //     "{} {} {} {} {}",
         //     cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
         // );
+        let name_str = stdlib_dll_name.to_str().unwrap().to_owned();
         AstBuilder {
             token_lexer,
             staticdata: StaticData::new(),
@@ -166,6 +169,8 @@ impl<'a> AstBuilder<'a> {
             process_info: lexprocess::LexProcess::new(),
             cache,
             first_func: false,
+            modules_dll_dup: collection! {name_str.clone()},
+            modules_dll: vec![name_str.clone()],
         }
     }
 
@@ -206,6 +211,11 @@ impl<'a> AstBuilder<'a> {
 
     pub fn prepare_get_static(&mut self) -> &StaticData {
         self.staticdata.constpool = self.token_lexer.const_pool.store_val_to_vm();
+        self.staticdata.dll_module_should_loaded.clear();
+        std::mem::swap(
+            &mut self.staticdata.dll_module_should_loaded,
+            &mut self.modules_dll,
+        );
         &self.staticdata
     }
 
@@ -823,7 +833,9 @@ impl<'a> AstBuilder<'a> {
 
     fn def_class(&mut self) -> AstError<()> {
         // new scope
-        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(self.self_scope.clone()))));
+        self.self_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(
+            self.self_scope.clone(),
+        ))));
         self.self_scope.borrow_mut().in_class = true;
         let name = self.get_token_checked(TokenType::ID)?.data.unwrap();
         let name_id = self.insert_sym_with_error(name)?;
@@ -846,7 +858,9 @@ impl<'a> AstBuilder<'a> {
             .get_token_checked(TokenType::StringValue)?
             .data
             .unwrap();
+        // import的路径
         let mut path_with_dot = self.token_lexer.const_pool.id_str[tok].clone();
+        // 具体文件的路径
         let mut import_file_path = String::new();
         let mut is_dll = false;
         if path_with_dot.starts_with("std") {
@@ -872,12 +886,15 @@ impl<'a> AstBuilder<'a> {
                     // 优先判断dll
                     now_module_path.set_file_name(file_name_dll);
                     if now_module_path.exists() {
+                        // 是dll
                         is_dll = true;
                         now_module_path
                             .to_str()
                             .unwrap()
                             .clone_into(&mut import_file_path);
+                        self.add_module(import_file_path.clone())
                     } else {
+                        // 不是dll，尝试判断trc文件
                         let file_name_trc = format!("{}{}", file_name.to_str().unwrap(), ".trc");
                         now_module_path.set_file_name(file_name_trc);
                         // now_module_path.ex
@@ -953,8 +970,9 @@ impl<'a> AstBuilder<'a> {
                     let tmp = self.token_lexer.add_id_token(&import_item_name);
                     let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(module);
-                    let sub_module =
-                        Rc::new(RefCell::new(SymScope::new(Some(self.self_scope.clone()))));
+                    let sub_module = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(
+                        self.self_scope.clone(),
+                    ))));
                     self.self_scope
                         .borrow_mut()
                         .add_imported_module(module_sym_idx, sub_module.clone());
@@ -1012,7 +1030,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn store_var(&mut self, name: usize) -> RunResult<()> {
+    fn store_var(&mut self, name: usize) -> RuntimeResult<()> {
         self.expr(false)?;
         let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
@@ -1024,7 +1042,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn assign_var(&mut self, name: usize) -> RunResult<()> {
+    fn assign_var(&mut self, name: usize) -> RuntimeResult<()> {
         self.expr(false)?;
         let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
@@ -1063,7 +1081,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn lex_condit(&mut self) -> RunResult<()> {
+    fn lex_condit(&mut self) -> RuntimeResult<()> {
         self.expr(false)?;
         match self.process_info.pop_last_ty() {
             None => {
@@ -1078,7 +1096,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn if_lex(&mut self) -> RunResult<()> {
+    fn if_lex(&mut self) -> RuntimeResult<()> {
         self.lex_condit()?;
         self.get_token_checked(TokenType::LeftBigBrace)?;
         // 最后需要跳转地址
@@ -1115,7 +1133,7 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    fn statement(&mut self) -> RunResult<()> {
+    fn statement(&mut self) -> RuntimeResult<()> {
         let t = self.token_lexer.next_token()?;
         match t.tp {
             TokenType::Continue => {
@@ -1245,7 +1263,7 @@ impl<'a> AstBuilder<'a> {
 
     /// # Return
     /// 返回函数的首地址
-    fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RunResult<(usize, usize)> {
+    fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RuntimeResult<(usize, usize)> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             self.first_func = true;
@@ -1263,7 +1281,7 @@ impl<'a> AstBuilder<'a> {
         let io = func_obj.get_io();
         let tmp = self.self_scope.clone();
         // 解析参数
-        self.self_scope = Rc::new(RefCell::new(SymScope::new(Some(tmp.clone()))));
+        self.self_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(tmp.clone()))));
         self.self_scope.borrow_mut().func_io = Some(io.return_type);
         debug_assert_eq!(io.argvs_type.len(), func_obj.args_names.len());
         for (argty, argname) in io
@@ -1309,13 +1327,17 @@ impl<'a> AstBuilder<'a> {
         Ok(())
     }
 
-    pub fn generate_code(&mut self) -> RunResult<()> {
+    pub fn generate_code(&mut self) -> RuntimeResult<()> {
         self.process_info.is_global = true;
         self.lex_until(TokenType::EndOfFile)?;
         // 结束一个作用域的代码解析后再解析这里面的函数
         self.process_info.is_global = false;
         self.generate_func_in_scope()?;
         Ok(())
+    }
+
+    pub fn modules_dll(&self) -> &[String] {
+        &self.modules_dll
     }
 }
 

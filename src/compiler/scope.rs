@@ -3,7 +3,12 @@ use super::{
     ValuePool,
 };
 use libcore::*;
-use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    fmt::Display,
+    rc::{Rc, Weak},
+};
 
 /// Manager of function
 #[derive(Clone, Debug)]
@@ -132,10 +137,44 @@ impl VarInfo {
     }
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct RootInfo {
+    // 该id不会减少，在所有作用域共同使用
+    funcs_extern_id: FuncIdxTy,
+}
+
+#[derive(Debug, Clone)]
+pub enum RootOnlyInfo<T> {
+    NonRoot(T),
+    Root(RootInfo),
+}
+
+impl<T> Default for RootOnlyInfo<T> {
+    fn default() -> Self {
+        Self::Root(RootInfo::default())
+    }
+}
+
+impl<T> RootOnlyInfo<T> {
+    pub fn get_info(&mut self) -> &mut RootInfo {
+        match self {
+            RootOnlyInfo::NonRoot(_) => panic!("without root info"),
+            RootOnlyInfo::Root(v) => v,
+        }
+    }
+
+    pub fn unwrap(self) -> T {
+        match self {
+            RootOnlyInfo::NonRoot(v) => v,
+            RootOnlyInfo::Root(_) => panic!("without root info"),
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct SymScope {
     // 父作用域
-    pub prev_scope: Option<Rc<RefCell<SymScope>>>,
+    pub prev_scope: RootOnlyInfo<Rc<RefCell<SymScope>>>,
     // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
     sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
@@ -152,7 +191,6 @@ pub struct SymScope {
     types_id: ClassIdxId,
     vars_id: ScopeAllocIdTy,
     funcs_custom_id: FuncIdxTy,
-    funcs_extern_id: FuncIdxTy,
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
     // 作用域暂时储存的函数token
@@ -170,21 +208,38 @@ pub struct SymScope {
     pub is_pub: bool,
     imported_modules: HashMap<ScopeAllocIdTy, Rc<RefCell<SymScope>>>,
     imported_native: HashMap<String, Rc<libloading::Library>>,
+    root_scope: Option<Weak<RefCell<SymScope>>>,
+}
+
+pub enum SymScopePrev {
+    Prev(Rc<RefCell<SymScope>>),
+    Root,
 }
 
 impl SymScope {
-    pub fn new(prev_scope: Option<Rc<RefCell<SymScope>>>) -> Self {
-        let mut ret = Self {
-            prev_scope: prev_scope.clone(),
-            ..Default::default()
-        };
-        if let Some(prev_scope) = prev_scope {
-            ret.scope_sym_id = prev_scope.borrow().scope_sym_id;
-            ret.types_id = prev_scope.borrow().types_id;
-            ret.funcs_custom_id = prev_scope.borrow().funcs_custom_id;
-            ret.funcs_extern_id = prev_scope.borrow().funcs_extern_id;
+    pub fn new(prev_scope: SymScopePrev) -> Self {
+        match prev_scope {
+            SymScopePrev::Prev(prev_scope) => {
+                let mut ret = Self {
+                    prev_scope: RootOnlyInfo::NonRoot(prev_scope.clone()),
+                    ..Default::default()
+                };
+                match prev_scope.borrow().root_scope.clone() {
+                    Some(v) => ret.root_scope = Some(v),
+                    None => ret.root_scope = Some(Rc::downgrade(&prev_scope)),
+                }
+                ret.scope_sym_id = prev_scope.borrow().scope_sym_id;
+                ret.types_id = prev_scope.borrow().types_id;
+                ret.funcs_custom_id = prev_scope.borrow().funcs_custom_id;
+                // ret.root_scope.clone_from(&prev_scope.borrow().root_scope);
+                ret
+            }
+            SymScopePrev::Root => Self {
+                root_scope: None,
+                prev_scope: RootOnlyInfo::Root(Default::default()),
+                ..Default::default()
+            },
         }
-        ret
     }
 
     pub fn add_custom_function(
@@ -280,8 +335,8 @@ impl SymScope {
         let t = self.imported_modules.get(&id);
         match t {
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.borrow().get_module(id),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_module(id),
+                RootOnlyInfo::Root(_) => None,
             },
             Some(v) => Some(v.clone()),
         }
@@ -291,8 +346,8 @@ impl SymScope {
         match self.funcs.get(&id) {
             Some(f) => Some(f.clone()),
             None => match self.prev_scope {
-                Some(ref prev) => prev.borrow().get_function(id),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev) => prev.borrow().get_function(id),
+                RootOnlyInfo::Root(_) => None,
             },
         }
     }
@@ -302,8 +357,8 @@ impl SymScope {
             return true;
         }
         match self.prev_scope {
-            Some(ref prev_scope) => prev_scope.borrow().has_sym(id),
-            None => false,
+            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().has_sym(id),
+            RootOnlyInfo::Root(_) => false,
         }
     }
 
@@ -328,8 +383,8 @@ impl SymScope {
         match self.vars.get(&id) {
             Some(v) => Some(*v),
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.borrow().get_var(id),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_var(id),
+                RootOnlyInfo::Root(_) => None,
             },
         }
     }
@@ -338,8 +393,8 @@ impl SymScope {
         let t = self.sym_map.get(&id);
         match t {
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.borrow().get_sym(id),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_sym(id),
+                RootOnlyInfo::Root(_) => None,
             },
             Some(t) => Some(*t),
         }
@@ -356,9 +411,22 @@ impl SymScope {
     }
 
     pub fn alloc_extern_func_id(&mut self) -> FuncIdxTy {
-        let ret = self.funcs_extern_id;
-        self.funcs_extern_id += 1;
-        ret
+        match self.root_scope {
+            Some(ref root_scope) => {
+                let tmp = root_scope.upgrade().unwrap();
+                let mut tmp = tmp.borrow_mut();
+                let refer = tmp.prev_scope.get_info();
+                let ret = refer.funcs_extern_id;
+                refer.funcs_extern_id += 1;
+                ret
+            }
+            None => {
+                let refer = self.prev_scope.get_info();
+                let ret = refer.funcs_extern_id;
+                refer.funcs_extern_id += 1;
+                ret
+            }
+        }
     }
 
     /// 返回变量的索引和内存地址
@@ -379,8 +447,8 @@ impl SymScope {
     pub fn get_type_id(&self, id: ScopeAllocIdTy) -> Option<ClassIdxId> {
         match self.types.get(&id) {
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.borrow().get_type_id(id),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_type_id(id),
+                RootOnlyInfo::Root(_) => None,
             },
             Some(t) => Some(*t),
         }
@@ -407,8 +475,8 @@ impl SymScope {
         match t {
             Some(t) => self.get_class_by_class_id(*t),
             None => match self.prev_scope {
-                Some(ref prev_scope) => prev_scope.borrow().get_class(classid_idx),
-                None => None,
+                RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_class(classid_idx),
+                RootOnlyInfo::Root(_) => None,
             },
         }
     }
@@ -457,9 +525,9 @@ mod tests {
 
     #[test]
     fn test_scope() {
-        let root_scope = Rc::new(RefCell::new(SymScope::new(None)));
+        let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
         root_scope.borrow_mut().insert_sym(1);
-        let mut son_scope = SymScope::new(Some(root_scope.clone()));
+        let mut son_scope = SymScope::new(SymScopePrev::Prev(root_scope.clone()));
         son_scope.insert_sym(2);
         assert_eq!(son_scope.get_sym(2), Some(1));
         drop(son_scope);

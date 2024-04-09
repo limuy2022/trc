@@ -10,6 +10,7 @@ pub struct Vm<'a> {
     run_context: Context,
     dynadata: DydataWrap,
     static_data: &'a libcore::codegen::StaticData,
+    imported_modules: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -125,6 +126,7 @@ impl<'a> Vm<'a> {
             dynadata: DydataWrap::new(),
             run_context: Context::new(cfg::MAIN_MODULE_NAME),
             static_data,
+            imported_modules: Vec::new(),
         }
     }
 
@@ -132,17 +134,50 @@ impl<'a> Vm<'a> {
         self.static_data = static_data;
     }
 
-    fn throw_err_info<T>(&self, info: RuntimeResult<T>) -> RunResult<T> {
+    fn convert_err_info<T>(&self, info: ErrorInfoResult<T>) -> RuntimeResult<T> {
         match info {
             Ok(data) => Ok(data),
-            Err(e) => Err(RuntimeError::new(Box::new(self.run_context.clone()), e)),
+            Err(e) => self.report_err(e),
         }
     }
 
-    pub fn reset(&mut self) {
+    fn report_err<T>(&self, info: ErrorInfo) -> RuntimeResult<T> {
+        Err(RuntimeError::new(Box::new(self.run_context.clone()), info))
+    }
+
+    pub fn reset(&mut self) -> RuntimeResult<()> {
         self.dynadata
             .dydata
             .init_global_var_store(self.static_data.sym_table_sz);
+        let mut should_be_reloaded = false;
+        for (i, j) in self.static_data.dll_module_should_loaded.iter().enumerate() {
+            if i >= self.imported_modules.len() {
+                break;
+            }
+            if *j != self.imported_modules[i] {
+                should_be_reloaded = true;
+                break;
+            }
+        }
+        // 导入未导入的模块
+        if !should_be_reloaded {
+            for i in self
+                .static_data
+                .dll_module_should_loaded
+                .iter()
+                .skip(self.imported_modules.len())
+            {
+                self.imported_modules.push(i.clone());
+                self.import_module(i.clone())?;
+            }
+        } else {
+            self.imported_modules.clear();
+            for i in &self.static_data.dll_module_should_loaded {
+                self.imported_modules.push(i.clone());
+                self.import_module(i.clone())?;
+            }
+        }
+        Ok(())
     }
 
     #[inline]
@@ -170,8 +205,10 @@ impl<'a> Vm<'a> {
             Opcode::PopFrame => {
                 let ret = match self.dynadata.frames_stack.pop() {
                     None => {
-                        return self
-                            .throw_err_info(Err(ErrorInfo::new(t!(VM_FRAME_EMPTY), t!(VM_ERROR))))
+                        return self.convert_err_info(Err(ErrorInfo::new(
+                            t!(VM_FRAME_EMPTY),
+                            t!(VM_ERROR),
+                        )))
                     }
                     Some(v) => v,
                 };
@@ -254,31 +291,31 @@ impl<'a> Vm<'a> {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
                     .dydata
-                    .push_data(self.throw_err_info(div_int(first, second))?);
+                    .push_data(self.convert_err_info(div_int(first, second))?);
             }
             Opcode::DivFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
                     .dydata
-                    .push_data(self.throw_err_info(div_float(first, second))?);
+                    .push_data(self.convert_err_info(div_float(first, second))?);
             }
             Opcode::ExactDivInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
                     .dydata
-                    .push_data(self.throw_err_info(exact_div_int(first, second))?);
+                    .push_data(self.convert_err_info(exact_div_int(first, second))?);
             }
             Opcode::ExtraDivFloat => {
                 let (first, second) = impl_opcode!(TrcFloatInternal, self, 2);
                 self.dynadata
                     .dydata
-                    .push_data(self.throw_err_info(exact_div_float(first, second))?);
+                    .push_data(self.convert_err_info(exact_div_float(first, second))?);
             }
             Opcode::ModInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata
                     .dydata
-                    .push_data(self.throw_err_info(mod_int(first, second))?);
+                    .push_data(self.convert_err_info(mod_int(first, second))?);
             }
             Opcode::PowerInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
@@ -604,8 +641,8 @@ impl<'a> Vm<'a> {
         Ok(())
     }
 
-    pub fn run(&mut self) -> Result<(), RuntimeError> {
-        self.reset();
+    pub fn run(&mut self) -> RuntimeResult<()> {
+        self.reset()?;
         let mut pc = 0;
         if !self.static_data.line_table.is_empty() {
             while pc < self.static_data.inst.len() {
@@ -617,6 +654,21 @@ impl<'a> Vm<'a> {
                 self.run_opcode(&mut pc)?;
             }
         }
+        Ok(())
+    }
+
+    /// 导入一个dll模块
+    fn import_module(&mut self, i: String) -> Result<(), RuntimeError> {
+        let lib = unsafe {
+            match libloading::Library::new(i.clone()) {
+                Ok(lib) => lib,
+                Err(_) => {
+                    return self.report_err(module_not_found(&i));
+                }
+            }
+        };
+        let (module, storage) = crate::base::dll::load_module_storage(&lib);
+        for i in &storage.func_table {}
         Ok(())
     }
 }

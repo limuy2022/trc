@@ -219,6 +219,7 @@ pub struct StaticData {
     pub line_table: Vec<usize>,
     pub type_list: Vec<Vec<VmStackType>>,
     pub function_split: Option<usize>,
+    pub dll_module_should_loaded: Vec<String>,
 }
 
 impl StaticData {
@@ -241,5 +242,10 @@ impl StaticData {
     #[inline]
     pub fn get_next_opcode_id(&self) -> usize {
         self.inst.len()
+    }
+
+    #[inline]
+    pub fn add_dll_module(&mut self, module_name: String) {
+        self.dll_module_should_loaded.push(module_name);
     }
 }

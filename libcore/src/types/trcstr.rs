@@ -27,7 +27,7 @@ impl TrcObj for TrcStr {
     }
 
     #[allow(clippy::not_unsafe_ptr_arg_deref)]
-    fn add(&self, other: *mut dyn TrcObj, gc: &mut GcMgr) -> RuntimeResult<*mut dyn TrcObj> {
+    fn add(&self, other: *mut dyn TrcObj, gc: &mut GcMgr) -> ErrorInfoResult<*mut dyn TrcObj> {
         unsafe { self.add_impl(other, gc) }
     }
 }
@@ -53,7 +53,7 @@ impl TrcStr {
         &self,
         other: *mut dyn TrcObj,
         gc: &mut GcMgr,
-    ) -> RuntimeResult<*mut dyn TrcObj> {
+    ) -> ErrorInfoResult<*mut dyn TrcObj> {
         unsafe {
             match (*other).downcast_ref::<TrcStr>() {
                 Some(v) => {

@@ -382,7 +382,7 @@ impl Compiler {
         self.input = input;
     }
 
-    pub fn lex(&mut self) -> RunResult<AstBuilder> {
+    pub fn lex(&mut self) -> RuntimeResult<AstBuilder> {
         let token_lexer = TokenLex::new(self);
         let mut ast_builder = AstBuilder::new(token_lexer);
         ast_builder.generate_code()?;
@@ -395,7 +395,7 @@ impl Compiler {
     }
 
     #[inline]
-    pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RunResult<T> {
+    pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RuntimeResult<T> {
         Err(RuntimeError::new(Box::new(self.context.clone()), info))
     }
 }

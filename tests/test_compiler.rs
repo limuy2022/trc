@@ -1,4 +1,5 @@
 use libcore::*;
+use libloading::library_filename;
 use std::mem::size_of;
 use trc::compiler::{ast::AstBuilder, *};
 
@@ -612,6 +613,10 @@ print("{}", math::sin(9.8))
     );
     t.generate_code().unwrap();
     let fid = get_func_id(&mut t, "print");
+    assert_eq!(
+        t.modules_dll(),
+        vec![library_filename("stdlib").to_str().unwrap().to_string()]
+    );
     opcode_assert_eq(
         t.staticdata.inst,
         vec![

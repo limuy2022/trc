@@ -16,9 +16,9 @@ As a modern language,rust provide us a lot of useful features and I enjoy myself
 
 ## Build
 
-Like other common rust project.Just use `cargo build`
+Like other common rust project.Just use `cargo build --all`
 
-Running tests is like other rust project,too.Just `cargo test`
+Running tests is like other rust project,too.Just `cargo test --all`
 But in order to read test data file,please run in the root dir.
 
 ## How to use

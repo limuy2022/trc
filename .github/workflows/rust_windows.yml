@@ -22,10 +22,10 @@ jobs:
           cargo miri setup
           setx MIRIFLAGS "-Zmiri-disable-isolation"
       - name: Build
-        run: cargo build
+        run: cargo build --all
       - name: Run tests Debug
-        run: cargo test
+        run: cargo test --all
       - name: Run tests Release
-        run: cargo test --release
+        run: cargo test --release --all
       # - name: Run miri test
       #   run: cargo miri test

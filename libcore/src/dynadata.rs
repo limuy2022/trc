@@ -1,4 +1,4 @@
-use std::{any::TypeId, mem::size_of, sync::OnceLock};
+use std::{mem::size_of, sync::OnceLock};
 
 use crate::gc::GcMgr;
 
@@ -23,7 +23,7 @@ pub struct DynaData {
     // 变量已经使用的内存空间大小
     var_used: usize,
     #[cfg(debug_assertions)]
-    type_used: Vec<(TypeId, &'static str)>,
+    type_used: Vec<&'static str>,
 }
 
 impl DynaData {
@@ -61,8 +61,7 @@ impl DynaData {
         self.stack_ptr += size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            self.type_used
-                .push((TypeId::of::<T>(), std::any::type_name::<T>()));
+            self.type_used.push(std::any::type_name::<T>());
         }
     }
 
@@ -75,13 +74,13 @@ impl DynaData {
         let sz = size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            let info = TypeId::of::<T>();
+            let info = std::any::type_name::<T>();
             let info_stack = self.type_used.pop().unwrap();
-            if info_stack.0 != info {
+            if info_stack != info {
                 panic!(
                     "pop data type error.Expected get {}.Actually has {}",
                     std::any::type_name::<T>(),
-                    info_stack.1
+                    info_stack
                 );
             }
             debug_assert!(self.stack_ptr >= sz);
@@ -99,13 +98,13 @@ impl DynaData {
         let sz = size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            let info = TypeId::of::<T>();
+            let info = std::any::type_name::<T>();
             let info_stack = self.type_used.last().unwrap();
-            if info_stack.0 != info {
+            if *info_stack != info {
                 panic!(
                     "pop data type error.Expected get {}.Actually has {}",
                     std::any::type_name::<T>(),
-                    info_stack.1
+                    info_stack
                 );
             }
             debug_assert!(self.stack_ptr >= sz);

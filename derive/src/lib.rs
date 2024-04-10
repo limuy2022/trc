@@ -183,15 +183,15 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
             }
 
             pub fn gen_funcs_info(storage: &mut ModuleStorage) {
-                storage.class_table[Self::export_info()].functions = Self::function_export(storage);
+                storage.access_class_mut(Self::export_info()).functions = Self::function_export(storage);
             }
 
             pub fn gen_overrides_info(storage: &mut ModuleStorage) {
-                storage.class_table[Self::export_info()].overrides = Self::override_export();
+                storage.access_class_mut(Self::export_info()).overrides = Self::override_export();
             }
 
             pub fn modify_shadow_name(storage: &mut ModuleStorage, name: &'static str) {
-                storage.class_table[Self::export_info()].name = name;
+                storage.access_class_mut(Self::export_info()).name = name;
             }
 
             pub fn export_info() -> usize {
@@ -264,12 +264,12 @@ pub fn def_module_export(_t: TokenStream) -> TokenStream {
         }
 
         #[no_mangle]
-        pub fn get_lib() -> &'static libcore::Module {
+        pub extern "C" fn get_lib() -> &'static libcore::Module {
             import_lib().0
         }
 
         #[no_mangle]
-        pub fn get_storage() -> &'static libcore::ModuleStorage {
+        pub extern "C" fn get_storage() -> &'static libcore::ModuleStorage {
             import_lib().1
         }
     )

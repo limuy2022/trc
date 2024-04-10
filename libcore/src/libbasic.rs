@@ -242,8 +242,8 @@ impl Display for RustClass {
 #[derive(Default)]
 #[repr(C)]
 pub struct ModuleStorage {
-    pub func_table: Vec<RustlibFunc>,
-    pub class_table: Vec<RustClass>,
+    pub(crate) func_table: Vec<RustlibFunc>,
+    pub(crate) class_table: Vec<RustClass>,
 }
 
 impl ModuleStorage {
@@ -267,6 +267,22 @@ impl ModuleStorage {
     pub fn add_class(&mut self, c: RustClass) -> usize {
         self.class_table.push(c);
         self.class_table.len() - 1
+    }
+
+    pub fn access_func(&self, id: usize) -> RustlibFunc {
+        self.func_table[id]
+    }
+
+    pub fn access_class(&self, id: usize) -> &RustClass {
+        &self.class_table[id]
+    }
+
+    pub fn func_table(&self) -> &[RustlibFunc] {
+        &self.func_table
+    }
+
+    pub fn access_class_mut(&mut self, idx: usize) -> &mut RustClass {
+        &mut self.class_table[idx]
     }
 }
 

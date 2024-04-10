@@ -10,7 +10,7 @@ pub struct Vm<'a> {
     run_context: Context,
     dynadata: DydataWrap,
     static_data: &'a libcore::codegen::StaticData,
-    imported_modules: Vec<String>,
+    imported_modules: Vec<(String, libloading::Library)>,
 }
 
 #[derive(Debug, Clone)]
@@ -154,7 +154,7 @@ impl<'a> Vm<'a> {
             if i >= self.imported_modules.len() {
                 break;
             }
-            if *j != self.imported_modules[i] {
+            if *j != self.imported_modules[i].0 {
                 should_be_reloaded = true;
                 break;
             }
@@ -167,14 +167,14 @@ impl<'a> Vm<'a> {
                 .iter()
                 .skip(self.imported_modules.len())
             {
-                self.imported_modules.push(i.clone());
-                self.import_module(i.clone())?;
+                let lib = self.import_module(i.clone())?;
+                self.imported_modules.push((i.clone(), lib));
             }
         } else {
             self.imported_modules.clear();
             for i in &self.static_data.dll_module_should_loaded {
-                self.imported_modules.push(i.clone());
-                self.import_module(i.clone())?;
+                let lib = self.import_module(i.clone())?;
+                self.imported_modules.push((i.clone(), lib));
             }
         }
         Ok(())
@@ -249,11 +249,12 @@ impl<'a> Vm<'a> {
             Opcode::SelfNegative => {
                 operator_opcode!(self_negative, self);
             }
-            Opcode::CallNative => unsafe {
-                // let tmp =
-                //     STD_FUNC_TABLE[self.static_data.inst[*pc].operand](&mut self.dynadata.dydata);
-                // self.throw_err_info(tmp)?;
-            },
+            Opcode::CallNative => {
+                let tmp = self.dynadata.imported_func[self.static_data.inst[*pc].operand](
+                    &mut self.dynadata.dydata,
+                );
+                self.convert_err_info(tmp)?;
+            }
             Opcode::AddInt => {
                 let (first, second) = impl_opcode!(TrcIntInternal, self, 2);
                 self.dynadata.dydata.push_data(first + second);
@@ -641,6 +642,7 @@ impl<'a> Vm<'a> {
         Ok(())
     }
 
+    /// 运行代码
     pub fn run(&mut self) -> RuntimeResult<()> {
         self.reset()?;
         let mut pc = 0;
@@ -658,7 +660,7 @@ impl<'a> Vm<'a> {
     }
 
     /// 导入一个dll模块
-    fn import_module(&mut self, i: String) -> Result<(), RuntimeError> {
+    fn import_module(&mut self, i: String) -> Result<libloading::Library, RuntimeError> {
         let lib = unsafe {
             match libloading::Library::new(i.clone()) {
                 Ok(lib) => lib,
@@ -667,9 +669,11 @@ impl<'a> Vm<'a> {
                 }
             }
         };
-        let (module, storage) = crate::base::dll::load_module_storage(&lib);
-        for i in &storage.func_table {}
-        Ok(())
+        let (_module, storage) = crate::base::dll::load_module_storage(&lib);
+        for i in storage.func_table() {
+            self.dynadata.imported_func.push(*i)
+        }
+        Ok(lib)
     }
 }
 

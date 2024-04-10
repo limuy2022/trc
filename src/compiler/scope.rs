@@ -274,14 +274,14 @@ impl SymScope {
     fn fix_func(&self, io: &mut IOType, storage: &ModuleStorage, pool: &ValuePool) {
         for i in &mut io.argvs_type {
             *i = self
-                .get_type_id_by_token(pool.name_pool[storage.class_table[*i].name])
+                .get_type_id_by_token(pool.name_pool[storage.access_class(*i).name])
                 .unwrap();
         }
         match io.return_type {
             None => {}
             Some(t) => {
                 io.return_type = Some(
-                    self.get_type_id_by_token(pool.name_pool[storage.class_table[t].name])
+                    self.get_type_id_by_token(pool.name_pool[storage.access_class(t).name])
                         .unwrap(),
                 );
             }
@@ -300,7 +300,7 @@ impl SymScope {
         let mut obj_vec = vec![];
         for i in types {
             let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], i.0)?;
-            let obj_rc = libstorage.class_table[*i.1].clone();
+            let obj_rc = libstorage.access_class(*i.1).clone();
             let classid = match self.alloc_type_id(idx) {
                 Err(_) => return Err(symbol_redefined(i.0)),
                 Ok(t) => t,

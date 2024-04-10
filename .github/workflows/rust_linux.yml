@@ -23,6 +23,8 @@ jobs:
           export MIRIFLAGS="-Zmiri-disable-isolation"
       - name: Build
         run: cargo build --all
+      - name: Build Release
+        run: cargo build --all --release
       - name: Run tests Debug
         run: cargo test --all
       - name: Run tests Release

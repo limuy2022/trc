@@ -4,7 +4,7 @@ use rust_i18n::t;
 use std::io::{self, Write};
 
 #[trc_function(var_params = true)]
-#[no_mangle]
+// #[no_mangle]
 pub fn print(fmt_string: str) -> void {
     let mut iter = va_list.iter();
     let mut output_iter = unsafe { (*fmt_string).chars() };
@@ -27,7 +27,7 @@ pub fn print(fmt_string: str) -> void {
 }
 
 #[trc_function(var_params = true)]
-#[no_mangle]
+// #[no_mangle]
 pub fn println(fmt_string: str) -> void {
     let mut iter = va_list.iter();
     let mut output_iter = unsafe { (*fmt_string).chars() };

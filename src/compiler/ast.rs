@@ -945,7 +945,7 @@ impl<'a> AstBuilder<'a> {
             match now.sub_modules().get(&import_item_name) {
                 None => {
                     // 不是模块
-                    match now.functions().get(&import_item_name) {
+                    match now.get_func_id_by_name(&import_item_name) {
                         None => {
                             return self.try_err(
                                 istry,
@@ -956,6 +956,7 @@ impl<'a> AstBuilder<'a> {
                             );
                         }
                         Some(func_item) => {
+                            let func_item = now.functions()[func_item].1.clone();
                             let token_idx: ConstPoolIndexTy =
                                 self.token_lexer.add_id_token(func_item.get_name());
                             // println!("{}", func_item.get_name());

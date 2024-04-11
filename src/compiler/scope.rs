@@ -321,7 +321,7 @@ impl SymScope {
         }
         let funcs = stdlib.functions();
         for i in funcs {
-            let idx = self.insert_sym_with_error(const_pool.name_pool[i.0], i.0)?;
+            let idx = self.insert_sym_with_error(const_pool.name_pool[&i.0], &i.0)?;
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);

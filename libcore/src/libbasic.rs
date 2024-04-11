@@ -308,7 +308,8 @@ impl RustFunction {
 pub struct Module {
     name: String,
     sub_modules: HashMap<String, Module>,
-    functions: HashMap<String, RustFunction>,
+    functions: Vec<(String, RustFunction)>,
+    name_to_id: HashMap<String, usize>,
     // class name 和class id
     classes: HashMap<String, usize>,
     consts: HashMap<String, String>,
@@ -318,7 +319,7 @@ impl Module {
     pub fn new(
         name: impl Into<String>,
         sub_modules: HashMap<String, Module>,
-        functions: HashMap<String, RustFunction>,
+        functions: Vec<(String, RustFunction)>,
         classes: HashMap<String, usize>,
         consts: HashMap<String, String>,
     ) -> Module {
@@ -328,6 +329,7 @@ impl Module {
             functions,
             classes,
             consts,
+            name_to_id: HashMap::new(),
         }
     }
 
@@ -337,8 +339,13 @@ impl Module {
     }
 
     pub fn add_function(&mut self, name: String, func: RustFunction) {
-        let ret = self.functions.insert(name, func);
-        debug_assert!(ret.is_none());
+        self.functions.push((name.clone(), func));
+        let tmp = self.name_to_id.insert(name, self.functions.len() - 1);
+        debug_assert!(tmp.is_none());
+    }
+
+    pub fn get_func_id_by_name(&self, name: &str) -> Option<usize> {
+        self.name_to_id.get(name).cloned()
     }
 
     pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Module> {
@@ -367,12 +374,8 @@ impl Module {
         self.sub_modules = sub_modules;
     }
 
-    pub fn functions(&self) -> &HashMap<String, RustFunction> {
+    pub fn functions(&self) -> &Vec<(String, RustFunction)> {
         &self.functions
-    }
-
-    pub fn set_functions(&mut self, functions: HashMap<String, RustFunction>) {
-        self.functions = functions;
     }
 
     pub fn classes(&self) -> &HashMap<String, usize> {

@@ -4,6 +4,11 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult
     let mut compiler = crate::compiler::Compiler::new(opt);
     let mut ast = compiler.lex()?;
     let static_data = ast.prepare_get_static();
+    println!("deps modules:");
+    for i in &static_data.dll_module_should_loaded {
+        println!("{}", i);
+    }
+    println!();
     for i in static_data.inst.iter().enumerate() {
         if rustcode {
             println!("Inst::new(Opcode::{}, {}),", i.1.opcode, i.1.operand);

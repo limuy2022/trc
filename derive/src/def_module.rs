@@ -157,7 +157,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
         pub fn module_init(storage: &mut ModuleStorage) -> libcore::libbasic::Module {
             use libcore::libbasic::Module;
             use std::collections::hash_map::HashMap;
-            let mut functions = HashMap::new();
+            let mut functions = vec![];
             let mut classes = HashMap::new();
             let mut submodules = HashMap::new();
             let mut consts_info = HashMap::new();
@@ -173,7 +173,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
                 consts_info.insert(stringify!(#consts).to_string(), #consts.to_string());
             )*
             #(
-                functions.insert(stringify!(#right_func).to_string(), #left_func(storage));
+                functions.push((stringify!(#right_func).to_string(), #left_func(storage)));
             )*
             #(
                 submodules.insert(stringify!(#submodules).to_string(), #submodules::module_init(storage));

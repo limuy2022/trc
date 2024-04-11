@@ -5,7 +5,7 @@ use crate::compiler::token::TokenType;
 use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
 use libcore::*;
 use rust_i18n::t;
-use std::{cell::RefCell, mem::size_of, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 impl<'a> AstBuilder<'a> {
     pub fn clear_inst(&mut self) {
@@ -26,12 +26,12 @@ impl<'a> AstBuilder<'a> {
     /// 获取对应类型的真实大小（内存对齐后）
     pub fn get_ty_sz(&self, id: TyIdxTy) -> usize {
         match self.convert_id_to_vm_ty(id) {
-            VmStackType::Int => size_of::<i64>(),
-            VmStackType::Float => size_of::<f64>(),
-            VmStackType::Str => size_of::<*mut String>(),
-            VmStackType::Char => size_of::<char>(),
-            VmStackType::Bool => size_of::<bool>(),
-            VmStackType::Object => get_trcobj_sz(),
+            VmStackType::Int => intsz!(),
+            VmStackType::Float => floatsz!(),
+            VmStackType::Str => strsz!(),
+            VmStackType::Char => charsz!(),
+            VmStackType::Bool => boolsz!(),
+            VmStackType::Object => objsz!(),
         }
     }
 
@@ -121,14 +121,25 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    pub fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
-        self.staticdata.inst.push(Inst::new(opty, opnum));
+    fn gen_line_table(&mut self) {
         if !self.token_lexer.compiler_data.option.optimize {
             // 不生成行号表了
             self.staticdata
                 .line_table
                 .push(self.token_lexer.compiler_data.context.get_line())
         }
+    }
+
+    pub fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
+        self.staticdata.inst.push(Inst::new_single(opty, opnum));
+        self.gen_line_table();
+    }
+
+    pub fn add_double_bycode(&mut self, opty: Opcode, opnum1: usize, opnum2: usize) {
+        self.staticdata
+            .inst
+            .push(Inst::new_double(opty, opnum1, opnum2));
+        self.gen_line_table();
     }
 
     pub fn gen_args_error(&mut self, info: ArguError) -> ErrorInfo {

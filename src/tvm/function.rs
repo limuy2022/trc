@@ -14,13 +14,21 @@ impl Frame {
         }
     }
 
-    pub fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
-        unsafe {
-            *(self.var_table_addr.byte_offset(addr as isize) as *mut Byte as *mut T) = data;
-        }
+    // pub unsafe fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
+    //     unsafe {
+    //         (self.get_addr(addr) as *mut T).write(data);
+    //     }
+    // }
+
+    pub unsafe fn write_to(&mut self, addr: usize, src: *mut Byte, n: usize) {
+        unsafe { self.get_addr(addr).copy_from(src, n) }
     }
 
-    pub fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
+    pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
         unsafe { *(self.var_table_addr.byte_offset(addr as isize) as *const Byte as *const T) }
+    }
+
+    fn get_addr(&self, addr: usize) -> *mut Byte {
+        unsafe { self.var_table_addr.byte_offset(addr as isize) }
     }
 }

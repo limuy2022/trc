@@ -9,11 +9,6 @@ pub fn get_max_stack_sz() -> usize {
     *T.get_or_init(|| 1024 * 1024 * 2 / size_of::<Byte>())
 }
 
-pub fn get_trcobj_sz() -> usize {
-    static T: OnceLock<usize> = OnceLock::new();
-    *T.get_or_init(size_of::<*mut dyn crate::types::TrcObj>)
-}
-
 #[derive(Default)]
 pub struct DynaData {
     pub gc: GcMgr,
@@ -89,6 +84,23 @@ impl DynaData {
         unsafe { *(self.run_stack.as_ptr().byte_offset(self.stack_ptr as isize) as *const T) }
     }
 
+    /// Pop n bytes of stack
+    pub fn pop_n_bytes_data(&mut self, n: usize) -> *mut Byte {
+        debug_assert!(self.stack_ptr >= n);
+        self.stack_ptr -= n;
+        unsafe {
+            let ret = self
+                .run_stack
+                .as_mut_ptr()
+                .byte_offset(self.stack_ptr as isize);
+            #[cfg(debug_assertions)]
+            {
+                self.type_used.pop().unwrap();
+            }
+            ret
+        }
+    }
+
     /// Returns the top data of the data stack.
     ///
     /// # Panics
@@ -117,15 +129,42 @@ impl DynaData {
         }
     }
 
-    pub fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
+    /// Sets the var of this [`DynaData`].
+    ///
+    /// # Safety
+    /// make sure your addr is valid, or it will panic
+    /// .
+    pub unsafe fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
         unsafe {
-            *(self.var_store.as_mut_ptr().byte_offset(addr as isize) as *mut T) = data;
+            (self.get_var_addr_mut(addr) as *mut T).write(data);
         }
     }
 
-    pub fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
+    /// Sets the var of this [`DynaData`].
+    ///
+    /// # Safety
+    /// make sure your addr is valid, or it will panic
+    /// .
+    pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
         debug_assert!(addr < self.var_used);
-        unsafe { *(self.var_store.as_ptr().byte_offset(addr as isize) as *const T) }
+        unsafe { *(self.get_var_addr(addr) as *const T) }
+    }
+
+    /// Sets the var of this [`DynaData`].
+    ///
+    /// # Safety
+    /// make sure your addr and src are valid, or it will panic
+    /// .
+    pub unsafe fn write_to_val(&mut self, addr: usize, src: *mut Byte, n: usize) {
+        unsafe { self.get_var_addr_mut(addr).copy_from(src, n) }
+    }
+
+    fn get_var_addr(&self, addr: usize) -> *const Byte {
+        unsafe { self.var_store.as_ptr().byte_offset(addr as isize) }
+    }
+
+    fn get_var_addr_mut(&mut self, addr: usize) -> *mut Byte {
+        unsafe { self.var_store.as_mut_ptr().byte_offset(addr as isize) }
     }
 
     pub fn alloc_var_space(&mut self, need_sz: usize) -> *mut Byte {

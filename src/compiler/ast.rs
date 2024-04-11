@@ -238,14 +238,14 @@ impl<'a> AstBuilder<'a> {
         self.lex_until(RightBigBrace)?;
         self.add_bycode(Opcode::Jump, condit_id);
         let opcode_after_while = self.staticdata.get_next_opcode_id();
-        self.staticdata.inst[jump_false_id].operand = opcode_after_while;
+        self.staticdata.inst[jump_false_id].operand.0 = opcode_after_while;
         let mut break_record = vec![];
         swap(
             &mut break_record,
             &mut self.self_scope.borrow_mut().for_break,
         );
         for i in break_record {
-            self.staticdata.inst[i].operand = opcode_after_while;
+            self.staticdata.inst[i].operand.0 = opcode_after_while;
         }
         let mut continue_record = vec![];
         swap(
@@ -253,7 +253,7 @@ impl<'a> AstBuilder<'a> {
             &mut self.self_scope.borrow_mut().for_continue,
         );
         for i in continue_record {
-            self.staticdata.inst[i].operand = condit_id;
+            self.staticdata.inst[i].operand.0 = condit_id;
         }
         swap(
             &mut prev_loop_state,
@@ -310,7 +310,7 @@ impl<'a> AstBuilder<'a> {
         // 跳转到条件判断语句
         self.add_bycode(Opcode::Jump, conid_id);
         let next_opcode_after_for = self.staticdata.get_next_opcode_id();
-        self.staticdata.inst[jump_false_id].operand = next_opcode_after_for;
+        self.staticdata.inst[jump_false_id].operand.0 = next_opcode_after_for;
         // 开始处理所有的break
         let mut break_record = vec![];
         swap(
@@ -318,7 +318,7 @@ impl<'a> AstBuilder<'a> {
             &mut self.self_scope.borrow_mut().for_break,
         );
         for i in break_record {
-            self.staticdata.inst[i].operand = next_opcode_after_for;
+            self.staticdata.inst[i].operand.0 = next_opcode_after_for;
         }
         let mut continue_record = vec![];
         swap(
@@ -326,7 +326,7 @@ impl<'a> AstBuilder<'a> {
             &mut self.self_scope.borrow_mut().for_continue,
         );
         for i in continue_record {
-            self.staticdata.inst[i].operand = opcode_goto;
+            self.staticdata.inst[i].operand.0 = opcode_goto;
         }
         // 重置循环状态
         swap(
@@ -684,7 +684,7 @@ impl<'a> AstBuilder<'a> {
         self.add_bycode(Opcode::Jump, ARG_WRONG);
         add_expr_addr(self.staticdata.get_last_opcode_id());
         for i in &jump_into_case {
-            self.staticdata.inst[*i].operand = self.staticdata.get_next_opcode_id();
+            self.staticdata.inst[*i].operand.0 = self.staticdata.get_next_opcode_id();
         }
         self.get_token_checked(TokenType::LeftBigBrace)?;
         self.lex_until(RightBigBrace)?;
@@ -708,7 +708,7 @@ impl<'a> AstBuilder<'a> {
                 loop {
                     for i in &jump_condit_save {
                         let t = self.staticdata.get_next_opcode_id();
-                        self.staticdata.inst[*i].operand = t;
+                        self.staticdata.inst[*i].operand.0 = t;
                     }
                     jump_condit_save.clear();
                     let t = self.token_lexer.next_token()?;
@@ -726,7 +726,7 @@ impl<'a> AstBuilder<'a> {
                     )?;
                 }
                 for i in jump_case_final {
-                    self.staticdata.inst[i].operand = self.staticdata.get_next_opcode_id();
+                    self.staticdata.inst[i].operand.0 = self.staticdata.get_next_opcode_id();
                 }
             }
         }
@@ -994,28 +994,12 @@ impl<'a> AstBuilder<'a> {
 
     /// 生成修改变量的指令
     fn modify_var(&mut self, varty: TyIdxTy, var_addr: usize, is_global: bool) {
-        self.add_bycode(
-            if !is_global {
-                match self.convert_id_to_vm_ty(varty) {
-                    VmStackType::Int => Opcode::StoreLocalInt,
-                    VmStackType::Float => Opcode::StoreLocalFloat,
-                    VmStackType::Str => Opcode::StoreLocalStr,
-                    VmStackType::Char => Opcode::StoreLocalChar,
-                    VmStackType::Bool => Opcode::StoreLocalBool,
-                    VmStackType::Object => Opcode::StoreLocalObj,
-                }
-            } else {
-                match self.convert_id_to_vm_ty(varty) {
-                    VmStackType::Int => Opcode::StoreGlobalInt,
-                    VmStackType::Float => Opcode::StoreGlobalFloat,
-                    VmStackType::Str => Opcode::StoreGlobalStr,
-                    VmStackType::Char => Opcode::StoreGlobalChar,
-                    VmStackType::Bool => Opcode::StoreGlobalBool,
-                    VmStackType::Object => Opcode::StoreGlobalObj,
-                }
-            },
-            var_addr,
-        );
+        let objsz = self.get_ty_sz(varty);
+        if !is_global {
+            self.add_double_bycode(Opcode::StoreLocal, var_addr, objsz);
+        } else {
+            self.add_double_bycode(Opcode::StoreGlobal, var_addr, objsz);
+        }
     }
 
     /// 生成新建变量的指令
@@ -1107,7 +1091,7 @@ impl<'a> AstBuilder<'a> {
             // 本行是为了跳转到下一个分支
             self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
             self.lex_until(RightBigBrace)?;
-            self.staticdata.inst[op_idx].operand = self.staticdata.get_next_opcode_id();
+            self.staticdata.inst[op_idx].operand.0 = self.staticdata.get_next_opcode_id();
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
             let t = self.token_lexer.next_token()?;
@@ -1129,7 +1113,7 @@ impl<'a> AstBuilder<'a> {
             break;
         }
         for i in save_jump_opcode_idx {
-            self.staticdata.inst[i].operand = self.staticdata.get_next_opcode_id();
+            self.staticdata.inst[i].operand.0 = self.staticdata.get_next_opcode_id();
         }
         Ok(())
     }

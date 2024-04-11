@@ -1,5 +1,5 @@
 use core::{cmp::max, fmt};
-use std::{fmt::Display, usize};
+use std::fmt::Display;
 
 #[derive(Clone)]
 pub struct FuncStorage {
@@ -112,18 +112,8 @@ pub enum Opcode {
     MoveBool,
     MoveStr,
     // Store a local var
-    StoreLocalObj,
-    StoreLocalInt,
-    StoreLocalFloat,
-    StoreLocalChar,
-    StoreLocalBool,
-    StoreLocalStr,
-    StoreGlobalObj,
-    StoreGlobalInt,
-    StoreGlobalFloat,
-    StoreGlobalChar,
-    StoreGlobalBool,
-    StoreGlobalStr,
+    StoreLocal,
+    StoreGlobal,
     // Do Nothing
     Empty,
     // a = -a
@@ -149,7 +139,6 @@ pub enum Opcode {
     PopDataStr,
     PopDataChar,
     PopDataBool,
-    ImportNativeModule,
 }
 
 impl Display for Opcode {
@@ -180,19 +169,29 @@ pub const ARG_WRONG: usize = usize::MAX;
 #[derive(Debug, PartialEq, Clone)]
 pub struct Inst {
     pub opcode: Opcode,
-    pub operand: usize,
+    pub operand: (usize, usize),
 }
 
 impl Inst {
-    pub fn new(opcode: Opcode, operand: usize) -> Self {
-        Self { opcode, operand }
+    pub fn new_single(opcode: Opcode, operand: usize) -> Self {
+        Self {
+            opcode,
+            operand: (operand, ARG_WRONG),
+        }
+    }
+
+    pub fn new_double(opcode: Opcode, operand1: usize, operand2: usize) -> Self {
+        Self {
+            opcode,
+            operand: (operand1, operand2),
+        }
     }
 }
 
 impl Display for Inst {
     #[cfg(not(tarpaulin_include))]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {}", self.opcode, self.operand)
+        write!(f, "{} {} {}", self.opcode, self.operand.0, self.operand.1)
     }
 }
 

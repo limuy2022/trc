@@ -134,11 +134,6 @@ pub enum Opcode {
     EqCharWithoutPop,
     EqBoolWithoutPop,
     PopData,
-    PopDataInt,
-    PopDataFloat,
-    PopDataStr,
-    PopDataChar,
-    PopDataBool,
 }
 
 impl Display for Opcode {

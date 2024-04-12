@@ -565,22 +565,8 @@ impl<'a> Vm<'a> {
                 self.dynadata.dydata.push_data(first == second);
             }
             Opcode::PopData => {
-                self.dynadata.dydata.pop_data::<*mut dyn TrcObj>();
-            }
-            Opcode::PopDataInt => {
-                self.dynadata.dydata.pop_data::<TrcIntInternal>();
-            }
-            Opcode::PopDataFloat => {
-                self.dynadata.dydata.pop_data::<TrcFloatInternal>();
-            }
-            Opcode::PopDataStr => {
-                self.dynadata.dydata.pop_data::<TrcStrInternal>();
-            }
-            Opcode::PopDataChar => {
-                self.dynadata.dydata.pop_data::<TrcCharInternal>();
-            }
-            Opcode::PopDataBool => {
-                self.dynadata.dydata.pop_data::<bool>();
+                let bytes = self.static_data.inst[*pc].operand.0;
+                self.dynadata.dydata.pop_n_bytes_data(bytes);
             }
             Opcode::JumpIfTrue => {
                 let condit = impl_opcode!(bool, self, 1);

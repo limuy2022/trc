@@ -18,7 +18,7 @@ pub struct DynaData {
     // 变量已经使用的内存空间大小
     var_used: usize,
     #[cfg(debug_assertions)]
-    type_used: Vec<&'static str>,
+    size_used: Vec<usize>,
 }
 
 impl DynaData {
@@ -52,7 +52,7 @@ impl DynaData {
         self.stack_ptr += size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            self.type_used.push(std::any::type_name::<T>());
+            self.size_used.push(size_of::<T>());
         }
     }
 
@@ -65,15 +65,15 @@ impl DynaData {
         let sz = size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            let info = std::any::type_name::<T>();
-            let info_stack = self.type_used.pop().unwrap();
-            if info_stack != info {
-                panic!(
-                    "pop data type error.Expected get {}.Actually has {}",
-                    std::any::type_name::<T>(),
-                    info_stack
-                );
-            }
+            let info = size_of::<T>();
+            let info_stack = self.size_used.pop().unwrap();
+            debug_assert_eq!(
+                info_stack,
+                info,
+                "pop data type error.Expected get {}.Actually has {}",
+                std::any::type_name::<T>(),
+                info_stack
+            );
             debug_assert!(self.stack_ptr >= sz);
         }
         self.stack_ptr -= sz;
@@ -87,7 +87,8 @@ impl DynaData {
         let ret = self.get_stack_addr_mut(self.stack_ptr);
         #[cfg(debug_assertions)]
         {
-            self.type_used.pop().unwrap();
+            let sz = self.size_used.pop().unwrap();
+            debug_assert_eq!(sz, n)
         }
         ret
     }
@@ -101,15 +102,15 @@ impl DynaData {
         let sz = size_of::<T>();
         #[cfg(debug_assertions)]
         {
-            let info = std::any::type_name::<T>();
-            let info_stack = self.type_used.last().unwrap();
-            if *info_stack != info {
-                panic!(
-                    "pop data type error.Expected get {}.Actually has {}",
-                    std::any::type_name::<T>(),
-                    info_stack
-                );
-            }
+            let info = size_of::<T>();
+            let info_stack = self.size_used.last().unwrap();
+            debug_assert_eq!(
+                *info_stack,
+                info,
+                "pop data type error.Expected get {}.Actually has {}",
+                std::any::type_name::<T>(),
+                info_stack
+            );
             debug_assert!(self.stack_ptr >= sz);
         }
         unsafe { *(self.get_stack_addr(self.stack_ptr - sz) as *const T) }
@@ -126,7 +127,7 @@ impl DynaData {
     /// Sets the var of this [`DynaData`].
     ///
     /// # Safety
-    /// make sure your addr is valid, or it will panic
+    /// make sure your addr is valid, or it will crash
     /// .
     pub unsafe fn set_var<T: 'static>(&mut self, addr: usize, data: T) {
         unsafe {
@@ -134,15 +135,24 @@ impl DynaData {
         }
     }
 
+    /// write n byte from src to data stack
+    ///
+    /// # Safety
+    /// make sure your addr is valid, or it will crash
+    /// .
     pub unsafe fn write_to_stack(&mut self, src: *mut Byte, n: usize) {
         unsafe { self.get_stack_addr_mut(self.stack_ptr).copy_from(src, n) }
         self.stack_ptr += n;
+        #[cfg(debug_assertions)]
+        {
+            self.size_used.push(n);
+        }
     }
 
     /// Sets the var of this [`DynaData`].
     ///
     /// # Safety
-    /// make sure your addr is valid, or it will panic
+    /// make sure your addr is valid, or it will crash
     /// .
     pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
         debug_assert!(addr < self.var_used);
@@ -152,7 +162,7 @@ impl DynaData {
     /// Sets the var of this [`DynaData`].
     ///
     /// # Safety
-    /// make sure your addr and src are valid, or it will panic
+    /// make sure your addr and src are valid, or it will crash
     /// .
     pub unsafe fn write_to_val(&mut self, addr: usize, src: *mut Byte, n: usize) {
         unsafe { self.get_var_addr_mut(addr).copy_from(src, n) }

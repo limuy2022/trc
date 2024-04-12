@@ -395,26 +395,13 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    fn load_var_opcode(&mut self, ty: TyIdxTy) -> Opcode {
-        if self.process_info.is_global {
-            match self.convert_id_to_vm_ty(ty) {
-                VmStackType::Int => Opcode::LoadGlobalVarInt,
-                VmStackType::Float => Opcode::LoadGlobalVarFloat,
-                VmStackType::Str => Opcode::LoadGlobalVarStr,
-                VmStackType::Char => Opcode::LoadGlobalVarChar,
-                VmStackType::Bool => Opcode::LoadGlobalVarBool,
-                VmStackType::Object => Opcode::LoadGlobalVarObj,
-            }
+    fn load_var_opcode(&mut self, ty: TyIdxTy) -> (Opcode, usize) {
+        let ret_opcode = if self.process_info.is_global {
+            Opcode::LoadGlobalVar
         } else {
-            match self.convert_id_to_vm_ty(ty) {
-                VmStackType::Int => Opcode::LoadLocalVarInt,
-                VmStackType::Float => Opcode::LoadLocalVarFloat,
-                VmStackType::Str => Opcode::LoadLocalVarStr,
-                VmStackType::Char => Opcode::LoadLocalVarChar,
-                VmStackType::Bool => Opcode::LoadLocalVarBool,
-                VmStackType::Object => Opcode::LoadLocalVarObj,
-            }
-        }
+            Opcode::LoadLocalVar
+        };
+        (ret_opcode, self.get_ty_sz(ty))
     }
 
     fn load_var(
@@ -437,7 +424,7 @@ impl<'a> AstBuilder<'a> {
             Some(v) => v,
         };
         let tmp = self.load_var_opcode(var.ty);
-        self.add_bycode(tmp, var.addr);
+        self.add_double_bycode(tmp.0, var.addr, tmp.1);
         self.process_info.new_type(var.ty);
         Ok(())
     }

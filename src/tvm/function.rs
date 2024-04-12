@@ -28,7 +28,7 @@ impl Frame {
         unsafe { *(self.var_table_addr.byte_offset(addr as isize) as *const Byte as *const T) }
     }
 
-    fn get_addr(&self, addr: usize) -> *mut Byte {
+    pub fn get_addr(&self, addr: usize) -> *mut Byte {
         unsafe { self.var_table_addr.byte_offset(addr as isize) }
     }
 }

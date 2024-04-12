@@ -23,7 +23,7 @@ impl<'a> AstBuilder<'a> {
         }
     }
 
-    /// 获取对应类型的真实大小（内存对齐后）
+    /// 获取对应类型在栈中的真实大小（内存对齐后）
     pub fn get_ty_sz(&self, id: TyIdxTy) -> usize {
         match self.convert_id_to_vm_ty(id) {
             VmStackType::Int => intsz!(),

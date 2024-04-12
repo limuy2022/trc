@@ -13,7 +13,7 @@ pub fn get_max_stack_sz() -> usize {
 pub struct DynaData {
     pub gc: GcMgr,
     run_stack: Vec<Byte>,
-    pub var_store: Vec<Byte>,
+    var_store: Vec<Byte>,
     stack_ptr: usize,
     // 变量已经使用的内存空间大小
     var_used: usize,
@@ -47,11 +47,7 @@ impl DynaData {
     /// Push data of this [`DynaData`].
     pub fn push_data<T: 'static>(&mut self, data: T) {
         unsafe {
-            (self
-                .run_stack
-                .as_mut_ptr()
-                .byte_offset(self.stack_ptr as isize) as *mut T)
-                .write(data);
+            (self.get_stack_addr_mut(self.stack_ptr) as *mut T).write(data);
         }
         self.stack_ptr += size_of::<T>();
         #[cfg(debug_assertions)]
@@ -81,24 +77,19 @@ impl DynaData {
             debug_assert!(self.stack_ptr >= sz);
         }
         self.stack_ptr -= sz;
-        unsafe { *(self.run_stack.as_ptr().byte_offset(self.stack_ptr as isize) as *const T) }
+        unsafe { *(self.get_stack_addr(self.stack_ptr) as *const T) }
     }
 
     /// Pop n bytes of stack
     pub fn pop_n_bytes_data(&mut self, n: usize) -> *mut Byte {
         debug_assert!(self.stack_ptr >= n);
         self.stack_ptr -= n;
-        unsafe {
-            let ret = self
-                .run_stack
-                .as_mut_ptr()
-                .byte_offset(self.stack_ptr as isize);
-            #[cfg(debug_assertions)]
-            {
-                self.type_used.pop().unwrap();
-            }
-            ret
+        let ret = self.get_stack_addr_mut(self.stack_ptr);
+        #[cfg(debug_assertions)]
+        {
+            self.type_used.pop().unwrap();
         }
+        ret
     }
 
     /// Returns the top data of the data stack.
@@ -121,12 +112,15 @@ impl DynaData {
             }
             debug_assert!(self.stack_ptr >= sz);
         }
-        unsafe {
-            *(self
-                .run_stack
-                .as_ptr()
-                .byte_offset((self.stack_ptr - sz) as isize) as *const T)
-        }
+        unsafe { *(self.get_stack_addr(self.stack_ptr - sz) as *const T) }
+    }
+
+    fn get_stack_addr(&self, addr: usize) -> *const Byte {
+        unsafe { self.run_stack.as_ptr().byte_offset(addr as isize) }
+    }
+
+    fn get_stack_addr_mut(&mut self, addr: usize) -> *mut Byte {
+        unsafe { self.run_stack.as_mut_ptr().byte_offset(addr as isize) }
     }
 
     /// Sets the var of this [`DynaData`].
@@ -138,6 +132,11 @@ impl DynaData {
         unsafe {
             (self.get_var_addr_mut(addr) as *mut T).write(data);
         }
+    }
+
+    pub unsafe fn write_to_stack(&mut self, src: *mut Byte, n: usize) {
+        unsafe { self.get_stack_addr_mut(self.stack_ptr).copy_from(src, n) }
+        self.stack_ptr += n;
     }
 
     /// Sets the var of this [`DynaData`].
@@ -159,7 +158,7 @@ impl DynaData {
         unsafe { self.get_var_addr_mut(addr).copy_from(src, n) }
     }
 
-    fn get_var_addr(&self, addr: usize) -> *const Byte {
+    pub fn get_var_addr(&self, addr: usize) -> *const Byte {
         unsafe { self.var_store.as_ptr().byte_offset(addr as isize) }
     }
 

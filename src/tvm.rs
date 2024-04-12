@@ -226,10 +226,15 @@ impl<'a> Vm<'a> {
             Opcode::BitNot => operator_opcode!(bit_not, self),
             Opcode::BitLeftShift => operator_opcode!(bit_left_shift, self),
             Opcode::BitRightShift => operator_opcode!(bit_right_shift, self),
-            Opcode::LoadLocalVarObj => {
-                self.dynadata.dydata.push_data(
-                    self.dynadata.dydata.var_store[self.static_data.inst[*pc].operand.0],
-                );
+            Opcode::LoadLocalVar => {
+                let addr = self.static_data.inst[*pc].operand.0;
+                let bytes_num = self.static_data.inst[*pc].operand.1;
+                let var_begin_addr = self.dynadata.frames_stack.last().unwrap().get_addr(addr);
+                unsafe {
+                    self.dynadata
+                        .dydata
+                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num)
+                };
             }
             Opcode::LoadString => {
                 let tmp = self.static_data.inst[*pc].operand.0;
@@ -483,21 +488,6 @@ impl<'a> Vm<'a> {
                 let ptr = self.dynadata.dydata.gc.alloc(tmp);
                 self.dynadata.dydata.push_data(ptr as *mut dyn TrcObj);
             }
-            Opcode::LoadLocalVarBool => {
-                impl_load_local_var!(bool, *pc, self);
-            }
-            Opcode::LoadLocalVarInt => {
-                impl_load_local_var!(TrcIntInternal, *pc, self);
-            }
-            Opcode::LoadLocalVarFloat => {
-                impl_load_local_var!(TrcFloatInternal, *pc, self);
-            }
-            Opcode::LoadLocalVarStr => {
-                impl_load_local_var!(TrcStrInternal, *pc, self);
-            }
-            Opcode::LoadLocalVarChar => {
-                impl_load_local_var!(TrcCharInternal, *pc, self);
-            }
             Opcode::Stop => {
                 *pc = self.static_data.inst.len();
                 return Ok(());
@@ -510,35 +500,15 @@ impl<'a> Vm<'a> {
                 *pc = self.static_data.funcs[self.static_data.inst[*pc].operand.0].func_addr;
                 return Ok(());
             }
-            Opcode::LoadGlobalVarObj => {
+            Opcode::LoadGlobalVar => {
                 let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<*mut dyn TrcObj>(addr) };
-                self.dynadata.dydata.push_data(data);
-            }
-            Opcode::LoadGlobalVarBool => {
-                let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<bool>(addr) };
-                self.dynadata.dydata.push_data(data);
-            }
-            Opcode::LoadGlobalVarInt => {
-                let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<TrcIntInternal>(addr) };
-                self.dynadata.dydata.push_data(data);
-            }
-            Opcode::LoadGlobalVarFloat => {
-                let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<TrcFloatInternal>(addr) };
-                self.dynadata.dydata.push_data(data);
-            }
-            Opcode::LoadGlobalVarStr => {
-                let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<TrcStrInternal>(addr) };
-                self.dynadata.dydata.push_data(data);
-            }
-            Opcode::LoadGlobalVarChar => {
-                let addr = self.static_data.inst[*pc].operand.0;
-                let data = unsafe { self.dynadata.dydata.get_var::<TrcCharInternal>(addr) };
-                self.dynadata.dydata.push_data(data);
+                let bytes_num = self.static_data.inst[*pc].operand.1;
+                let var_begin_addr = self.dynadata.dydata.get_var_addr(addr);
+                unsafe {
+                    self.dynadata
+                        .dydata
+                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num)
+                };
             }
             Opcode::EqWithoutPop => {
                 // let (first, second) = impl_opcode_without_pop_first_data!(*mut dyn TrcObj, self);

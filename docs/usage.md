@@ -39,10 +39,10 @@ The next is the string value. To make you to write strings more easily:
 There are also many easape char in the string:
 
 | escape char | meaning                           |
-| :---------- | :-------------------------------- | --- |
+| :---------- | :-------------------------------- |
 | \t          | tab                               |
 | \n          | new line                          |
-| \\\\        | \|                                |     |
+| \\\\        | \|                                |
 | \'          | '                                 |
 | \"          | "                                 |
 | \0          | the tick of the end of the string |

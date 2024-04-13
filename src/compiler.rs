@@ -1,6 +1,7 @@
 pub mod ast;
 pub mod linker;
 pub mod llvm_convent;
+pub mod manager;
 pub mod scope;
 pub mod token;
 

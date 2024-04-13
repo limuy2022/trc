@@ -5,16 +5,18 @@ pub mod manager;
 pub mod scope;
 pub mod token;
 
-use self::{ast::AstBuilder, token::TokenLex};
+pub use self::{ast::AstBuilder, manager::ModuleManager, token::TokenLex};
 use crate::cfg;
 use libcore::*;
 use rust_i18n::t;
 use std::{
+    cell::RefCell,
     collections::HashMap,
     fmt::Display,
     fs,
     io::{self, BufRead},
     process::exit,
+    rc::Rc,
     vec,
 };
 
@@ -385,7 +387,8 @@ impl Compiler {
 
     pub fn lex(&mut self) -> RuntimeResult<AstBuilder> {
         let token_lexer = TokenLex::new(self);
-        let mut ast_builder = AstBuilder::new(token_lexer);
+        let env_manager = Rc::new(RefCell::new(ModuleManager::new()));
+        let mut ast_builder = AstBuilder::new(token_lexer, env_manager.clone());
         ast_builder.generate_code()?;
         Ok(ast_builder)
     }

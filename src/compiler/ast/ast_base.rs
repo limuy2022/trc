@@ -1,7 +1,7 @@
 use super::AstBuilder;
 use super::AstError;
-use crate::compiler::token::Token;
 use crate::compiler::token::TokenType;
+use crate::compiler::{scope::FuncIdxTy, token::Token};
 use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
 use libcore::*;
 use rust_i18n::t;
@@ -209,5 +209,9 @@ impl<'a> AstBuilder<'a> {
         if self.modules_dll_dup.insert(module_name.clone()) {
             self.modules_dll.push(module_name);
         }
+    }
+
+    pub fn alloc_extern_function_id(&mut self) -> FuncIdxTy {
+        self.module_manager.borrow_mut().alloc_extern_function_id()
     }
 }

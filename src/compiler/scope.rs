@@ -137,7 +137,6 @@ impl VarInfo {
 #[derive(Clone, Debug, Default)]
 pub struct RootInfo {
     // 该id不会减少，在所有作用域共同使用
-    funcs_extern_id: FuncIdxTy,
 }
 
 #[derive(Debug, Clone)]
@@ -187,7 +186,6 @@ pub struct SymScope {
     // 当前作用域可以分配的下一个class id
     types_id: ClassIdxId,
     vars_id: ScopeAllocIdTy,
-    funcs_custom_id: FuncIdxTy,
     // 用户自定义的类型储存位置
     types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
     // 作用域暂时储存的函数token
@@ -227,8 +225,6 @@ impl SymScope {
                 }
                 ret.scope_sym_id = prev_scope.borrow().scope_sym_id;
                 ret.types_id = prev_scope.borrow().types_id;
-                ret.funcs_custom_id = prev_scope.borrow().funcs_custom_id;
-                // ret.root_scope.clone_from(&prev_scope.borrow().root_scope);
                 ret
             }
             SymScopePrev::Root => Self {
@@ -242,15 +238,13 @@ impl SymScope {
     pub fn add_custom_function(
         &mut self,
         id: ScopeAllocIdTy,
+        function_id: FuncIdxTy,
         mut f: CustomFunction,
         body: Vec<(Token, usize)>,
-    ) -> FuncIdxTy {
-        let ret = self.funcs_custom_id;
+    ) {
         self.funcs_temp_store.push((id, body));
-        f.custom_id = ret;
+        f.custom_id = function_id;
         self.add_func(id, Rc::new(f));
-        self.funcs_custom_id += 1;
-        ret
     }
 
     pub fn insert_sym_with_error(
@@ -291,6 +285,7 @@ impl SymScope {
         stdlib: &Module,
         libstorage: &ModuleStorage,
         const_pool: &ValuePool,
+        mut alloc_extern_id_func: impl FnMut() -> usize,
     ) -> Result<(), ErrorInfo> {
         let types = stdlib.classes();
         // println!("{:?}", types);
@@ -322,7 +317,7 @@ impl SymScope {
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);
-            self.add_extern_func(idx, fobj);
+            self.add_extern_func(idx, alloc_extern_id_func(), fobj);
         }
         // 改写类的重载方法
         Ok(())
@@ -401,29 +396,14 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_extern_func(&mut self, id: ScopeAllocIdTy, mut f: RustFunction) {
-        let funcid = self.alloc_extern_func_id();
-        f.buildin_id = funcid;
+    pub fn add_extern_func(
+        &mut self,
+        id: ScopeAllocIdTy,
+        function_id: FuncIdxTy,
+        mut f: RustFunction,
+    ) {
+        f.buildin_id = function_id;
         self.add_func(id, Rc::new(f))
-    }
-
-    pub fn alloc_extern_func_id(&mut self) -> FuncIdxTy {
-        match self.root_scope {
-            Some(ref root_scope) => {
-                let tmp = root_scope.upgrade().unwrap();
-                let mut tmp = tmp.borrow_mut();
-                let refer = tmp.prev_scope.get_info();
-                let ret = refer.funcs_extern_id;
-                refer.funcs_extern_id += 1;
-                ret
-            }
-            None => {
-                let refer = self.prev_scope.get_info();
-                let ret = refer.funcs_extern_id;
-                refer.funcs_extern_id += 1;
-                ret
-            }
-        }
     }
 
     /// 返回变量的索引和内存地址

@@ -6,7 +6,10 @@ use super::{
     token::{ConstPoolIndexTy, TokenType},
     InputSource, TokenLex,
 };
-use crate::{base::dll::load_module_storage, compiler::token::TokenType::RightBigBrace};
+use crate::{
+    base::dll::load_module_storage,
+    compiler::{manager::ModuleManager, token::TokenType::RightBigBrace},
+};
 use collection_literals::collection;
 use libcore::*;
 use rust_i18n::t;
@@ -39,6 +42,7 @@ pub struct AstBuilder<'a> {
     first_func: bool,
     modules_dll_dup: HashSet<String>,
     modules_dll: Vec<String>,
+    module_manager: Rc<RefCell<ModuleManager<'a>>>,
 }
 
 type AstError<T> = RuntimeResult<T>;
@@ -113,7 +117,10 @@ macro_rules! expr_gen {
 }
 
 impl<'a> AstBuilder<'a> {
-    pub fn new(mut token_lexer: TokenLex<'a>) -> Self {
+    pub fn new(
+        mut token_lexer: TokenLex<'a>,
+        module_manager: Rc<RefCell<ModuleManager<'a>>>,
+    ) -> Self {
         let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
         let stdlib_dll_name = libloading::library_filename("stdlib");
         let stdlib_dll =
@@ -130,7 +137,9 @@ impl<'a> AstBuilder<'a> {
         let _optimize = token_lexer.compiler_data.option.optimize;
         root_scope
             .borrow_mut()
-            .import_native_module(prelude, stdstorage, &token_lexer.const_pool)
+            .import_native_module(prelude, stdstorage, &token_lexer.const_pool, || {
+                module_manager.borrow_mut().alloc_extern_function_id()
+            })
             .expect("Import prelude but failed");
         root_scope
             .borrow_mut()
@@ -171,6 +180,7 @@ impl<'a> AstBuilder<'a> {
             first_func: false,
             modules_dll_dup: collection! {name_str.clone()},
             modules_dll: vec![name_str.clone()],
+            module_manager,
         }
     }
 
@@ -762,8 +772,10 @@ impl<'a> AstBuilder<'a> {
             }
         }
         // self.self_scope = tmp.clone();
+        let function_id = self.module_manager.borrow_mut().alloc_custom_function_id();
         self.self_scope.borrow_mut().add_custom_function(
             name_id,
+            function_id,
             CustomFunction::new(
                 io,
                 argname,
@@ -948,9 +960,12 @@ impl<'a> AstBuilder<'a> {
                                 self.token_lexer.add_id_token(func_item.get_name());
                             // println!("{}", func_item.get_name());
                             let func_id = self.insert_sym_with_error(token_idx)?;
-                            self.self_scope
-                                .borrow_mut()
-                                .add_extern_func(func_id, func_item.clone());
+                            let func_extern_id = self.alloc_extern_function_id();
+                            self.self_scope.borrow_mut().add_extern_func(
+                                func_id,
+                                func_extern_id,
+                                func_item.clone(),
+                            );
                         }
                     }
                 }
@@ -968,6 +983,7 @@ impl<'a> AstBuilder<'a> {
                         module,
                         lib_storage,
                         &self.token_lexer.const_pool,
+                        || self.module_manager.borrow_mut().alloc_extern_function_id(),
                     ) {
                         return self.try_err(istry, e);
                     };

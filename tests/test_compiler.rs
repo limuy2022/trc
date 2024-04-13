@@ -11,8 +11,10 @@ macro_rules! gen_test_env {
             CompileOption::new(false, InputSource::StringInternal),
             $test_code,
         );
+        use std::{cell::RefCell, rc::Rc};
+        let env_tmp = Rc::new(RefCell::new(trc::compiler::ModuleManager::new()));
         let token_lexer = trc::compiler::token::TokenLex::new(&mut compiler);
-        let mut $env_name = trc::compiler::ast::AstBuilder::new(token_lexer);
+        let mut $env_name = trc::compiler::ast::AstBuilder::new(token_lexer, env_tmp);
     };
 }
 

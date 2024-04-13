@@ -212,7 +212,7 @@ impl<'a> AstBuilder<'a> {
     pub fn prepare_get_static(&mut self) -> &StaticData {
         self.staticdata.constpool = self.token_lexer.const_pool.store_val_to_vm();
         self.staticdata.dll_module_should_loaded.clear();
-        std::mem::swap(
+        swap(
             &mut self.staticdata.dll_module_should_loaded,
             &mut self.modules_dll,
         );
@@ -1294,7 +1294,7 @@ impl<'a> AstBuilder<'a> {
             let (code_begin, var_mem_sz) = self.lex_function(i.0, &i.1)?;
             self.staticdata
                 .funcs
-                .push(libcore::FuncStorage::new(code_begin, var_mem_sz))
+                .push(FuncStorage::new(code_begin, var_mem_sz))
         }
         Ok(())
     }

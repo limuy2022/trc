@@ -111,10 +111,7 @@ impl ClassInterface for CustomType {
         &self.origin_name
     }
 
-    fn get_override_func(
-        &self,
-        _oper_token: libcore::OverrideOperations,
-    ) -> Option<&OverrideWrapper> {
+    fn get_override_func(&self, _oper_token: OverrideOperations) -> Option<&OverrideWrapper> {
         None
     }
 }

@@ -100,7 +100,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         Commands::Version {} => {
             println!(
                 "trc version {} {} {}\nbuild by {} at {} ",
-                crate::cfg::VERSION,
+                cfg::VERSION,
                 shadow_rs::branch(),
                 build::COMMIT_HASH,
                 build::RUST_VERSION,

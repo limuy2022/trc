@@ -1,6 +1,7 @@
 //! the read execute print loop for trc
 
 use crate::{
+    cfg,
     compiler::{self, token::TokenType},
     tvm::Vm,
 };
@@ -16,6 +17,10 @@ pub fn tshell() -> RuntimeResult<()> {
         .check_cursor_position(true)
         .build();
     let mut rl: Editor<(), FileHistory> = rustyline::Editor::with_config(config).unwrap();
+    let history_path = cfg::get_history_file();
+    if let Some(history_path) = history_path {
+        let _ = rl.load_history(history_path);
+    }
     rl.set_max_history_size(1000).unwrap();
     let mut compiler = compiler::Compiler::new_string_compiler(
         compiler::CompileOption::new(false, compiler::InputSource::StringInternal),
@@ -131,6 +136,12 @@ pub fn tshell() -> RuntimeResult<()> {
         }
         io::stdout().flush().unwrap();
         should_exit = false;
+    }
+    if let Some(history_path) = history_path {
+        if !history_path.exists() {
+            std::fs::File::create(history_path).unwrap();
+        }
+        rl.save_history(history_path).unwrap();
     }
     Ok(())
 }

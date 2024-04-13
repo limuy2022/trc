@@ -9,7 +9,7 @@ use rust_i18n::t;
 pub struct Vm<'a> {
     run_context: Context,
     dynadata: DydataWrap,
-    static_data: &'a libcore::codegen::StaticData,
+    static_data: &'a StaticData,
     imported_modules: Vec<(String, libloading::Library)>,
 }
 
@@ -45,7 +45,7 @@ impl Context {
 pub struct DydataWrap {
     frames_stack: Vec<Frame>,
     dydata: DynaData,
-    imported_func: Vec<libcore::RustlibFunc>,
+    imported_func: Vec<RustlibFunc>,
 }
 
 impl DydataWrap {
@@ -93,33 +93,6 @@ macro_rules! impl_opcode_without_pop_first_data {
         let first = $sself.dynadata.dydata.read_top_data::<$obj_ty>();
         (first, second)
     }};
-}
-
-// macro_rules! impl_store_local_var {
-//     ($ty:path, $pc:expr, $sself:expr) => {{
-//         let data = $sself.dynadata.dydata.pop_data::<$ty>();
-//         let addr = $sself.static_data.inst[$pc].operand.0;
-//         $sself
-//             .dynadata
-//             .frames_stack
-//             .last_mut()
-//             .unwrap()
-//             .set_var(addr, data)
-//     }};
-// }
-
-macro_rules! impl_load_local_var {
-    ($ty:path, $pc:expr, $sself:expr) => {
-        let data = unsafe {
-            $sself
-                .dynadata
-                .frames_stack
-                .last()
-                .unwrap()
-                .get_var::<$ty>($sself.static_data.inst[$pc].operand.0)
-        };
-        $sself.dynadata.dydata.push_data(data);
-    };
 }
 
 impl<'a> Vm<'a> {

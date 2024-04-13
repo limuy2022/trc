@@ -138,12 +138,12 @@ impl FunctionInterface for RustFunction {
         &self.io
     }
 
-    fn get_io_mut(&mut self) -> &mut IOType {
-        &mut self.io
-    }
-
     fn get_name(&self) -> &str {
         &self.name
+    }
+
+    fn get_io_mut(&mut self) -> &mut IOType {
+        &mut self.io
     }
 
     fn get_func_id(&self) -> usize {

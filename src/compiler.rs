@@ -233,7 +233,7 @@ impl StringSource {
 impl Iterator for StringSource {
     type Item = char;
 
-    fn next(&mut self) -> std::option::Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         match self.read() {
             '\0' => None,
             other => Some(other),
@@ -301,7 +301,7 @@ impl FileSource {
 
 impl Iterator for FileSource {
     type Item = char;
-    fn next(&mut self) -> std::option::Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         match self.read() {
             '\0' => None,
             other => Some(other),

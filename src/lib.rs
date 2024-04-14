@@ -53,7 +53,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     match cli.mode {
         Commands::Build { optimize, files } => {
             for i in files {
-                match tools::compile(compiler::CompileOption::new(
+                match tools::build(compiler::CompileOption::new(
                     optimize,
                     compiler::InputSource::File(i),
                 )) {
@@ -65,11 +65,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             }
         }
         Commands::Tshell {} => {
-            tools::tshell::tshell()?;
+            tools::tshell()?;
         }
         Commands::Run { optimize, files } => {
             for i in files {
-                match tools::run::run(compiler::CompileOption::new(
+                match tools::run(compiler::CompileOption::new(
                     optimize,
                     compiler::InputSource::File(i),
                 )) {
@@ -86,7 +86,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             rustcode,
         } => {
             for i in files {
-                match tools::dis::dis(
+                match tools::dis(
                     compiler::CompileOption::new(optimize, compiler::InputSource::File(i)),
                     rustcode,
                 ) {

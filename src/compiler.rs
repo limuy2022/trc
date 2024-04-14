@@ -2,6 +2,7 @@ pub mod ast;
 pub mod linker;
 pub mod llvm_convent;
 pub mod manager;
+pub mod optimizer;
 pub mod scope;
 pub mod token;
 
@@ -25,6 +26,16 @@ use std::{
 pub enum InputSource {
     File(String),
     StringInternal,
+}
+
+impl InputSource {
+    /// 获取文件路径，非文件直接返回main
+    pub fn get_path(&self) -> &str {
+        match *self {
+            InputSource::File(ref filename) => filename,
+            _ => cfg::MAIN_MODULE_NAME,
+        }
+    }
 }
 
 /// 编译器的参数控制
@@ -103,20 +114,8 @@ impl Float {
         Self { front, back, zero }
     }
 
-    fn get_len(mut tmp: i64) -> u8 {
-        if tmp == 0 {
-            return 1;
-        }
-        let mut ret: u8 = 0;
-        while tmp != 0 {
-            tmp /= 10;
-            ret += 1;
-        }
-        ret
-    }
-
     pub fn to_float(&self) -> f64 {
-        let len = Self::get_len(self.back);
+        let len = crate::base::utils::get_bit_num(self.back);
         let mut float_part = self.back as f64;
         for _ in 0..len {
             float_part /= 10.0;
@@ -339,11 +338,22 @@ impl TokenIo for FileSource {
     }
 }
 
-pub struct Compiler {
+pub struct CompilerImpl {
     // to support read from stdin and file
     input: Box<dyn TokenIo<Item = char>>,
     option: CompileOption,
     context: Context,
+}
+
+impl CompilerImpl {
+    #[inline]
+    pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RuntimeResult<T> {
+        Err(RuntimeError::new(Box::new(self.context.clone()), info))
+    }
+}
+
+pub struct Compiler {
+    pub compiler_impl: Rc<RefCell<CompilerImpl>>,
 }
 
 impl Compiler {
@@ -362,9 +372,11 @@ impl Compiler {
                     Ok(file) => file,
                 };
                 Compiler {
-                    input: Box::new(FileSource::new(f)),
-                    option,
-                    context: Context::new(cfg::MAIN_MODULE_NAME),
+                    compiler_impl: Rc::new(RefCell::new(CompilerImpl {
+                        input: Box::new(FileSource::new(f)),
+                        option,
+                        context: Context::new(cfg::MAIN_MODULE_NAME),
+                    })),
                 }
             }
             _ => {
@@ -375,32 +387,43 @@ impl Compiler {
 
     pub fn new_string_compiler(option: CompileOption, source: &str) -> Self {
         Compiler {
-            input: Box::new(StringSource::new(String::from(source))),
-            option,
-            context: Context::new(cfg::MAIN_MODULE_NAME),
+            compiler_impl: Rc::new(RefCell::new(CompilerImpl {
+                input: Box::new(StringSource::new(String::from(source))),
+                option,
+                context: Context::new(cfg::MAIN_MODULE_NAME),
+            })),
         }
     }
 
     pub fn modify_input(&mut self, input: Box<dyn TokenIo<Item = char>>) {
-        self.input = input;
+        self.compiler_impl.borrow_mut().input = input;
     }
 
-    pub fn lex(&mut self) -> RuntimeResult<AstBuilder> {
-        let token_lexer = TokenLex::new(self);
+    pub fn lex(&mut self) -> RuntimeResult<StaticData> {
+        let token_lexer = Rc::new(RefCell::new(TokenLex::new(self.compiler_impl.clone())));
         let env_manager = Rc::new(RefCell::new(ModuleManager::new()));
-        let mut ast_builder = AstBuilder::new(token_lexer, env_manager.clone());
+        let mut ast_builder = AstBuilder::new(
+            token_lexer.clone(),
+            self.compiler_impl.clone(),
+            env_manager.clone(),
+        );
         ast_builder.generate_code()?;
-        Ok(ast_builder)
+        env_manager.borrow_mut().add_module(
+            self.compiler_impl
+                .borrow()
+                .option
+                .inputsource
+                .get_path()
+                .to_string(),
+            ast_builder,
+        );
+
+        // Ok(ast_builder)
+        todo!()
     }
 
     pub fn get_token_lex(&mut self) -> TokenLex {
-        let token_lexer = TokenLex::new(self);
-        token_lexer
-    }
-
-    #[inline]
-    pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RuntimeResult<T> {
-        Err(RuntimeError::new(Box::new(self.context.clone()), info))
+        TokenLex::new(self.compiler_impl.clone())
     }
 }
 

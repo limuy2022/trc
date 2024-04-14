@@ -1,19 +1,21 @@
 //! ast的控制者，总管一个编译过程中的数据
 
+use libcore::StaticData;
+
 use crate::compiler::ast::AstBuilder;
 use std::collections::HashMap;
 
 /// ast manager
-pub struct ModuleManager<'a> {
+pub struct ModuleManager {
     // 储存模块和对应的中间文件的关系
     modules: HashMap<String, String>,
     // 有的模块是本次已经编译过的，在缓存中可以直接找到
-    cache: HashMap<String, AstBuilder<'a>>,
+    cache: HashMap<String, AstBuilder>,
     global_custom_function_id: usize,
     global_extern_function_id: usize,
 }
 
-impl<'a> ModuleManager<'a> {
+impl ModuleManager {
     pub fn new() -> Self {
         Self {
             modules: HashMap::new(),
@@ -23,15 +25,15 @@ impl<'a> ModuleManager<'a> {
         }
     }
 
-    pub fn add_module(&mut self, path: String, module: AstBuilder<'a>) {
-        self.cache.insert(path, module);
+    pub fn add_module(&mut self, path: impl Into<String>, module: AstBuilder) {
+        self.cache.insert(path.into(), module);
     }
 
     pub fn add_specific_module(&mut self, name: String, path: String) {
         self.modules.insert(name, path);
     }
 
-    pub fn get_module(&mut self, name: &str) -> Option<&AstBuilder<'a>> {
+    pub fn get_module(&mut self, name: &str) -> Option<&AstBuilder> {
         todo!()
     }
 
@@ -46,9 +48,17 @@ impl<'a> ModuleManager<'a> {
         self.global_extern_function_id += 1;
         ret
     }
+
+    /// 执行优化
+    pub fn optimize(&mut self) {}
+
+    /// 将所有模块都链接到一起
+    pub fn link(&mut self) -> StaticData {
+        todo!()
+    }
 }
 
-impl<'a> Default for ModuleManager<'a> {
+impl Default for ModuleManager {
     fn default() -> Self {
         Self::new()
     }

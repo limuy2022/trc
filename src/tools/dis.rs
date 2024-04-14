@@ -2,8 +2,8 @@ use libcore::*;
 
 pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult<()> {
     let mut compiler = crate::compiler::Compiler::new(opt);
-    let mut ast = compiler.lex()?;
-    let static_data = ast.prepare_get_static();
+    let mut static_data = compiler.lex()?;
+    // let static_data = ast.prepare_get_static();
     println!("deps modules:");
     for i in &static_data.dll_module_should_loaded {
         println!("{}", i);

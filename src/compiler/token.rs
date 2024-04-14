@@ -1,8 +1,8 @@
 use super::{Compiler, Context, Float, TokenIo, ValuePool};
-use crate::cfg::FLOAT_OVER_FLOW_LIMIT;
+use crate::{cfg::FLOAT_OVER_FLOW_LIMIT, compiler::CompilerImpl};
 use libcore::*;
 use rust_i18n::t;
-use std::{collections::HashMap, fmt::Display, sync::OnceLock};
+use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, sync::OnceLock};
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy)]
 pub enum TokenType {
@@ -261,8 +261,8 @@ impl BraceRecord {
     }
 }
 
-pub struct TokenLex<'code> {
-    pub compiler_data: &'code mut Compiler,
+pub struct TokenLex {
+    compiler_data: Rc<RefCell<CompilerImpl>>,
     braces_check: Vec<BraceRecord>,
     // token和当前行号
     unget_token: Vec<(Token, usize)>,
@@ -281,8 +281,9 @@ macro_rules! check_braces_match {
             $(
                 $front_brace => {
                     if $should_be_matched != $after_brace {
+                        let tmp = &$sself.compiler_data.borrow().context.module_name.clone();
                         return $sself.report_error_with_context(RuntimeError::new(
-                            Box::new(Context::new_line(&$sself.compiler_data.context.module_name, $brace_record.line)),
+                            Box::new(Context::new_line(tmp, $brace_record.line)),
                             ErrorInfo::new(
                                 t!(UNMATCHED_BRACE, "0"=$brace_record.c),
                                 t!(SYNTAX_ERROR),
@@ -335,7 +336,7 @@ enum NumValue {
     FloatVal(Float),
 }
 
-impl<'a> Iterator for TokenLex<'a> {
+impl Iterator for TokenLex {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -352,8 +353,8 @@ impl<'a> Iterator for TokenLex<'a> {
     }
 }
 
-impl<'a> TokenLex<'a> {
-    pub fn new(compiler_data: &'a mut Compiler) -> TokenLex<'a> {
+impl TokenLex {
+    pub fn new(compiler_data: Rc<RefCell<CompilerImpl>>) -> TokenLex {
         TokenLex {
             compiler_data,
             braces_check: Vec::new(),
@@ -385,18 +386,18 @@ impl<'a> TokenLex<'a> {
     }
 
     pub fn modify_input(&mut self, source: Box<dyn TokenIo<Item = char>>) {
-        self.compiler_data.input = source;
+        self.compiler_data.borrow_mut().input = source;
     }
 
     fn lex_id(&mut self, c: char) -> RuntimeResult<Token> {
         Ok({
             let mut retname: String = String::from(c);
             loop {
-                let c = self.compiler_data.input.read();
+                let c = self.compiler_data.borrow_mut().input.read();
                 if Self::is_id_char(c) {
                     retname.push(c);
                 } else {
-                    self.compiler_data.input.unread(c);
+                    self.compiler_data.borrow_mut().input.unread(c);
                     break;
                 }
             }
@@ -463,8 +464,10 @@ impl<'a> TokenLex<'a> {
             '.' => Token::new(TokenType::Dot, None),
             ',' => Token::new(TokenType::Comma, None),
             '{' => {
-                self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
+                self.braces_check.push(BraceRecord::new(
+                    c,
+                    self.compiler_data.borrow().context.get_line(),
+                ));
                 Token::new(TokenType::LeftBigBrace, None)
             }
             '}' => {
@@ -472,8 +475,10 @@ impl<'a> TokenLex<'a> {
                 Token::new(TokenType::RightBigBrace, None)
             }
             '[' => {
-                self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
+                self.braces_check.push(BraceRecord::new(
+                    c,
+                    self.compiler_data.borrow().context.get_line(),
+                ));
                 Token::new(TokenType::LeftMiddleBrace, None)
             }
             ']' => {
@@ -481,8 +486,10 @@ impl<'a> TokenLex<'a> {
                 Token::new(TokenType::RightMiddleBrace, None)
             }
             '(' => {
-                self.braces_check
-                    .push(BraceRecord::new(c, self.compiler_data.context.get_line()));
+                self.braces_check.push(BraceRecord::new(
+                    c,
+                    self.compiler_data.borrow().context.get_line(),
+                ));
                 Token::new(TokenType::LeftSmallBrace, None)
             }
             ')' => {
@@ -491,13 +498,13 @@ impl<'a> TokenLex<'a> {
             }
             '+' => self.self_symbol(TokenType::Add, TokenType::SelfAdd),
             '-' => {
-                let c = self.compiler_data.input.read();
+                let c = self.compiler_data.borrow_mut().input.read();
                 if c == '>' {
                     Token::new(TokenType::Arrow, None)
                 } else if c == '=' {
                     Token::new(TokenType::SelfSub, None)
                 } else {
-                    self.compiler_data.input.unread(c);
+                    self.compiler_data.borrow_mut().input.unread(c);
                     Token::new(TokenType::Sub, None)
                 }
             }
@@ -511,27 +518,27 @@ impl<'a> TokenLex<'a> {
             '%' => self.self_symbol(TokenType::Mod, TokenType::SelfMod),
             '/' => {
                 // 特判注释
-                let c = self.compiler_data.input.read();
+                let c = self.compiler_data.borrow_mut().input.read();
                 if c == '*' {
                     loop {
-                        let c = self.compiler_data.input.read();
+                        let c = self.compiler_data.borrow_mut().input.read();
                         if c == '*' {
-                            let c = self.compiler_data.input.read();
+                            let c = self.compiler_data.borrow_mut().input.read();
                             if c == '/' {
                                 return self.next_token();
                             }
-                            self.compiler_data.input.unread(c);
+                            self.compiler_data.borrow_mut().input.unread(c);
                         } else if c == '\0' {
                             return self.report_error(ErrorInfo::new(
                                 t!(UNCLODED_COMMENT),
                                 t!(SYNTAX_ERROR),
                             ));
                         } else if c == '\n' {
-                            self.compiler_data.context.add_line();
+                            self.compiler_data.borrow_mut().context.add_line();
                         }
                     }
                 }
-                self.compiler_data.input.unread(c);
+                self.compiler_data.borrow_mut().input.unread(c);
                 self.double_symbol(
                     TokenType::Div,
                     TokenType::SelfDiv,
@@ -559,13 +566,13 @@ impl<'a> TokenLex<'a> {
             '~' => Token::new(TokenType::BitNot, None),
             '^' => self.self_symbol(TokenType::Xor, TokenType::SelfXor),
             ':' => {
-                let c = self.compiler_data.input.read();
+                let c = self.compiler_data.borrow_mut().input.read();
                 if c == '=' {
                     Token::new(TokenType::Store, None)
                 } else if c == ':' {
                     Token::new(TokenType::DoubleColon, None)
                 } else {
-                    self.compiler_data.input.unread(c);
+                    self.compiler_data.borrow_mut().input.unread(c);
                     Token::new(TokenType::Colon, None)
                 }
             }
@@ -595,14 +602,14 @@ impl<'a> TokenLex<'a> {
         let mut s = String::from(c);
         let mut presecnt_lex;
         loop {
-            presecnt_lex = self.compiler_data.input.read();
+            presecnt_lex = self.compiler_data.borrow_mut().input.read();
             if presecnt_lex == '_' {
                 continue;
             }
             if presecnt_lex.is_digit(radix) {
                 s.push(presecnt_lex);
             } else {
-                self.compiler_data.input.unread(presecnt_lex);
+                self.compiler_data.borrow_mut().input.unread(presecnt_lex);
                 break;
             }
         }
@@ -614,7 +621,7 @@ impl<'a> TokenLex<'a> {
         let mut radix = 10;
         if c == '0' {
             // check the radix
-            c = self.compiler_data.input.read();
+            c = self.compiler_data.borrow_mut().input.read();
             match c {
                 'x' | 'X' => {
                     radix = 16;
@@ -626,14 +633,14 @@ impl<'a> TokenLex<'a> {
                     radix = 8;
                 }
                 _ => {
-                    self.compiler_data.input.unread(c);
+                    self.compiler_data.borrow_mut().input.unread(c);
                     return Ok(NumValue::Integer(0));
                 }
             }
-            c = self.compiler_data.input.read();
+            c = self.compiler_data.borrow_mut().input.read();
         }
         let intpart = self.lex_num_integer(c, radix).to_string();
-        c = self.compiler_data.input.read();
+        c = self.compiler_data.borrow_mut().input.read();
         if c == '.' {
             // float can be used with prefix
             if radix != 10 {
@@ -646,7 +653,7 @@ impl<'a> TokenLex<'a> {
                 ));
             }
             // float mode
-            c = self.compiler_data.input.read();
+            c = self.compiler_data.borrow_mut().input.read();
             let float_part = self.lex_num_integer(c, radix);
             if float_part.len() + intpart.len() > FLOAT_OVER_FLOW_LIMIT {
                 // overflow
@@ -661,7 +668,7 @@ impl<'a> TokenLex<'a> {
                 Self::cal_zero(&float_part),
             )));
         } else {
-            self.compiler_data.input.unread(c);
+            self.compiler_data.borrow_mut().input.unread(c);
         }
         Ok(NumValue::Integer(
             i64::from_str_radix(&intpart, radix).unwrap(),
@@ -691,15 +698,15 @@ impl<'a> TokenLex<'a> {
 
     fn lex_num(&mut self, mut c: char) -> RuntimeResult<Token> {
         let tmp = self.lex_int_float(c)?;
-        c = self.compiler_data.input.read();
+        c = self.compiler_data.borrow_mut().input.read();
         if c == 'e' || c == 'E' {
-            c = self.compiler_data.input.read();
+            c = self.compiler_data.borrow_mut().input.read();
             let mut up_flag: i64 = 1;
             if c == '+' {
-                c = self.compiler_data.input.read();
+                c = self.compiler_data.borrow_mut().input.read();
             } else if c == '-' {
                 up_flag = -1;
-                c = self.compiler_data.input.read();
+                c = self.compiler_data.borrow_mut().input.read();
             }
             let mut up: i64 = self.lex_num_integer(c, 10).parse().unwrap();
             up *= up_flag;
@@ -779,17 +786,17 @@ impl<'a> TokenLex<'a> {
                 }
             }
         } else {
-            self.compiler_data.input.unread(c);
+            self.compiler_data.borrow_mut().input.unread(c);
             Ok(self.turn_to_token(tmp))
         }
     }
 
     fn lex_str(&mut self) -> RuntimeResult<Token> {
         let mut s = String::new();
-        let mut c = self.compiler_data.input.read();
+        let mut c = self.compiler_data.borrow_mut().input.read();
         while c != '"' {
             if c == '\\' {
-                c = self.compiler_data.input.read();
+                c = self.compiler_data.borrow_mut().input.read();
                 c = match c {
                     't' => '\t',
                     'n' => '\n',
@@ -804,7 +811,7 @@ impl<'a> TokenLex<'a> {
                 }
             }
             s.push(c);
-            c = self.compiler_data.input.read();
+            c = self.compiler_data.borrow_mut().input.read();
             if c == '\0' {
                 return self.report_error(ErrorInfo::new(t!(STRING_WITHOUT_END), t!(SYNTAX_ERROR)));
             }
@@ -816,8 +823,8 @@ impl<'a> TokenLex<'a> {
     }
 
     fn lex_char(&mut self) -> RuntimeResult<Token> {
-        let c = self.compiler_data.input.read();
-        let end = self.compiler_data.input.read();
+        let c = self.compiler_data.borrow_mut().input.read();
+        let end = self.compiler_data.borrow_mut().input.read();
         if end != '\'' {
             return self.report_error(ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)));
         }
@@ -826,7 +833,7 @@ impl<'a> TokenLex<'a> {
 
     fn report_error<T>(&mut self, e: ErrorInfo) -> Result<T, RuntimeError> {
         self.clear_error();
-        self.compiler_data.report_compiler_error(e)
+        self.compiler_data.borrow().report_compiler_error(e)
     }
 
     fn report_error_with_context<T>(&mut self, e: RuntimeError) -> Result<T, RuntimeError> {
@@ -842,10 +849,10 @@ impl<'a> TokenLex<'a> {
     pub fn next_token(&mut self) -> RuntimeResult<Token> {
         if !self.unget_token.is_empty() {
             let tmp = self.unget_token.pop().unwrap();
-            self.compiler_data.context.set_line(tmp.1);
+            self.compiler_data.borrow_mut().context.set_line(tmp.1);
             return Ok(tmp.0);
         }
-        let presecnt_lex = self.compiler_data.input.read();
+        let presecnt_lex = self.compiler_data.borrow_mut().input.read();
         match presecnt_lex {
             '\0' => {
                 return Ok(Token::new(TokenType::EndOfFile, None));
@@ -854,15 +861,15 @@ impl<'a> TokenLex<'a> {
                 return self.next_token();
             }
             '\n' => {
-                self.compiler_data.context.add_line();
+                self.compiler_data.borrow_mut().context.add_line();
                 return self.next_token();
             }
             '#' => {
                 // 注释
                 loop {
-                    let c = self.compiler_data.input.read();
+                    let c = self.compiler_data.borrow_mut().input.read();
                     if c == '\n' {
-                        self.compiler_data.context.add_line();
+                        self.compiler_data.borrow_mut().context.add_line();
                         return self.next_token();
                     }
                     if c == '\0' {
@@ -889,23 +896,21 @@ impl<'a> TokenLex<'a> {
 
     pub fn next_back(&mut self, t: Token) {
         self.unget_token
-            .push((t, self.compiler_data.context.get_line()));
+            .push((t, self.compiler_data.borrow().context.get_line()));
     }
 
     /// 回退并重新设置行号
     pub fn next_back_with_line(&mut self, t: Token, line_num: usize) {
         self.next_back(t);
-        self.compiler_data.context.set_line(line_num);
+        self.compiler_data.borrow_mut().context.set_line(line_num);
     }
 
     pub fn check(&mut self) -> Result<(), RuntimeError> {
         if !self.braces_check.is_empty() {
             let unmatch_char = self.braces_check.pop().unwrap();
+            let tmp = self.compiler_data.borrow_mut().context.module_name.clone();
             return self.report_error_with_context(RuntimeError::new(
-                Box::new(Context::new_line(
-                    &self.compiler_data.context.module_name,
-                    unmatch_char.line,
-                )),
+                Box::new(Context::new_line(&(tmp), unmatch_char.line)),
                 ErrorInfo::new(t!(UNMATCHED_BRACE, "0" = unmatch_char.c), t!(SYNTAX_ERROR)),
             ));
         }
@@ -913,11 +918,11 @@ impl<'a> TokenLex<'a> {
     }
 
     fn binary_symbol(&mut self, a: TokenType, b: TokenType, binary_sym: char) -> Token {
-        let c = self.compiler_data.input.read();
+        let c = self.compiler_data.borrow_mut().input.read();
         if c == binary_sym {
             Token::new(b, None)
         } else {
-            self.compiler_data.input.unread(c);
+            self.compiler_data.borrow_mut().input.unread(c);
             Token::new(a, None)
         }
     }
@@ -934,11 +939,11 @@ impl<'a> TokenLex<'a> {
         matched_self_sym: TokenType,
         matched_char: char,
     ) -> Token {
-        let c = self.compiler_data.input.read();
+        let c = self.compiler_data.borrow_mut().input.read();
         if c == matched_char {
             self.self_symbol(matched_sym, matched_self_sym)
         } else {
-            self.compiler_data.input.unread(c);
+            self.compiler_data.borrow_mut().input.unread(c);
             self.self_symbol(before_sym, before_self_sym)
         }
     }
@@ -954,11 +959,11 @@ mod tests {
 
     macro_rules! gen_test_token_env {
         ($test_string:expr, $env_name:ident) => {
-            let mut env = Compiler::new_string_compiler(
+            let env = Compiler::new_string_compiler(
                 CompileOption::new(false, InputSource::StringInternal),
                 $test_string,
             );
-            let mut $env_name = TokenLex::new(&mut env);
+            let mut $env_name = TokenLex::new(env.compiler_impl.clone());
         };
     }
 

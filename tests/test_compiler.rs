@@ -7,14 +7,20 @@ macro_rules! gen_test_env {
     ($test_code:expr, $env_name:ident) => {
         use trc::compiler::CompileOption;
         use trc::compiler::InputSource;
-        let mut compiler = Compiler::new_string_compiler(
+        let compiler = Compiler::new_string_compiler(
             CompileOption::new(false, InputSource::StringInternal),
             $test_code,
         );
         use std::{cell::RefCell, rc::Rc};
         let env_tmp = Rc::new(RefCell::new(trc::compiler::ModuleManager::new()));
-        let token_lexer = trc::compiler::token::TokenLex::new(&mut compiler);
-        let mut $env_name = trc::compiler::ast::AstBuilder::new(token_lexer, env_tmp);
+        let token_lexer = Rc::new(RefCell::new(trc::compiler::token::TokenLex::new(
+            compiler.compiler_impl.clone(),
+        )));
+        let mut $env_name = trc::compiler::ast::AstBuilder::new(
+            token_lexer,
+            compiler.compiler_impl.clone(),
+            env_tmp,
+        );
     };
 }
 
@@ -26,6 +32,7 @@ fn get_offset(int_nums: usize) -> usize {
 fn get_func_id(scope: &mut AstBuilder, name: &str) -> usize {
     let idstr = scope
         .token_lexer
+        .borrow()
         .const_pool
         .get_id(&name.to_string())
         .unwrap();

@@ -7,7 +7,7 @@ use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
 
-impl<'a> AstBuilder<'a> {
+impl AstBuilder {
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
         self.staticdata.function_split = None;
@@ -69,7 +69,7 @@ impl<'a> AstBuilder<'a> {
     pub fn get_type_id(&self, ty_name: &str) -> Option<usize> {
         self.self_scope
             .borrow()
-            .get_type_id_by_token(self.token_lexer.const_pool.name_pool[ty_name])
+            .get_type_id_by_token(self.token_lexer.borrow_mut().const_pool.name_pool[ty_name])
     }
 
     pub fn get_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
@@ -84,7 +84,7 @@ impl<'a> AstBuilder<'a> {
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.const_pool.id_name[t.data.unwrap()]
+                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[t.data.unwrap()]
                     ),
                     t!(TYPE_ERROR),
                 ),
@@ -95,7 +95,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn gen_error<T>(&self, e: ErrorInfo) -> AstError<T> {
-        self.token_lexer.compiler_data.report_compiler_error(e)
+        self.compiler_data.borrow().report_compiler_error(e)
     }
 
     pub fn gen_unexpected_token_token<T>(&mut self, unexpcted: TokenType) -> AstError<T> {
@@ -106,9 +106,9 @@ impl<'a> AstBuilder<'a> {
     }
 
     pub fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
-        let t = self.token_lexer.next_token()?;
+        let t = self.token_lexer.borrow_mut().next_token()?;
         if t.tp != ty {
-            self.token_lexer.next_back(t.clone());
+            self.token_lexer.borrow_mut().next_back(t.clone());
             self.gen_unexpected_token_token(t.tp)?;
         }
         Ok(t)
@@ -122,11 +122,11 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn gen_line_table(&mut self) {
-        if !self.token_lexer.compiler_data.option.optimize {
+        if !self.compiler_data.borrow().option.optimize {
             // 不生成行号表了
             self.staticdata
                 .line_table
-                .push(self.token_lexer.compiler_data.context.get_line())
+                .push(self.compiler_data.borrow().context.get_line())
         }
     }
 
@@ -170,10 +170,10 @@ impl<'a> AstBuilder<'a> {
 
     pub fn import_module_sym(&mut self, lib: &Module) {
         for i in lib.functions() {
-            self.token_lexer.const_pool.add_id(i.0.clone());
+            self.token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
         }
         for i in lib.classes() {
-            self.token_lexer.const_pool.add_id(i.0.clone());
+            self.token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
         }
     }
 
@@ -183,7 +183,7 @@ impl<'a> AstBuilder<'a> {
             None => self.gen_error(ErrorInfo::new(
                 t!(
                     SYMBOL_REDEFINED,
-                    "0" = self.token_lexer.const_pool.id_name[name]
+                    "0" = self.token_lexer.borrow_mut().const_pool.id_name[name]
                 ),
                 t!(SYMBOL_ERROR),
             ))?,
@@ -213,5 +213,9 @@ impl<'a> AstBuilder<'a> {
 
     pub fn alloc_extern_function_id(&mut self) -> FuncIdxTy {
         self.module_manager.borrow_mut().alloc_extern_function_id()
+    }
+
+    pub fn next_token(&mut self) -> RuntimeResult<Token> {
+        self.token_lexer.borrow_mut().next_token()
     }
 }

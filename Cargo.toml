@@ -19,8 +19,6 @@ num-bigint = "0.4"
 # llvm-sys = "170.0.1"
 derive = { path = "./derive" }
 libloading = "0.8"
-# stdlib = { path = "./stdlib" }
-rust-i18n = "3.0"
 sys-locale = "0.3"
 rustyline = { version = "14.0", features = ["with-file-history"] }
 suffix_array = "0.5.0"
@@ -30,6 +28,7 @@ libcore = { path = "./libcore" }
 collection_literals = "1"
 thiserror = "1"
 dirs = "5"
+rust-i18n = "3.0.1"
 
 [build-dependencies]
 shadow-rs = "0"

@@ -8,7 +8,7 @@ use super::{
 };
 use crate::{
     base::dll::load_module_storage,
-    compiler::{manager::ModuleManager, token::TokenType::RightBigBrace},
+    compiler::{manager::ModuleManager, token::TokenType::RightBigBrace, CompilerImpl},
 };
 use collection_literals::collection;
 use libcore::*;
@@ -32,8 +32,8 @@ impl Cache {
     }
 }
 
-pub struct AstBuilder<'a> {
-    pub token_lexer: TokenLex<'a>,
+pub struct AstBuilder {
+    pub token_lexer: Rc<RefCell<TokenLex>>,
     pub staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
     process_info: lexprocess::LexProcess,
@@ -42,7 +42,8 @@ pub struct AstBuilder<'a> {
     first_func: bool,
     modules_dll_dup: HashSet<String>,
     modules_dll: Vec<String>,
-    module_manager: Rc<RefCell<ModuleManager<'a>>>,
+    module_manager: Rc<RefCell<ModuleManager>>,
+    compiler_data: Rc<RefCell<CompilerImpl>>,
 }
 
 type AstError<T> = RuntimeResult<T>;
@@ -50,7 +51,7 @@ type AstError<T> = RuntimeResult<T>;
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
         fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<()> {
-            let next_sym = self.token_lexer.next_token()?;
+            let next_sym = self.token_lexer.borrow_mut().next_token()?;
             match next_sym.tp {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
@@ -91,7 +92,7 @@ macro_rules! tmp_expe_function_gen {
                     }
                 })*
                 _ => {
-                    self.token_lexer.next_back(next_sym);
+                    self.token_lexer.borrow_mut().next_back(next_sym);
                 }
             }
             Ok(())
@@ -116,10 +117,11 @@ macro_rules! expr_gen {
     };
 }
 
-impl<'a> AstBuilder<'a> {
+impl AstBuilder {
     pub fn new(
-        mut token_lexer: TokenLex<'a>,
-        module_manager: Rc<RefCell<ModuleManager<'a>>>,
+        token_lexer: Rc<RefCell<TokenLex>>,
+        compiler_data: Rc<RefCell<CompilerImpl>>,
+        module_manager: Rc<RefCell<ModuleManager>>,
     ) -> Self {
         let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
         let stdlib_dll_name = libloading::library_filename("stdlib");
@@ -128,24 +130,28 @@ impl<'a> AstBuilder<'a> {
         let (stdlib, stdstorage) = load_module_storage(&stdlib_dll);
         let prelude = stdlib.sub_modules().get("prelude").unwrap();
         for i in prelude.functions() {
-            token_lexer.const_pool.add_id(i.0.clone());
+            token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
         }
         for i in prelude.classes() {
-            token_lexer.const_pool.add_id(i.0.clone());
+            token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
         }
         // 为root scope添加prelude
-        let _optimize = token_lexer.compiler_data.option.optimize;
+        let _optimize = compiler_data.borrow_mut().option.optimize;
         root_scope
             .borrow_mut()
-            .import_native_module(prelude, stdstorage, &token_lexer.const_pool, || {
-                module_manager.borrow_mut().alloc_extern_function_id()
-            })
+            .import_native_module(
+                prelude,
+                stdstorage,
+                &token_lexer.borrow_mut().const_pool,
+                || module_manager.borrow_mut().alloc_extern_function_id(),
+            )
             .expect("Import prelude but failed");
         root_scope
             .borrow_mut()
             .add_imported_native_dll("std".to_string(), Rc::new(stdlib_dll));
         let mut cache = Cache::new();
-        let val_pool_ref = &token_lexer.const_pool;
+        let tmp = token_lexer.clone();
+        let val_pool_ref = &tmp.borrow_mut().const_pool;
         cache.intty_id = root_scope
             .borrow()
             .get_type_id_by_token(val_pool_ref.name_pool[INT])
@@ -170,6 +176,7 @@ impl<'a> AstBuilder<'a> {
         //     "{} {} {} {} {}",
         //     cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
         // );
+        drop(val_pool_ref);
         let name_str = stdlib_dll_name.to_str().unwrap().to_owned();
         AstBuilder {
             token_lexer,
@@ -181,6 +188,7 @@ impl<'a> AstBuilder<'a> {
             modules_dll_dup: collection! {name_str.clone()},
             modules_dll: vec![name_str.clone()],
             module_manager,
+            compiler_data,
         }
     }
 
@@ -220,7 +228,7 @@ impl<'a> AstBuilder<'a> {
     expr_gen!(expr, expr_, expr1, TokenType::Or);
 
     pub fn prepare_get_static(&mut self) -> &StaticData {
-        self.staticdata.constpool = self.token_lexer.const_pool.store_val_to_vm();
+        self.staticdata.constpool = self.token_lexer.borrow_mut().const_pool.store_val_to_vm();
         self.staticdata.dll_module_should_loaded.clear();
         swap(
             &mut self.staticdata.dll_module_should_loaded,
@@ -289,13 +297,13 @@ impl<'a> AstBuilder<'a> {
         // action
         let mut token_save = vec![];
         loop {
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == TokenType::LeftBigBrace {
                 break;
             }
             if t.tp == TokenType::EndOfFile {
-                self.token_lexer
-                    .compiler_data
+                self.compiler_data
+                    .borrow_mut()
                     .report_compiler_error(ErrorInfo::new(
                         t!(UNEXPECTED_TOKEN, "0" = t.tp),
                         t!(SYNTAX_ERROR),
@@ -312,7 +320,7 @@ impl<'a> AstBuilder<'a> {
         // 将先前储存的循环控制语句恢复
         token_save.reverse();
         for i in token_save {
-            self.token_lexer.next_back(i);
+            self.token_lexer.borrow_mut().next_back(i);
         }
         let opcode_goto = self.staticdata.get_next_opcode_id();
         // 解析循环控制语句
@@ -347,7 +355,11 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn add_var_params_bycode(&mut self, var_params_num: usize) {
-        let tmp = self.token_lexer.const_pool.add_int(var_params_num as i64);
+        let tmp = self
+            .token_lexer
+            .borrow_mut()
+            .const_pool
+            .add_int(var_params_num as i64);
         self.add_bycode(Opcode::LoadInt, tmp);
     }
 
@@ -357,18 +369,18 @@ impl<'a> AstBuilder<'a> {
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();
         loop {
-            let nextt = self.token_lexer.next_token()?;
+            let nextt = self.next_token()?;
             match nextt.tp {
                 TokenType::RightSmallBrace => {
                     if io_tmp.var_params {
                         self.add_var_params_bycode(var_params_num);
                     }
-                    self.token_lexer.next_back(nextt);
+                    self.token_lexer.borrow_mut().next_back(nextt);
                     return Ok(ret);
                 }
                 TokenType::Comma => {}
                 _ => {
-                    self.token_lexer.next_back(nextt);
+                    self.token_lexer.borrow_mut().next_back(nextt);
                 }
             }
             self.expr(false)?;
@@ -426,7 +438,7 @@ impl<'a> AstBuilder<'a> {
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.const_pool.id_name[name_token]
+                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[name_token]
                     ),
                     t!(SYMBOL_ERROR),
                 ),
@@ -441,7 +453,7 @@ impl<'a> AstBuilder<'a> {
 
     /// 解析函数，变量等的读取
     fn val(&mut self, istry: bool) -> AstError<()> {
-        let t = self.token_lexer.next_token()?;
+        let t = self.next_token()?;
         if t.tp == TokenType::ID {
             let token_data = t.data.unwrap();
             let idx = self.self_scope.borrow().get_sym(token_data);
@@ -451,14 +463,14 @@ impl<'a> AstBuilder<'a> {
                     ErrorInfo::new(
                         t!(
                             SYMBOL_NOT_FOUND,
-                            "0" = self.token_lexer.const_pool.id_name[token_data]
+                            "0" = self.token_lexer.borrow_mut().const_pool.id_name[token_data]
                         ),
                         t!(SYMBOL_ERROR),
                     ),
                 )?
             }
             let idx = idx.unwrap();
-            let nxt = self.token_lexer.next_token()?;
+            let nxt = self.next_token()?;
             match nxt.tp {
                 TokenType::LeftSmallBrace => {
                     let func_obj = self.self_scope.borrow().get_function(idx).unwrap();
@@ -500,7 +512,8 @@ impl<'a> AstBuilder<'a> {
                             ErrorInfo::new(
                                 t!(
                                     SYMBOL_NOT_FOUND,
-                                    "0" = self.token_lexer.const_pool.id_name[token_data]
+                                    "0" = self.token_lexer.borrow_mut().const_pool.id_name
+                                        [token_data]
                                 ),
                                 t!(SYMBOL_ERROR),
                             ),
@@ -523,10 +536,10 @@ impl<'a> AstBuilder<'a> {
                 }
                 _ => {}
             }
-            self.token_lexer.next_back(nxt);
+            self.token_lexer.borrow_mut().next_back(nxt);
             self.load_var(idx, token_data, istry)?;
         } else {
-            self.token_lexer.next_back(t.clone());
+            self.token_lexer.borrow_mut().next_back(t.clone());
             self.try_err(
                 istry,
                 ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
@@ -536,7 +549,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn item(&mut self, istry: bool) -> AstError<()> {
-        let t = self.token_lexer.next_token()?;
+        let t = self.next_token()?;
         match t.tp {
             TokenType::IntValue => {
                 self.add_bycode(Opcode::LoadInt, t.data.unwrap());
@@ -559,7 +572,7 @@ impl<'a> AstBuilder<'a> {
                 self.process_info.new_type(self.cache.boolty_id);
             }
             _ => {
-                self.token_lexer.next_back(t.clone());
+                self.token_lexer.borrow_mut().next_back(t.clone());
                 self.val(istry)?
             }
         }
@@ -603,7 +616,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn factor(&mut self, istry: bool) -> AstError<()> {
-        let next_token = self.token_lexer.next_token()?;
+        let next_token = self.next_token()?;
         match next_token.tp {
             TokenType::Sub => {
                 self.factor(istry)?;
@@ -625,7 +638,7 @@ impl<'a> AstBuilder<'a> {
                 self.get_token_checked(TokenType::RightSmallBrace)?;
             }
             _ => {
-                self.token_lexer.next_back(next_token);
+                self.token_lexer.borrow_mut().next_back(next_token);
                 self.item(istry)?;
             }
         }
@@ -643,15 +656,17 @@ impl<'a> AstBuilder<'a> {
         let mut jump_into_case = vec![];
         loop {
             // 处理通配符
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == TokenType::ID
-                && self.token_lexer.const_pool.id_name[unsafe { t.data.unwrap_unchecked() }] == "_"
+                && self.token_lexer.borrow_mut().const_pool.id_name
+                    [unsafe { t.data.unwrap_unchecked() }]
+                    == "_"
             {
                 is_end = true;
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
                 jump_into_case.push(self.staticdata.get_last_opcode_id());
             } else {
-                self.token_lexer.next_back(t);
+                self.token_lexer.borrow_mut().next_back(t);
                 self.factor(false)?;
                 match self.process_info.pop_last_ty() {
                     None => {
@@ -669,7 +684,7 @@ impl<'a> AstBuilder<'a> {
                 self.add_bycode(Opcode::JumpIfTrue, ARG_WRONG);
                 jump_into_case.push(self.staticdata.get_last_opcode_id());
             }
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == TokenType::BitOr {
             } else if t.tp == TokenType::Arrow {
                 break;
@@ -708,14 +723,14 @@ impl<'a> AstBuilder<'a> {
                         self.staticdata.inst[*i].operand.0 = t;
                     }
                     jump_condit_save.clear();
-                    let t = self.token_lexer.next_token()?;
+                    let t = self.next_token()?;
                     if t.tp == RightBigBrace {
                         break;
                     }
                     if end {
                         break;
                     }
-                    self.token_lexer.next_back(t);
+                    self.token_lexer.borrow_mut().next_back(t);
                     end = self.lex_case(
                         v,
                         |line_num| jump_condit_save.push(line_num),
@@ -738,12 +753,12 @@ impl<'a> AstBuilder<'a> {
         let mut argname: ArgsNameTy = vec![];
         let mut ty_list: Vec<TyIdxTy> = vec![];
         loop {
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == TokenType::RightSmallBrace {
                 break;
             }
             if t.tp != TokenType::Comma {
-                self.token_lexer.next_back(t);
+                self.token_lexer.borrow_mut().next_back(t);
             }
             let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
             argname.push(name_id);
@@ -760,8 +775,8 @@ impl<'a> AstBuilder<'a> {
         let mut function_body = vec![];
         let mut cnt = 1;
         loop {
-            let t = self.token_lexer.next_token()?;
-            function_body.push((t.clone(), self.token_lexer.compiler_data.context.get_line()));
+            let t = self.next_token()?;
+            function_body.push((t.clone(), self.compiler_data.borrow().context.get_line()));
             if t.tp == RightBigBrace {
                 cnt -= 1;
                 if cnt == 0 {
@@ -779,7 +794,7 @@ impl<'a> AstBuilder<'a> {
             CustomFunction::new(
                 io,
                 argname,
-                self.token_lexer.const_pool.id_name[funcname].clone(),
+                self.token_lexer.borrow_mut().const_pool.id_name[funcname].clone(),
             ),
             function_body,
         );
@@ -788,18 +803,18 @@ impl<'a> AstBuilder<'a> {
 
     fn lex_class_item_loop(&mut self, class_obj: &mut CustomType) -> AstError<()> {
         loop {
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == RightBigBrace {
                 break;
             }
-            self.token_lexer.next_back(t);
+            self.token_lexer.borrow_mut().next_back(t);
             self.lex_class_item(class_obj)?;
         }
         Ok(())
     }
 
     fn lex_class_item(&mut self, class_obj: &mut CustomType) -> AstError<()> {
-        let t = self.token_lexer.next_token()?;
+        let t = self.next_token()?;
         match t.tp {
             TokenType::Var => {
                 // 声明属性
@@ -838,8 +853,10 @@ impl<'a> AstBuilder<'a> {
         self.self_scope.borrow_mut().in_class = true;
         let name = self.get_token_checked(TokenType::ID)?.data.unwrap();
         let name_id = self.insert_sym_with_error(name)?;
-        let mut class_obj =
-            CustomType::new(name_id, self.token_lexer.const_pool.id_name[name].clone());
+        let mut class_obj = CustomType::new(
+            name_id,
+            self.token_lexer.borrow_mut().const_pool.id_name[name].clone(),
+        );
         self.get_token_checked(TokenType::LeftBigBrace)?;
         self.lex_class_item_loop(&mut class_obj)?;
         // 将作用域中剩下的函数加入作用域
@@ -858,7 +875,7 @@ impl<'a> AstBuilder<'a> {
             .data
             .unwrap();
         // import的路径
-        let mut path_with_dot = self.token_lexer.const_pool.id_str[tok].clone();
+        let mut path_with_dot = self.token_lexer.borrow_mut().const_pool.id_str[tok].clone();
         // 具体文件的路径
         let mut import_file_path = String::new();
         let mut is_dll = false;
@@ -868,7 +885,9 @@ impl<'a> AstBuilder<'a> {
             is_dll = true;
         } else {
             // 判断是dll还是普通模块
-            match self.token_lexer.compiler_data.option.inputsource.clone() {
+            let tmp0 = self.compiler_data.clone();
+            let tmp = tmp0.borrow();
+            match tmp.option.inputsource.clone() {
                 InputSource::File(now_module_path) => {
                     let path = PathBuf::from(path_with_dot.replace('.', "/"));
                     let mut now_module_path = PathBuf::from(now_module_path);
@@ -956,8 +975,10 @@ impl<'a> AstBuilder<'a> {
                         }
                         Some(func_item) => {
                             let func_item = now.functions()[func_item].1.clone();
-                            let token_idx: ConstPoolIndexTy =
-                                self.token_lexer.add_id_token(func_item.get_name());
+                            let token_idx: ConstPoolIndexTy = self
+                                .token_lexer
+                                .borrow_mut()
+                                .add_id_token(func_item.get_name());
                             // println!("{}", func_item.get_name());
                             let func_id = self.insert_sym_with_error(token_idx)?;
                             let func_extern_id = self.alloc_extern_function_id();
@@ -970,7 +991,10 @@ impl<'a> AstBuilder<'a> {
                     }
                 }
                 Some(module) => {
-                    let tmp = self.token_lexer.add_id_token(&import_item_name);
+                    let tmp = self
+                        .token_lexer
+                        .borrow_mut()
+                        .add_id_token(&import_item_name);
                     let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(module);
                     let sub_module = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(
@@ -982,7 +1006,7 @@ impl<'a> AstBuilder<'a> {
                     if let Err(e) = sub_module.borrow_mut().import_native_module(
                         module,
                         lib_storage,
-                        &self.token_lexer.const_pool,
+                        &self.token_lexer.borrow_mut().const_pool,
                         || self.module_manager.borrow_mut().alloc_extern_function_id(),
                     ) {
                         return self.try_err(istry, e);
@@ -1044,7 +1068,7 @@ impl<'a> AstBuilder<'a> {
                 return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.const_pool.id_name[name]
+                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[name]
                     ),
                     t!(SYMBOL_ERROR),
                 ))
@@ -1059,11 +1083,11 @@ impl<'a> AstBuilder<'a> {
 
     fn lex_until(&mut self, end_state: TokenType) -> AstError<()> {
         loop {
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == end_state {
                 break;
             }
-            self.token_lexer.next_back(t);
+            self.token_lexer.borrow_mut().next_back(t);
             self.statement()?;
         }
         Ok(())
@@ -1097,22 +1121,22 @@ impl<'a> AstBuilder<'a> {
             self.staticdata.inst[op_idx].operand.0 = self.staticdata.get_next_opcode_id();
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == TokenType::Else {
-                let nxt_tok = self.token_lexer.next_token()?;
+                let nxt_tok = self.next_token()?;
                 if nxt_tok.tp == TokenType::If {
                     self.lex_condit()?;
                     self.get_token_checked(TokenType::LeftBigBrace)?;
                     continue;
                 }
-                self.token_lexer.next_back(nxt_tok);
+                self.token_lexer.borrow_mut().next_back(nxt_tok);
                 self.get_token_checked(TokenType::LeftBigBrace)?;
                 self.lex_until(RightBigBrace)?;
                 break;
             }
             save_jump_opcode_idx.pop();
             self.del_opcode().unwrap();
-            self.token_lexer.next_back(t);
+            self.token_lexer.borrow_mut().next_back(t);
             break;
         }
         for i in save_jump_opcode_idx {
@@ -1122,7 +1146,7 @@ impl<'a> AstBuilder<'a> {
     }
 
     fn statement(&mut self) -> RuntimeResult<()> {
-        let t = self.token_lexer.next_token()?;
+        let t = self.next_token()?;
         match t.tp {
             TokenType::Continue => {
                 if !self.self_scope.borrow().in_loop {
@@ -1219,7 +1243,7 @@ impl<'a> AstBuilder<'a> {
             }
             TokenType::ID => {
                 let name = t.data.unwrap();
-                let tt = self.token_lexer.next_token()?;
+                let tt = self.next_token()?;
                 match tt.tp {
                     TokenType::Assign => {
                         self.assign_var(name)?;
@@ -1237,13 +1261,13 @@ impl<'a> AstBuilder<'a> {
                     TokenType::SelfOr => {}
                     TokenType::SelfAnd => {}
                     _ => {
-                        self.token_lexer.next_back(tt);
+                        self.token_lexer.borrow_mut().next_back(tt);
                     }
                 }
             }
             _ => {}
         }
-        self.token_lexer.next_back(t);
+        self.token_lexer.borrow_mut().next_back(t);
         self.expr(false)?;
         self.process_info.clear();
         Ok(())
@@ -1282,14 +1306,16 @@ impl<'a> AstBuilder<'a> {
         }
         // 回退函数体
         for i in body.iter().rev() {
-            self.token_lexer.next_back_with_line(i.0.clone(), i.1);
+            self.token_lexer
+                .borrow_mut()
+                .next_back_with_line(i.0.clone(), i.1);
         }
         loop {
-            let t = self.token_lexer.next_token()?;
+            let t = self.next_token()?;
             if t.tp == RightBigBrace {
                 break;
             }
-            self.token_lexer.next_back(t);
+            self.token_lexer.borrow_mut().next_back(t);
             self.statement()?;
         }
         if !self.staticdata.inst.is_empty()

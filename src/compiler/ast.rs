@@ -1335,7 +1335,7 @@ impl AstBuilder {
         for i in tmp {
             let (code_begin, var_mem_sz) = self.lex_function(i.0, &i.1)?;
             self.staticdata
-                .funcs
+                .funcs_pos
                 .push(FuncStorage::new(code_begin, var_mem_sz))
         }
         Ok(())

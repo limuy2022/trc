@@ -5,7 +5,7 @@ pub mod tools;
 pub mod tvm;
 
 use clap::{Parser, Subcommand};
-use std::error::Error;
+use std::{error::Error, path::PathBuf};
 
 rust_i18n::i18n!("locales");
 #[derive(Debug, Parser)]
@@ -55,7 +55,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             for i in files {
                 match tools::build(compiler::CompileOption::new(
                     optimize,
-                    compiler::InputSource::File(i),
+                    compiler::InputSource::File(PathBuf::from(i)),
                 )) {
                     Ok(_) => {}
                     Err(c) => {
@@ -71,7 +71,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             for i in files {
                 match tools::run(compiler::CompileOption::new(
                     optimize,
-                    compiler::InputSource::File(i),
+                    compiler::InputSource::File(PathBuf::from(i)),
                 )) {
                     Ok(_) => {}
                     Err(c) => {
@@ -87,7 +87,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         } => {
             for i in files {
                 match tools::dis(
-                    compiler::CompileOption::new(optimize, compiler::InputSource::File(i)),
+                    compiler::CompileOption::new(
+                        optimize,
+                        compiler::InputSource::File(PathBuf::from(i)),
+                    ),
                     rustcode,
                 ) {
                     Ok(_) => {}

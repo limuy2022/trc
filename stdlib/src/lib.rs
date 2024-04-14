@@ -10,7 +10,7 @@ pub mod math;
 pub mod prelude;
 pub mod sys;
 
-rust_i18n::i18n!("locales");
+rust_i18n::i18n!("../locales");
 
 #[trc_class]
 struct TrcAny {}

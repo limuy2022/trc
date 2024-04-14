@@ -3,6 +3,7 @@ welcome = "欢迎使用tshell。输入help()获取更多信息"
 
 [common]
 cannot_open_file = "无法打开文件%{filename}"
+cannot_create_build_dir = "无法创建构建目录"
 
 [compiler]
 NumberOverFlowError = "数值溢出错误"

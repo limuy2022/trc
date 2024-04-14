@@ -16,6 +16,7 @@ use std::{
     fmt::Display,
     fs,
     io::{self, BufRead},
+    path::PathBuf,
     process::exit,
     rc::Rc,
     vec,
@@ -24,7 +25,7 @@ use std::{
 #[derive(Debug, Clone)]
 /// 不同的输入源
 pub enum InputSource {
-    File(String),
+    File(PathBuf),
     StringInternal,
 }
 
@@ -32,7 +33,7 @@ impl InputSource {
     /// 获取文件路径，非文件直接返回main
     pub fn get_path(&self) -> &str {
         match *self {
-            InputSource::File(ref filename) => filename,
+            InputSource::File(ref filename) => filename.to_str().unwrap(),
             _ => cfg::MAIN_MODULE_NAME,
         }
     }
@@ -364,13 +365,21 @@ impl Compiler {
                     Err(e) => {
                         eprintln!(
                             "{}:{}",
-                            t!("common.cannot_open_file", filename = filename),
+                            t!(
+                                "common.cannot_open_file",
+                                filename = filename.to_str().unwrap()
+                            ),
                             e
                         );
                         exit(1);
                     }
                     Ok(file) => file,
                 };
+                // 新建build文件夹
+                if std::fs::create_dir_all(cfg::BUILD_DIR_NAME).is_err() {
+                    eprintln!("{}", t!("common.cannot_create_build_dir"));
+                    exit(1);
+                }
                 Compiler {
                     compiler_impl: Rc::new(RefCell::new(CompilerImpl {
                         input: Box::new(FileSource::new(f)),
@@ -417,7 +426,10 @@ impl Compiler {
                 .to_string(),
             ast_builder,
         );
-
+        if self.compiler_impl.borrow().option.optimize {
+            env_manager.borrow_mut().optimize();
+        }
+        env_manager.borrow_mut().link();
         // Ok(ast_builder)
         todo!()
     }

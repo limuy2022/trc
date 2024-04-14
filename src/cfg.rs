@@ -6,6 +6,7 @@ use std::{path::PathBuf, sync::OnceLock};
 pub const MAIN_MODULE_NAME: &str = "main";
 pub const FLOAT_OVER_FLOW_LIMIT: usize = 18;
 pub const VERSION: &str = build::PKG_VERSION;
+pub const BUILD_DIR_NAME: &str = "trcbuild";
 
 pub fn get_history_file() -> &'static Option<PathBuf> {
     static PATH: OnceLock<Option<PathBuf>> = OnceLock::new();

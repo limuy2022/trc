@@ -1,6 +1,8 @@
 use core::{cmp::max, fmt};
 use std::fmt::Display;
 
+use num_enum::TryFromPrimitive;
+
 #[derive(Clone)]
 pub struct FuncStorage {
     pub func_addr: usize,
@@ -8,15 +10,18 @@ pub struct FuncStorage {
 }
 
 impl FuncStorage {
-    pub fn new(name: usize, var_table_sz: usize) -> Self {
+    pub fn new(func_addr: usize, var_table_sz: usize) -> Self {
         Self {
-            func_addr: name,
+            func_addr,
             var_table_sz,
         }
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+pub type OpcodeTy = u16;
+
+#[derive(Debug, PartialEq, Clone, Copy, TryFromPrimitive)]
+#[repr(u16)]
 pub enum Opcode {
     Add,
     AddInt,
@@ -133,6 +138,29 @@ impl Display for Opcode {
     }
 }
 
+impl Opcode {
+    /// 获取操作数个数
+    pub fn get_opcode_arg_nums(&self) -> usize {
+        use Opcode::*;
+        match *self {
+            Add | AddInt | AddFloat | AddStr | Sub | SubInt | SubFloat | Mul | MulInt
+            | MulFloat | Div | DivInt | DivFloat | ExactDiv | ExactDivInt | ExtraDivFloat | Mod
+            | ModInt | Power | PowerInt | Eq | EqInt | EqFloat | EqStr | EqChar | EqBool | Ne
+            | NeInt | NeFloat | NeStr | NeChar | NeBool | Lt | LtInt | LtFloat | Le | LeInt
+            | LeFloat | Gt | GtInt | GtFloat | Ge | GeInt | GeFloat | And | AndBool | Or
+            | OrBool | Not | NotBool | Xor | XorInt | BitNot | BitNotInt | BitAnd | BitAndInt
+            | BitOr | BitOrInt | BitLeftShift | BitLeftShiftInt | BitRightShift
+            | BitRightShiftInt | PopFrame | MoveInt | MoveFloat | MoveChar | MoveBool | MoveStr
+            | SelfNegative | SelfNegativeInt | SelfNegativeFloat | Empty | Stop | EqWithoutPop
+            | EqIntWithoutPop | EqFloatWithoutPop | EqStrWithoutPop | EqCharWithoutPop
+            | EqBoolWithoutPop => 0,
+            PopData | LoadInt | LoadFloat | LoadString | LoadBigInt | LoadChar | LoadBool
+            | CallNative | CallCustom | JumpIfFalse | JumpIfTrue | Jump => 1,
+            LoadLocalVar | LoadGlobalVar | StoreLocal | StoreGlobal => 2,
+        }
+    }
+}
+
 #[derive(Default, Clone)]
 pub struct ConstPool {
     pub intpool: Vec<i64>,
@@ -197,7 +225,7 @@ pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,
     // 储存函数的位置
-    pub funcs: Vec<FuncStorage>,
+    pub funcs_pos: Vec<FuncStorage>,
     // 符号表需要的长度
     pub sym_table_sz: usize,
     pub line_table: Vec<usize>,

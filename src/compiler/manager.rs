@@ -2,7 +2,7 @@
 
 use libcore::StaticData;
 
-use crate::compiler::ast::AstBuilder;
+use crate::compiler::{ast::AstBuilder, optimizer::optimize_module};
 use std::collections::HashMap;
 
 /// ast manager
@@ -50,7 +50,11 @@ impl ModuleManager {
     }
 
     /// 执行优化
-    pub fn optimize(&mut self) {}
+    pub fn optimize(&mut self) {
+        for i in &mut self.cache {
+            optimize_module(i.1);
+        }
+    }
 
     /// 将所有模块都链接到一起
     pub fn link(&mut self) -> StaticData {

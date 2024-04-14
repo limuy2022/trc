@@ -467,10 +467,10 @@ impl<'a> Vm<'a> {
             }
             Opcode::CallCustom => {
                 let var_table_mem_sz =
-                    self.static_data.funcs[self.static_data.inst[*pc].operand.0].var_table_sz;
+                    self.static_data.funcs_pos[self.static_data.inst[*pc].operand.0].var_table_sz;
                 let space = self.dynadata.dydata.alloc_var_space(var_table_mem_sz);
                 self.dynadata.frames_stack.push(Frame::new(*pc, space));
-                *pc = self.static_data.funcs[self.static_data.inst[*pc].operand.0].func_addr;
+                *pc = self.static_data.funcs_pos[self.static_data.inst[*pc].operand.0].func_addr;
                 return Ok(());
             }
             Opcode::LoadGlobalVar => {

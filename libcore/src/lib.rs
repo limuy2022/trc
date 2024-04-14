@@ -50,4 +50,4 @@ macro_rules! objsz {
         std::mem::size_of::<*mut dyn $crate::TrcObj>()
     };
 }
-rust_i18n::i18n!("locales");
+rust_i18n::i18n!("../locales");

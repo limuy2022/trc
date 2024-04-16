@@ -1,8 +1,22 @@
 use libcore::*;
 
+use crate::base::ctrc::load_from_reader_without_magic;
+
 pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult<()> {
-    let mut compiler = crate::compiler::Compiler::new(opt);
-    let static_data = compiler.lex()?;
+    let file = match std::fs::File::open(opt.inputsource.get_path()) {
+        Ok(file) => file,
+        Err(e) => {
+            println!("open file error: {}", e);
+            return Ok(());
+        }
+    };
+    let mut reader = std::io::BufReader::new(file);
+    let static_data = if crate::base::ctrc::check_if_ctrc_file(&mut reader).unwrap() {
+        load_from_reader_without_magic(&mut reader).unwrap()
+    } else {
+        let mut compiler = crate::compiler::Compiler::new(opt);
+        compiler.lex()?
+    };
     // let static_data = ast.prepare_get_static();
     println!("deps modules:");
     for i in &static_data.dll_module_should_loaded {
@@ -29,11 +43,14 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult
                 Opcode::LoadString => {
                     print!("({})", static_data.constpool.stringpool[i.1.operand.0])
                 }
-                Opcode::LoadFloat => print!("({})", static_data.constpool.floatpool[i.1.operand.0]),
+                Opcode::LoadFloat => {
+                    print!("({})", static_data.constpool.floatpool[i.1.operand.0])
+                }
                 _ => {}
             }
             println!();
         }
     }
+
     Ok(())
 }

@@ -951,9 +951,10 @@ impl TokenLex {
 
 #[cfg(test)]
 mod tests {
+    use crate::compiler::{
+        CompileOption, Compiler, InputSource, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO,
+    };
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
-
-    use crate::compiler::{CompileOption, InputSource, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO};
 
     use super::*;
 

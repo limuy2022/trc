@@ -10,6 +10,7 @@ use std::{
 
 type LenSize = u64;
 type FloatTy = f64;
+const MAGIC_NUMBER: u64 = 0xA1B5C6D7u64;
 
 macro_rules! read_integer {
     ($f:expr, $U:ty) => {{
@@ -210,12 +211,28 @@ fn load_function_info(f: &mut BufReader<impl Read>, data: &mut StaticData) -> an
     Ok(())
 }
 
+fn write_magic_number(f: &mut BufWriter<impl Write>) -> anyhow::Result<()> {
+    write_integer(f, MAGIC_NUMBER)?;
+    Ok(())
+}
+
+fn load_magic_number(f: &mut BufReader<impl Read>) -> anyhow::Result<()> {
+    let _magic = read_integer!(f, u64);
+    Ok(())
+}
+
+pub fn check_if_ctrc_file(f: &mut BufReader<impl Read>) -> anyhow::Result<bool> {
+    let magic = read_integer!(f, u64);
+    Ok(magic == MAGIC_NUMBER)
+}
+
 /// 生成ctrc
 /// write_to_path: ctrc文件的路径
 /// data: 静态数据
 pub fn write_to_ctrc(data: &StaticData, write_to_path: &str) -> anyhow::Result<()> {
     let f = std::fs::File::create(write_to_path).unwrap();
     let mut writer = BufWriter::new(f);
+    write_magic_number(&mut writer)?;
     write_deps(&mut writer, data)?;
     write_symbol_table(&mut writer, data)?;
     write_bytecodes(&mut writer, data)?;
@@ -225,16 +242,22 @@ pub fn write_to_ctrc(data: &StaticData, write_to_path: &str) -> anyhow::Result<(
     Ok(())
 }
 
+pub fn load_from_reader_without_magic(f: &mut BufReader<impl Read>) -> anyhow::Result<StaticData> {
+    let mut data = StaticData::default();
+    load_deps(f, &mut data)?;
+    load_symbol_table(f, &mut data)?;
+    load_bytecodes(f, &mut data)?;
+    load_const_pool(f, &mut data)?;
+    load_function_info(f, &mut data)?;
+    load_line_table(f, &mut data)?;
+    Ok(data)
+}
+
 pub fn load_from_ctrc(load_path: &str) -> anyhow::Result<StaticData> {
     let f = std::fs::File::open(load_path)?;
     let mut reader = BufReader::new(f);
-    let mut data = StaticData::default();
-    load_deps(&mut reader, &mut data)?;
-    load_symbol_table(&mut reader, &mut data)?;
-    load_bytecodes(&mut reader, &mut data)?;
-    load_const_pool(&mut reader, &mut data)?;
-    load_function_info(&mut reader, &mut data)?;
-    load_line_table(&mut reader, &mut data)?;
+    load_magic_number(&mut reader)?;
+    let data = load_from_reader_without_magic(&mut reader)?;
     Ok(data)
 }
 

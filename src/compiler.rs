@@ -41,8 +41,8 @@ impl InputSource {
 
 /// 编译器的参数控制
 pub struct CompileOption {
-    optimize: bool,
-    inputsource: InputSource,
+    pub optimize: bool,
+    pub inputsource: InputSource,
 }
 
 #[derive(Debug, Clone)]

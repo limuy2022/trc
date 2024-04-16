@@ -1,4 +1,4 @@
-use super::{Compiler, Context, Float, TokenIo, ValuePool};
+use super::{Context, Float, TokenIo, ValuePool};
 use crate::{cfg::FLOAT_OVER_FLOW_LIMIT, compiler::CompilerImpl};
 use libcore::*;
 use rust_i18n::t;

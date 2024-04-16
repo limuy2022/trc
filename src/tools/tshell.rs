@@ -2,14 +2,12 @@
 
 use crate::{
     cfg,
-    compiler::{self, token::TokenType},
-    tvm::Vm,
+    compiler::{self},
 };
 use colored::*;
-use libcore::{codegen::StaticData, *};
+use libcore::*;
 use rust_i18n::t;
 use rustyline::{config::Configurer, history::FileHistory, Editor};
-use std::io::{self, Write};
 
 pub fn tshell() -> RuntimeResult<()> {
     println!("{}\n", t!("tshell.welcome").bold());
@@ -26,7 +24,7 @@ pub fn tshell() -> RuntimeResult<()> {
         compiler::CompileOption::new(false, compiler::InputSource::StringInternal),
         "",
     );
-    let mut ast = compiler.lex()?;
+    let ast = compiler.lex()?;
     // let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
     let mut vm = todo!();
     let mut should_exit = false;

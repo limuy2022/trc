@@ -2,7 +2,7 @@ use libcore::*;
 
 use crate::base::ctrc::load_from_reader_without_magic;
 
-pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult<()> {
+pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Result<()> {
     let file = match std::fs::File::open(opt.inputsource.get_path()) {
         Ok(file) => file,
         Err(e) => {
@@ -11,8 +11,8 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> RuntimeResult
         }
     };
     let mut reader = std::io::BufReader::new(file);
-    let static_data = if crate::base::ctrc::check_if_ctrc_file(&mut reader).unwrap() {
-        load_from_reader_without_magic(&mut reader).unwrap()
+    let static_data = if crate::base::ctrc::check_if_ctrc_file(&mut reader)? {
+        load_from_reader_without_magic(&mut reader)?
     } else {
         let mut compiler = crate::compiler::Compiler::new(opt);
         compiler.lex()?

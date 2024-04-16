@@ -239,6 +239,7 @@ pub fn write_to_ctrc(data: &StaticData, write_to_path: &str) -> anyhow::Result<(
     write_const_pool(&mut writer, data)?;
     write_function_info(&mut writer, data)?;
     write_line_table(&mut writer, data)?;
+    writer.flush()?;
     Ok(())
 }
 
@@ -264,4 +265,19 @@ pub fn load_from_ctrc(load_path: &str) -> anyhow::Result<StaticData> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_magic_number() {
+        let f = std::fs::File::create("tests/testdata/utils/ctrc/magic_number_with.ctrc").unwrap();
+        let mut writer = BufWriter::new(f);
+        write_magic_number(&mut writer).unwrap();
+        writer.flush().unwrap();
+        drop(writer);
+        let f = std::fs::File::open("tests/testdata/utils/ctrc/magic_number_with.ctrc").unwrap();
+        let mut reader = BufReader::new(f);
+        assert!(check_if_ctrc_file(&mut reader).unwrap());
+        let f = std::fs::File::open("tests/testdata/utils/ctrc/magic_number_without.ctrc").unwrap();
+        let mut reader = BufReader::new(f);
+        assert!(!check_if_ctrc_file(&mut reader).unwrap());
+    }
 }

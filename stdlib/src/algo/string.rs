@@ -1,6 +1,5 @@
 use derive::{def_module, trc_function};
 use libcore::*;
-use std::usize;
 
 pub fn kmp_impl(main_string: &str, pattern: &str) -> usize {
     // 首先对模式串构建next数组
@@ -25,6 +24,7 @@ pub fn kmp_impl(main_string: &str, pattern: &str) -> usize {
 }
 
 #[trc_function]
+#[allow(unreachable_code)]
 pub fn kmp(main_string: str, pattern: str) -> int {
     return unsafe { kmp_impl(&*main_string, &*pattern) as TrcIntInternal };
 }

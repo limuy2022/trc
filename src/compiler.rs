@@ -6,8 +6,9 @@ pub mod optimizer;
 pub mod scope;
 pub mod token;
 
-pub use self::{ast::AstBuilder, manager::ModuleManager, token::TokenLex};
+pub use self::{ast::ModuleUnit, manager::ModuleManager, token::TokenLex};
 use crate::cfg;
+use core::panic;
 use libcore::*;
 use rust_i18n::t;
 use std::{
@@ -35,6 +36,14 @@ impl InputSource {
         match *self {
             InputSource::File(ref filename) => filename.to_str().unwrap(),
             _ => cfg::MAIN_MODULE_NAME,
+        }
+    }
+
+    pub fn set_path(&mut self, name: PathBuf) {
+        if let InputSource::File(filename) = self {
+            *filename = name;
+        } else {
+            panic!("not a file error")
         }
     }
 }
@@ -408,7 +417,7 @@ impl Compiler {
     pub fn lex(&mut self) -> RuntimeResult<StaticData> {
         let token_lexer = Rc::new(RefCell::new(TokenLex::new(self.compiler_impl.clone())));
         let env_manager = Rc::new(RefCell::new(ModuleManager::new()));
-        let mut ast_builder = AstBuilder::new(
+        let mut ast_builder = ModuleUnit::new(
             token_lexer.clone(),
             self.compiler_impl.clone(),
             env_manager.clone(),

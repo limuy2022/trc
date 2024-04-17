@@ -44,7 +44,10 @@ macro_rules! make_commands {
 make_commands!(Commands, Build {}, Run {}, Dis {
     #[arg(short, long, default_value_t = false)]
     rustcode: bool
-}, | Tshell {}, Version {});
+}, | Tshell {}, Version {}, New {
+    #[arg()]
+    project_name: String
+    });
 
 shadow_rs::shadow!(build);
 
@@ -109,6 +112,9 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 build::RUST_VERSION,
                 build::BUILD_TIME
             );
+        }
+        Commands::New { project_name } => {
+            tools::new_project(&project_name)?;
         }
     };
     Ok(())

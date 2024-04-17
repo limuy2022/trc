@@ -1,7 +1,7 @@
 use libcore::*;
 use libloading::library_filename;
 use std::mem::size_of;
-use trc::compiler::{ast::AstBuilder, *};
+use trc::compiler::{ast::ModuleUnit, *};
 
 macro_rules! gen_test_env {
     ($test_code:expr, $env_name:ident) => {
@@ -16,7 +16,7 @@ macro_rules! gen_test_env {
         let token_lexer = Rc::new(RefCell::new(trc::compiler::token::TokenLex::new(
             compiler.compiler_impl.clone(),
         )));
-        let mut $env_name = trc::compiler::ast::AstBuilder::new(
+        let mut $env_name = trc::compiler::ast::ModuleUnit::new(
             token_lexer,
             compiler.compiler_impl.clone(),
             env_tmp,
@@ -29,7 +29,7 @@ fn get_offset(int_nums: usize) -> usize {
     size_of::<i64>() * int_nums
 }
 
-fn get_func_id(scope: &mut AstBuilder, name: &str) -> usize {
+fn get_func_id(scope: &mut ModuleUnit, name: &str) -> usize {
     let idstr = scope
         .token_lexer
         .borrow()

@@ -12,6 +12,8 @@ pub fn build(mut opt: compiler::CompileOption) -> anyhow::Result<()> {
             exit(1);
         }
         opt.file_save = PathBuf::from(cfg::BUILD_DIR_NAME);
+        // 将路径指向直接编译的文件
+        opt.inputsource.set_path(PathBuf::from(cfg::MAIN_FILE));
         let mut compiler = compiler::Compiler::new(opt);
         compiler.lex()?;
     } else {

@@ -32,7 +32,7 @@ impl Cache {
     }
 }
 
-pub struct AstBuilder {
+pub struct ModuleUnit {
     pub token_lexer: Rc<RefCell<TokenLex>>,
     pub staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
@@ -117,7 +117,7 @@ macro_rules! expr_gen {
     };
 }
 
-impl AstBuilder {
+impl ModuleUnit {
     pub fn new(
         token_lexer: Rc<RefCell<TokenLex>>,
         compiler_data: Rc<RefCell<CompilerImpl>>,
@@ -178,7 +178,7 @@ impl AstBuilder {
         // );
         drop(val_pool_ref);
         let name_str = stdlib_dll_name.to_str().unwrap().to_owned();
-        AstBuilder {
+        ModuleUnit {
             token_lexer,
             staticdata: StaticData::new(),
             self_scope: root_scope,

@@ -2,7 +2,7 @@
 
 use libcore::StaticData;
 
-use crate::compiler::{ast::AstBuilder, optimizer::optimize_module};
+use crate::compiler::{ast::ModuleUnit, optimizer::optimize_module};
 use std::collections::HashMap;
 
 /// ast manager
@@ -10,7 +10,7 @@ pub struct ModuleManager {
     // 储存模块和对应的中间文件的关系
     modules: HashMap<String, String>,
     // 有的模块是本次已经编译过的，在缓存中可以直接找到
-    cache: HashMap<String, AstBuilder>,
+    cache: HashMap<String, ModuleUnit>,
     global_custom_function_id: usize,
     global_extern_function_id: usize,
 }
@@ -25,7 +25,7 @@ impl ModuleManager {
         }
     }
 
-    pub fn add_module(&mut self, path: impl Into<String>, module: AstBuilder) {
+    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit) {
         self.cache.insert(path.into(), module);
     }
 
@@ -33,7 +33,7 @@ impl ModuleManager {
         self.modules.insert(name, path);
     }
 
-    pub fn get_module(&mut self, name: &str) -> Option<&AstBuilder> {
+    pub fn get_module(&mut self, name: &str) -> Option<&ModuleUnit> {
         todo!()
     }
 

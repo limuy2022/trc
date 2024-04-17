@@ -1,5 +1,5 @@
-use super::AstBuilder;
 use super::AstError;
+use super::ModuleUnit;
 use crate::compiler::token::TokenType;
 use crate::compiler::{scope::FuncIdxTy, token::Token};
 use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
@@ -7,7 +7,7 @@ use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
 
-impl AstBuilder {
+impl ModuleUnit {
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
         self.staticdata.function_split = None;

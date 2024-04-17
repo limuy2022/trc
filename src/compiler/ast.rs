@@ -227,14 +227,14 @@ impl ModuleUnit {
     expr_gen!(expr1, expr1_, expr2, TokenType::And);
     expr_gen!(expr, expr_, expr1, TokenType::Or);
 
-    pub fn prepare_get_static(&mut self) -> &StaticData {
+    pub fn prepare_get_static(&mut self) -> &mut StaticData {
         self.staticdata.constpool = self.token_lexer.borrow_mut().const_pool.store_val_to_vm();
         self.staticdata.dll_module_should_loaded.clear();
         swap(
             &mut self.staticdata.dll_module_should_loaded,
             &mut self.modules_dll,
         );
-        &self.staticdata
+        &mut self.staticdata
     }
 
     pub fn return_static_data(mut self) -> StaticData {

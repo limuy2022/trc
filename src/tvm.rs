@@ -123,7 +123,7 @@ impl<'a> Vm<'a> {
     pub fn reset(&mut self) -> RuntimeResult<()> {
         self.dynadata
             .dydata
-            .init_global_var_store(self.static_data.sym_table_sz);
+            .init_global_var_store(self.static_data.global_sym_table_sz);
         let mut should_be_reloaded = false;
         for (i, j) in self.static_data.dll_module_should_loaded.iter().enumerate() {
             if i >= self.imported_modules.len() {

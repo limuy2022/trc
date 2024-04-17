@@ -159,6 +159,17 @@ impl Opcode {
             LoadLocalVar | LoadGlobalVar | StoreLocal | StoreGlobal => 2,
         }
     }
+    pub fn check_if_load_from_const(opcode: Opcode) -> bool {
+        matches!(
+            opcode,
+            Opcode::LoadInt
+                | Opcode::LoadFloat
+                | Opcode::LoadString
+                | Opcode::LoadBigInt
+                | Opcode::LoadChar
+                | Opcode::LoadBool
+        )
+    }
 }
 
 #[derive(Default, Clone)]
@@ -224,10 +235,10 @@ pub type InstSet = Vec<Inst>;
 pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,
-    // 储存函数的位置
+    // 储存函数的位置,保证有序
     pub funcs_pos: Vec<FuncStorage>,
-    // 符号表需要的长度
-    pub sym_table_sz: usize,
+    // 全局符号表需要的长度
+    pub global_sym_table_sz: usize,
     pub line_table: Vec<usize>,
     pub type_list: Vec<Vec<VmStackType>>,
     pub function_split: Option<usize>,
@@ -243,7 +254,7 @@ impl StaticData {
 
     #[inline]
     pub fn update_var_table_mem_sz(&mut self, newsz: usize) {
-        self.sym_table_sz = max(self.sym_table_sz, newsz);
+        self.global_sym_table_sz = max(self.global_sym_table_sz, newsz);
     }
 
     #[inline]

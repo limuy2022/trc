@@ -164,12 +164,12 @@ fn load_const_pool<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyh
 }
 
 fn write_symbol_table<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
-    write_integer(f, data.sym_table_sz)?;
+    write_integer(f, data.global_sym_table_sz)?;
     Ok(())
 }
 
 fn load_symbol_table<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyhow::Result<()> {
-    data.sym_table_sz = read_integer!(f, usize);
+    data.global_sym_table_sz = read_integer!(f, usize);
     Ok(())
 }
 

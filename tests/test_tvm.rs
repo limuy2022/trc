@@ -33,10 +33,7 @@ macro_rules! gen_test_env {
             $code,
         );
         let com_tmp = compiler.lex().unwrap();
-        // println!("{:?}", com_tmp.inst);
-        // let tmp = com_tmp.return_static_data();
-        let tmp = todo!();
-        let mut $var = Vm::new(&tmp);
+        let mut $var = Vm::new(&com_tmp);
     };
 }
 

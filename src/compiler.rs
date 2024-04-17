@@ -14,7 +14,6 @@ use rust_i18n::t;
 use std::{
     cell::RefCell,
     collections::HashMap,
-    fmt::Display,
     fs,
     io::{self, BufRead},
     path::PathBuf,
@@ -109,53 +108,18 @@ impl CompileOption {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
-/// # Reference
-/// float hash map:<https://www.soinside.com/question/tUJxYmevbVSHZYe2C2AK5o>
-pub struct Float {
-    // 小数点前的部分
-    front: i64,
-    // 小数点后的部分
-    back: i64,
-    // 小数点后紧跟着的0的个数
-    zero: usize,
-}
-
-impl Float {
-    fn new(front: i64, back: i64, zero: usize) -> Self {
-        Self { front, back, zero }
-    }
-
-    pub fn to_float(&self) -> f64 {
-        let len = crate::base::utils::get_bit_num(self.back);
-        let mut float_part = self.back as f64;
-        for _ in 0..len {
-            float_part /= 10.0;
-        }
-        for _ in 0..self.zero {
-            float_part /= 10.0;
-        }
-        self.front as f64 + float_part
-    }
-}
-
-impl Display for Float {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 type Pool<T> = HashMap<T, usize>;
 
 #[derive(Default)]
+/// 管理常量池添加删除
 pub struct ValuePool {
     const_ints: Pool<i64>,
     const_strings: Pool<String>,
-    const_floats: Pool<Float>,
+    const_floats: Pool<String>,
     name_pool: Pool<String>,
     _const_big_int: Pool<String>,
     pub id_int: Vec<i64>,
-    pub id_float: Vec<Float>,
+    pub id_float: Vec<f64>,
     pub id_str: Vec<String>,
     pub id_name: Vec<String>,
 }
@@ -163,24 +127,49 @@ pub struct ValuePool {
 pub const INT_VAL_POOL_ZERO: usize = 0;
 pub const INT_VAL_POOL_ONE: usize = 1;
 
+macro_rules! gen_single_getter_setter {
+    ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)) => {
+        paste::paste! {
+        pub fn [<add_ $func_name>](&mut self, val: $type) -> usize {
+            let len_tmp = self.$const_pool.len();
+            let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
+            if len_tmp != self.$const_pool.len() {
+                self.$id_pool.push(val);
+            }
+            ret
+        }
+        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<usize> {
+            self.$const_pool.get(val).copied()
+        }
+        }
+    };
+    ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty, $convent_func: ident)) => {
+        paste::paste! {
+        pub fn [<add_ $func_name>](&mut self, val: $type) -> usize {
+            let len_tmp = self.$const_pool.len();
+            let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
+            if len_tmp != self.$const_pool.len() {
+                self.$id_pool.push($convent_func(val));
+            }
+            ret
+        }
+        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<usize> {
+            self.$const_pool.get(val).copied()
+        }
+        }
+    };
+}
+
 macro_rules! gen_getter_setter {
     ($($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)),*) => {
         $(
-            paste::paste!{
-            pub fn [<add_ $func_name>](&mut self, val: $type) -> usize {
-                let len_tmp = self.$const_pool.len();
-                let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
-                if len_tmp != self.$const_pool.len() {
-                    self.$id_pool.push(val);
-                }
-                ret
-            }
-            pub fn [<get_ $func_name>](&self, val: &$type) -> Option<usize> {
-                self.$const_pool.get(val).copied()
-            }
-            }
+        gen_single_getter_setter!($func_name => ($const_pool, $id_pool, $type));
         )*
     };
+}
+
+fn convert_str_to_float(s: String) -> f64 {
+    s.parse::<f64>().unwrap()
 }
 
 impl ValuePool {
@@ -195,27 +184,30 @@ impl ValuePool {
 
     gen_getter_setter!(
         int => (const_ints, id_int, i64),
-        float => (const_floats, id_float, Float),
         string => (const_strings, id_str, String),
         id => (name_pool, id_name, String)
     );
+    gen_single_getter_setter!(float => (const_floats, id_float, String, convert_str_to_float));
 
     fn store_val_to_vm(&mut self) -> ConstPool {
         let mut ret = ConstPool::new();
-        ret.intpool.resize(self.const_ints.len(), 0);
-        for i in &self.const_ints {
-            ret.intpool[*i.1] = *i.0;
-        }
-        ret.floatpool.resize(self.const_floats.len(), 0.0);
-        for i in &self.const_floats {
-            ret.floatpool[*i.1] = i.0.to_float();
-        }
-        ret.stringpool
-            .resize(self.const_strings.len(), "".to_string());
-        for i in &self.const_strings {
-            ret.stringpool[*i.1].clone_from(i.0);
-        }
+        ret.intpool.clone_from(&self.id_int);
+        ret.floatpool.clone_from(&self.id_float);
+        ret.stringpool.clone_from(&self.id_str);
         ret
+    }
+
+    pub fn extend_pool(&mut self, data: &StaticData) {
+        for i in &data.constpool.intpool {
+            self.add_int(*i);
+        }
+        for i in &data.constpool.floatpool {
+            self.add_float((i).to_string());
+        }
+        for i in &data.constpool.stringpool {
+            // TODO::improve copy performance
+            self.add_string(i.clone());
+        }
     }
 }
 
@@ -435,9 +427,8 @@ impl Compiler {
         if self.compiler_impl.borrow().option.optimize {
             env_manager.borrow_mut().optimize();
         }
-        env_manager.borrow_mut().link();
-        // Ok(ast_builder)
-        todo!()
+        let mut tmp = env_manager.borrow_mut();
+        Ok(tmp.link())
     }
 
     pub fn get_token_lex(&mut self) -> TokenLex {
@@ -488,21 +479,14 @@ mod tests {
         assert_eq!(pool.add_int(7), 2);
         assert_eq!(pool.add_int(1), INT_VAL_POOL_ONE);
         assert_eq!(pool.add_int(0), INT_VAL_POOL_ZERO);
-        assert_eq!(pool.add_float(Float::new(9, 0, 0)), 0);
-        assert_eq!(pool.add_float(Float::new(9, 0, 0)), 0);
-        assert_eq!(pool.add_float(Float::new(9, 5, 0)), 1);
+        assert_eq!(pool.add_float("9.0".to_owned()), 0);
+        assert_eq!(pool.add_float("9.0".to_owned()), 0);
+        assert_eq!(pool.add_float("9.5".to_owned()), 1);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("vale")), 1);
         assert_eq!(pool.id_int[0], 0);
-        assert_eq!(pool.id_float[0], Float::new(9, 0, 0));
+        assert!((pool.id_float[0] - 9.0).abs() < 0.00001);
         assert_eq!(pool.id_str[1], "vale");
-    }
-
-    #[test]
-    fn test_float() {
-        assert_eq!(Float::new(9, 0, 0).to_float(), 9f64);
-        assert_eq!(Float::new(9, 1, 0).to_float(), 9.1f64);
-        assert_eq!(Float::new(9, 5, 1).to_float(), 9.05f64);
     }
 }

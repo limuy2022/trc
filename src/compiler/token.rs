@@ -1,4 +1,4 @@
-use super::{Context, Float, TokenIo, ValuePool};
+use super::{Context, TokenIo, ValuePool};
 use crate::{cfg::FLOAT_OVER_FLOW_LIMIT, compiler::CompilerImpl};
 use libcore::*;
 use rust_i18n::t;
@@ -333,7 +333,7 @@ fn get_redix_to_prefix() -> &'static HashMap<usize, &'static str> {
 
 enum NumValue {
     Integer(i64),
-    FloatVal(Float),
+    FloatVal(String),
 }
 
 impl Iterator for TokenLex {
@@ -662,10 +662,10 @@ impl TokenLex {
                     t!(NUMBER_OVER_FLOW),
                 ));
             }
-            return Ok(NumValue::FloatVal(Float::new(
-                i64::from_str_radix(&intpart, radix).unwrap(),
-                i64::from_str_radix(&float_part, radix).unwrap(),
-                Self::cal_zero(&float_part),
+            return Ok(NumValue::FloatVal(format!(
+                "{}.{}",
+                i64::from_str_radix(&intpart, radix).unwrap().to_string(),
+                i64::from_str_radix(&float_part, radix).unwrap().to_string(),
             )));
         } else {
             self.compiler_data.borrow_mut().input.unread(c);
@@ -686,21 +686,13 @@ impl TokenLex {
         }
     }
 
-    fn cal_zero(s: &str) -> usize {
-        let mut zero = 0;
-        for i in s.chars() {
-            if i == '0' {
-                zero += 1;
-            }
-        }
-        zero
-    }
-
     fn lex_num(&mut self, mut c: char) -> RuntimeResult<Token> {
         let tmp = self.lex_int_float(c)?;
         c = self.compiler_data.borrow_mut().input.read();
         if c == 'e' || c == 'E' {
+            // 科学计数法
             c = self.compiler_data.borrow_mut().input.read();
+            // 科学计数法的指数符号
             let mut up_flag: i64 = 1;
             if c == '+' {
                 c = self.compiler_data.borrow_mut().input.read();
@@ -708,6 +700,7 @@ impl TokenLex {
                 up_flag = -1;
                 c = self.compiler_data.borrow_mut().input.read();
             }
+            // 读取科学计数法的指数部分
             let mut up: i64 = self.lex_num_integer(c, 10).parse().unwrap();
             up *= up_flag;
             match tmp {
@@ -735,52 +728,50 @@ impl TokenLex {
                         }
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.const_pool.add_float(Float::new(
-                                it,
-                                float_part.parse().unwrap(),
-                                Self::cal_zero(&float_part),
-                            ))),
+                            Some(self.const_pool.add_float(format!("{}.{}", it, float_part))),
                         ))
                     }
                 }
-                NumValue::FloatVal(mut v) => {
+                NumValue::FloatVal(v) => {
+                    // 转换为两个元素的元组
+                    let mut vv = v.split('.');
+                    let mut v = (vv.next().unwrap().to_owned(), vv.next().unwrap().to_owned());
+                    debug_assert_eq!(vv.next(), None);
                     if up >= 0 {
-                        let mut s = v.back.to_string();
                         for _ in 0..up {
-                            if s.is_empty() {
-                                v.front *= 10;
+                            if v.1.is_empty() {
+                                v.0.push('0');
                             } else {
-                                v.front *= 10;
-                                v.front += s.remove(0) as i64 - '0' as i64;
+                                v.0.push(v.1.remove(0));
                             }
                         }
-                        if s.is_empty() {
-                            v = Float::new(v.front, 0, 0);
+                        let ret = if v.1.is_empty() {
+                            v.0
                         } else {
-                            v.zero = Self::cal_zero(&s);
-                            v.back = s.parse().unwrap();
-                        }
+                            format!("{}.{}", v.0, v.1)
+                        };
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.const_pool.add_float(v)),
+                            Some(self.const_pool.add_float(ret)),
                         ))
                     } else {
                         up = -up;
                         let mut s = String::new();
+                        let mut zero_num = 0;
                         for _ in 0..up {
-                            if v.front == 0 {
-                                v.zero += 1;
+                            if v.0.is_empty() {
+                                zero_num += 1;
                             } else {
-                                s = (v.front % 10).to_string() + &s;
-                                v.front /= 10;
+                                s = (v.0.pop().unwrap()).to_string() + &s;
                             }
                         }
-                        s += &v.back.to_string();
-                        v.zero += Self::cal_zero(&s);
-                        v.back = s.parse().unwrap();
+                        if v.0.is_empty() {
+                            v.0 = "0".to_string();
+                        }
+                        s = format!("{}.{}{}", v.0, "0".repeat(zero_num), s + &v.1.to_string());
                         Ok(Token::new(
                             TokenType::FloatValue,
-                            Some(self.const_pool.add_float(v)),
+                            Some(self.const_pool.add_float(s)),
                         ))
                     }
                 }
@@ -977,13 +968,14 @@ mod tests {
     }
 
     /// check const pool
-    fn check_pool<T>(v: Vec<T>, pool_be_checked: &Pool<T>)
+    fn check_pool<T, U>(v: Vec<U>, pool_be_checked: &Pool<T>)
     where
-        T: Eq + Hash + Clone + Display + Debug,
+        T: Eq + Hash + Clone + Display + Debug + std::convert::From<U>,
+        U: Eq + Hash + Clone + Display + Debug + Into<T>,
     {
         let mut testpool: HashSet<T> = HashSet::new();
         for i in &v {
-            testpool.insert((*i).clone());
+            testpool.insert(((*i).clone()).into());
         }
         assert_eq!(testpool.len(), pool_be_checked.len());
         for i in &testpool {
@@ -1049,14 +1041,7 @@ mod tests {
             &t.const_pool.const_ints,
         );
         check_pool(
-            vec![
-                Float::new(123, 9, 0),
-                Float::new(12, 0, 0),
-                Float::new(0, 8, 0),
-                Float::new(0, 18, 2),
-                Float::new(0, 17, 1),
-                Float::new(198, 0, 0),
-            ],
+            vec!["123.9", "12", "0.8", "0.0018", "0.017", "198"],
             &t.const_pool.const_floats,
         );
     }

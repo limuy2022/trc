@@ -2,39 +2,16 @@
 .vscode/
 .idea/
 .cmake/
-.xmake/
 .vs/
 .fleet/
 build/
 out/
 bin/
-bison/
-cmake_third_party/
-Testing/
-CMakeFiles/
-.ninja_deps
-.ninja_log
-build.ninja
-cmake_install.cmake
-CMakeCache.txt
-Makefile
-rules.ninja
-compile_commands.json
-#clangd缓存
-.cache/
 lib/
 
-#for rust
 target/
 
-*.aps
-*.ctree
-*.cbp
-*.filters
-*.vcxproj
-Trc.sln
-CMakeSettings.json
-testlog.log
+*.ctrc
 *.dll
 *.lib
 *.so

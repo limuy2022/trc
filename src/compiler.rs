@@ -43,6 +43,7 @@ impl InputSource {
 pub struct CompileOption {
     pub optimize: bool,
     pub inputsource: InputSource,
+    pub file_save: PathBuf,
 }
 
 #[derive(Debug, Clone)]
@@ -94,6 +95,7 @@ impl CompileOption {
         CompileOption {
             optimize,
             inputsource: source,
+            file_save: PathBuf::from("."),
         }
     }
 }
@@ -375,11 +377,6 @@ impl Compiler {
                     }
                     Ok(file) => file,
                 };
-                // 新建build文件夹
-                if std::fs::create_dir_all(cfg::BUILD_DIR_NAME).is_err() {
-                    eprintln!("{}", t!("common.cannot_create_build_dir"));
-                    exit(1);
-                }
                 Compiler {
                     compiler_impl: Rc::new(RefCell::new(CompilerImpl {
                         input: Box::new(FileSource::new(f)),

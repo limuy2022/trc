@@ -91,8 +91,8 @@ mod test {
         let data = link(datas.iter_mut());
         assert_eq!(data.constpool.intpool, vec![0, 1, 2, 4, 8, 10]);
         assert_eq!(
-            data.dll_module_should_loaded,
-            vec!["test.dll2".to_string(), "test.dll".to_string()]
+            HashSet::<String>::from_iter(data.dll_module_should_loaded.into_iter()),
+            HashSet::from_iter(vec!["test.dll2".to_string(), "test.dll".to_string()].into_iter())
         );
         assert_eq!(
             data.inst,

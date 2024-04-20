@@ -30,6 +30,7 @@ impl DynaData {
             ..Default::default()
         };
         unsafe {
+            // maybe use write instead of = is not UB
             ret.run_stack.set_len(get_max_stack_sz());
             ret.var_store.set_len(get_max_stack_sz());
         }

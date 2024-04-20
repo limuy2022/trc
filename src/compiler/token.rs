@@ -942,9 +942,7 @@ impl TokenLex {
 
 #[cfg(test)]
 mod tests {
-    use crate::compiler::{
-        CompileOption, Compiler, InputSource, Pool, INT_VAL_POOL_ONE, INT_VAL_POOL_ZERO,
-    };
+    use crate::compiler::{CompileOption, Compiler, InputSource, Pool};
     use std::{collections::HashSet, fmt::Debug, hash::Hash};
 
     use super::*;
@@ -1020,15 +1018,33 @@ mod tests {
                 Token::new(TokenType::Comma, None),
                 Token::new(TokenType::Dot, None),
                 Token::new(TokenType::Comma, None),
-                Token::new(TokenType::IntValue, Some(2)),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(100)),
+                ),
                 Token::new(TokenType::FloatValue, Some(0)),
-                Token::new(TokenType::IntValue, Some(3)),
-                Token::new(TokenType::IntValue, Some(4)),
-                Token::new(TokenType::IntValue, Some(5)),
-                Token::new(TokenType::IntValue, Some(6)),
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
-                Token::new(TokenType::IntValue, Some(7)),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(232_304904)),
+                ),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(0b011)),
+                ),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(0x2AA4)),
+                ),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(0o2434)),
+                ),
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(1e9 as TrcIntInternal)),
+                ),
                 Token::new(TokenType::FloatValue, Some(1)),
                 Token::new(TokenType::FloatValue, Some(2)),
                 Token::new(TokenType::FloatValue, Some(3)),
@@ -1153,7 +1169,7 @@ func main() {
                 Token::new(TokenType::Mod, None),
                 Token::new(TokenType::IntValue, Some(2)),
                 Token::new(TokenType::Equal, None),
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ZERO)),
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
                 Token::new(TokenType::LeftBigBrace, None),
                 Token::new(TokenType::Return, None),
                 Token::new(TokenType::StringValue, Some(1)),
@@ -1223,8 +1239,8 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::IntValue, Some(INT_VAL_POOL_ONE)),
-                Token::new(TokenType::IntValue, Some(2)),
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(1))),
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(23))),
             ],
         );
     }
@@ -1235,7 +1251,10 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::IntValue, Some(2)),
+                Token::new(
+                    TokenType::IntValue,
+                    Some(convert_int_constval_to_usize(0xabc)),
+                ),
                 Token::new(TokenType::ID, Some(0)),
             ],
         );

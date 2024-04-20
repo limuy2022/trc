@@ -89,8 +89,8 @@ mod test {
         assert_eq!(
             data.inst,
             vec![
-                Inst::new_single(Opcode::LoadInt, 2),
-                Inst::new_single(Opcode::LoadInt, 5),
+                Inst::new_single(Opcode::LoadInt, 1),
+                Inst::new_single(Opcode::LoadInt, 3),
             ]
         );
     }

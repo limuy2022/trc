@@ -1,8 +1,6 @@
 mod def;
 mod function;
 
-use std::usize;
-
 use self::function::Frame;
 use crate::cfg;
 use libcore::*;

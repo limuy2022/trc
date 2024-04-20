@@ -42,9 +42,9 @@ impl TrcBool {
 
     fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
         collection_literals::hash![
-            OverrideOperations::And => OverrideWrapper::new(crate::codegen::Opcode::AndBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::Or => OverrideWrapper::new(crate::codegen::Opcode::OrBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::Not => OverrideWrapper::new(crate::codegen::Opcode::NotBool, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false))
+            OverrideOperations::And => OverrideWrapper::new(crate::codegen::Opcode::AndBool, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::Or => OverrideWrapper::new(crate::codegen::Opcode::OrBool, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::Not => OverrideWrapper::new(crate::codegen::Opcode::NotBool, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false))
         ]
     }
 }

@@ -27,18 +27,18 @@ impl TrcFloat {
 
     fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
         collection_literals::hash![
-            OverrideOperations::Add => OverrideWrapper::new(Opcode::AddFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::Sub => OverrideWrapper::new(Opcode::SubFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::Mul => OverrideWrapper::new(Opcode::MulFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::Div => OverrideWrapper::new(Opcode::DivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-            OverrideOperations::ExactDiv => OverrideWrapper::new(Opcode::ExtraDivFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcInt::export_info()), false)),
-            OverrideOperations::Equal => OverrideWrapper::new(Opcode::EqFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::NotEqual => OverrideWrapper::new(Opcode::NeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::Less => OverrideWrapper::new(Opcode::LtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::LessEqual => OverrideWrapper::new(Opcode::LeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::Greater => OverrideWrapper::new(Opcode::GtFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::GreaterEqual => OverrideWrapper::new(Opcode::GeFloat, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-            OverrideOperations::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeFloat, IOType::new(vec![], TypeAllowNull::Some(Self::export_info()), false))
+            OverrideOperations::Add => OverrideWrapper::new(Opcode::AddFloat, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::Sub => OverrideWrapper::new(Opcode::SubFloat, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::Mul => OverrideWrapper::new(Opcode::MulFloat, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::Div => OverrideWrapper::new(Opcode::DivFloat, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+            OverrideOperations::ExactDiv => OverrideWrapper::new(Opcode::ExtraDivFloat, IOType::new(vec![Self::export_info()], Some(TrcInt::export_info()), false)),
+            OverrideOperations::Equal => OverrideWrapper::new(Opcode::EqFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::NotEqual => OverrideWrapper::new(Opcode::NeFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::Less => OverrideWrapper::new(Opcode::LtFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::LessEqual => OverrideWrapper::new(Opcode::LeFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::Greater => OverrideWrapper::new(Opcode::GtFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::GreaterEqual => OverrideWrapper::new(Opcode::GeFloat, IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+            OverrideOperations::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeFloat, IOType::new(vec![], Some(Self::export_info()), false))
         ]
     }
 }

@@ -1,5 +1,3 @@
-use std::usize;
-
 use libcore::*;
 
 use crate::base::ctrc::load_from_reader_without_magic;

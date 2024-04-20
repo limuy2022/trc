@@ -13,9 +13,7 @@ use crate::{
 use collection_literals::collection;
 use libcore::*;
 use rust_i18n::t;
-use std::{
-    cell::RefCell, collections::HashSet, env::vars_os, mem::swap, path::PathBuf, rc::Rc, usize,
-};
+use std::{cell::RefCell, collections::HashSet, mem::swap, path::PathBuf, rc::Rc, usize};
 
 #[derive(Default)]
 struct Cache {

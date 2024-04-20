@@ -36,7 +36,7 @@ where
     <U as TryInto<u64>>::Error: Send + Sync + std::fmt::Debug,
 {
     let tmp: LenSize = convert_to_lensize(len);
-    f.write_all(&(tmp).to_le_bytes())?;
+    f.write_all(&tmp.to_le_bytes())?;
     Ok(())
 }
 
@@ -67,7 +67,7 @@ fn write_bytecodes<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow:
     // 先写入个数
     write_integer(f, data.inst.len())?;
     for i in &data.inst {
-        write_integer(f, i.opcode as libcore::OpcodeTy)?;
+        write_integer(f, i.opcode as OpcodeTy)?;
         let opnums = i.opcode.get_opcode_arg_nums();
         if opnums > 0 {
             write_integer(f, i.operand.0)?;

@@ -25,26 +25,26 @@ impl TrcInt {
     }
 
     fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
-        collection_literals::hash![OverrideOperations::Add => OverrideWrapper::new(Opcode::AddInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Sub => OverrideWrapper::new(Opcode::SubInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Mul => OverrideWrapper::new(Opcode::MulInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Div => OverrideWrapper::new(Opcode::DivInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcFloat::export_info()), false)),
-        OverrideOperations::Mod => OverrideWrapper::new(Opcode::ModInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Power => OverrideWrapper::new(Opcode::PowerInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::BitAnd => OverrideWrapper::new(Opcode::BitAndInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::BitOr => OverrideWrapper::new(Opcode::BitOrInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Xor => OverrideWrapper::new(Opcode::XorInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::ExactDiv => OverrideWrapper::new(Opcode::ExactDivInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::BitLeftShift => OverrideWrapper::new(Opcode::BitLeftShiftInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::BitRightShift => OverrideWrapper::new(Opcode::BitRightShiftInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::BitNot => OverrideWrapper::new(Opcode::BitNotInt,IOType::new(vec![], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeInt,IOType::new(vec![], TypeAllowNull::Some(Self::export_info()), false)),
-        OverrideOperations::Equal => OverrideWrapper::new(Opcode::EqInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-        OverrideOperations::NotEqual => OverrideWrapper::new(Opcode::NeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-        OverrideOperations::Less => OverrideWrapper::new(Opcode::LtInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-        OverrideOperations::LessEqual => OverrideWrapper::new(Opcode::LeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-        OverrideOperations::Greater => OverrideWrapper::new(Opcode::GtInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false)),
-        OverrideOperations::GreaterEqual => OverrideWrapper::new(Opcode::GeInt,IOType::new(vec![Self::export_info()], TypeAllowNull::Some(TrcBool::export_info()), false))
+        collection_literals::hash![OverrideOperations::Add => OverrideWrapper::new(Opcode::AddInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::Sub => OverrideWrapper::new(Opcode::SubInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::Mul => OverrideWrapper::new(Opcode::MulInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::Div => OverrideWrapper::new(Opcode::DivInt,IOType::new(vec![Self::export_info()], Some(TrcFloat::export_info()), false)),
+        OverrideOperations::Mod => OverrideWrapper::new(Opcode::ModInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::Power => OverrideWrapper::new(Opcode::PowerInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::BitAnd => OverrideWrapper::new(Opcode::BitAndInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::BitOr => OverrideWrapper::new(Opcode::BitOrInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::Xor => OverrideWrapper::new(Opcode::XorInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::ExactDiv => OverrideWrapper::new(Opcode::ExactDivInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::BitLeftShift => OverrideWrapper::new(Opcode::BitLeftShiftInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::BitRightShift => OverrideWrapper::new(Opcode::BitRightShiftInt,IOType::new(vec![Self::export_info()], Some(Self::export_info()), false)),
+        OverrideOperations::BitNot => OverrideWrapper::new(Opcode::BitNotInt,IOType::new(vec![], Some(Self::export_info()), false)),
+        OverrideOperations::SelfNegative => OverrideWrapper::new(Opcode::SelfNegativeInt,IOType::new(vec![], Some(Self::export_info()), false)),
+        OverrideOperations::Equal => OverrideWrapper::new(Opcode::EqInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+        OverrideOperations::NotEqual => OverrideWrapper::new(Opcode::NeInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+        OverrideOperations::Less => OverrideWrapper::new(Opcode::LtInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+        OverrideOperations::LessEqual => OverrideWrapper::new(Opcode::LeInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+        OverrideOperations::Greater => OverrideWrapper::new(Opcode::GtInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false)),
+        OverrideOperations::GreaterEqual => OverrideWrapper::new(Opcode::GeInt,IOType::new(vec![Self::export_info()], Some(TrcBool::export_info()), false))
         ]
     }
 }

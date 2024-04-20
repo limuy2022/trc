@@ -104,7 +104,4 @@ impl Default for ModuleManager {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::compiler::ast::ModuleUnit;
-}
+mod tests {}

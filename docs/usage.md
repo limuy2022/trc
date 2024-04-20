@@ -33,7 +33,7 @@ Tip3:The form like 001 is supported
 The next is the string value. To make you to write strings more easily:
 
 | Way               | Explain                                       |
-| :---------------- | :-------------------------------------------- |
+|:------------------|:----------------------------------------------|
 | "hello world"     | commom value                                  |
 | 'h'               | A way to store character                      |
 | """hello world""" | this method is for code across multiple lines |

@@ -169,10 +169,9 @@ fn convert_str_to_float(s: String) -> f64 {
 
 impl ValuePool {
     fn new() -> Self {
-        let ret = Self {
+        Self {
             ..Default::default()
-        };
-        ret
+        }
     }
 
     gen_getter_setter!(
@@ -190,7 +189,7 @@ impl ValuePool {
 
     pub fn extend_pool(&mut self, data: &StaticData) {
         for i in &data.constpool.floatpool {
-            self.add_float((i).to_string());
+            self.add_float(i.to_string());
         }
         for i in &data.constpool.stringpool {
             // TODO::improve copy performance

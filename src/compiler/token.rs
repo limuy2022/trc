@@ -762,7 +762,7 @@ impl TokenLex {
                             if v.0.is_empty() {
                                 zero_num += 1;
                             } else {
-                                s = (v.0.pop().unwrap()).to_string() + &s;
+                                s = v.0.pop().unwrap().to_string() + &s;
                             }
                         }
                         if v.0.is_empty() {
@@ -968,12 +968,12 @@ mod tests {
     /// check const pool
     fn check_pool<T, U>(v: Vec<U>, pool_be_checked: &Pool<T>)
     where
-        T: Eq + Hash + Clone + Display + Debug + std::convert::From<U>,
+        T: Eq + Hash + Clone + Display + Debug + From<U>,
         U: Eq + Hash + Clone + Display + Debug + Into<T>,
     {
         let mut testpool: HashSet<T> = HashSet::new();
         for i in &v {
-            testpool.insert(((*i).clone()).into());
+            testpool.insert((*i).clone().into());
         }
         assert_eq!(testpool.len(), pool_be_checked.len());
         for i in &testpool {

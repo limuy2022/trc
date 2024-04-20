@@ -1,7 +1,7 @@
 //! link different modules
 use crate::compiler::ValuePool;
 use libcore::*;
-use std::{collections::HashSet, usize};
+use std::collections::HashSet;
 
 pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticData {
     let mut data = StaticData::new();

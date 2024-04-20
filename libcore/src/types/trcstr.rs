@@ -45,7 +45,7 @@ impl TrcStr {
 
     fn override_export() -> HashMap<OverrideOperations, OverrideWrapper> {
         collection_literals::hash![
-            OverrideOperations::Add => OverrideWrapper::new(Opcode::AddStr, IOType::new(vec![Self::export_info()], TypeAllowNull::Some(Self::export_info()), false))
+            OverrideOperations::Add => OverrideWrapper::new(Opcode::AddStr, IOType::new(vec![Self::export_info()], Some(Self::export_info()), false))
         ]
     }
 

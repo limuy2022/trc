@@ -3,7 +3,7 @@
 Trc is a easy-learn programming language. It can be fast,safe and effective.
 
 | Platform | Status                                                                                                |
-| :------- | :---------------------------------------------------------------------------------------------------- |
+|:---------|:------------------------------------------------------------------------------------------------------|
 | Linux    | ![Linux Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_linux.yml)     |
 | Winodows | ![Windows Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_windows.yml) |
 | Macos    | ![Macos Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_macos.yml)     |

@@ -129,6 +129,6 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
     (new_stmts, args_type_required, output)
 }
 
-pub fn convent_to_info_func(name: impl Into<String>) -> String {
+pub fn convert_to_info_func(name: impl Into<String>) -> String {
     format!("{}_info", name.into())
 }

@@ -150,7 +150,7 @@ pub fn def_impl(context: TokenStream) -> TokenStream {
         }
     }
     for i in &mut left_func {
-        *i = syn::parse_str::<syn::Ident>(&function::convent_to_info_func(i.to_string()))
+        *i = syn::parse_str::<syn::Ident>(&function::convert_to_info_func(i.to_string()))
             .expect("name error");
     }
     let ret = quote!(

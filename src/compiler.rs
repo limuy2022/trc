@@ -1,6 +1,6 @@
 pub mod ast;
 pub mod linker;
-pub mod llvm_convent;
+pub mod llvm_convert;
 pub mod manager;
 pub mod optimizer;
 pub mod scope;
@@ -138,13 +138,13 @@ macro_rules! gen_single_getter_setter {
         }
         }
     };
-    ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty, $convent_func: ident)) => {
+    ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty, $convert_func: ident)) => {
         paste::paste! {
         pub fn [<add_ $func_name>](&mut self, val: $type) -> usize {
             let len_tmp = self.$const_pool.len();
             let ret = *self.$const_pool.entry(val.clone()).or_insert(len_tmp);
             if len_tmp != self.$const_pool.len() {
-                self.$id_pool.push($convent_func(val));
+                self.$id_pool.push($convert_func(val));
             }
             ret
         }

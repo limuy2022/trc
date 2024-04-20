@@ -111,7 +111,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
     input.block.stmts = new_stmts;
     // 将函数改写成正常的函数之后还需要生成一个函数来获取这个函数的信息，例如接收的参数和返回值
     let info_func_name =
-        parse_str::<Ident>(&function::convent_to_info_func(name.to_string())).expect("name error");
+        parse_str::<Ident>(&function::convert_to_info_func(name.to_string())).expect("name error");
     // println!("{}{:#?}", name.to_string(), info_function_self);
 
     let rettmp = quote!(#input
@@ -217,7 +217,7 @@ pub fn trc_method(_: TokenStream, input: TokenStream) -> TokenStream {
         if let ImplItem::Fn(func) = i {
             if let Visibility::Public(_) = func.vis {
                 funcs.push(
-                    parse_str::<Ident>(&function::convent_to_info_func(func.sig.ident.to_string()))
+                    parse_str::<Ident>(&function::convert_to_info_func(func.sig.ident.to_string()))
                         .unwrap(),
                 );
             }

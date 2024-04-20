@@ -25,11 +25,11 @@ macro_rules! gen_test_env {
 }
 
 /// 前面有int_nums个int时的首地址
-fn get_offset(int_nums: usize) -> usize {
-    size_of::<i64>() * int_nums
+fn get_offset(int_nums: usize) -> Opidx {
+    (size_of::<i64>() * int_nums) as Opidx
 }
 
-fn get_func_id(scope: &mut ModuleUnit, name: &str) -> usize {
+fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
     let idstr = scope
         .token_lexer
         .borrow()
@@ -48,10 +48,10 @@ fn get_func_id(scope: &mut ModuleUnit, name: &str) -> usize {
         .unwrap()
         .downcast_rc::<RustFunction>()
         .unwrap()
-        .buildin_id
+        .buildin_id as Opidx
 }
 
-const SEPCIAL_FUNC_ID: usize = usize::MAX;
+const SEPCIAL_FUNC_ID: Opidx = ARG_WRONG;
 
 fn opcode_assert_eq(expect: Vec<Inst>, acual: Vec<Inst>) {
     for (i, j) in expect.iter().zip(acual.iter()) {
@@ -108,7 +108,7 @@ fn test_expr_easy1() {
     t.generate_code().unwrap();
     opcode_assert_eq(
         t.staticdata.inst,
-        vec![Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE)],
+        vec![Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1))],
     );
 }
 
@@ -166,7 +166,7 @@ fn test_expr() {
     opcode_assert_eq(
         t.staticdata.inst,
         vec![
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1)),
             Inst::new_single(Opcode::LoadInt, 2),
             Inst::new_single(Opcode::AddInt, NO_ARG),
             Inst::new_single(Opcode::LoadInt, 3),
@@ -186,7 +186,7 @@ fn test_expr_final() {
     opcode_assert_eq(
         t.staticdata.inst,
         vec![
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1)),
             Inst::new_single(Opcode::LoadInt, 2),
             Inst::new_single(Opcode::SelfNegativeInt, NO_ARG),
             Inst::new_single(Opcode::AddInt, NO_ARG),
@@ -230,7 +230,7 @@ print("{}", a+90)"#,
             Inst::new_single(Opcode::LoadInt, 2),
             Inst::new_single(Opcode::AddInt, NO_ARG),
             Inst::new_single(Opcode::MoveInt, NO_ARG),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1)),
             Inst::new_single(Opcode::CallNative, fid),
         ],
     )
@@ -245,7 +245,7 @@ fn test_call_builtin_function() {
         t.staticdata.inst,
         vec![
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
         ],
     )
@@ -288,7 +288,7 @@ fn test_if_easy() {
             Inst::new_single(Opcode::EqInt, NO_ARG),
             Inst::new_single(Opcode::JumpIfFalse, 7),
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
         ],
     )
@@ -362,7 +362,7 @@ fn test_var_params() {
         t.staticdata.inst,
         vec![
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1)),
             Inst::new_single(Opcode::MoveInt, NO_ARG),
             Inst::new_single(Opcode::LoadInt, 2),
             Inst::new_single(Opcode::MoveInt, NO_ARG),
@@ -387,7 +387,7 @@ fn test_while_1() {
             Inst::new_single(Opcode::EqInt, NO_ARG),
             Inst::new_single(Opcode::JumpIfFalse, 8),
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
             Inst::new_single(Opcode::Jump, 0),
         ],
@@ -409,7 +409,7 @@ fn test_for_1() {
             Inst::new_single(Opcode::LtInt, NO_ARG),
             Inst::new_single(Opcode::JumpIfFalse, 14),
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
             Inst::new_double(Opcode::LoadGlobalVar, get_offset(0), intsz!()),
             Inst::new_single(Opcode::LoadInt, 1),
@@ -440,11 +440,11 @@ func f() {
         vec![
             Inst::new_single(Opcode::Stop, NO_ARG),
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
             Inst::new_single(Opcode::PopFrame, NO_ARG),
             Inst::new_single(Opcode::LoadString, 1),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
             Inst::new_single(Opcode::CallCustom, 0),
             Inst::new_single(Opcode::PopFrame, NO_ARG),
@@ -470,7 +470,7 @@ f()"#,
             Inst::new_single(Opcode::CallCustom, 0),
             Inst::new_single(Opcode::Stop, NO_ARG),
             Inst::new_single(Opcode::LoadString, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_single(Opcode::CallNative, fid),
             Inst::new_single(Opcode::PopFrame, NO_ARG),
         ],
@@ -499,9 +499,9 @@ print("{}{}", a, b)
             Inst::new_single(Opcode::LoadInt, 0),
             Inst::new_single(Opcode::LoadInt, 1),
             Inst::new_single(Opcode::CallCustom, 0),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ONE),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(1)),
             Inst::new_double(Opcode::StoreGlobal, get_offset(0), intsz!()),
-            Inst::new_single(Opcode::LoadInt, INT_VAL_POOL_ZERO),
+            Inst::new_single(Opcode::LoadInt, convert_usize_to_oparg(0)),
             Inst::new_double(Opcode::StoreGlobal, get_offset(1), intsz!()),
             Inst::new_single(Opcode::LoadString, 0),
             Inst::new_double(Opcode::LoadGlobalVar, get_offset(0), intsz!()),

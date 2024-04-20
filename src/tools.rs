@@ -2,6 +2,7 @@ pub mod build;
 pub mod dis;
 pub mod new;
 pub mod run;
+pub mod style;
 pub mod tshell;
 
 pub use build::build;

@@ -2,11 +2,11 @@
 
 Trc is a easy-learn programming language. It can be fast,safe and effective.
 
-|Platform|Status|
-|:---|:---|
-|Linux|![Linux Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_linux.yml)|
-|Winodows|![Windows Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_windows.yml)|
-|Macos|![Macos Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_macos.yml)|
+| Platform | Status                                                                                                |
+| :------- | :---------------------------------------------------------------------------------------------------- |
+| Linux    | ![Linux Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_linux.yml)     |
+| Winodows | ![Windows Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_windows.yml) |
+| Macos    | ![Macos Test](https://img.shields.io/github/actions/workflow/status/limuy2022/trc/rust_macos.yml)     |
 
 ![Total Lines](https://tokei.rs/b1/github/limuy2022/trc)
 
@@ -31,7 +31,9 @@ But in order to read test data file,please run in the root dir.
 
 ## How to use
 
-[Trc user Guide](docs/usage.md)
+[Trc Programming Book](docs/usage.md)
+
+[Trc Programming Book中文版](docs/usage-zh.md)
 
 ## Provide translation for this project
 

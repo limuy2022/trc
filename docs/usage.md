@@ -1,10 +1,12 @@
-# The usage of Rust version Trc
+# The Trc Programming Book
+
+This is a simple tutorial for Trc.Maybe it is not always catch up with the latest version of Trc.
 
 ## Hello world
 
 Writing a hello world is the beginning of learning Trc.
 
-```rust
+```
 println("Hello World!")
 ```
 
@@ -89,10 +91,10 @@ But,something should be noticed is that you cannot use logical operators for `in
 
 So,code like this cannot be compiled successfully:
 
-```rust
+```
 a := 1
 if a {
-    println(a)
+    println("{}", a)
 }
 ```
 
@@ -101,7 +103,7 @@ you cannot use the different types of values to calaulate
 
 For example:
 
-```go
+```
 a:=9
 b:=7.8
 a+b
@@ -115,7 +117,7 @@ First,you can use `if ... else if ... else` statements
 
 An example:
 
-```python
+```
 if 1 == 1 {
 
 } else if 2 != 1 {
@@ -129,7 +131,7 @@ if 1 == 1 {
 
 First:
 
-```cpp
+```
 for i := 0; i < 10; i++ {
     println(i)
 }
@@ -137,13 +139,57 @@ for i := 0; i < 10; i++ {
 
 Second:
 
-```python
+```
 for i in xxx {
     println(i)
 }
 ```
 
 `xxx` should be a iterable var
+
+`match` is also supported:
+
+different types are supported
+
+if you want to match more than one values you should use `|`
+
+example:
+
+```
+a:=9
+match a {
+1 -> {
+    println("1")
+}
+2 | 3 -> {
+    println("2 or 3")
+}
+_ -> {
+    println("other")
+}
+}
+```
+
+String is supported,too.
+
+example:
+
+```
+a:="hello"
+match a {
+"hello" -> {
+    println("hello")
+}
+"world" -> {
+    println("world")
+}
+_ -> {
+    println("other")
+}
+}
+```
+
+Ok. It is very like rust programming.I like the rules of `match` in rust.
 
 ## the comments of Trc
 
@@ -153,7 +199,7 @@ the first is use `#`,from `#` to the end of the line belongs to the comment
 
 the second is use `/**/`,this kind can cross the line,like:
 
-```cpp
+```
 /*
 hello world!
 */
@@ -163,7 +209,7 @@ hello world!
 
 First,we support the UTF-8 with your var name.So you can define your var like this:
 
-```go
+```
 你好:=90
 ```
 
@@ -171,8 +217,8 @@ the compiler will regard this var as a int var.
 
 Sometimes maybe you want to define the type.Do it like this:
 
-```go
-int a:=90
+```
+a:int:=90
 ```
 
 ## Data structures for Trc
@@ -193,17 +239,17 @@ Std lib provide many kinds of data structures for Trc.Here is the list:
 
 Define a function like this:
 
-```go
-func add(int a, int b) -> int {
-    return a + b;
+```
+func add(a:int, b:int) int {
+    return a + b
 }
 ```
 
 Or define a template function:
 
-```go
-func add<T>(T a, T b) -> T {
-    return a + b;
+```
+func add<T>(a:T, b:T) T {
+    return a + b
 }
 ```
 
@@ -211,12 +257,8 @@ func add<T>(T a, T b) -> T {
 
 You can import by the following ways:
 
-```go
+```
 import "a.b.c"
 ```
 
-Or:
-
-```go
-import "a/b/c"
-```
+`c` can be a function or a struct or a module

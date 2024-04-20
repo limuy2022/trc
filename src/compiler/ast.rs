@@ -176,7 +176,6 @@ impl ModuleUnit {
         //     "{} {} {} {} {}",
         //     cache.intty_id, cache.floatty_id, cache.charty_id, cache.strty_id, cache.boolty_id
         // );
-        drop(val_pool_ref);
         let name_str = stdlib_dll_name.to_str().unwrap().to_owned();
         ModuleUnit {
             token_lexer,
@@ -878,6 +877,7 @@ impl ModuleUnit {
         let mut path_with_dot = self.token_lexer.borrow_mut().const_pool.id_str[tok].clone();
         // 具体文件的路径
         let mut import_file_path = String::new();
+        // 是不是dll
         let mut is_dll = false;
         if path_with_dot.starts_with("std") {
             // std特殊对待
@@ -890,7 +890,7 @@ impl ModuleUnit {
             match tmp.option.inputsource.clone() {
                 InputSource::File(now_module_path) => {
                     let path = PathBuf::from(path_with_dot.replace('.', "/"));
-                    let mut now_module_path = PathBuf::from(now_module_path);
+                    let mut now_module_path = now_module_path;
                     now_module_path.pop();
                     now_module_path = now_module_path.join(path.clone());
                     let tmp = now_module_path.clone();

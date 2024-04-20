@@ -41,7 +41,7 @@ codegen-units = 1
 strip = true
 
 [workspace]
-members = ["derive", ".", "stdlib", "libcore"]
+members = ["derive", ".", "stdlib", "libcore", "trclsp"]
 
 [package.metadata.i18n]
 # The available locales for your application, default: ["en"].

@@ -2,7 +2,7 @@
 //! ctrc file is trc's compiled object
 //! can be loaded and runned by vm without compiling
 
-use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, StaticData};
+use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData};
 use std::{
     io::{BufReader, BufWriter, Read, Write},
     mem::size_of,
@@ -87,8 +87,12 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
         let opnums = opcode.get_opcode_arg_nums();
         let inst = if opnums > 0 {
             (
-                read_lensize(f)?,
-                if opnums > 1 { read_lensize(f)? } else { 0 },
+                read_integer!(f, Opidx),
+                if opnums > 1 {
+                    read_integer!(f, Opidx)
+                } else {
+                    0
+                },
             )
         } else {
             (0, 0)
@@ -120,11 +124,6 @@ fn load_deps<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyhow::Re
 }
 
 fn write_const_pool<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
-    // int pool
-    write_integer(f, data.constpool.intpool.len())?;
-    for i in &data.constpool.intpool {
-        write_integer(f, *i)?;
-    }
     // float pool
     write_integer(f, data.constpool.floatpool.len())?;
     for i in &data.constpool.floatpool {
@@ -141,11 +140,6 @@ fn write_const_pool<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow
 fn load_const_pool<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyhow::Result<()> {
     // int pool
     let len = read_lensize(f)?;
-    data.constpool.intpool.reserve(len);
-    for _ in 0..len {
-        let val = read_integer!(f, i64);
-        data.constpool.intpool.push(val);
-    }
     // float pool
     let len = read_lensize(f)?;
     data.constpool.floatpool.reserve(len);

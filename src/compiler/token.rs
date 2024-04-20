@@ -681,7 +681,7 @@ impl TokenLex {
                 Token::new(TokenType::FloatValue, Some(self.const_pool.add_float(v)))
             }
             NumValue::Integer(it) => {
-                Token::new(TokenType::IntValue, Some(self.const_pool.add_int(it)))
+                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(it)))
             }
         }
     }
@@ -712,7 +712,7 @@ impl TokenLex {
                         }
                         Ok(Token::new(
                             TokenType::IntValue,
-                            Some(self.const_pool.add_int(it)),
+                            Some(convert_int_constval_to_usize(it)),
                         ))
                     } else {
                         // 负数次，升级为float
@@ -1037,10 +1037,6 @@ mod tests {
             ],
         );
         check_pool(
-            vec![100, 232_304904, 0b011, 0x2AA4, 0o2434, 0, 1, 1e9 as i64],
-            &t.const_pool.const_ints,
-        );
-        check_pool(
             vec!["123.9", "12", "0.8", "0.0018", "0.017", "198"],
             &t.const_pool.const_floats,
         );
@@ -1231,7 +1227,6 @@ func main() {
                 Token::new(TokenType::IntValue, Some(2)),
             ],
         );
-        check_pool(vec![0b1, 23, 0], &t.const_pool.const_ints);
     }
 
     #[test]
@@ -1244,7 +1239,6 @@ func main() {
                 Token::new(TokenType::ID, Some(0)),
             ],
         );
-        check_pool(vec![0xabc, 0, 1], &t.const_pool.const_ints);
         check_pool(vec!["hds".to_string()], &t.const_pool.name_pool);
     }
 

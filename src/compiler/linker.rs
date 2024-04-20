@@ -1,7 +1,7 @@
 //! link different modules
 use crate::compiler::ValuePool;
 use libcore::*;
-use std::collections::HashSet;
+use std::{collections::HashSet, usize};
 
 pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticData {
     let mut data = StaticData::new();
@@ -28,26 +28,20 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
             // 改变指令对常量池的引用
             let mut added = j.clone();
             match j.opcode {
-                Opcode::LoadInt => {
-                    added.operand.0 = value_pool
-                        .get_int(&i.constpool.intpool[added.operand.0])
-                        .unwrap();
-                }
-                Opcode::LoadBool | Opcode::LoadChar => { /*ignore*/ }
                 Opcode::LoadString => {
                     added.operand.0 = value_pool
-                        .get_string(&i.constpool.stringpool[added.operand.0])
-                        .unwrap()
+                        .get_string(&i.constpool.stringpool[added.operand.0 as usize])
+                        .unwrap() as Opidx
                 }
                 Opcode::LoadFloat => {
                     // TODO:improve the performance
                     added.operand.0 = value_pool
-                        .get_float(&i.constpool.floatpool[added.operand.0].to_string())
-                        .unwrap()
+                        .get_float(&i.constpool.floatpool[added.operand.0 as usize].to_string())
+                        .unwrap() as Opidx
                 }
                 Opcode::LoadBigInt => { /* TODO:bigint */ }
                 Opcode::CallCustom => {
-                    added.operand.0 += data.funcs_pos.len();
+                    added.operand.0 += data.funcs_pos.len() as Opidx;
                 }
                 _ => {}
             }
@@ -56,7 +50,7 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
                 if inst_ori_id == pos.func_addr {
                     function_expected_pos = iter_of_function.next();
                     let mut added = pos.clone();
-                    added.func_addr = data.get_last_opcode_id();
+                    added.func_addr = data.get_last_opcode_id() as usize;
                     func_record_tmp.push(added);
                 }
             }
@@ -79,17 +73,15 @@ mod test {
 
     #[test]
     fn test_link() {
+        // TODO:add pool test
         let mut data1 = StaticData::new();
-        data1.constpool.intpool = vec![1, 2, 4, 8];
         data1.dll_module_should_loaded = vec!["test.dll".to_string()];
         data1.inst = vec![Inst::new_single(Opcode::LoadInt, 1)];
         let mut data2 = StaticData::new();
-        data2.constpool.intpool = vec![1, 2, 4, 10];
         data2.dll_module_should_loaded = vec!["test.dll2".to_string(), "test.dll".to_string()];
         data2.inst = vec![Inst::new_single(Opcode::LoadInt, 3)];
         let mut datas = vec![data1, data2];
         let data = link(datas.iter_mut());
-        assert_eq!(data.constpool.intpool, vec![0, 1, 2, 4, 8, 10]);
         assert_eq!(
             HashSet::<String>::from_iter(data.dll_module_should_loaded.into_iter()),
             HashSet::from_iter(vec!["test.dll2".to_string(), "test.dll".to_string()].into_iter())

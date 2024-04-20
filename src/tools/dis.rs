@@ -1,3 +1,5 @@
+use std::usize;
+
 use libcore::*;
 
 use crate::base::ctrc::load_from_reader_without_magic;
@@ -39,12 +41,20 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
         } else {
             print!("{} {}", i.0, i.1);
             match i.1.opcode {
-                Opcode::LoadInt => print!("({})", static_data.constpool.intpool[i.1.operand.0]),
+                Opcode::LoadInt => {
+                    print!("({})", unsafe { convert_to_int_constval(i.1.operand.0) })
+                }
                 Opcode::LoadString => {
-                    print!("({})", static_data.constpool.stringpool[i.1.operand.0])
+                    print!(
+                        "({})",
+                        static_data.constpool.stringpool[i.1.operand.0 as usize]
+                    )
                 }
                 Opcode::LoadFloat => {
-                    print!("({})", static_data.constpool.floatpool[i.1.operand.0])
+                    print!(
+                        "({})",
+                        static_data.constpool.floatpool[i.1.operand.0 as usize]
+                    )
                 }
                 _ => {}
             }

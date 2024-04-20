@@ -3,6 +3,8 @@ use std::fmt::Display;
 
 use num_enum::TryFromPrimitive;
 
+use crate::TrcIntInternal;
+
 #[derive(Clone)]
 pub struct FuncStorage {
     pub func_addr: usize,
@@ -174,7 +176,6 @@ impl Opcode {
 
 #[derive(Default, Clone)]
 pub struct ConstPool {
-    pub intpool: Vec<i64>,
     pub stringpool: Vec<String>,
     pub floatpool: Vec<f64>,
 }
@@ -187,24 +188,25 @@ impl ConstPool {
     }
 }
 
-pub const NO_ARG: usize = 0;
-pub const ARG_WRONG: usize = usize::MAX;
+pub type Opidx = u64;
+pub const NO_ARG: Opidx = 0;
+pub const ARG_WRONG: Opidx = Opidx::MAX;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Inst {
     pub opcode: Opcode,
-    pub operand: (usize, usize),
+    pub operand: (Opidx, Opidx),
 }
 
 impl Inst {
-    pub fn new_single(opcode: Opcode, operand: usize) -> Self {
+    pub fn new_single(opcode: Opcode, operand: Opidx) -> Self {
         Self {
             opcode,
             operand: (operand, ARG_WRONG),
         }
     }
 
-    pub fn new_double(opcode: Opcode, operand1: usize, operand2: usize) -> Self {
+    pub fn new_double(opcode: Opcode, operand1: Opidx, operand2: Opidx) -> Self {
         Self {
             opcode,
             operand: (operand1, operand2),
@@ -241,7 +243,7 @@ pub struct StaticData {
     pub global_sym_table_sz: usize,
     pub line_table: Vec<usize>,
     pub type_list: Vec<Vec<VmStackType>>,
-    pub function_split: Option<usize>,
+    pub function_split: Option<Opidx>,
     pub dll_module_should_loaded: Vec<String>,
 }
 
@@ -258,17 +260,39 @@ impl StaticData {
     }
 
     #[inline]
-    pub fn get_last_opcode_id(&self) -> usize {
-        self.inst.len() - 1
+    pub fn get_last_opcode_id(&self) -> Opidx {
+        self.inst.len() as Opidx - 1
     }
 
     #[inline]
-    pub fn get_next_opcode_id(&self) -> usize {
-        self.inst.len()
+    pub fn get_next_opcode_id(&self) -> Opidx {
+        self.inst.len() as Opidx
     }
 
     #[inline]
     pub fn add_dll_module(&mut self, module_name: String) {
         self.dll_module_should_loaded.push(module_name);
     }
+}
+
+///
+/// Convert Opidx to TrcIntInternal
+///
+/// # Safety
+///
+/// The caller must ensure that the Opidx is a valid integer
+pub unsafe fn convert_to_int_constval(v: Opidx) -> TrcIntInternal {
+    unsafe { std::mem::transmute(v) }
+}
+
+pub fn convert_int_constval_to_oparg(v: TrcIntInternal) -> Opidx {
+    unsafe { std::mem::transmute::<TrcIntInternal, Opidx>(v) }
+}
+
+pub fn convert_int_constval_to_usize(v: TrcIntInternal) -> usize {
+    unsafe { std::mem::transmute::<TrcIntInternal, usize>(v) }
+}
+
+pub fn convert_usize_to_oparg(v: usize) -> Opidx {
+    unsafe { std::mem::transmute::<usize, Opidx>(v) }
 }

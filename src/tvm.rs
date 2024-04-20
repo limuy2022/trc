@@ -1,6 +1,8 @@
 mod def;
 mod function;
 
+use std::usize;
+
 use self::function::Frame;
 use crate::cfg;
 use libcore::*;
@@ -190,9 +192,9 @@ impl<'a> Vm<'a> {
                 *pc = ret.prev_addr;
             }
             Opcode::LoadInt => {
-                self.dynadata.dydata.push_data(
-                    self.static_data.constpool.intpool[self.static_data.inst[*pc].operand.0],
-                );
+                self.dynadata.dydata.push_data(unsafe {
+                    convert_to_int_constval(self.static_data.inst[*pc].operand.0)
+                });
             }
             Opcode::BitAnd => operator_opcode!(bit_and, self),
             Opcode::BitOr => operator_opcode!(bit_or, self),
@@ -202,22 +204,28 @@ impl<'a> Vm<'a> {
             Opcode::LoadLocalVar => {
                 let addr = self.static_data.inst[*pc].operand.0;
                 let bytes_num = self.static_data.inst[*pc].operand.1;
-                let var_begin_addr = self.dynadata.frames_stack.last().unwrap().get_addr(addr);
+                let var_begin_addr = self
+                    .dynadata
+                    .frames_stack
+                    .last()
+                    .unwrap()
+                    .get_addr(addr as usize);
                 unsafe {
                     self.dynadata
                         .dydata
-                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num)
+                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num as usize)
                 };
             }
             Opcode::LoadString => {
                 let tmp = self.static_data.inst[*pc].operand.0;
-                let tmp = self.static_data.constpool.stringpool[tmp].clone();
+                let tmp = self.static_data.constpool.stringpool[tmp as usize].clone();
                 let tmp = self.dynadata.dydata.gc.alloc(tmp);
                 self.dynadata.dydata.push_data(tmp);
             }
             Opcode::LoadFloat => {
                 self.dynadata.dydata.push_data(
-                    self.static_data.constpool.floatpool[self.static_data.inst[*pc].operand.0],
+                    self.static_data.constpool.floatpool
+                        [self.static_data.inst[*pc].operand.0 as usize],
                 );
             }
             Opcode::LoadBigInt => {}
@@ -226,8 +234,9 @@ impl<'a> Vm<'a> {
                 operator_opcode!(self_negative, self);
             }
             Opcode::CallNative => {
-                let tmp = self.dynadata.imported_func[self.static_data.inst[*pc].operand.0](
-                    &mut self.dynadata.dydata,
+                let tmp = self.dynadata.imported_func
+                    [self.static_data.inst[*pc].operand.0 as usize](
+                    &mut self.dynadata.dydata
                 );
                 self.convert_err_info(tmp)?;
             }
@@ -417,12 +426,12 @@ impl<'a> Vm<'a> {
             Opcode::JumpIfFalse => {
                 let condit = impl_opcode!(bool, self, 1);
                 if !condit {
-                    *pc = self.static_data.inst[*pc].operand.0;
+                    *pc = self.static_data.inst[*pc].operand.0 as usize;
                     return Ok(());
                 }
             }
             Opcode::Jump => {
-                *pc = self.static_data.inst[*pc].operand.0;
+                *pc = self.static_data.inst[*pc].operand.0 as usize;
                 return Ok(());
             }
             Opcode::LoadChar => unsafe {
@@ -466,21 +475,23 @@ impl<'a> Vm<'a> {
                 return Ok(());
             }
             Opcode::CallCustom => {
-                let var_table_mem_sz =
-                    self.static_data.funcs_pos[self.static_data.inst[*pc].operand.0].var_table_sz;
+                let var_table_mem_sz = self.static_data.funcs_pos
+                    [self.static_data.inst[*pc].operand.0 as usize]
+                    .var_table_sz;
                 let space = self.dynadata.dydata.alloc_var_space(var_table_mem_sz);
                 self.dynadata.frames_stack.push(Frame::new(*pc, space));
-                *pc = self.static_data.funcs_pos[self.static_data.inst[*pc].operand.0].func_addr;
+                *pc = self.static_data.funcs_pos[self.static_data.inst[*pc].operand.0 as usize]
+                    .func_addr;
                 return Ok(());
             }
             Opcode::LoadGlobalVar => {
                 let addr = self.static_data.inst[*pc].operand.0;
                 let bytes_num = self.static_data.inst[*pc].operand.1;
-                let var_begin_addr = self.dynadata.dydata.get_var_addr(addr);
+                let var_begin_addr = self.dynadata.dydata.get_var_addr(addr as usize);
                 unsafe {
                     self.dynadata
                         .dydata
-                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num)
+                        .write_to_stack(var_begin_addr as *mut Byte, bytes_num as usize)
                 };
             }
             Opcode::EqWithoutPop => {
@@ -509,35 +520,37 @@ impl<'a> Vm<'a> {
             }
             Opcode::PopData => {
                 let bytes = self.static_data.inst[*pc].operand.0;
-                self.dynadata.dydata.pop_n_bytes_data(bytes);
+                self.dynadata.dydata.pop_n_bytes_data(bytes as usize);
             }
             Opcode::JumpIfTrue => {
                 let condit = impl_opcode!(bool, self, 1);
                 if condit {
-                    *pc = self.static_data.inst[*pc].operand.0;
+                    *pc = self.static_data.inst[*pc].operand.0 as usize;
                     return Ok(());
                 }
             }
             Opcode::StoreLocal => {
                 let byte_num = self.static_data.inst[*pc].operand.1;
                 let var_addr = self.static_data.inst[*pc].operand.0;
-                let stack_ptr = self.dynadata.dydata.pop_n_bytes_data(byte_num);
+                let stack_ptr = self.dynadata.dydata.pop_n_bytes_data(byte_num as usize);
                 unsafe {
-                    self.dynadata
-                        .frames_stack
-                        .last_mut()
-                        .unwrap()
-                        .write_to(var_addr, stack_ptr, byte_num)
+                    self.dynadata.frames_stack.last_mut().unwrap().write_to(
+                        var_addr as usize,
+                        stack_ptr,
+                        byte_num as usize,
+                    )
                 };
             }
             Opcode::StoreGlobal => {
                 let var_addr = self.static_data.inst[*pc].operand.0;
                 let bytes_num = self.static_data.inst[*pc].operand.1;
-                let stack_data_ptr = self.dynadata.dydata.pop_n_bytes_data(bytes_num);
+                let stack_data_ptr = self.dynadata.dydata.pop_n_bytes_data(bytes_num as usize);
                 unsafe {
-                    self.dynadata
-                        .dydata
-                        .write_to_val(var_addr, stack_data_ptr, bytes_num)
+                    self.dynadata.dydata.write_to_val(
+                        var_addr as usize,
+                        stack_data_ptr,
+                        bytes_num as usize,
+                    )
                 };
             }
         };

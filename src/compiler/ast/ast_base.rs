@@ -130,12 +130,12 @@ impl ModuleUnit {
         }
     }
 
-    pub fn add_bycode(&mut self, opty: Opcode, opnum: usize) {
+    pub fn add_bycode(&mut self, opty: Opcode, opnum: Opidx) {
         self.staticdata.inst.push(Inst::new_single(opty, opnum));
         self.gen_line_table();
     }
 
-    pub fn add_double_bycode(&mut self, opty: Opcode, opnum1: usize, opnum2: usize) {
+    pub fn add_double_bycode(&mut self, opty: Opcode, opnum1: Opidx, opnum2: Opidx) {
         self.staticdata
             .inst
             .push(Inst::new_double(opty, opnum1, opnum2));

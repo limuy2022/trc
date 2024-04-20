@@ -113,12 +113,10 @@ type Pool<T> = HashMap<T, usize>;
 #[derive(Default)]
 /// 管理常量池添加删除
 pub struct ValuePool {
-    const_ints: Pool<i64>,
     const_strings: Pool<String>,
     const_floats: Pool<String>,
     name_pool: Pool<String>,
     _const_big_int: Pool<String>,
-    pub id_int: Vec<i64>,
     pub id_float: Vec<f64>,
     pub id_str: Vec<String>,
     pub id_name: Vec<String>,
@@ -174,16 +172,13 @@ fn convert_str_to_float(s: String) -> f64 {
 
 impl ValuePool {
     fn new() -> Self {
-        let mut ret = Self {
+        let ret = Self {
             ..Default::default()
         };
-        ret.add_int(0);
-        ret.add_int(1);
         ret
     }
 
     gen_getter_setter!(
-        int => (const_ints, id_int, i64),
         string => (const_strings, id_str, String),
         id => (name_pool, id_name, String)
     );
@@ -191,16 +186,12 @@ impl ValuePool {
 
     fn store_val_to_vm(&mut self) -> ConstPool {
         let mut ret = ConstPool::new();
-        ret.intpool.clone_from(&self.id_int);
         ret.floatpool.clone_from(&self.id_float);
         ret.stringpool.clone_from(&self.id_str);
         ret
     }
 
     pub fn extend_pool(&mut self, data: &StaticData) {
-        for i in &data.constpool.intpool {
-            self.add_int(*i);
-        }
         for i in &data.constpool.floatpool {
             self.add_float((i).to_string());
         }
@@ -476,16 +467,12 @@ mod tests {
     #[test]
     fn test_value_pool() {
         let mut pool = ValuePool::new();
-        assert_eq!(pool.add_int(7), 2);
-        assert_eq!(pool.add_int(1), INT_VAL_POOL_ONE);
-        assert_eq!(pool.add_int(0), INT_VAL_POOL_ZERO);
         assert_eq!(pool.add_float("9.0".to_owned()), 0);
         assert_eq!(pool.add_float("9.0".to_owned()), 0);
         assert_eq!(pool.add_float("9.5".to_owned()), 1);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("value")), 0);
         assert_eq!(pool.add_string(String::from("vale")), 1);
-        assert_eq!(pool.id_int[0], 0);
         assert!((pool.id_float[0] - 9.0).abs() < 0.00001);
         assert_eq!(pool.id_str[1], "vale");
     }

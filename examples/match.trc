@@ -4,7 +4,7 @@ match a{
 println("{}", a)
 }
 2|90 -> {
-println("{}", a)
+println("get {}", a)
 }
 _ -> {
 println("final case")

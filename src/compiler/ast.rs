@@ -56,7 +56,7 @@ macro_rules! tmp_expe_function_gen {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     // 读取IOType检查
-                    let func_obj = self.self_scope.borrow().get_class_by_class_id(extend).expect("Class empty");
+                    let func_obj = self.self_scope.borrow().get_class_by_class_id(extend).expect(&format!("Class {} not found", extend));
                     let io_check = func_obj.get_override_func(match $accepted_token.convert_to_override() {
                         Some(v) => v,
                         None => {
@@ -102,18 +102,20 @@ macro_rules! tmp_expe_function_gen {
 
 /// there are a log of similar operators to be generated
 macro_rules! expr_gen {
-    ($funcname:ident, $tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
-        tmp_expe_function_gen!($tmpfuncname, $next_item_func, $($accepted_token),*);
+    ($funcname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
+        paste::paste!(
+        tmp_expe_function_gen!([<_ $funcname>], $next_item_func, $($accepted_token),*);
         fn $funcname(&mut self, istry: bool) -> AstError<()> {
             self.$next_item_func(istry)?;
             match self.process_info.get_last_ty() {
                 None => {}
                 Some(v) => {
-                    self.$tmpfuncname(istry, v)?;
+                    self.[<_ $funcname>](istry, v)?;
                 }
             }
             Ok(())
         }
+        );
     };
 }
 
@@ -191,30 +193,27 @@ impl ModuleUnit {
         }
     }
 
-    expr_gen!(expr9, expr9_, factor, TokenType::Power);
+    expr_gen!(expr9, factor, TokenType::Power);
     expr_gen!(
         expr8,
-        expr8_,
         expr9,
         TokenType::Mul,
         TokenType::Div,
         TokenType::Mod,
         TokenType::ExactDiv
     );
-    expr_gen!(expr7, expr7_, expr8, TokenType::Sub, TokenType::Add);
+    expr_gen!(expr7, expr8, TokenType::Sub, TokenType::Add);
     expr_gen!(
         expr6,
-        expr6_,
         expr7,
         TokenType::BitLeftShift,
         TokenType::BitRightShift
     );
-    expr_gen!(expr5, expr5_, expr6, TokenType::BitAnd);
-    expr_gen!(expr4, expr4_, expr5, TokenType::Xor);
-    expr_gen!(expr3, expr3_, expr4, TokenType::BitOr);
+    expr_gen!(expr5, expr6, TokenType::BitAnd);
+    expr_gen!(expr4, expr5, TokenType::Xor);
+    expr_gen!(expr3, expr4, TokenType::BitOr);
     expr_gen!(
         expr2,
-        expr2_,
         expr3,
         TokenType::Equal,
         TokenType::NotEqual,
@@ -223,8 +222,8 @@ impl ModuleUnit {
         TokenType::Greater,
         TokenType::GreaterEqual
     );
-    expr_gen!(expr1, expr1_, expr2, TokenType::And);
-    expr_gen!(expr, expr_, expr1, TokenType::Or);
+    expr_gen!(expr1, expr2, TokenType::And);
+    expr_gen!(expr, expr1, TokenType::Or);
 
     pub fn prepare_get_static(&mut self) -> &mut StaticData {
         self.staticdata.constpool = self.token_lexer.borrow_mut().const_pool.store_val_to_vm();

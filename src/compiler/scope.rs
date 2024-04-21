@@ -136,7 +136,30 @@ impl VarInfo {
 
 #[derive(Clone, Debug, Default)]
 pub struct RootInfo {
-    // 该id不会减少，在所有作用域共同使用
+    types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
+    // 当前作用域可以分配的下一个class id
+    types_id: ClassIdxId,
+}
+
+impl RootInfo {
+    pub fn get_class_by_class_id(&self, id: ClassIdxId) -> Option<Rc<dyn ClassInterface>> {
+        // 不存在的类
+        if id >= self.types_id {
+            return None;
+        }
+        self.types_custom_store.get(&id).cloned()
+    }
+
+    fn alloc_type_id(&mut self) -> Result<ScopeAllocIdTy, ScopeError> {
+        let ret = self.types_id;
+        self.types_id += 1;
+        Ok(ret)
+    }
+
+    fn insert_type(&mut self, id: ClassIdxId, f: Rc<dyn ClassInterface>) -> Result<(), ScopeError> {
+        self.types_custom_store.insert(id, f);
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -183,11 +206,7 @@ pub struct SymScope {
     vars: HashMap<ScopeAllocIdTy, VarInfo>,
     // 由token id到模块的映射
     // modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
-    // 当前作用域可以分配的下一个class id
-    types_id: ClassIdxId,
     vars_id: ScopeAllocIdTy,
-    // 用户自定义的类型储存位置
-    types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
     // 作用域暂时储存的函数token
     pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
     // 计算当前需要最少多大的空间来保存变量
@@ -224,7 +243,6 @@ impl SymScope {
                     None => ret.root_scope = Some(Rc::downgrade(&prev_scope)),
                 }
                 ret.scope_sym_id = prev_scope.borrow().scope_sym_id;
-                ret.types_id = prev_scope.borrow().types_id;
                 ret
             }
             SymScopePrev::Root => Self {
@@ -440,11 +458,16 @@ impl SymScope {
     }
 
     pub fn get_class_by_class_id(&self, classid: ClassIdxId) -> Option<Rc<dyn ClassInterface>> {
-        // 不存在的类
-        if classid >= self.types_id {
-            return None;
+        // if classid >= self.types_id {
+        //     return None;
+        // }
+        // self.types_custom_store.get(&classid).cloned()
+        match &self.prev_scope {
+            RootOnlyInfo::NonRoot(ref prev_scope) => {
+                prev_scope.borrow().get_class_by_class_id(classid)
+            }
+            RootOnlyInfo::Root(data) => data.get_class_by_class_id(classid),
         }
-        self.types_custom_store.get(&classid).cloned()
     }
 
     pub fn get_class(&self, classid_idx: ScopeAllocIdTy) -> Option<Rc<dyn ClassInterface>> {
@@ -459,17 +482,19 @@ impl SymScope {
     }
 
     fn alloc_type_id(&mut self, idx: ScopeAllocIdTy) -> Result<ScopeAllocIdTy, ScopeError> {
-        if self.types.insert(idx, self.types_id).is_some() {
-            return Err(ScopeError::Redefine);
-        }
-        let ret = self.types_id;
-        self.types_id += 1;
+        let ret = match &mut self.prev_scope {
+            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().alloc_type_id(idx),
+            RootOnlyInfo::Root(data) => data.alloc_type_id(),
+        }?;
+        self.types.insert(idx, ret);
         Ok(ret)
     }
 
     fn insert_type(&mut self, id: ClassIdxId, f: Rc<dyn ClassInterface>) -> Result<(), ScopeError> {
-        self.types_custom_store.insert(id, f);
-        Ok(())
+        match &mut self.prev_scope {
+            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().insert_type(id, f),
+            RootOnlyInfo::Root(data) => data.insert_type(id, f),
+        }
     }
 
     pub fn add_type(

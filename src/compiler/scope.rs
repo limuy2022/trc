@@ -139,6 +139,7 @@ pub struct RootInfo {
     types_custom_store: HashMap<ClassIdxId, Rc<dyn ClassInterface>>,
     // 当前作用域可以分配的下一个class id
     types_id: ClassIdxId,
+    imported_native: HashMap<String, Rc<libloading::Library>>,
 }
 
 impl RootInfo {
@@ -159,6 +160,10 @@ impl RootInfo {
     fn insert_type(&mut self, id: ClassIdxId, f: Rc<dyn ClassInterface>) -> Result<(), ScopeError> {
         self.types_custom_store.insert(id, f);
         Ok(())
+    }
+
+    pub fn add_imported_native_dll(&mut self, dll_name: String, lib: Rc<libloading::Library>) {
+        self.imported_native.insert(dll_name, lib);
     }
 }
 
@@ -221,7 +226,6 @@ pub struct SymScope {
     pub in_class: bool,
     pub is_pub: bool,
     imported_modules: HashMap<ScopeAllocIdTy, Rc<RefCell<SymScope>>>,
-    imported_native: HashMap<String, Rc<libloading::Library>>,
     root_scope: Option<Weak<RefCell<SymScope>>>,
 }
 
@@ -298,14 +302,16 @@ impl SymScope {
     }
 
     /// import the module defined in rust
+    /// # Warning
+    /// 第一次导入dll记得将id加dll中函数的个数个
     pub fn import_native_module(
         &mut self,
-        stdlib: &Module,
+        library: &Module,
         libstorage: &ModuleStorage,
         const_pool: &ValuePool,
-        mut alloc_extern_id_func: impl FnMut() -> usize,
+        prev_func_base: usize, // 给定函数索引起始点
     ) -> Result<(), ErrorInfo> {
-        let types = stdlib.classes();
+        let types = library.classes();
         // println!("{:?}", types);
         let mut obj_vec = vec![];
         for i in types {
@@ -317,6 +323,7 @@ impl SymScope {
             };
             obj_vec.push((classid, obj_rc));
         }
+        // 改写类的重载方法
         for i in &mut obj_vec {
             for j in &mut i.1.functions {
                 self.fix_func(j.1.get_io_mut(), libstorage, const_pool);
@@ -329,15 +336,14 @@ impl SymScope {
             self.insert_type(i.0, Rc::new(i.1))
                 .expect("type symbol conflict");
         }
-        let funcs = stdlib.functions();
+        let funcs = library.functions();
         for i in funcs {
             let idx = self.insert_sym_with_error(const_pool.name_pool[&i.0], &i.0)?;
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);
-            self.add_extern_func(idx, alloc_extern_id_func(), fobj);
+            self.add_extern_func(idx, prev_func_base + fobj.buildin_id, fobj);
         }
-        // 改写类的重载方法
         Ok(())
     }
 
@@ -414,12 +420,7 @@ impl SymScope {
         self.funcs.insert(id, f);
     }
 
-    pub fn add_extern_func(
-        &mut self,
-        id: ScopeAllocIdTy,
-        function_id: FuncIdxTy,
-        mut f: RustFunction,
-    ) {
+    fn add_extern_func(&mut self, id: ScopeAllocIdTy, function_id: FuncIdxTy, mut f: RustFunction) {
         f.buildin_id = function_id;
         self.add_func(id, Rc::new(f))
     }
@@ -528,12 +529,29 @@ impl SymScope {
         self.get_type_id(ty_idx_id)
     }
 
-    pub fn add_imported_native_dll(&mut self, dll_name: String, lib: Rc<libloading::Library>) {
-        self.imported_native.insert(dll_name, lib);
+    pub fn add_imported_native_dll(
+        &mut self,
+        dll_name: String,
+        lib: Rc<libloading::Library>,
+        storage: &ModuleStorage,
+        addid: impl Fn(usize),
+    ) {
+        match &mut self.prev_scope {
+            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope
+                .borrow_mut()
+                .add_imported_native_dll(dll_name, lib, storage, addid),
+            RootOnlyInfo::Root(data) => {
+                data.add_imported_native_dll(dll_name, lib);
+                addid(storage.func_table().len());
+            }
+        }
     }
 
     pub fn get_dll(&self, name: &str) -> Option<Rc<libloading::Library>> {
-        self.imported_native.get(name).map(|v| (*v).clone())
+        match &self.prev_scope {
+            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_dll(name),
+            RootOnlyInfo::Root(data) => data.imported_native.get(name).map(|v| (*v).clone()),
+        }
     }
 }
 

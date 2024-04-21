@@ -18,7 +18,7 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
         compiler.lex()?
     };
     // let static_data = ast.prepare_get_static();
-    println!("deps modules:");
+    println!("deps modules(Order is significant):");
     for i in &static_data.dll_module_should_loaded {
         println!("{}", i);
     }

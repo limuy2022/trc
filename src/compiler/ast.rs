@@ -13,7 +13,13 @@ use crate::{
 use collection_literals::collection;
 use libcore::*;
 use rust_i18n::t;
-use std::{cell::RefCell, collections::HashSet, mem::swap, path::PathBuf, rc::Rc, usize};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, HashSet},
+    mem::swap,
+    path::PathBuf,
+    rc::Rc,
+};
 
 #[derive(Default)]
 struct Cache {
@@ -40,7 +46,9 @@ pub struct ModuleUnit {
     cache: Cache,
     // record if the fisrt func is defined
     first_func: bool,
+    // 对哈希表去重，并且记录每个dll的函数起始索引
     modules_dll_dup: HashSet<String>,
+    modules_info: HashMap<String, usize>,
     modules_dll: Vec<String>,
     module_manager: Rc<RefCell<ModuleManager>>,
     compiler_data: Rc<RefCell<CompilerImpl>>,
@@ -130,6 +138,7 @@ impl ModuleUnit {
         let stdlib_dll =
             unsafe { libloading::Library::new(stdlib_dll_name.clone()).expect("without stdlib") };
         let (stdlib, stdstorage) = load_module_storage(&stdlib_dll);
+        // 向token lexer常量池中添加prelude解析数据
         let prelude = stdlib.sub_modules().get("prelude").unwrap();
         for i in prelude.functions() {
             token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
@@ -139,18 +148,24 @@ impl ModuleUnit {
         }
         // 为root scope添加prelude
         let _optimize = compiler_data.borrow_mut().option.optimize;
+        let func_id_base = module_manager.borrow().global_extern_function_id();
         root_scope
             .borrow_mut()
             .import_native_module(
                 prelude,
                 stdstorage,
                 &token_lexer.borrow_mut().const_pool,
-                || module_manager.borrow_mut().alloc_extern_function_id(),
+                func_id_base,
             )
             .expect("Import prelude but failed");
-        root_scope
-            .borrow_mut()
-            .add_imported_native_dll("std".to_string(), Rc::new(stdlib_dll));
+        root_scope.borrow_mut().add_imported_native_dll(
+            "std".to_string(),
+            Rc::new(stdlib_dll),
+            stdstorage,
+            |v| {
+                module_manager.borrow_mut().add_extern_function_id(v);
+            },
+        );
         let mut cache = Cache::new();
         let tmp = token_lexer.clone();
         let val_pool_ref = &tmp.borrow_mut().const_pool;
@@ -190,6 +205,7 @@ impl ModuleUnit {
             modules_dll: vec![name_str.clone()],
             module_manager,
             compiler_data,
+            modules_info: collection! {"std".to_owned() => 0},
         }
     }
 
@@ -868,7 +884,7 @@ impl ModuleUnit {
         Ok(())
     }
 
-    fn import_module(&mut self, istry: bool) -> AstError<()> {
+    fn lex_import(&mut self, istry: bool) -> AstError<()> {
         let tok = self
             .get_token_checked(TokenType::StringValue)?
             .data
@@ -910,7 +926,8 @@ impl ModuleUnit {
                             .to_str()
                             .unwrap()
                             .clone_into(&mut import_file_path);
-                        self.add_module(import_file_path.clone())
+                        let tmp = self.module_manager.borrow().global_extern_function_id();
+                        self.add_module(import_file_path.clone(), tmp)
                     } else {
                         // 不是dll，尝试判断trc文件
                         let file_name_trc = format!("{}{}", file_name.to_str().unwrap(), ".trc");
@@ -976,14 +993,16 @@ impl ModuleUnit {
                             );
                         }
                         Some(func_item) => {
-                            println!("{}", import_item_name);
+                            // println!("{}", import_item_name);
                             let func_item = now.functions()[func_item].1.clone();
                             // println!("{}", func_item.get_name());
                             let token_idx: ConstPoolIndexTy = self
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id_token(func_item.get_name());
-                            let func_extern_id = self.alloc_extern_function_id();
+                            let func_extern_id =
+                                func_item.buildin_id + self.modules_info[&import_file_path];
+                            // println!("{}", func_extern_id);
                             let name = func_item.get_name().to_owned();
                             if let Err(e) = self.self_scope.borrow_mut().import_extern_func(
                                 func_item,
@@ -1015,7 +1034,7 @@ impl ModuleUnit {
                         module,
                         lib_storage,
                         &self.token_lexer.borrow_mut().const_pool,
-                        || self.module_manager.borrow_mut().alloc_extern_function_id(),
+                        self.modules_info[&import_file_path],
                     ) {
                         return self.try_err(istry, e);
                     };
@@ -1242,7 +1261,7 @@ impl ModuleUnit {
                 return Ok(());
             }
             TokenType::Import => {
-                self.import_module(false)?;
+                self.lex_import(false)?;
                 return Ok(());
             }
             TokenType::Match => {

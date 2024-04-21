@@ -95,6 +95,18 @@ impl ModuleManager {
         let iter = LinkerIter::new(s);
         link(iter)
     }
+
+    pub fn add_extern_function_id(&mut self, v: usize) {
+        self.global_extern_function_id += v
+    }
+
+    pub fn global_custom_function_id(&self) -> usize {
+        self.global_custom_function_id
+    }
+
+    pub fn global_extern_function_id(&self) -> usize {
+        self.global_extern_function_id
+    }
 }
 
 impl Default for ModuleManager {

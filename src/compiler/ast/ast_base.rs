@@ -205,8 +205,9 @@ impl ModuleUnit {
         self.self_scope.clone()
     }
 
-    pub fn add_module(&mut self, module_name: String) {
+    pub fn add_module(&mut self, module_name: String, function_base: usize) {
         if self.modules_dll_dup.insert(module_name.clone()) {
+            self.modules_info.insert(module_name.clone(), function_base);
             self.modules_dll.push(module_name);
         }
     }

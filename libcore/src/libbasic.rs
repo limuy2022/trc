@@ -310,7 +310,7 @@ pub struct Module {
     name: String,
     sub_modules: HashMap<String, Module>,
     functions: Vec<(String, RustFunction)>,
-    name_to_id: HashMap<String, usize>,
+    name_map_index: HashMap<String, usize>,
     // class name 和class id
     classes: HashMap<String, usize>,
     consts: HashMap<String, String>,
@@ -330,12 +330,12 @@ impl Module {
             functions,
             classes,
             consts,
-            name_to_id: HashMap::new(),
+            name_map_index: HashMap::new(),
         };
         let mut tmp = vec![];
         swap(&mut tmp, &mut ret.functions);
-        for i in &mut tmp {
-            ret.add_funcid(i.0.clone(), i.1.buildin_id);
+        for (counter, i) in tmp.iter_mut().enumerate() {
+            ret.add_funcmap(i.0.clone(), counter);
         }
         swap(&mut tmp, &mut ret.functions);
         ret
@@ -346,12 +346,12 @@ impl Module {
         debug_assert!(ret.is_none());
     }
 
-    pub fn add_funcid(&mut self, name: String, id: usize) {
-        self.name_to_id.insert(name, id);
+    pub fn add_funcmap(&mut self, name: String, id: usize) {
+        self.name_map_index.insert(name, id);
     }
 
     pub fn get_func_id_by_name(&self, name: &str) -> Option<usize> {
-        self.name_to_id.get(name).cloned()
+        self.name_map_index.get(name).cloned()
     }
 
     pub fn get_module<T: Iterator<Item = impl Into<String>>>(&self, mut path: T) -> Option<Module> {

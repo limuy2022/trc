@@ -961,7 +961,6 @@ impl ModuleUnit {
                     );
                 }
             };
-            // println!("{}", import_item_name);
             match now.sub_modules().get(&import_item_name) {
                 None => {
                     // 不是模块
@@ -977,7 +976,9 @@ impl ModuleUnit {
                             );
                         }
                         Some(func_item) => {
+                            println!("{}", import_item_name);
                             let func_item = now.functions()[func_item].1.clone();
+                            // println!("{}", func_item.get_name());
                             let token_idx: ConstPoolIndexTy = self
                                 .token_lexer
                                 .borrow_mut()

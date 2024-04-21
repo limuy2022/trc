@@ -543,13 +543,26 @@ impl<'a> Vm<'a> {
                 let var_addr = self.static_data.inst[*pc].operand.0;
                 let bytes_num = self.static_data.inst[*pc].operand.1;
                 let stack_data_ptr = self.dynadata.dydata.pop_n_bytes_data(bytes_num as usize);
+                // println!(
+                //     "opcode num:{}.notice:{} {} {}",
+                //     *pc,
+                //     var_addr as usize,
+                //     bytes_num as usize,
+                //     unsafe { *(stack_data_ptr as *mut TrcIntInternal) }
+                // );
+                // println!("previous:{}", unsafe {
+                //     *(self.dynadata.dydata.get_var_addr(8) as *mut Byte)
+                // });
                 unsafe {
-                    self.dynadata.dydata.write_to_val(
+                    self.dynadata.dydata.write_to_var(
                         var_addr as usize,
                         stack_data_ptr,
                         bytes_num as usize,
                     )
                 };
+                // println!("after:{}", unsafe {
+                //     *(self.dynadata.dydata.get_var_addr(8) as *mut Byte)
+                // });
             }
         };
         *pc += 1;

@@ -1,8 +1,9 @@
-use std::{mem::size_of, sync::OnceLock};
+use core::panic;
+use std::{collections::HashMap, mem::size_of, sync::OnceLock};
 
 use crate::gc::GcMgr;
 
-pub type Byte = u64;
+pub type Byte = u8;
 
 pub fn get_max_stack_sz() -> usize {
     static T: OnceLock<usize> = OnceLock::new();
@@ -19,6 +20,9 @@ pub struct DynaData {
     var_used: usize,
     #[cfg(debug_assertions)]
     size_used: Vec<usize>,
+    #[cfg(debug_assertions)]
+    // 起始地址到终点地址的映射
+    mapped_var: HashMap<usize, usize>,
 }
 
 impl DynaData {
@@ -150,13 +154,22 @@ impl DynaData {
         }
     }
 
-    /// Sets the var of this [`DynaData`].
+    /// Get the var of this [`DynaData`].
     ///
     /// # Safety
     /// make sure your addr is valid, or it will crash
     /// .
     pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
         debug_assert!(addr < self.var_used);
+        #[cfg(debug_assertions)]
+        {
+            match self.mapped_var.get(&addr) {
+                None => panic!("not found var address: {}", addr),
+                Some(sz) => {
+                    debug_assert_eq!(*sz, addr + size_of::<T>() - 1);
+                }
+            }
+        }
         unsafe { *(self.get_var_addr(addr) as *const T) }
     }
 
@@ -165,7 +178,18 @@ impl DynaData {
     /// # Safety
     /// make sure your addr and src are valid, or it will crash
     /// .
-    pub unsafe fn write_to_val(&mut self, addr: usize, src: *mut Byte, n: usize) {
+    pub unsafe fn write_to_var(&mut self, addr: usize, src: *mut Byte, n: usize) {
+        #[cfg(debug_assertions)]
+        {
+            match self.mapped_var.get(&addr) {
+                None => {
+                    self.mapped_var.insert(addr, addr + n - 1);
+                }
+                Some(sz) => {
+                    debug_assert_eq!(*sz, addr + n - 1);
+                }
+            }
+        }
         unsafe { self.get_var_addr_mut(addr).copy_from(src, n) }
     }
 

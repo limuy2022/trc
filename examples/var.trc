@@ -1,5 +1,7 @@
 a:=90
 b:=9
-print("{}{}", a, b)
+println("{}{}", a, b)
+println("{}", b)
 a=1
-print("{}{}{}{}!", a + b, a - b, a, b)
+println("{}", b)
+println("{} {} {} {}", a + b, a - b, a, b)

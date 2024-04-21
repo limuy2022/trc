@@ -7,10 +7,10 @@ use assert_cmd::Command;
 #[test]
 pub fn test_run_examples() {
     // 遍历整个examples目录
-    let mut cmd = Command::cargo_bin("trc").unwrap();
     for entry in std::fs::read_dir("examples").unwrap() {
         let path = entry.unwrap().path();
         if path.is_file() {
+            let mut cmd = Command::cargo_bin("trc").unwrap();
             // 获取标准答案
             let mut ans_path = path.clone();
             ans_path.pop();

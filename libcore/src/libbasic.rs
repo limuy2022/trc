@@ -3,6 +3,7 @@ use downcast_rs::{impl_downcast, Downcast};
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
+    mem::swap,
 };
 
 use super::{codegen::Opcode, error::*};
@@ -323,14 +324,21 @@ impl Module {
         classes: HashMap<String, usize>,
         consts: HashMap<String, String>,
     ) -> Module {
-        Module {
+        let mut ret = Module {
             name: name.into(),
             sub_modules,
             functions,
             classes,
             consts,
             name_to_id: HashMap::new(),
+        };
+        let mut tmp = vec![];
+        swap(&mut tmp, &mut ret.functions);
+        for i in &mut tmp {
+            ret.add_funcid(i.0.clone(), i.1.buildin_id);
         }
+        swap(&mut tmp, &mut ret.functions);
+        ret
     }
 
     pub fn add_module(&mut self, name: String, module: Module) {
@@ -338,10 +346,8 @@ impl Module {
         debug_assert!(ret.is_none());
     }
 
-    pub fn add_function(&mut self, name: String, func: RustFunction) {
-        self.functions.push((name.clone(), func));
-        let tmp = self.name_to_id.insert(name, self.functions.len() - 1);
-        debug_assert!(tmp.is_none());
+    pub fn add_funcid(&mut self, name: String, id: usize) {
+        self.name_to_id.insert(name, id);
     }
 
     pub fn get_func_id_by_name(&self, name: &str) -> Option<usize> {
@@ -370,10 +376,6 @@ impl Module {
         &self.sub_modules
     }
 
-    pub fn set_sub_modules(&mut self, sub_modules: HashMap<String, Module>) {
-        self.sub_modules = sub_modules;
-    }
-
     pub fn functions(&self) -> &Vec<(String, RustFunction)> {
         &self.functions
     }
@@ -384,14 +386,6 @@ impl Module {
 
     pub fn consts(&self) -> &HashMap<String, String> {
         &self.consts
-    }
-
-    pub fn set_consts(&mut self, consts: HashMap<String, String>) {
-        self.consts = consts;
-    }
-
-    pub fn set_classes(&mut self, classes: HashMap<String, usize>) {
-        self.classes = classes;
     }
 }
 

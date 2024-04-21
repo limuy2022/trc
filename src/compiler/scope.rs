@@ -424,6 +424,22 @@ impl SymScope {
         self.add_func(id, Rc::new(f))
     }
 
+    pub fn import_extern_func(
+        &mut self,
+        mut f: RustFunction,
+        tokenid: usize,
+        fname: &str,
+        extern_function_id: usize,
+        storage: &ModuleStorage,
+        pool: &ValuePool,
+    ) -> Result<(), ErrorInfo> {
+        // println!("{}", f.get_name());
+        let func_id = self.insert_sym_with_error(tokenid, fname)?;
+        self.fix_func(f.get_io_mut(), storage, pool);
+        self.add_extern_func(func_id, extern_function_id, f.clone());
+        Ok(())
+    }
+
     /// 返回变量的索引和内存地址
     pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> (VarIdxTy, usize) {
         let ret_addr = self.var_sz;

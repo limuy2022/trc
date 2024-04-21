@@ -498,20 +498,26 @@ impl ModuleUnit {
                     return Ok(());
                 }
                 TokenType::DoubleColon => {
+                    // 访问某个作用域里的东西
+                    // println!("doublecolon");
                     let mut module = match self.self_scope.borrow().get_module(idx) {
                         Some(m) => m,
-                        None => self.try_err(
-                            istry,
-                            ErrorInfo::new(
-                                t!(
-                                    SYMBOL_NOT_FOUND,
-                                    "0" = self.token_lexer.borrow_mut().const_pool.id_name
-                                        [token_data]
+                        None => {
+                            // println!("there!");
+                            self.try_err(
+                                istry,
+                                ErrorInfo::new(
+                                    t!(
+                                        SYMBOL_NOT_FOUND,
+                                        "0" = self.token_lexer.borrow_mut().const_pool.id_name
+                                            [token_data]
+                                    ),
+                                    t!(SYMBOL_ERROR),
                                 ),
-                                t!(SYMBOL_ERROR),
-                            ),
-                        )?,
+                            )?
+                        }
                     };
+                    // println!("doublecolon");
                     swap(&mut self.self_scope, &mut module);
                     let ret = self.val(istry);
                     swap(&mut self.self_scope, &mut module);
@@ -930,6 +936,7 @@ impl ModuleUnit {
             // 导入对象可能是模块，也有可能是函数，类等，先单独截取出来
             let mut import_item_name = String::new();
             loop {
+                // 从后往前截取出导入对象的名字
                 let c = path_with_dot.pop().unwrap();
                 if c == '.' {
                     break;
@@ -943,7 +950,7 @@ impl ModuleUnit {
                 .get_dll(&import_file_path)
                 .expect("error not found dll");
             let (lib_module, lib_storage) = load_module_storage(dll_lib.as_ref());
-            // 删除std
+            // 删除模块名字
             items.next();
             let now = match lib_module.get_module(items) {
                 Some(d) => d,
@@ -954,11 +961,13 @@ impl ModuleUnit {
                     );
                 }
             };
+            // println!("{}", import_item_name);
             match now.sub_modules().get(&import_item_name) {
                 None => {
                     // 不是模块
                     match now.get_func_id_by_name(&import_item_name) {
                         None => {
+                            // println!("here!{}", import_item_name);
                             return self.try_err(
                                 istry,
                                 ErrorInfo::new(
@@ -973,14 +982,18 @@ impl ModuleUnit {
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id_token(func_item.get_name());
-                            // println!("{}", func_item.get_name());
-                            let func_id = self.insert_sym_with_error(token_idx)?;
                             let func_extern_id = self.alloc_extern_function_id();
-                            self.self_scope.borrow_mut().add_extern_func(
-                                func_id,
+                            let name = func_item.get_name().to_owned();
+                            if let Err(e) = self.self_scope.borrow_mut().import_extern_func(
+                                func_item,
+                                token_idx,
+                                &name,
                                 func_extern_id,
-                                func_item.clone(),
-                            );
+                                lib_storage,
+                                &self.token_lexer.borrow_mut().const_pool,
+                            ) {
+                                return self.try_err(istry, e);
+                            }
                         }
                     }
                 }

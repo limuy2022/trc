@@ -17,7 +17,7 @@ pub fn test_run_examples() {
             ans_path.push("expected_result");
             ans_path.push(path.file_name().expect("not file name"));
             ans_path.set_extension("txt");
-            println!("{}", ans_path.display());
+            println!("checking {}", ans_path.display());
             let expected_res = read_to_string(ans_path).unwrap();
             let assert = cmd.arg("run").arg(path);
             assert.assert().success().stdout(expected_res);

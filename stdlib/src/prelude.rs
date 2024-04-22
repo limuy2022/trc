@@ -14,6 +14,7 @@ pub fn print(fmt_string: str) -> void {
                     .write_all((**iter.next().unwrap()).to_string().as_bytes())
                     .unwrap();
             }
+            // print!("{}", unsafe { (**iter.next().unwrap()).to_string() });
             if let Some(j) = output_iter.next() {
                 if j != '}' {
                     return Err(ErrorInfo::new(t!(UNCLOSED_FORMAT), t!(FORMAT_STR_ERROR)));
@@ -21,6 +22,7 @@ pub fn print(fmt_string: str) -> void {
             }
         } else {
             io::stdout().write_all(&[i as u8]).unwrap();
+            // print!("{}", i);
         }
     }
 }

@@ -22,7 +22,7 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
     for i in &static_data.dll_module_should_loaded {
         println!("{}", i);
     }
-    println!();
+    println!("Inst:");
     for i in static_data.inst.iter().enumerate() {
         if rustcode {
             if i.1.operand.1 == ARG_WRONG {
@@ -64,6 +64,12 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
             println!();
         }
     }
-
+    println!("Function Info:");
+    for i in &static_data.funcs_pos {
+        println!(
+            "Function address:{} | Function Var table size:{}",
+            i.func_addr, i.var_table_sz
+        );
+    }
     Ok(())
 }

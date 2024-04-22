@@ -1,2 +1,2 @@
 import "std.algo.string"
-print("{}", string::kmp("ababa", "aba"))
+println("{}", string::kmp("ababa", "aba"))

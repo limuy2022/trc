@@ -50,7 +50,8 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
                 if inst_ori_id == pos.func_addr {
                     function_expected_pos = iter_of_function.next();
                     let mut added = pos.clone();
-                    added.func_addr = data.get_last_opcode_id() as usize;
+                    // 该项指令还没有加入，所以是next
+                    added.func_addr = data.get_next_opcode_id() as usize;
                     func_record_tmp.push(added);
                 }
             }

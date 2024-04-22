@@ -157,6 +157,7 @@ impl<'a> Vm<'a> {
 
     #[inline]
     fn run_opcode(&mut self, pc: &mut usize) -> Result<(), RuntimeError> {
+        // println!("run opcode:{}", self.static_data.inst[*pc].opcode);
         match self.static_data.inst[*pc].opcode {
             Opcode::Add => operator_opcode!(add, self),
             Opcode::Sub => operator_opcode!(sub, self),
@@ -430,6 +431,7 @@ impl<'a> Vm<'a> {
             }
             Opcode::Jump => {
                 *pc = self.static_data.inst[*pc].operand.0 as usize;
+                // *pc += 1;
                 return Ok(());
             }
             Opcode::LoadChar => unsafe {

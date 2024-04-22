@@ -1305,11 +1305,18 @@ impl ModuleUnit {
     fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RuntimeResult<(usize, usize)> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
+            // println!("run here.Inst num is {}", self.staticdata.inst.len());
             self.first_func = true;
             self.add_bycode(Opcode::Stop, NO_ARG);
+            // println!(
+            //     "run here.Inst num is {}.Op {}",
+            //     self.staticdata.inst.len(),
+            //     self.staticdata.get_next_opcode_id()
+            // );
             self.staticdata.function_split = Some(self.staticdata.get_last_opcode_id());
         }
         let begin_inst_idx = self.staticdata.get_next_opcode_id();
+        // println!("start addr:{}", begin_inst_idx);
         let func_obj = self
             .self_scope
             .borrow()
@@ -1361,6 +1368,7 @@ impl ModuleUnit {
         swap(&mut tmp, &mut self.self_scope.borrow_mut().funcs_temp_store);
         for i in tmp {
             let (code_begin, var_mem_sz) = self.lex_function(i.0, &i.1)?;
+            // println!("{}", code_begin);
             self.staticdata
                 .funcs_pos
                 .push(FuncStorage::new(code_begin, var_mem_sz))

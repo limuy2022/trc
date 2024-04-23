@@ -14,6 +14,19 @@ func test_complex(a:int) {
 func oo(p: int) {
   oo(p//2)
 }
+func t() {
+    println("90")
+}
+t()
+t()
+func tt() {
+  println("I am function2")
+}
+func ttt() {
+  println("I am function1")
+  tt()
+}
+ttt()
 t1(90, 89, 77)
 a:=9
 b:=8

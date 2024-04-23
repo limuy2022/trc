@@ -1,6 +1,8 @@
 mod def;
 mod function;
 
+use std::io::Write;
+
 use self::function::Frame;
 use crate::cfg;
 use libcore::*;
@@ -585,6 +587,7 @@ impl<'a> Vm<'a> {
                 self.run_opcode(&mut pc)?;
             }
         }
+        std::io::stdout().flush().unwrap();
         Ok(())
     }
 

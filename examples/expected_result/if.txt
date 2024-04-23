@@ -1,1 +1,3 @@
+ok
+error
 i equal to 90

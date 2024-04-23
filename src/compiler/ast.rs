@@ -1138,16 +1138,16 @@ impl ModuleUnit {
     fn if_lex(&mut self) -> RuntimeResult<()> {
         self.lex_condit()?;
         self.get_token_checked(TokenType::LeftBigBrace)?;
-        // 最后需要跳转地址
+        // 每个分支末尾的跳转地址，用于跳出if
         let mut save_jump_opcode_idx = vec![];
         loop {
             let op_idx = self.staticdata.inst.len();
-            // 本行是为了跳转到下一个分支
+            // 本行是为了若条件不成立，跳转到下一个分支
             self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
             self.lex_until(RightBigBrace)?;
-            self.staticdata.inst[op_idx].operand.0 = self.staticdata.get_next_opcode_id();
             self.add_bycode(Opcode::Jump, ARG_WRONG);
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
+            self.staticdata.inst[op_idx].operand.0 = self.staticdata.get_next_opcode_id();
             let t = self.next_token()?;
             if t.tp == TokenType::Else {
                 let nxt_tok = self.next_token()?;
@@ -1161,8 +1161,10 @@ impl ModuleUnit {
                 self.lex_until(RightBigBrace)?;
                 break;
             }
+            // 小优化，最后一个分支不需要跳转出去
             save_jump_opcode_idx.pop();
             self.del_opcode().unwrap();
+            self.staticdata.inst[op_idx].operand.0 -= 1;
             self.token_lexer.borrow_mut().next_back(t);
             break;
         }

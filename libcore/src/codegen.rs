@@ -5,7 +5,7 @@ use num_enum::TryFromPrimitive;
 
 use crate::TrcIntInternal;
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FuncStorage {
     pub func_addr: usize,
     pub var_table_sz: usize,
@@ -174,7 +174,7 @@ impl Opcode {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct ConstPool {
     pub stringpool: Vec<String>,
     pub floatpool: Vec<f64>,
@@ -221,7 +221,7 @@ impl Display for Inst {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum VmStackType {
     Int,
     Float,
@@ -233,7 +233,7 @@ pub enum VmStackType {
 
 pub type InstSet = Vec<Inst>;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct StaticData {
     pub constpool: ConstPool,
     pub inst: InstSet,

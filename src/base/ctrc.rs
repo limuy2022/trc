@@ -2,6 +2,7 @@
 //! ctrc file is trc's compiled object
 //! can be loaded and runned by vm without compiling
 
+use anyhow::bail;
 use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData};
 use std::{
     io::{BufReader, BufWriter, Read, Write},
@@ -69,10 +70,13 @@ fn write_bytecodes<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow:
     for i in &data.inst {
         write_integer(f, i.opcode as OpcodeTy)?;
         let opnums = i.opcode.get_opcode_arg_nums();
+        // println!("op:{}", opnums);
         if opnums > 0 {
-            write_integer(f, i.operand.0)?;
+            write_integer(f, i.operand.0 as Opidx)?;
+            // println!("op:{}", i.operand.0);
             if opnums > 1 {
-                write_integer(f, i.operand.1)?;
+                write_integer(f, i.operand.1 as Opidx)?;
+                // panic!("fuck")
             }
         }
     }
@@ -84,6 +88,7 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
     data.inst.reserve(len);
     for _ in 0..len {
         let opcode = Opcode::try_from(read_integer!(f, OpcodeTy))?;
+        // println!("op:{}", opcode as OpcodeTy);
         let opnums = opcode.get_opcode_arg_nums();
         let inst = if opnums > 0 {
             (
@@ -106,6 +111,7 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
 fn write_deps<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
     // 写入依赖模块的个数
     write_integer(f, data.dll_module_should_loaded.len())?;
+    // eprintln!("len:{:?}", data.dll_module_should_loaded);
     for i in &data.dll_module_should_loaded {
         write_string(f, i)?;
     }
@@ -138,8 +144,6 @@ fn write_const_pool<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow
 }
 
 fn load_const_pool<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyhow::Result<()> {
-    // int pool
-    let len = read_lensize(f)?;
     // float pool
     let len = read_lensize(f)?;
     data.constpool.floatpool.reserve(len);
@@ -210,9 +214,9 @@ fn write_magic_number(f: &mut BufWriter<impl Write>) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn load_magic_number(f: &mut BufReader<impl Read>) -> anyhow::Result<()> {
-    let _magic = read_integer!(f, u64);
-    Ok(())
+fn load_magic_number(f: &mut BufReader<impl Read>) -> anyhow::Result<u64> {
+    let magic = read_integer!(f, u64);
+    Ok(magic)
 }
 
 pub fn check_if_ctrc_file(f: &mut BufReader<impl Read>) -> anyhow::Result<bool> {
@@ -238,20 +242,32 @@ pub fn write_to_ctrc(data: &StaticData, write_to_path: &str) -> anyhow::Result<(
 }
 
 pub fn load_from_reader_without_magic(f: &mut BufReader<impl Read>) -> anyhow::Result<StaticData> {
+    // let mut debug_file = std::fs::File::create("tmp/debug.log").unwrap();
     let mut data = StaticData::default();
     load_deps(f, &mut data)?;
+    // for i in &data.dll_module_should_loaded {
+    //     eprintln!("{}", i);
+    //     // write!(debug_file, "{}\n", i).unwrap();
+    // }
+    // drop(debug_file);
     load_symbol_table(f, &mut data)?;
+    // println!("{}", data.global_sym_table_sz);
     load_bytecodes(f, &mut data)?;
-    load_const_pool(f, &mut data)?;
-    load_function_info(f, &mut data)?;
-    load_line_table(f, &mut data)?;
+    for i in &data.inst {
+        eprintln!("{:?}", i);
+    }
+    // load_const_pool(f, &mut data)?;
+    // load_function_info(f, &mut data)?;
+    // load_line_table(f, &mut data)?;
     Ok(data)
 }
 
 pub fn load_from_ctrc(load_path: &str) -> anyhow::Result<StaticData> {
     let f = std::fs::File::open(load_path)?;
     let mut reader = BufReader::new(f);
-    load_magic_number(&mut reader)?;
+    if load_magic_number(&mut reader)? != MAGIC_NUMBER {
+        bail!("not ctrc file");
+    };
     let data = load_from_reader_without_magic(&mut reader)?;
     Ok(data)
 }
@@ -273,5 +289,46 @@ mod tests {
         let f = std::fs::File::open("tests/testdata/utils/ctrc/magic_number_without.ctrc").unwrap();
         let mut reader = BufReader::new(f);
         assert!(!check_if_ctrc_file(&mut reader).unwrap());
+    }
+
+    #[test]
+    fn test_load_and_write() {
+        let mut static_data = StaticData::new();
+        static_data.constpool.floatpool = vec![1.0, 2.0, 3.0];
+        static_data.constpool.stringpool = vec!["hello".to_string(), "world".to_string()];
+        static_data.line_table = vec![0, 1, 2, 3];
+        static_data.funcs_pos = vec![FuncStorage::new(0, 0), FuncStorage::new(1, 1)];
+        static_data.inst = vec![
+            Inst::new_single(Opcode::LoadInt, 1),
+            Inst::new_single(Opcode::LoadInt, 2),
+            Inst::new_single(Opcode::LoadFloat, 2),
+        ];
+        static_data.dll_module_should_loaded = vec!["hello".to_string(), "world".to_string()];
+        static_data.global_sym_table_sz = 2;
+        write_to_ctrc(&static_data, "tests/testdata/utils/ctrc/test.ctrc").unwrap();
+        let static_data = load_from_ctrc("tests/testdata/utils/ctrc/test.ctrc").unwrap();
+        assert_eq!(static_data.global_sym_table_sz, 2);
+        assert_eq!(
+            static_data.dll_module_should_loaded,
+            vec!["hello".to_string(), "world".to_string()]
+        );
+        assert_eq!(static_data.constpool.floatpool, vec![1.0, 2.0, 3.0]);
+        assert_eq!(
+            static_data.constpool.stringpool,
+            vec!["hello".to_string(), "world".to_string()]
+        );
+        assert_eq!(static_data.line_table, vec![0, 1, 2, 3]);
+        assert_eq!(
+            static_data.funcs_pos,
+            vec![FuncStorage::new(0, 0), FuncStorage::new(1, 1)]
+        );
+        assert_eq!(
+            static_data.inst,
+            vec![
+                Inst::new_single(Opcode::LoadInt, 1),
+                Inst::new_single(Opcode::LoadInt, 2),
+                Inst::new_single(Opcode::LoadFloat, 2)
+            ]
+        );
     }
 }

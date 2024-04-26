@@ -3,7 +3,7 @@
 //! can be loaded and runned by vm without compiling
 
 use anyhow::bail;
-use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData};
+use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData, ARG_WRONG};
 use std::{
     io::{BufReader, BufWriter, Read, Write},
     mem::size_of,
@@ -17,12 +17,26 @@ macro_rules! read_integer {
     ($f:expr, $U:ty) => {{
         let mut len = [0u8; size_of::<$U>()];
         $f.read_exact(&mut len)?;
-        <$U>::from_le_bytes(len)
+        let ret = <$U>::from_le_bytes(len);
+        // println!("read:{}", ret)
+        ret
+    }};
+}
+
+macro_rules! write_integer {
+    ($f:expr,$len:expr) => {{
+        // println!("write:{}", $len);
+        $f.write_all(&$len.to_le_bytes())?;
     }};
 }
 
 fn read_lensize<T: Read>(f: &mut BufReader<T>) -> anyhow::Result<usize> {
     Ok(read_integer!(f, LenSize) as usize)
+}
+
+fn write_lensize<T: Write>(f: &mut BufWriter<T>, len: usize) -> anyhow::Result<()> {
+    write_integer!(f, len as LenSize);
+    Ok(())
 }
 
 pub fn convert_to_lensize<T: TryInto<LenSize>>(value: T) -> LenSize
@@ -32,17 +46,9 @@ where
     value.try_into().unwrap()
 }
 
-fn write_integer<T: Write, U: TryInto<LenSize>>(f: &mut BufWriter<T>, len: U) -> anyhow::Result<()>
-where
-    <U as TryInto<u64>>::Error: Send + Sync + std::fmt::Debug,
-{
-    let tmp: LenSize = convert_to_lensize(len);
-    f.write_all(&tmp.to_le_bytes())?;
-    Ok(())
-}
-
 fn write_float<T: Write>(f: &mut BufWriter<T>, val: FloatTy) -> anyhow::Result<()> {
-    write_integer(f, val.to_bits())
+    write_integer!(f, val.to_bits());
+    Ok(())
 }
 
 fn read_float<T: Read>(f: &mut BufReader<T>) -> anyhow::Result<f64> {
@@ -51,7 +57,7 @@ fn read_float<T: Read>(f: &mut BufReader<T>) -> anyhow::Result<f64> {
 }
 
 fn write_string<T: Write>(f: &mut BufWriter<T>, s: &str) -> anyhow::Result<()> {
-    write_integer(f, s.len())?;
+    write_integer!(f, s.len());
     f.write_all(s.as_bytes()).unwrap();
     Ok(())
 }
@@ -66,17 +72,14 @@ fn read_string<T: Read>(f: &mut BufReader<T>) -> anyhow::Result<String> {
 
 fn write_bytecodes<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
     // 先写入个数
-    write_integer(f, data.inst.len())?;
+    write_lensize(f, data.inst.len())?;
     for i in &data.inst {
-        write_integer(f, i.opcode as OpcodeTy)?;
+        write_integer!(f, i.opcode as OpcodeTy);
         let opnums = i.opcode.get_opcode_arg_nums();
-        // println!("op:{}", opnums);
         if opnums > 0 {
-            write_integer(f, i.operand.0 as Opidx)?;
-            // println!("op:{}", i.operand.0);
+            write_integer!(f, i.operand.0 as Opidx);
             if opnums > 1 {
-                write_integer(f, i.operand.1 as Opidx)?;
-                // panic!("fuck")
+                write_integer!(f, i.operand.1 as Opidx);
             }
         }
     }
@@ -88,19 +91,19 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
     data.inst.reserve(len);
     for _ in 0..len {
         let opcode = Opcode::try_from(read_integer!(f, OpcodeTy))?;
-        // println!("op:{}", opcode as OpcodeTy);
         let opnums = opcode.get_opcode_arg_nums();
+        // println!("opnums:{}", opnums);
         let inst = if opnums > 0 {
             (
                 read_integer!(f, Opidx),
                 if opnums > 1 {
                     read_integer!(f, Opidx)
                 } else {
-                    0
+                    ARG_WRONG
                 },
             )
         } else {
-            (0, 0)
+            (ARG_WRONG, ARG_WRONG)
         };
         let inst = Inst::new_double(opcode, inst.0, inst.1);
         data.inst.push(inst);
@@ -110,7 +113,7 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
 
 fn write_deps<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
     // 写入依赖模块的个数
-    write_integer(f, data.dll_module_should_loaded.len())?;
+    write_integer!(f, data.dll_module_should_loaded.len());
     // eprintln!("len:{:?}", data.dll_module_should_loaded);
     for i in &data.dll_module_should_loaded {
         write_string(f, i)?;
@@ -131,12 +134,12 @@ fn load_deps<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyhow::Re
 
 fn write_const_pool<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
     // float pool
-    write_integer(f, data.constpool.floatpool.len())?;
+    write_integer!(f, data.constpool.floatpool.len());
     for i in &data.constpool.floatpool {
         write_float(f, *i)?;
     }
     // string pool
-    write_integer(f, data.constpool.stringpool.len())?;
+    write_integer!(f, data.constpool.stringpool.len());
     for i in &data.constpool.stringpool {
         write_string(f, i)?;
     }
@@ -162,7 +165,7 @@ fn load_const_pool<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyh
 }
 
 fn write_symbol_table<T: Write>(f: &mut BufWriter<T>, data: &StaticData) -> anyhow::Result<()> {
-    write_integer(f, data.global_sym_table_sz)?;
+    write_integer!(f, data.global_sym_table_sz);
     Ok(())
 }
 
@@ -172,9 +175,9 @@ fn load_symbol_table<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> an
 }
 
 fn write_line_table(f: &mut BufWriter<impl Write>, data: &StaticData) -> anyhow::Result<()> {
-    write_integer(f, data.line_table.len())?;
+    write_integer!(f, data.line_table.len());
     for i in &data.line_table {
-        write_integer(f, *i)?;
+        write_integer!(f, *i);
     }
     Ok(())
 }
@@ -189,10 +192,10 @@ fn load_line_table(f: &mut BufReader<impl Read>, data: &mut StaticData) -> anyho
 }
 
 fn write_function_info(f: &mut BufWriter<impl Write>, data: &StaticData) -> anyhow::Result<()> {
-    write_integer(f, data.funcs_pos.len())?;
+    write_integer!(f, data.funcs_pos.len());
     for i in &data.funcs_pos {
-        write_integer(f, i.func_addr)?;
-        write_integer(f, i.var_table_sz)?;
+        write_integer!(f, i.func_addr);
+        write_integer!(f, i.var_table_sz);
     }
     Ok(())
 }
@@ -210,7 +213,7 @@ fn load_function_info(f: &mut BufReader<impl Read>, data: &mut StaticData) -> an
 }
 
 fn write_magic_number(f: &mut BufWriter<impl Write>) -> anyhow::Result<()> {
-    write_integer(f, MAGIC_NUMBER)?;
+    write_integer!(f, MAGIC_NUMBER);
     Ok(())
 }
 
@@ -245,20 +248,14 @@ pub fn load_from_reader_without_magic(f: &mut BufReader<impl Read>) -> anyhow::R
     // let mut debug_file = std::fs::File::create("tmp/debug.log").unwrap();
     let mut data = StaticData::default();
     load_deps(f, &mut data)?;
-    // for i in &data.dll_module_should_loaded {
-    //     eprintln!("{}", i);
-    //     // write!(debug_file, "{}\n", i).unwrap();
-    // }
-    // drop(debug_file);
     load_symbol_table(f, &mut data)?;
-    // println!("{}", data.global_sym_table_sz);
     load_bytecodes(f, &mut data)?;
     for i in &data.inst {
         eprintln!("{:?}", i);
     }
-    // load_const_pool(f, &mut data)?;
-    // load_function_info(f, &mut data)?;
-    // load_line_table(f, &mut data)?;
+    load_const_pool(f, &mut data)?;
+    load_function_info(f, &mut data)?;
+    load_line_table(f, &mut data)?;
     Ok(data)
 }
 

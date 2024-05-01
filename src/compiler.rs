@@ -427,14 +427,36 @@ impl Compiler {
 }
 
 mod tests {
+    use std::str::Chars;
+
     use super::*;
 
-    fn check_read(reader: &mut impl TokenIo<Item = char>, s: &str) {
+    fn get_next_char(
+        iter: &mut impl Iterator<Item = char>,
+        mut is_ignore: impl FnMut(char) -> bool,
+    ) -> Option<char> {
+        loop {
+            let c = match iter.next() {
+                None => return None,
+                Some(c) => c,
+            };
+            if is_ignore(c) {
+                continue;
+            }
+            return Some(c);
+        }
+    }
+
+    fn check_read(
+        reader: &mut impl TokenIo<Item = char>,
+        s: &str,
+        mut is_ignore: impl FnMut(char) -> bool,
+    ) {
         let mut iter = s.chars();
         for i in reader {
-            assert_eq!(i, iter.next().unwrap());
+            assert_eq!(i, get_next_char(&mut iter, &mut is_ignore).unwrap());
         }
-        assert_eq!(iter.next(), None);
+        assert_eq!(get_next_char(&mut iter, &mut is_ignore), None);
     }
 
     #[test]
@@ -446,7 +468,7 @@ mod tests {
         for i in &tmp {
             t.unread(*i);
         }
-        check_read(&mut t, source)
+        check_read(&mut t, source, |_| false)
     }
 
     #[test]
@@ -460,7 +482,7 @@ mod tests {
         for i in &tmp {
             t.unread(*i);
         }
-        check_read(&mut t, &source)
+        check_read(&mut t, &source, |c| c == '\r')
     }
 
     #[test]

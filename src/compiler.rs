@@ -322,6 +322,9 @@ impl TokenIo for FileSource {
                 }
                 Some(c) => {
                     self.input_pos += c.len_utf8();
+                    if c == '\r' {
+                        continue;
+                    }
                     return c;
                 }
             }

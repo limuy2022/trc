@@ -848,7 +848,7 @@ impl TokenLex {
             '\0' => {
                 return Ok(Token::new(TokenType::EndOfFile, None));
             }
-            '\t' | ' ' | '\r' => {
+            '\t' | ' ' => {
                 return self.next_token();
             }
             '\n' => {

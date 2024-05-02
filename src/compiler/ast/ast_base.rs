@@ -8,6 +8,7 @@ use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
 
 impl ModuleUnit {
+    /// 清除之前编译留下的数据
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
         self.staticdata.function_split = None;
@@ -15,6 +16,7 @@ impl ModuleUnit {
     }
 
     #[inline]
+    /// 根据istry的值判断是否抛出错误
     pub fn try_err<T>(&self, istry: bool, info: ErrorInfo) -> AstError<T> {
         if istry {
             Err(LightFakeError::new().into())
@@ -35,6 +37,9 @@ impl ModuleUnit {
         }
     }
 
+    /// 将栈中的基本类型转换成Scope中的类型
+    /// # Panic
+    /// 如果不是基本类型，将会直接panic
     pub fn convert_vm_ty_to_id(&self, ty: VmStackType) -> TyIdxTy {
         match ty {
             VmStackType::Int => self.cache.intty_id,
@@ -66,13 +71,15 @@ impl ModuleUnit {
         VmStackType::Object
     }
 
+    /// 该函数通过类型的名字得到对应的Scope中的id
     pub fn get_type_id(&self, ty_name: &str) -> Option<usize> {
         self.self_scope
             .borrow()
             .get_type_id_by_token(self.token_lexer.borrow_mut().const_pool.name_pool[ty_name])
     }
 
-    pub fn get_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
+    /// 解析一个类型名为id
+    pub fn lex_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
         let t = self.get_token_checked(TokenType::ID)?;
         let ty = match self
             .self_scope
@@ -94,33 +101,45 @@ impl ModuleUnit {
         Ok(ty)
     }
 
+    /// 根据错误信息，包装上上下文信息生成一个错误
     pub fn gen_error<T>(&self, e: ErrorInfo) -> AstError<T> {
         self.compiler_data.borrow().report_compiler_error(e)
     }
 
-    pub fn gen_unexpected_token_token<T>(&mut self, unexpcted: TokenType) -> AstError<T> {
+    /// token不正确，报出一个错误
+    pub fn gen_unexpected_token_error<T>(&mut self, unexpcted: TokenType) -> AstError<T> {
         self.gen_error(ErrorInfo::new(
             t!(UNEXPECTED_TOKEN, "0" = unexpcted),
             t!(SYNTAX_ERROR),
         ))
     }
 
+    /// 获取一个token并检查该token是否正确
     pub fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
         let t = self.token_lexer.borrow_mut().next_token()?;
         if t.tp != ty {
             self.token_lexer.borrow_mut().next_back(t.clone());
-            self.gen_unexpected_token_token(t.tp)?;
+            self.gen_unexpected_token_error(t.tp)?;
         }
         Ok(t)
     }
 
+    /// 移除最后的一条指令
     pub fn del_opcode(&mut self) -> Result<(), &'static str> {
-        match self.staticdata.inst.pop() {
-            Some(_) => Ok(()),
-            None => Err("stack empty"),
-        }
+        // 删除指令
+        if self.staticdata.inst.pop().is_none() {
+            return Err("stack empty");
+        };
+        // 还有行号表
+        if !self.compiler_data.borrow().option.optimize
+            && self.staticdata.line_table.pop().is_none()
+        {
+            return Err("stack empty");
+        };
+        Ok(())
     }
 
+    /// 生成一条指令的行号表
     fn gen_line_table(&mut self) {
         if !self.compiler_data.borrow().option.optimize {
             // 不生成行号表了
@@ -130,11 +149,13 @@ impl ModuleUnit {
         }
     }
 
+    /// 添加一条单参数或无参数指令
     pub fn add_bycode(&mut self, opty: Opcode, opnum: Opidx) {
         self.staticdata.inst.push(Inst::new_single(opty, opnum));
         self.gen_line_table();
     }
 
+    /// 添加一条双参数指令
     pub fn add_double_bycode(&mut self, opty: Opcode, opnum1: Opidx, opnum2: Opidx) {
         self.staticdata
             .inst
@@ -142,6 +163,7 @@ impl ModuleUnit {
         self.gen_line_table();
     }
 
+    /// 生成参数不匹配的错误信息
     pub fn gen_args_error(&mut self, info: ArguError) -> ErrorInfo {
         match info {
             ArguError::TypeNotMatch(ArgumentError { expected, actual }) => ErrorInfo::new(
@@ -159,6 +181,7 @@ impl ModuleUnit {
         }
     }
 
+    /// 通过Scope中的ID获取类型名
     pub fn get_ty_name(&mut self, type_name: TyIdxTy) -> String {
         self.self_scope
             .borrow()
@@ -168,6 +191,7 @@ impl ModuleUnit {
             .to_string()
     }
 
+    /// 导入模块中的符号
     pub fn import_module_sym(&mut self, lib: &Module) {
         for i in lib.functions() {
             self.token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
@@ -177,6 +201,7 @@ impl ModuleUnit {
         }
     }
 
+    /// 添加一个符号，在符号冲突的时候报出错误
     pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocIdTy> {
         match self.self_scope.borrow_mut().insert_sym(name) {
             Some(v) => Ok(v),
@@ -190,6 +215,7 @@ impl ModuleUnit {
         }
     }
 
+    // 生成EqWithoutPop指令
     pub fn eq_without_pop(&self, ty: ScopeAllocIdTy) -> Opcode {
         match self.convert_id_to_vm_ty(ty) {
             VmStackType::Int => Opcode::EqIntWithoutPop,
@@ -201,10 +227,12 @@ impl ModuleUnit {
         }
     }
 
+    /// 获取当前的Scope
     pub fn get_scope(&self) -> Rc<RefCell<SymScope>> {
         self.self_scope.clone()
     }
 
+    /// 添加模块记录到数据中
     pub fn add_module(&mut self, module_name: String, function_base: usize) {
         if self.modules_dll_dup.insert(module_name.clone()) {
             self.modules_info.insert(module_name.clone(), function_base);
@@ -212,10 +240,7 @@ impl ModuleUnit {
         }
     }
 
-    pub fn alloc_extern_function_id(&mut self) -> FuncIdxTy {
-        self.module_manager.borrow_mut().alloc_extern_function_id()
-    }
-
+    /// 获取下一个Token,不检查
     pub fn next_token(&mut self) -> RuntimeResult<Token> {
         self.token_lexer.borrow_mut().next_token()
     }

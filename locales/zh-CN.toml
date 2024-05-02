@@ -48,6 +48,7 @@ unclosed_format = "{未匹配"
 operator_unsupport = "操作符%{0}不支持类型%{1}"
 type_not_same = "类型%{0}和%{1}不同"
 if_while_accept_bool = "if和while的条件表达式只能是bool类型"
+array_len_int = "数组长度必须是整数"
 return_type = "函数返回值类型是%{0},你试图返回%{1}"
 
 [compiler.report]

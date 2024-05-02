@@ -59,7 +59,6 @@ pub fn test_run_examples() {
             println!("checking {}", ans_path.display());
             let expected_res = read_to_string(ans_path).unwrap();
             let assert = cmd.arg("run").arg(path);
-            // assert.assert().success().stdout(expected_res);
             let tmp = assert.assert();
             let output = tmp.get_output();
             let output = String::from_utf8_lossy(&output.stdout);

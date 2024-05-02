@@ -652,6 +652,27 @@ impl ModuleUnit {
                 self.expr(istry)?;
                 self.get_token_checked(TokenType::RightSmallBrace)?;
             }
+            TokenType::LeftMiddleBrace => {
+                // 数组定义
+                // 获取数组长度
+                self.expr(istry)?;
+                // 检查是否是整数
+                match self.process_info.pop_last_ty() {
+                    None => {
+                        return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
+                    }
+                    Some(ty) => {
+                        if ty != self.cache.intty_id {
+                            return self
+                                .gen_error(ErrorInfo::new(t!(ARRAY_LEN_INT), t!(TYPE_ERROR)));
+                        }
+                    }
+                }
+                self.get_token_checked(TokenType::Semicolon)?;
+                // 获取数组元素类型
+                // TODO:在此处加上对于Default的检查
+                let t = self.lex_ty(istry)?;
+            }
             _ => {
                 self.token_lexer.borrow_mut().next_back(next_token);
                 self.item(istry)?;
@@ -704,7 +725,7 @@ impl ModuleUnit {
             } else if t.tp == TokenType::Arrow {
                 break;
             } else {
-                self.gen_unexpected_token_token(t.tp)?;
+                self.gen_unexpected_token_error(t.tp)?;
             }
         }
         // 这个是跳转到下一个case的
@@ -778,10 +799,10 @@ impl ModuleUnit {
             let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
             argname.push(name_id);
             self.get_token_checked(TokenType::Colon)?;
-            ty_list.push(self.get_ty(false)?);
+            ty_list.push(self.lex_ty(false)?);
         }
         // 返回值解析
-        let return_ty = match self.get_ty(true) {
+        let return_ty = match self.lex_ty(true) {
             Err(_) => None,
             Ok(ty) => Some(ty),
         };
@@ -836,7 +857,7 @@ impl ModuleUnit {
                 let attr_name_tok = self.get_token_checked(TokenType::ID)?;
                 let attr_id = self.insert_sym_with_error(attr_name_tok.data.unwrap())?;
                 self.get_token_checked(TokenType::Colon)?;
-                let ty = self.get_ty(false)?;
+                let ty = self.lex_ty(false)?;
                 class_obj.add_attr(attr_id, ty);
             }
             TokenType::Pub => {

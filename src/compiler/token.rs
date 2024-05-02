@@ -129,6 +129,8 @@ pub enum TokenType {
     Pub,
     // ::
     DoubleColon,
+    Uninit,
+    Unsafe,
 }
 
 impl TokenType {
@@ -239,6 +241,8 @@ impl Display for TokenType {
             TokenType::Var => "var",
             TokenType::Pub => "pub",
             TokenType::DoubleColon => "::",
+            TokenType::Uninit => "uninit",
+            TokenType::Unsafe => "unsafe",
         };
         write!(f, "{}", res)
     }
@@ -315,7 +319,9 @@ fn get_keywords() -> &'static HashMap<String, TokenType> {
             "continue".to_string() => TokenType::Continue,
             "break".to_string() => TokenType::Break,
             "var".to_string() => TokenType::Var,
-            "pub".to_string() => TokenType::Pub
+            "pub".to_string() => TokenType::Pub,
+            "unsafe".to_string() => TokenType::Unsafe,
+            "uninit".to_string() => TokenType::Uninit
         ]
     })
 }

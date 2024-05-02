@@ -62,7 +62,7 @@ impl ModuleManager {
         // 没找到，从路径中找
         match self.cache.get(name) {
             None => None,
-            Some(v) => return Some(v),
+            Some(v) => Some(v),
         }
         // 还是没找到，从磁盘中加载中间文件
         // 磁盘中不存在但是对应模块存在，重新编译

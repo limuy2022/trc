@@ -33,7 +33,7 @@ Tip3:The form like 001 is supported
 The next is the string value. To make you to write strings more easily:
 
 | Way               | Explain                                       |
-|:------------------|:----------------------------------------------|
+| :---------------- | :-------------------------------------------- |
 | "hello world"     | commom value                                  |
 | 'h'               | A way to store character                      |
 | """hello world""" | this method is for code across multiple lines |
@@ -262,3 +262,29 @@ import "a.b.c"
 ```
 
 `c` can be a function or a struct or a module
+
+## Array
+
+There is a built-in type `array`.Its length is immutable.But Its length don't need to be a constant value.So if your array is too large,the stack will be broken.It can store values which have the same type.It must be initialized when it is created.
+The grammar is :
+
+```
+# Array doesn't not support auto type inference
+id:=[size;type]
+```
+
+Example:
+
+```
+a:=[9;int]
+```
+
+Any type can be stored in the array should have a default constructor.Or use the following uninit array:
+
+```
+unsafe {
+    uninit a:=[9;int]
+}
+```
+
+We will discuss about `unsafe` in the following part.

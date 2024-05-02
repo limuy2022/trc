@@ -12,3 +12,4 @@ func fastpow(a: int, b: int) int {
 }
 
 println("{}", fastpow(2, 3))
+println("{}", fastpow(4, 2))

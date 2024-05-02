@@ -145,7 +145,7 @@ for i in xxx {
 }
 ```
 
-`xxx` should be a iterable var
+`xxx` should be an iterable var
 
 `match` is also supported:
 
@@ -213,7 +213,7 @@ First,we support the UTF-8 with your var name.So you can define your var like th
 你好:=90
 ```
 
-the compiler will regard this var as a int var.
+the compiler will regard this var as an int var.
 
 Sometimes maybe you want to define the type.Do it like this:
 

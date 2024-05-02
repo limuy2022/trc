@@ -1,6 +1,6 @@
 # Trc programming language
 
-Trc is a easy-learn programming language. It can be fast,safe and effective.
+Trc is an easy-learn programming language. It can be fast,safe and effective.
 
 | Platform | Status                                                                                                |
 |:---------|:------------------------------------------------------------------------------------------------------|

@@ -89,7 +89,7 @@ pub enum Opcode {
     BitRightShiftInt,
     // return from a function
     PopFrame,
-    // Load a int from const pool
+    // Load an int from const pool
     LoadInt,
     // Load a float from const pool
     LoadFloat,

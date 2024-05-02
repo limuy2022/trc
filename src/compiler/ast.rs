@@ -484,7 +484,7 @@ impl ModuleUnit {
                 TokenType::LeftSmallBrace => {
                     let func_obj = self.self_scope.borrow().get_function(idx).unwrap();
                     let argv_list = self.opt_args(&func_obj)?;
-                    // match )
+                    // match ")"
                     self.get_token_checked(TokenType::RightSmallBrace)?;
                     // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
                     // 第二种情况就是入参有明确的类型

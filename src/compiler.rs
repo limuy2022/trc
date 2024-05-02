@@ -200,7 +200,7 @@ impl ValuePool {
 
 #[derive(Debug)]
 /// # Reference
-/// reference iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
+///  iterator:<https://stackoverflow.com/questions/43952104/how-can-i-store-a-chars-iterator-in-the-same-struct-as-the-string-it-is-iteratin>
 pub struct StringSource {
     text: String,
     pos: usize,
@@ -427,8 +427,6 @@ impl Compiler {
 }
 
 mod tests {
-    use std::str::Chars;
-
     use super::*;
 
     fn get_next_char(

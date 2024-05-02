@@ -427,23 +427,8 @@ impl Compiler {
 }
 
 mod tests {
+    use crate::base::utils::get_next_check_char;
     use super::*;
-
-    fn get_next_char(
-        iter: &mut impl Iterator<Item = char>,
-        mut is_ignore: impl FnMut(char) -> bool,
-    ) -> Option<char> {
-        loop {
-            let c = match iter.next() {
-                None => return None,
-                Some(c) => c,
-            };
-            if is_ignore(c) {
-                continue;
-            }
-            return Some(c);
-        }
-    }
 
     fn check_read(
         reader: &mut impl TokenIo<Item = char>,
@@ -452,9 +437,9 @@ mod tests {
     ) {
         let mut iter = s.chars();
         for i in reader {
-            assert_eq!(i, get_next_char(&mut iter, &mut is_ignore).unwrap());
+            assert_eq!(i, get_next_check_char(&mut iter, &mut is_ignore).unwrap());
         }
-        assert_eq!(get_next_char(&mut iter, &mut is_ignore), None);
+        assert_eq!(get_next_check_char(&mut iter, &mut is_ignore), None);
     }
 
     #[test]

@@ -32,7 +32,10 @@ pub fn check_path_type(path: &str) -> PathType {
     PathType::new(ret.0, ret.1)
 }
 
-pub fn get_next_check_char(iter: &mut impl Iterator<Item = char>, mut check: impl FnMut(char) -> bool) -> Option<char> {
+pub fn get_next_check_char(
+    iter: &mut impl Iterator<Item = char>,
+    mut check: impl FnMut(char) -> bool,
+) -> Option<char> {
     loop {
         let c = match iter.next() {
             Some(c) => c,

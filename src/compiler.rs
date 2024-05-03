@@ -427,8 +427,8 @@ impl Compiler {
 }
 
 mod tests {
-    use crate::base::utils::get_next_check_char;
     use super::*;
+    use crate::base::utils::get_next_check_char;
 
     fn check_read(
         reader: &mut impl TokenIo<Item = char>,

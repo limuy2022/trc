@@ -3,12 +3,12 @@ mod lexprocess;
 
 use super::{
     scope::*,
-    token::{ConstPoolIndexTy, TokenType},
+    token::{ConstPoolIndexTy, Token},
     InputSource, TokenLex,
 };
 use crate::{
     base::dll::load_module_storage,
-    compiler::{manager::ModuleManager, token::TokenType::RightBigBrace, CompilerImpl},
+    compiler::{manager::ModuleManager, token::Token::RightBigBrace, CompilerImpl},
 };
 use collection_literals::collection;
 use libcore::*;
@@ -60,7 +60,7 @@ macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
         fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<()> {
             let next_sym = self.token_lexer.borrow_mut().next_token()?;
-            match next_sym.tp {
+            match next_sym {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     // 读取IOType检查
@@ -209,37 +209,32 @@ impl ModuleUnit {
         }
     }
 
-    expr_gen!(expr9, factor, TokenType::Power);
+    expr_gen!(expr9, factor, Token::Power);
     expr_gen!(
         expr8,
         expr9,
-        TokenType::Mul,
-        TokenType::Div,
-        TokenType::Mod,
-        TokenType::ExactDiv
+        Token::Mul,
+        Token::Div,
+        Token::Mod,
+        Token::ExactDiv
     );
-    expr_gen!(expr7, expr8, TokenType::Sub, TokenType::Add);
-    expr_gen!(
-        expr6,
-        expr7,
-        TokenType::BitLeftShift,
-        TokenType::BitRightShift
-    );
-    expr_gen!(expr5, expr6, TokenType::BitAnd);
-    expr_gen!(expr4, expr5, TokenType::Xor);
-    expr_gen!(expr3, expr4, TokenType::BitOr);
+    expr_gen!(expr7, expr8, Token::Sub, Token::Add);
+    expr_gen!(expr6, expr7, Token::BitLeftShift, Token::BitRightShift);
+    expr_gen!(expr5, expr6, Token::BitAnd);
+    expr_gen!(expr4, expr5, Token::Xor);
+    expr_gen!(expr3, expr4, Token::BitOr);
     expr_gen!(
         expr2,
         expr3,
-        TokenType::Equal,
-        TokenType::NotEqual,
-        TokenType::Less,
-        TokenType::LessEqual,
-        TokenType::Greater,
-        TokenType::GreaterEqual
+        Token::Equal,
+        Token::NotEqual,
+        Token::Less,
+        Token::LessEqual,
+        Token::Greater,
+        Token::GreaterEqual
     );
-    expr_gen!(expr1, expr2, TokenType::And);
-    expr_gen!(expr, expr1, TokenType::Or);
+    expr_gen!(expr1, expr2, Token::And);
+    expr_gen!(expr, expr1, Token::Or);
 
     pub fn prepare_get_static(&mut self) -> &mut StaticData {
         self.staticdata.constpool = self.token_lexer.borrow_mut().const_pool.store_val_to_vm();
@@ -264,7 +259,7 @@ impl ModuleUnit {
         );
         let condit_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         self.add_bycode(Opcode::JumpIfFalse, ARG_WRONG);
         let jump_false_id = self.staticdata.get_last_opcode_id();
         self.lex_until(RightBigBrace)?;
@@ -302,24 +297,24 @@ impl ModuleUnit {
             &mut self.self_scope.borrow_mut().in_loop,
         );
         self.statement()?;
-        self.get_token_checked(TokenType::Semicolon)?;
+        self.get_token_checked(Token::Semicolon)?;
         // condit
         let conid_id = self.staticdata.get_next_opcode_id();
         self.lex_condit()?;
-        self.get_token_checked(TokenType::Semicolon)?;
+        self.get_token_checked(Token::Semicolon)?;
         // 记录当前的头
         // action
         let mut token_save = vec![];
         loop {
             let t = self.next_token()?;
-            if t.tp == TokenType::LeftBigBrace {
+            if t == Token::LeftBigBrace {
                 break;
             }
-            if t.tp == TokenType::EndOfFile {
+            if t == Token::EndOfFile {
                 self.compiler_data
                     .borrow_mut()
                     .report_compiler_error(ErrorInfo::new(
-                        t!(UNEXPECTED_TOKEN, "0" = t.tp),
+                        t!(UNEXPECTED_TOKEN, "0" = t),
                         t!(SYNTAX_ERROR),
                     ))?;
             }
@@ -379,15 +374,15 @@ impl ModuleUnit {
         let io_tmp = lex_func_obj.get_io();
         loop {
             let nextt = self.next_token()?;
-            match nextt.tp {
-                TokenType::RightSmallBrace => {
+            match nextt {
+                Token::RightSmallBrace => {
                     if io_tmp.var_params {
                         self.add_var_params_bycode(var_params_num);
                     }
                     self.token_lexer.borrow_mut().next_back(nextt);
                     return Ok(ret);
                 }
-                TokenType::Comma => {}
+                Token::Comma => {}
                 _ => {
                     self.token_lexer.borrow_mut().next_back(nextt);
                 }
@@ -463,8 +458,7 @@ impl ModuleUnit {
     /// 解析函数，变量等的读取
     fn val(&mut self, istry: bool) -> AstError<()> {
         let t = self.next_token()?;
-        if t.tp == TokenType::ID {
-            let token_data = t.data.unwrap();
+        if let Token::ID(token_data) = t {
             let idx = self.self_scope.borrow().get_sym(token_data);
             if idx.is_none() {
                 self.try_err(
@@ -480,12 +474,12 @@ impl ModuleUnit {
             }
             let idx = idx.unwrap();
             let nxt = self.next_token()?;
-            match nxt.tp {
-                TokenType::LeftSmallBrace => {
+            match nxt {
+                Token::LeftSmallBrace => {
                     let func_obj = self.self_scope.borrow().get_function(idx).unwrap();
                     let argv_list = self.opt_args(&func_obj)?;
                     // match ")"
-                    self.get_token_checked(TokenType::RightSmallBrace)?;
+                    self.get_token_checked(Token::RightSmallBrace)?;
                     // 阐明此处设计，首先我们的函数模板会以any的方式来占位，接下来调用的时候有几种情况，第一种就是入参有any，这种情况下我们会保留一份虚函数调用版本
                     // 第二种情况就是入参有明确的类型
                     // 接下来在这种情况的基础上再分两种情况
@@ -513,7 +507,7 @@ impl ModuleUnit {
                     }
                     return Ok(());
                 }
-                TokenType::DoubleColon => {
+                Token::DoubleColon => {
                     // 访问某个作用域里的东西
                     // println!("doublecolon");
                     let mut module = match self.self_scope.borrow().get_module(idx) {
@@ -539,14 +533,14 @@ impl ModuleUnit {
                     swap(&mut self.self_scope, &mut module);
                     return ret;
                 }
-                TokenType::LeftBigBrace => {
+                Token::LeftBigBrace => {
                     // 定义类
                     match self.self_scope.borrow().get_class(idx) {
                         None => {}
                         Some(_v) => return Ok(()),
                     }
                 }
-                TokenType::Dot => {
+                Token::Dot => {
                     // 访问类成员
                 }
                 _ => {}
@@ -554,10 +548,10 @@ impl ModuleUnit {
             self.token_lexer.borrow_mut().next_back(nxt);
             self.load_var(idx, token_data, istry)?;
         } else {
-            self.token_lexer.borrow_mut().next_back(t.clone());
+            self.token_lexer.borrow_mut().next_back(t);
             self.try_err(
                 istry,
-                ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t.tp), t!(SYNTAX_ERROR)),
+                ErrorInfo::new(t!(UNEXPECTED_TOKEN, "0" = t), t!(SYNTAX_ERROR)),
             )?
         }
         Ok(())
@@ -565,36 +559,36 @@ impl ModuleUnit {
 
     fn item(&mut self, istry: bool) -> AstError<()> {
         let t = self.next_token()?;
-        match t.tp {
-            TokenType::IntValue => {
-                self.add_bycode(Opcode::LoadInt, t.data.unwrap() as Opidx);
+        match t {
+            Token::IntValue(data) => {
+                self.add_bycode(Opcode::LoadInt, data as Opidx);
                 self.process_info.new_type(self.cache.intty_id);
             }
-            TokenType::FloatValue => {
-                self.add_bycode(Opcode::LoadFloat, t.data.unwrap() as Opidx);
+            Token::FloatValue(data) => {
+                self.add_bycode(Opcode::LoadFloat, data as Opidx);
                 self.process_info.new_type(self.cache.floatty_id);
             }
-            TokenType::StringValue => {
-                self.add_bycode(Opcode::LoadString, t.data.unwrap() as Opidx);
+            Token::StringValue(data) => {
+                self.add_bycode(Opcode::LoadString, data as Opidx);
                 self.process_info.new_type(self.cache.strty_id);
             }
-            TokenType::CharValue => {
-                self.add_bycode(Opcode::LoadChar, t.data.unwrap() as Opidx);
+            Token::CharValue(data) => {
+                self.add_bycode(Opcode::LoadChar, data as Opidx);
                 self.process_info.new_type(self.cache.charty_id);
             }
-            TokenType::BoolValue => {
-                self.add_bycode(Opcode::LoadBool, t.data.unwrap() as Opidx);
+            Token::BoolValue(data) => {
+                self.add_bycode(Opcode::LoadBool, data as Opidx);
                 self.process_info.new_type(self.cache.boolty_id);
             }
             _ => {
-                self.token_lexer.borrow_mut().next_back(t.clone());
+                self.token_lexer.borrow_mut().next_back(t);
                 self.val(istry)?
             }
         }
         Ok(())
     }
 
-    fn unary_opcode_impl(&mut self, istry: bool, optoken: TokenType) -> AstError<()> {
+    fn unary_opcode_impl(&mut self, istry: bool, optoken: Token) -> AstError<()> {
         let class_obj = self
             .self_scope
             .borrow()
@@ -632,27 +626,27 @@ impl ModuleUnit {
 
     fn factor(&mut self, istry: bool) -> AstError<()> {
         let next_token = self.next_token()?;
-        match next_token.tp {
-            TokenType::Sub => {
+        match next_token {
+            Token::Sub => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::SelfNegative)?;
+                self.unary_opcode_impl(istry, Token::SelfNegative)?;
             }
-            TokenType::BitNot => {
+            Token::BitNot => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::BitNot)?;
+                self.unary_opcode_impl(istry, Token::BitNot)?;
             }
-            TokenType::Not => {
+            Token::Not => {
                 self.factor(istry)?;
-                self.unary_opcode_impl(istry, TokenType::Not)?;
+                self.unary_opcode_impl(istry, Token::Not)?;
             }
-            TokenType::Add => {
+            Token::Add => {
                 self.factor(istry)?;
             }
-            TokenType::LeftSmallBrace => {
+            Token::LeftSmallBrace => {
                 self.expr(istry)?;
-                self.get_token_checked(TokenType::RightSmallBrace)?;
+                self.get_token_checked(Token::RightSmallBrace)?;
             }
-            TokenType::LeftMiddleBrace => {
+            Token::LeftMiddleBrace => {
                 // 数组定义
                 // 获取数组长度
                 self.expr(istry)?;
@@ -668,7 +662,7 @@ impl ModuleUnit {
                         }
                     }
                 }
-                self.get_token_checked(TokenType::Semicolon)?;
+                self.get_token_checked(Token::Semicolon)?;
                 // 获取数组元素类型
                 // TODO:在此处加上对于Default的检查
                 let t = self.lex_ty(istry)?;
@@ -693,10 +687,8 @@ impl ModuleUnit {
         loop {
             // 处理通配符
             let t = self.next_token()?;
-            if t.tp == TokenType::ID
-                && self.token_lexer.borrow_mut().const_pool.id_name
-                    [unsafe { t.data.unwrap_unchecked() }]
-                    == "_"
+            if let Token::ID(data) = t
+                && self.token_lexer.borrow_mut().const_pool.id_name[data] == "_"
             {
                 is_end = true;
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
@@ -721,11 +713,11 @@ impl ModuleUnit {
                 jump_into_case.push(self.staticdata.get_last_opcode_id());
             }
             let t = self.next_token()?;
-            if t.tp == TokenType::BitOr {
-            } else if t.tp == TokenType::Arrow {
+            if t == Token::BitOr {
+            } else if t == Token::Arrow {
                 break;
             } else {
-                self.gen_unexpected_token_error(t.tp)?;
+                self.gen_unexpected_token_error(t)?;
             }
         }
         // 这个是跳转到下一个case的
@@ -734,7 +726,7 @@ impl ModuleUnit {
         for i in &jump_into_case {
             self.staticdata.inst[*i as usize].operand.0 = self.staticdata.get_next_opcode_id();
         }
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         self.lex_until(RightBigBrace)?;
         // 最后还需要跳转指令
         self.add_bycode(Opcode::Jump, ARG_WRONG);
@@ -744,7 +736,7 @@ impl ModuleUnit {
 
     fn match_lex(&mut self) -> AstError<()> {
         self.expr(false)?;
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         match self.process_info.pop_last_ty() {
             None => {
                 return self.gen_error(ErrorInfo::new(t!(EXPECTED_EXPR), t!(SYNTAX_ERROR)));
@@ -760,7 +752,7 @@ impl ModuleUnit {
                     }
                     jump_condit_save.clear();
                     let t = self.next_token()?;
-                    if t.tp == RightBigBrace {
+                    if t == RightBigBrace {
                         break;
                     }
                     if end {
@@ -782,23 +774,23 @@ impl ModuleUnit {
     }
 
     fn def_func(&mut self) -> AstError<()> {
-        let funcname = self.get_token_checked(TokenType::ID)?.data.unwrap();
+        let funcname = self.get_token_checked(Token::ID(0))?;
         let name_id = self.insert_sym_with_error(funcname)?;
         // lex args
-        self.get_token_checked(TokenType::LeftSmallBrace)?;
+        self.get_token_checked(Token::LeftSmallBrace)?;
         let mut argname: ArgsNameTy = vec![];
         let mut ty_list: Vec<TyIdxTy> = vec![];
         loop {
             let t = self.next_token()?;
-            if t.tp == TokenType::RightSmallBrace {
+            if t == Token::RightSmallBrace {
                 break;
             }
-            if t.tp != TokenType::Comma {
+            if t != Token::Comma {
                 self.token_lexer.borrow_mut().next_back(t);
             }
-            let name_id = self.get_token_checked(TokenType::ID)?.data.unwrap();
+            let name_id = self.get_token_checked(Token::ID(0))?;
             argname.push(name_id);
-            self.get_token_checked(TokenType::Colon)?;
+            self.get_token_checked(Token::Colon)?;
             ty_list.push(self.lex_ty(false)?);
         }
         // 返回值解析
@@ -807,18 +799,18 @@ impl ModuleUnit {
             Ok(ty) => Some(ty),
         };
         let io = IOType::new(ty_list, return_ty, false);
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         let mut function_body = vec![];
         let mut cnt = 1;
         loop {
             let t = self.next_token()?;
-            function_body.push((t.clone(), self.compiler_data.borrow().context.get_line()));
-            if t.tp == RightBigBrace {
+            function_body.push((t, self.compiler_data.borrow().context.get_line()));
+            if t == RightBigBrace {
                 cnt -= 1;
                 if cnt == 0 {
                     break;
                 }
-            } else if t.tp == TokenType::LeftBigBrace {
+            } else if t == Token::LeftBigBrace {
                 cnt += 1;
             }
         }
@@ -840,7 +832,7 @@ impl ModuleUnit {
     fn lex_class_item_loop(&mut self, class_obj: &mut CustomType) -> AstError<()> {
         loop {
             let t = self.next_token()?;
-            if t.tp == RightBigBrace {
+            if t == RightBigBrace {
                 break;
             }
             self.token_lexer.borrow_mut().next_back(t);
@@ -851,29 +843,29 @@ impl ModuleUnit {
 
     fn lex_class_item(&mut self, class_obj: &mut CustomType) -> AstError<()> {
         let t = self.next_token()?;
-        match t.tp {
-            TokenType::Var => {
+        match t {
+            Token::Var => {
                 // 声明属性
-                let attr_name_tok = self.get_token_checked(TokenType::ID)?;
-                let attr_id = self.insert_sym_with_error(attr_name_tok.data.unwrap())?;
-                self.get_token_checked(TokenType::Colon)?;
+                let attr_name_tok = self.get_token_checked(Token::ID(0))?;
+                let attr_id = self.insert_sym_with_error(attr_name_tok)?;
+                self.get_token_checked(Token::Colon)?;
                 let ty = self.lex_ty(false)?;
                 class_obj.add_attr(attr_id, ty);
             }
-            TokenType::Pub => {
+            Token::Pub => {
                 let mut is_in_pub = true;
                 swap(&mut self.self_scope.borrow_mut().is_pub, &mut is_in_pub);
-                self.get_token_checked(TokenType::LeftBigBrace)?;
+                self.get_token_checked(Token::LeftBigBrace)?;
                 self.lex_class_item_loop(class_obj)?;
                 self.get_token_checked(RightBigBrace)?;
                 swap(&mut self.self_scope.borrow_mut().is_pub, &mut is_in_pub);
             }
-            TokenType::Func => {
+            Token::Func => {
                 self.def_func()?;
             }
             _ => {
                 self.gen_error(ErrorInfo::new(
-                    t!(UNEXPECTED_TOKEN, "0" = t.tp),
+                    t!(UNEXPECTED_TOKEN, "0" = t),
                     t!(SYNTAX_ERROR),
                 ))?;
             }
@@ -887,13 +879,13 @@ impl ModuleUnit {
             self.self_scope.clone(),
         ))));
         self.self_scope.borrow_mut().in_class = true;
-        let name = self.get_token_checked(TokenType::ID)?.data.unwrap();
+        let name = self.get_token_checked(Token::ID(0))?;
         let name_id = self.insert_sym_with_error(name)?;
         let mut class_obj = CustomType::new(
             name_id,
             self.token_lexer.borrow_mut().const_pool.id_name[name].clone(),
         );
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         self.lex_class_item_loop(&mut class_obj)?;
         // 将作用域中剩下的函数加入作用域
         self.self_scope
@@ -906,10 +898,7 @@ impl ModuleUnit {
     }
 
     fn lex_import(&mut self, istry: bool) -> AstError<()> {
-        let tok = self
-            .get_token_checked(TokenType::StringValue)?
-            .data
-            .unwrap();
+        let tok = self.get_token_checked(Token::StringValue(0))?;
         // import的路径
         let mut path_with_dot = self.token_lexer.borrow_mut().const_pool.id_str[tok].clone();
         // 具体文件的路径
@@ -1129,10 +1118,10 @@ impl ModuleUnit {
         Ok(())
     }
 
-    fn lex_until(&mut self, end_state: TokenType) -> AstError<()> {
+    fn lex_until(&mut self, end_state: Token) -> AstError<()> {
         loop {
             let t = self.next_token()?;
-            if t.tp == end_state {
+            if t == end_state {
                 break;
             }
             self.token_lexer.borrow_mut().next_back(t);
@@ -1158,7 +1147,7 @@ impl ModuleUnit {
 
     fn if_lex(&mut self) -> RuntimeResult<()> {
         self.lex_condit()?;
-        self.get_token_checked(TokenType::LeftBigBrace)?;
+        self.get_token_checked(Token::LeftBigBrace)?;
         // 每个分支末尾的跳转地址，用于跳出if
         let mut save_jump_opcode_idx = vec![];
         loop {
@@ -1170,15 +1159,15 @@ impl ModuleUnit {
             save_jump_opcode_idx.push(self.staticdata.get_last_opcode_id());
             self.staticdata.inst[op_idx].operand.0 = self.staticdata.get_next_opcode_id();
             let t = self.next_token()?;
-            if t.tp == TokenType::Else {
+            if t == Token::Else {
                 let nxt_tok = self.next_token()?;
-                if nxt_tok.tp == TokenType::If {
+                if nxt_tok == Token::If {
                     self.lex_condit()?;
-                    self.get_token_checked(TokenType::LeftBigBrace)?;
+                    self.get_token_checked(Token::LeftBigBrace)?;
                     continue;
                 }
                 self.token_lexer.borrow_mut().next_back(nxt_tok);
-                self.get_token_checked(TokenType::LeftBigBrace)?;
+                self.get_token_checked(Token::LeftBigBrace)?;
                 self.lex_until(RightBigBrace)?;
                 break;
             }
@@ -1197,8 +1186,8 @@ impl ModuleUnit {
 
     fn statement(&mut self) -> RuntimeResult<()> {
         let t = self.next_token()?;
-        match t.tp {
-            TokenType::Continue => {
+        match t {
+            Token::Continue => {
                 if !self.self_scope.borrow().in_loop {
                     return self.gen_error(ErrorInfo::new(
                         t!(SHOULD_IN_LOOP, "0" = "continue"),
@@ -1212,7 +1201,7 @@ impl ModuleUnit {
                     .push(self.staticdata.get_last_opcode_id() as usize);
                 return Ok(());
             }
-            TokenType::Break => {
+            Token::Break => {
                 if !self.self_scope.borrow().in_loop {
                     return self.gen_error(ErrorInfo::new(
                         t!(SHOULD_IN_LOOP, "0" = "break"),
@@ -1226,7 +1215,7 @@ impl ModuleUnit {
                     .push(self.staticdata.get_last_opcode_id() as usize);
                 return Ok(());
             }
-            TokenType::Return => {
+            Token::Return => {
                 if self.process_info.is_global {
                     return self.gen_error(ErrorInfo::new(
                         t!(RETURN_SHOULD_IN_FUNCTION),
@@ -1263,53 +1252,52 @@ impl ModuleUnit {
                 self.add_bycode(Opcode::PopFrame, NO_ARG);
                 return Ok(());
             }
-            TokenType::Func => {
+            Token::Func => {
                 self.def_func()?;
                 return Ok(());
             }
-            TokenType::Class => {
+            Token::Class => {
                 self.def_class()?;
                 return Ok(());
             }
-            TokenType::While => {
+            Token::While => {
                 self.while_lex()?;
                 return Ok(());
             }
-            TokenType::For => {
+            Token::For => {
                 self.for_lex()?;
                 return Ok(());
             }
-            TokenType::If => {
+            Token::If => {
                 self.if_lex()?;
                 return Ok(());
             }
-            TokenType::Import => {
+            Token::Import => {
                 self.lex_import(false)?;
                 return Ok(());
             }
-            TokenType::Match => {
+            Token::Match => {
                 self.match_lex()?;
                 return Ok(());
             }
-            TokenType::ID => {
-                let name = t.data.unwrap();
+            Token::ID(name) => {
                 let tt = self.next_token()?;
-                match tt.tp {
-                    TokenType::Assign => {
+                match tt {
+                    Token::Assign => {
                         self.assign_var(name)?;
                         return Ok(());
                     }
-                    TokenType::Store => {
+                    Token::Store => {
                         self.store_var(name)?;
                         return Ok(());
                     }
-                    TokenType::SelfAdd => {}
-                    TokenType::SelfSub => {}
-                    TokenType::SelfMul => {}
-                    TokenType::SelfDiv => {}
-                    TokenType::SelfMod => {}
-                    TokenType::SelfOr => {}
-                    TokenType::SelfAnd => {}
+                    Token::SelfAdd => {}
+                    Token::SelfSub => {}
+                    Token::SelfMul => {}
+                    Token::SelfDiv => {}
+                    Token::SelfMod => {}
+                    Token::SelfOr => {}
+                    Token::SelfAnd => {}
                     _ => {
                         self.token_lexer.borrow_mut().next_back(tt);
                     }
@@ -1363,13 +1351,11 @@ impl ModuleUnit {
         }
         // 回退函数体
         for i in body.iter().rev() {
-            self.token_lexer
-                .borrow_mut()
-                .next_back_with_line(i.0.clone(), i.1);
+            self.token_lexer.borrow_mut().next_back_with_line(i.0, i.1);
         }
         loop {
             let t = self.next_token()?;
-            if t.tp == RightBigBrace {
+            if t == RightBigBrace {
                 break;
             }
             self.token_lexer.borrow_mut().next_back(t);
@@ -1401,7 +1387,7 @@ impl ModuleUnit {
 
     pub fn generate_code(&mut self) -> RuntimeResult<()> {
         self.process_info.is_global = true;
-        self.lex_until(TokenType::EndOfFile)?;
+        self.lex_until(Token::EndOfFile)?;
         // 结束一个作用域的代码解析后再解析这里面的函数
         self.process_info.is_global = false;
         self.generate_func_in_scope()?;

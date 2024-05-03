@@ -1,17 +1,31 @@
 use super::{Context, TokenIo, ValuePool};
-use crate::{
-    cfg::FLOAT_OVER_FLOW_LIMIT,
-    compiler::{token, CompilerImpl},
-};
+use crate::compiler::CompilerImpl;
 use libcore::*;
-use logos::{Lexer, Logos, Span};
+use logos::{Lexer, Logos};
 use rust_i18n::t;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, sync::OnceLock};
 
+fn add_float(lex: &mut Lexer<Token>) -> usize {
+    lex.extras.add_float(lex.slice().to_owned())
+}
+
+fn add_string(lex: &mut Lexer<Token>) -> usize {
+    lex.extras.add_string(lex.slice().to_owned())
+}
+
+fn add_id(lex: &mut Lexer<Token>) -> usize {
+    lex.extras.add_id(lex.slice().to_owned())
+}
+
+fn convert_int(lex: &mut Lexer<Token>) -> usize {
+    let val: i64 = lex.slice().parse().unwrap();
+    convert_int_constval_to_usize(val)
+}
+
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
-#[logos(extras = TokenLex)]
+#[logos(extras = ValuePool)]
 #[logos(skip r"[ \t\r\n\f]+")]
-pub enum TokenType {
+pub enum Token {
     #[token("->")]
     Arrow,
     #[token(".")]
@@ -80,14 +94,18 @@ pub enum TokenType {
     SelfBitOr,
     #[token("^=")]
     SelfXor,
-    #[regex("[0-9]+")]
-    IntValue,
-    #[regex("[0-9]+\\.[0-9]+")]
-    StringValue,
-    FloatValue,
+    #[regex(r#"[+-]?(0[bB][01]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+|\d+)"#, convert_int)]
+    IntValue(usize),
+    #[regex(r#"".*""#, add_string)]
+    StringValue(usize),
+    #[regex(r#"[-+]?[0-9]+\.?[0-9]+([eE][-+]?[0-9]+)?"#, add_float)]
+    FloatValue(usize),
     LongIntValue,
-    CharValue,
-    BoolValue,
+    #[regex(r#"'[a-zA-Z_0-9]'"#, |lex| lex.slice().chars().next().unwrap() as usize)]
+    CharValue(usize),
+    #[token("false", |_| false as usize)]
+    #[token("true", |_| true as usize)]
+    BoolValue(usize),
     #[token("||=")]
     SelfOr,
     #[token("&&=")]
@@ -118,7 +136,8 @@ pub enum TokenType {
     Colon,
     #[token(";")]
     Semicolon,
-    ID,
+    #[regex(r#"[a-zA-Z_][a-zA-Z_0-9]*"#, add_id)]
+    ID(usize),
     #[token("while")]
     While,
     #[token("for")]
@@ -139,6 +158,7 @@ pub enum TokenType {
     Return,
     // 不会被使用到的自反运算符，仅仅当标识重载运算符使用
     SelfNegative,
+    #[token("\0")]
     EndOfFile,
     #[token("continue")]
     Continue,
@@ -156,32 +176,32 @@ pub enum TokenType {
     Unsafe,
 }
 
-impl TokenType {
+impl Token {
     pub fn convert_to_override(&self) -> Option<OverrideOperations> {
         Some(match *self {
-            TokenType::Add => OverrideOperations::Add,
-            TokenType::Sub => OverrideOperations::Sub,
-            TokenType::Mul => OverrideOperations::Mul,
-            TokenType::Div => OverrideOperations::Div,
-            TokenType::Mod => OverrideOperations::Mod,
-            TokenType::ExactDiv => OverrideOperations::ExactDiv,
-            TokenType::Power => OverrideOperations::Power,
-            TokenType::Not => OverrideOperations::Not,
-            TokenType::And => OverrideOperations::And,
-            TokenType::Or => OverrideOperations::Or,
-            TokenType::SelfNegative => OverrideOperations::SelfNegative,
-            TokenType::GreaterEqual => OverrideOperations::GreaterEqual,
-            TokenType::Greater => OverrideOperations::Greater,
-            TokenType::LessEqual => OverrideOperations::LessEqual,
-            TokenType::Less => OverrideOperations::Less,
-            TokenType::Equal => OverrideOperations::Equal,
-            TokenType::NotEqual => OverrideOperations::NotEqual,
-            TokenType::BitNot => OverrideOperations::BitNot,
-            TokenType::BitRightShift => OverrideOperations::BitRightShift,
-            TokenType::BitLeftShift => OverrideOperations::BitLeftShift,
-            TokenType::BitAnd => OverrideOperations::BitAnd,
-            TokenType::BitOr => OverrideOperations::BitOr,
-            TokenType::Xor => OverrideOperations::Xor,
+            Token::Add => OverrideOperations::Add,
+            Token::Sub => OverrideOperations::Sub,
+            Token::Mul => OverrideOperations::Mul,
+            Token::Div => OverrideOperations::Div,
+            Token::Mod => OverrideOperations::Mod,
+            Token::ExactDiv => OverrideOperations::ExactDiv,
+            Token::Power => OverrideOperations::Power,
+            Token::Not => OverrideOperations::Not,
+            Token::And => OverrideOperations::And,
+            Token::Or => OverrideOperations::Or,
+            Token::SelfNegative => OverrideOperations::SelfNegative,
+            Token::GreaterEqual => OverrideOperations::GreaterEqual,
+            Token::Greater => OverrideOperations::Greater,
+            Token::LessEqual => OverrideOperations::LessEqual,
+            Token::Less => OverrideOperations::Less,
+            Token::Equal => OverrideOperations::Equal,
+            Token::NotEqual => OverrideOperations::NotEqual,
+            Token::BitNot => OverrideOperations::BitNot,
+            Token::BitRightShift => OverrideOperations::BitRightShift,
+            Token::BitLeftShift => OverrideOperations::BitLeftShift,
+            Token::BitAnd => OverrideOperations::BitAnd,
+            Token::BitOr => OverrideOperations::BitOr,
+            Token::Xor => OverrideOperations::Xor,
             _ => return None,
         })
     }
@@ -189,92 +209,86 @@ impl TokenType {
 
 pub type ConstPoolIndexTy = usize;
 
-impl Display for TokenType {
+impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
-            TokenType::Dot => ".",
-            TokenType::Comma => ",",
-            TokenType::LeftBigBrace => "{",
-            TokenType::RightBigBrace => "}",
-            TokenType::LeftMiddleBrace => "[",
-            TokenType::RightMiddleBrace => "]",
-            TokenType::LeftSmallBrace => "(",
-            TokenType::RightSmallBrace => ")",
-            TokenType::Add => "+",
-            TokenType::Sub => "-",
-            TokenType::Mul => "*",
-            TokenType::Div => "/",
-            TokenType::Mod => "%",
-            TokenType::ExactDiv => "//",
-            TokenType::BitNot => "~",
-            TokenType::BitLeftShift => "<<",
-            TokenType::BitRightShift => ">>",
-            TokenType::BitAnd => "&",
-            TokenType::BitOr => "|",
-            TokenType::Xor => "^",
-            TokenType::Power => "**",
-            TokenType::SelfAdd => "+=",
-            TokenType::SelfSub => "-=",
-            TokenType::SelfMul => "*=",
-            TokenType::SelfDiv => "/=",
-            TokenType::SelfExactDiv => "//=",
-            TokenType::SelfMod => "%=",
-            TokenType::SelfPower => "**=",
-            TokenType::SelfBitLeftShift => "<<=",
-            TokenType::SelfBitRightShift => ">>=",
-            TokenType::SelfBitAnd => "&=",
-            TokenType::SelfBitOr => "|=",
-            TokenType::SelfXor => "^=",
-            TokenType::IntValue => "integer",
-            TokenType::StringValue => "string",
-            TokenType::FloatValue => "float",
-            TokenType::LongIntValue => "long integer",
-            TokenType::Assign => "=",
-            TokenType::Store => ":=",
-            TokenType::Equal => "==",
-            TokenType::NotEqual => "!=",
-            TokenType::Greater => ">",
-            TokenType::Less => "<",
-            TokenType::LessEqual => "<=",
-            TokenType::GreaterEqual => ">=",
-            TokenType::Not => "!",
-            TokenType::Or => "||",
-            TokenType::And => "&&",
-            TokenType::Colon => ":",
-            TokenType::Semicolon => ";",
-            TokenType::ID => "identifier",
-            TokenType::While => "while",
-            TokenType::For => "for",
-            TokenType::If => "if",
-            TokenType::Else => "else",
-            TokenType::Class => "class",
-            TokenType::Match => "match",
-            TokenType::Func => "func",
-            TokenType::EndOfFile => "EOF",
-            TokenType::Import => "import",
-            TokenType::Arrow => "->",
-            TokenType::Return => "return",
-            TokenType::SelfAnd => "&&=",
-            TokenType::SelfOr => "||=",
-            TokenType::SelfNegative => "-",
-            TokenType::CharValue => "char",
-            TokenType::BoolValue => "bool",
-            TokenType::Continue => "continue",
-            TokenType::Break => "break",
-            TokenType::Var => "var",
-            TokenType::Pub => "pub",
-            TokenType::DoubleColon => "::",
-            TokenType::Uninit => "uninit",
-            TokenType::Unsafe => "unsafe",
+            Token::Dot => ".",
+            Token::Comma => ",",
+            Token::LeftBigBrace => "{",
+            Token::RightBigBrace => "}",
+            Token::LeftMiddleBrace => "[",
+            Token::RightMiddleBrace => "]",
+            Token::LeftSmallBrace => "(",
+            Token::RightSmallBrace => ")",
+            Token::Add => "+",
+            Token::Sub => "-",
+            Token::Mul => "*",
+            Token::Div => "/",
+            Token::Mod => "%",
+            Token::ExactDiv => "//",
+            Token::BitNot => "~",
+            Token::BitLeftShift => "<<",
+            Token::BitRightShift => ">>",
+            Token::BitAnd => "&",
+            Token::BitOr => "|",
+            Token::Xor => "^",
+            Token::Power => "**",
+            Token::SelfAdd => "+=",
+            Token::SelfSub => "-=",
+            Token::SelfMul => "*=",
+            Token::SelfDiv => "/=",
+            Token::SelfExactDiv => "//=",
+            Token::SelfMod => "%=",
+            Token::SelfPower => "**=",
+            Token::SelfBitLeftShift => "<<=",
+            Token::SelfBitRightShift => ">>=",
+            Token::SelfBitAnd => "&=",
+            Token::SelfBitOr => "|=",
+            Token::SelfXor => "^=",
+            Token::IntValue(_) => "integer",
+            Token::StringValue(_) => "string",
+            Token::FloatValue(_) => "float",
+            Token::LongIntValue => "long integer",
+            Token::Assign => "=",
+            Token::Store => ":=",
+            Token::Equal => "==",
+            Token::NotEqual => "!=",
+            Token::Greater => ">",
+            Token::Less => "<",
+            Token::LessEqual => "<=",
+            Token::GreaterEqual => ">=",
+            Token::Not => "!",
+            Token::Or => "||",
+            Token::And => "&&",
+            Token::Colon => ":",
+            Token::Semicolon => ";",
+            Token::ID(_) => "identifier",
+            Token::While => "while",
+            Token::For => "for",
+            Token::If => "if",
+            Token::Else => "else",
+            Token::Class => "class",
+            Token::Match => "match",
+            Token::Func => "func",
+            Token::EndOfFile => "EOF",
+            Token::Import => "import",
+            Token::Arrow => "->",
+            Token::Return => "return",
+            Token::SelfAnd => "&&=",
+            Token::SelfOr => "||=",
+            Token::SelfNegative => "-",
+            Token::CharValue(_) => "char",
+            Token::BoolValue(_) => "bool",
+            Token::Continue => "continue",
+            Token::Break => "break",
+            Token::Var => "var",
+            Token::Pub => "pub",
+            Token::DoubleColon => "::",
+            Token::Uninit => "uninit",
+            Token::Unsafe => "unsafe",
         };
         write!(f, "{}", res)
     }
-}
-
-#[derive(PartialEq, Debug, Clone)]
-pub struct Token {
-    pub tp: TokenType,
-    pub data: Option<usize>,
 }
 
 struct BraceRecord {
@@ -294,12 +308,6 @@ pub struct TokenLex {
     // token和当前行号
     unget_token: Vec<(Token, usize)>,
     pub const_pool: ValuePool,
-}
-
-impl Token {
-    fn new(tp: TokenType, data: Option<usize>) -> Token {
-        Token { tp, data }
-    }
 }
 
 macro_rules! check_braces_match {
@@ -326,43 +334,27 @@ macro_rules! check_braces_match {
     }}
 }
 
-fn get_keywords() -> &'static HashMap<String, TokenType> {
-    static KEYWORDS: OnceLock<HashMap<String, TokenType>> = OnceLock::new();
+fn get_keywords() -> &'static HashMap<String, Token> {
+    static KEYWORDS: OnceLock<HashMap<String, Token>> = OnceLock::new();
     KEYWORDS.get_or_init(|| {
         collection_literals::hash![
-            "while".to_string() => TokenType::While,
-            "for".to_string() => TokenType::For,
-            "if".to_string() => TokenType::If,
-            "else".to_string() => TokenType::Else,
-            "class".to_string() => TokenType::Class,
-            "func".to_string() => TokenType::Func,
-            "match".to_string() => TokenType::Match,
-            "return".to_string() => TokenType::Return,
-            "import".to_string() => TokenType::Import,
-            "continue".to_string() => TokenType::Continue,
-            "break".to_string() => TokenType::Break,
-            "var".to_string() => TokenType::Var,
-            "pub".to_string() => TokenType::Pub,
-            "unsafe".to_string() => TokenType::Unsafe,
-            "uninit".to_string() => TokenType::Uninit
+            "while".to_string() => Token::While,
+            "for".to_string() => Token::For,
+            "if".to_string() => Token::If,
+            "else".to_string() => Token::Else,
+            "class".to_string() => Token::Class,
+            "func".to_string() => Token::Func,
+            "match".to_string() => Token::Match,
+            "return".to_string() => Token::Return,
+            "import".to_string() => Token::Import,
+            "continue".to_string() => Token::Continue,
+            "break".to_string() => Token::Break,
+            "var".to_string() => Token::Var,
+            "pub".to_string() => Token::Pub,
+            "unsafe".to_string() => Token::Unsafe,
+            "uninit".to_string() => Token::Uninit
         ]
     })
-}
-
-fn get_redix_to_prefix() -> &'static HashMap<usize, &'static str> {
-    static RADIX_TO_PREFIX: OnceLock<HashMap<usize, &'static str>> = OnceLock::new();
-    RADIX_TO_PREFIX.get_or_init(|| {
-        collection_literals::hash![
-            2 => "0b",
-            8 => "0o",
-            16 => "0x"
-        ]
-    })
-}
-
-enum NumValue {
-    Integer(i64),
-    FloatVal(String),
 }
 
 impl Iterator for TokenLex {
@@ -371,7 +363,7 @@ impl Iterator for TokenLex {
     fn next(&mut self) -> Option<Self::Item> {
         match self.next_token() {
             Ok(v) => {
-                if v.tp == TokenType::EndOfFile {
+                if v == Token::EndOfFile {
                     None
                 } else {
                     Some(v)
@@ -418,439 +410,6 @@ impl TokenLex {
         self.compiler_data.borrow_mut().input = source;
     }
 
-    fn lex_id(&mut self, c: char) -> RuntimeResult<Token> {
-        Ok({
-            let mut retname: String = String::from(c);
-            loop {
-                let c = self.compiler_data.borrow_mut().input.read();
-                if Self::is_id_char(c) {
-                    retname.push(c);
-                } else {
-                    self.compiler_data.borrow_mut().input.unread(c);
-                    break;
-                }
-            }
-            let tmp = get_keywords().get(&retname);
-            match tmp {
-                Some(val) => Token::new(*val, None),
-                None => {
-                    if retname == "true" {
-                        return Ok(Token::new(TokenType::BoolValue, Some(1)));
-                    }
-                    if retname == "false" {
-                        return Ok(Token::new(TokenType::BoolValue, Some(0)));
-                    }
-                    Token::new(TokenType::ID, Some(self.const_pool.add_id(retname)))
-                }
-            }
-        })
-    }
-
-    fn check_whether_symbol(c: char) -> bool {
-        matches!(
-            c,
-            '.' | ','
-                | '{'
-                | '}'
-                | '['
-                | ']'
-                | '('
-                | ')'
-                | '+'
-                | '-'
-                | '*'
-                | '%'
-                | '/'
-                | '='
-                | '!'
-                | '>'
-                | '<'
-                | '~'
-                | '^'
-                | '|'
-                | ':'
-                | ';'
-                | '&'
-        )
-    }
-
-    fn is_useless_char(c: char) -> bool {
-        matches!(c, ' ' | '\n' | '\t' | '\0')
-    }
-
-    fn is_string_or_char_begin(c: char) -> bool {
-        matches!(c, '"' | '\'')
-    }
-
-    fn is_id_char(c: char) -> bool {
-        !(Self::check_whether_symbol(c)
-            || Self::is_string_or_char_begin(c)
-            || Self::is_useless_char(c))
-    }
-
-    fn lex_symbol(&mut self, c: char) -> RuntimeResult<Token> {
-        Ok(match c {
-            '.' => Token::new(TokenType::Dot, None),
-            ',' => Token::new(TokenType::Comma, None),
-            '{' => {
-                self.braces_check.push(BraceRecord::new(
-                    c,
-                    self.compiler_data.borrow().context.get_line(),
-                ));
-                Token::new(TokenType::LeftBigBrace, None)
-            }
-            '}' => {
-                self.check_braces_stack(c)?;
-                Token::new(TokenType::RightBigBrace, None)
-            }
-            '[' => {
-                self.braces_check.push(BraceRecord::new(
-                    c,
-                    self.compiler_data.borrow().context.get_line(),
-                ));
-                Token::new(TokenType::LeftMiddleBrace, None)
-            }
-            ']' => {
-                self.check_braces_stack(c)?;
-                Token::new(TokenType::RightMiddleBrace, None)
-            }
-            '(' => {
-                self.braces_check.push(BraceRecord::new(
-                    c,
-                    self.compiler_data.borrow().context.get_line(),
-                ));
-                Token::new(TokenType::LeftSmallBrace, None)
-            }
-            ')' => {
-                self.check_braces_stack(c)?;
-                Token::new(TokenType::RightSmallBrace, None)
-            }
-            '+' => self.self_symbol(TokenType::Add, TokenType::SelfAdd),
-            '-' => {
-                let c = self.compiler_data.borrow_mut().input.read();
-                if c == '>' {
-                    Token::new(TokenType::Arrow, None)
-                } else if c == '=' {
-                    Token::new(TokenType::SelfSub, None)
-                } else {
-                    self.compiler_data.borrow_mut().input.unread(c);
-                    Token::new(TokenType::Sub, None)
-                }
-            }
-            '*' => self.double_symbol(
-                TokenType::Mul,
-                TokenType::SelfMul,
-                TokenType::Power,
-                TokenType::SelfPower,
-                '*',
-            ),
-            '%' => self.self_symbol(TokenType::Mod, TokenType::SelfMod),
-            '/' => {
-                // 特判注释
-                let c = self.compiler_data.borrow_mut().input.read();
-                if c == '*' {
-                    loop {
-                        let c = self.compiler_data.borrow_mut().input.read();
-                        if c == '*' {
-                            let c = self.compiler_data.borrow_mut().input.read();
-                            if c == '/' {
-                                return self.next_token();
-                            }
-                            self.compiler_data.borrow_mut().input.unread(c);
-                        } else if c == '\0' {
-                            return self.report_error(ErrorInfo::new(
-                                t!(UNCLODED_COMMENT),
-                                t!(SYNTAX_ERROR),
-                            ));
-                        } else if c == '\n' {
-                            self.compiler_data.borrow_mut().context.add_line();
-                        }
-                    }
-                }
-                self.compiler_data.borrow_mut().input.unread(c);
-                self.double_symbol(
-                    TokenType::Div,
-                    TokenType::SelfDiv,
-                    TokenType::ExactDiv,
-                    TokenType::SelfExactDiv,
-                    '/',
-                )
-            }
-            '=' => self.binary_symbol(TokenType::Assign, TokenType::Equal, '='),
-            '!' => self.binary_symbol(TokenType::Not, TokenType::NotEqual, '='),
-            '>' => self.double_symbol(
-                TokenType::Greater,
-                TokenType::GreaterEqual,
-                TokenType::BitRightShift,
-                TokenType::SelfBitRightShift,
-                '>',
-            ),
-            '<' => self.double_symbol(
-                TokenType::Less,
-                TokenType::LessEqual,
-                TokenType::BitLeftShift,
-                TokenType::SelfBitLeftShift,
-                '<',
-            ),
-            '~' => Token::new(TokenType::BitNot, None),
-            '^' => self.self_symbol(TokenType::Xor, TokenType::SelfXor),
-            ':' => {
-                let c = self.compiler_data.borrow_mut().input.read();
-                if c == '=' {
-                    Token::new(TokenType::Store, None)
-                } else if c == ':' {
-                    Token::new(TokenType::DoubleColon, None)
-                } else {
-                    self.compiler_data.borrow_mut().input.unread(c);
-                    Token::new(TokenType::Colon, None)
-                }
-            }
-            ';' => Token::new(TokenType::Semicolon, None),
-            '|' => self.double_symbol(
-                TokenType::BitOr,
-                TokenType::SelfBitOr,
-                TokenType::Or,
-                TokenType::SelfOr,
-                '|',
-            ),
-            '&' => self.double_symbol(
-                TokenType::BitAnd,
-                TokenType::SelfBitAnd,
-                TokenType::And,
-                TokenType::SelfAnd,
-                '&',
-            ),
-            _ => {
-                unreachable!()
-            }
-        })
-    }
-
-    /// lex only an integer
-    fn lex_num_integer(&mut self, c: char, radix: u32) -> String {
-        let mut s = String::from(c);
-        let mut presecnt_lex;
-        loop {
-            presecnt_lex = self.compiler_data.borrow_mut().input.read();
-            if presecnt_lex == '_' {
-                continue;
-            }
-            if presecnt_lex.is_digit(radix) {
-                s.push(presecnt_lex);
-            } else {
-                self.compiler_data.borrow_mut().input.unread(presecnt_lex);
-                break;
-            }
-        }
-        s
-    }
-
-    fn lex_int_float(&mut self, mut c: char) -> RuntimeResult<NumValue> {
-        // the radix of result
-        let mut radix = 10;
-        if c == '0' {
-            // check the radix
-            c = self.compiler_data.borrow_mut().input.read();
-            match c {
-                'x' | 'X' => {
-                    radix = 16;
-                }
-                'b' | 'B' => {
-                    radix = 2;
-                }
-                'o' | 'O' => {
-                    radix = 8;
-                }
-                _ => {
-                    self.compiler_data.borrow_mut().input.unread(c);
-                    return Ok(NumValue::Integer(0));
-                }
-            }
-            c = self.compiler_data.borrow_mut().input.read();
-        }
-        let intpart = self.lex_num_integer(c, radix).to_string();
-        c = self.compiler_data.borrow_mut().input.read();
-        if c == '.' {
-            // float can be used with prefix
-            if radix != 10 {
-                return self.report_error(ErrorInfo::new(
-                    t!(
-                        PREFIX_FOR_FLOAT,
-                        "0" = get_redix_to_prefix()[&(radix as usize)]
-                    ),
-                    t!(SYNTAX_ERROR),
-                ));
-            }
-            // float mode
-            c = self.compiler_data.borrow_mut().input.read();
-            let float_part = self.lex_num_integer(c, radix);
-            if float_part.len() + intpart.len() > FLOAT_OVER_FLOW_LIMIT {
-                // overflow
-                return self.report_error(ErrorInfo::new(
-                    t!(FLOAT_OVER_FLOW, "0" = format!("{intpart}.{float_part}")),
-                    t!(NUMBER_OVER_FLOW),
-                ));
-            }
-            return Ok(NumValue::FloatVal(format!(
-                "{}.{}",
-                i64::from_str_radix(&intpart, radix).unwrap().to_string(),
-                i64::from_str_radix(&float_part, radix).unwrap().to_string(),
-            )));
-        } else {
-            self.compiler_data.borrow_mut().input.unread(c);
-        }
-        Ok(NumValue::Integer(
-            i64::from_str_radix(&intpart, radix).unwrap(),
-        ))
-    }
-
-    fn turn_to_token(&mut self, val: NumValue) -> Token {
-        match val {
-            NumValue::FloatVal(v) => {
-                Token::new(TokenType::FloatValue, Some(self.const_pool.add_float(v)))
-            }
-            NumValue::Integer(it) => {
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(it)))
-            }
-        }
-    }
-
-    fn lex_num(&mut self, mut c: char) -> RuntimeResult<Token> {
-        let tmp = self.lex_int_float(c)?;
-        c = self.compiler_data.borrow_mut().input.read();
-        if c == 'e' || c == 'E' {
-            // 科学计数法
-            c = self.compiler_data.borrow_mut().input.read();
-            // 科学计数法的指数符号
-            let mut up_flag: i64 = 1;
-            if c == '+' {
-                c = self.compiler_data.borrow_mut().input.read();
-            } else if c == '-' {
-                up_flag = -1;
-                c = self.compiler_data.borrow_mut().input.read();
-            }
-            // 读取科学计数法的指数部分
-            let mut up: i64 = self.lex_num_integer(c, 10).parse().unwrap();
-            up *= up_flag;
-            match tmp {
-                NumValue::Integer(mut it) => {
-                    if up >= 0 {
-                        // 保留int身份
-                        for _ in 0..up {
-                            it *= 10;
-                        }
-                        Ok(Token::new(
-                            TokenType::IntValue,
-                            Some(convert_int_constval_to_usize(it)),
-                        ))
-                    } else {
-                        // 负数次，升级为float
-                        let mut float_part = String::new();
-                        up = -up;
-                        for _ in 0..up {
-                            if it == 0 {
-                                float_part.insert(0, '0');
-                            } else {
-                                float_part = (it % 10).to_string() + &float_part;
-                                it /= 10;
-                            }
-                        }
-                        Ok(Token::new(
-                            TokenType::FloatValue,
-                            Some(self.const_pool.add_float(format!("{}.{}", it, float_part))),
-                        ))
-                    }
-                }
-                NumValue::FloatVal(v) => {
-                    // 转换为两个元素的元组
-                    let mut vv = v.split('.');
-                    let mut v = (vv.next().unwrap().to_owned(), vv.next().unwrap().to_owned());
-                    debug_assert_eq!(vv.next(), None);
-                    if up >= 0 {
-                        for _ in 0..up {
-                            if v.1.is_empty() {
-                                v.0.push('0');
-                            } else {
-                                v.0.push(v.1.remove(0));
-                            }
-                        }
-                        let ret = if v.1.is_empty() {
-                            v.0
-                        } else {
-                            format!("{}.{}", v.0, v.1)
-                        };
-                        Ok(Token::new(
-                            TokenType::FloatValue,
-                            Some(self.const_pool.add_float(ret)),
-                        ))
-                    } else {
-                        up = -up;
-                        let mut s = String::new();
-                        let mut zero_num = 0;
-                        for _ in 0..up {
-                            if v.0.is_empty() {
-                                zero_num += 1;
-                            } else {
-                                s = v.0.pop().unwrap().to_string() + &s;
-                            }
-                        }
-                        if v.0.is_empty() {
-                            v.0 = "0".to_string();
-                        }
-                        s = format!("{}.{}{}", v.0, "0".repeat(zero_num), s + &v.1.to_string());
-                        Ok(Token::new(
-                            TokenType::FloatValue,
-                            Some(self.const_pool.add_float(s)),
-                        ))
-                    }
-                }
-            }
-        } else {
-            self.compiler_data.borrow_mut().input.unread(c);
-            Ok(self.turn_to_token(tmp))
-        }
-    }
-
-    fn lex_str(&mut self) -> RuntimeResult<Token> {
-        let mut s = String::new();
-        let mut c = self.compiler_data.borrow_mut().input.read();
-        while c != '"' {
-            if c == '\\' {
-                c = self.compiler_data.borrow_mut().input.read();
-                c = match c {
-                    't' => '\t',
-                    'n' => '\n',
-                    '\\' => '\\',
-                    '"' => '"',
-                    '\'' => '\'',
-                    '0' => '\0',
-                    _ => {
-                        s.push('\\');
-                        c
-                    }
-                }
-            }
-            s.push(c);
-            c = self.compiler_data.borrow_mut().input.read();
-            if c == '\0' {
-                return self.report_error(ErrorInfo::new(t!(STRING_WITHOUT_END), t!(SYNTAX_ERROR)));
-            }
-        }
-        Ok(Token::new(
-            TokenType::StringValue,
-            Some(self.const_pool.add_string(s)),
-        ))
-    }
-
-    fn lex_char(&mut self) -> RuntimeResult<Token> {
-        let c = self.compiler_data.borrow_mut().input.read();
-        let end = self.compiler_data.borrow_mut().input.read();
-        if end != '\'' {
-            return self.report_error(ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)));
-        }
-        Ok(Token::new(TokenType::CharValue, Some(c as usize)))
-    }
-
     fn report_error<T>(&mut self, e: ErrorInfo) -> Result<T, RuntimeError> {
         self.clear_error();
         self.compiler_data.borrow().report_compiler_error(e)
@@ -875,7 +434,7 @@ impl TokenLex {
         let presecnt_lex = self.compiler_data.borrow_mut().input.read();
         match presecnt_lex {
             '\0' => {
-                return Ok(Token::new(TokenType::EndOfFile, None));
+                return Ok(Token::EndOfFile);
             }
             '\t' | ' ' => {
                 return self.next_token();
@@ -893,25 +452,13 @@ impl TokenLex {
                         return self.next_token();
                     }
                     if c == '\0' {
-                        return Ok(Token::new(TokenType::EndOfFile, None));
+                        return Ok(Token::EndOfFile);
                     }
                 }
             }
             _ => {}
         }
-        if presecnt_lex.is_ascii_digit() {
-            return self.lex_num(presecnt_lex);
-        }
-        if presecnt_lex == '"' {
-            return self.lex_str();
-        }
-        if presecnt_lex == '\'' {
-            return self.lex_char();
-        }
-        if Self::check_whether_symbol(presecnt_lex) {
-            return self.lex_symbol(presecnt_lex);
-        }
-        self.lex_id(presecnt_lex)
+        todo!()
     }
 
     pub fn next_back(&mut self, t: Token) {
@@ -936,37 +483,6 @@ impl TokenLex {
         }
         Ok(())
     }
-
-    fn binary_symbol(&mut self, a: TokenType, b: TokenType, binary_sym: char) -> Token {
-        let c = self.compiler_data.borrow_mut().input.read();
-        if c == binary_sym {
-            Token::new(b, None)
-        } else {
-            self.compiler_data.borrow_mut().input.unread(c);
-            Token::new(a, None)
-        }
-    }
-
-    fn self_symbol(&mut self, sym: TokenType, self_sym: TokenType) -> Token {
-        self.binary_symbol(sym, self_sym, '=')
-    }
-
-    fn double_symbol(
-        &mut self,
-        before_sym: TokenType,
-        before_self_sym: TokenType,
-        matched_sym: TokenType,
-        matched_self_sym: TokenType,
-        matched_char: char,
-    ) -> Token {
-        let c = self.compiler_data.borrow_mut().input.read();
-        if c == matched_char {
-            self.self_symbol(matched_sym, matched_self_sym)
-        } else {
-            self.compiler_data.borrow_mut().input.unread(c);
-            self.self_symbol(before_sym, before_self_sym)
-        }
-    }
 }
 
 #[cfg(test)]
@@ -990,7 +506,7 @@ mod tests {
         for i in expected_res {
             assert_eq!(i, tokenlex.next_token().unwrap());
         }
-        assert_eq!(TokenType::EndOfFile, tokenlex.next_token().unwrap().tp);
+        assert_eq!(Token::EndOfFile, tokenlex.next_token().unwrap());
         tokenlex.check().unwrap();
     }
 
@@ -1020,7 +536,7 @@ mod tests {
         loop {
             let token_tmp = tokenlex.next_token().unwrap();
             println!("{:?}", token_tmp);
-            if token_tmp.tp == TokenType::EndOfFile {
+            if token_tmp == Token::EndOfFile {
                 break;
             }
         }
@@ -1043,42 +559,24 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::Comma, None),
-                Token::new(TokenType::Comma, None),
-                Token::new(TokenType::Dot, None),
-                Token::new(TokenType::Comma, None),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(100)),
-                ),
-                Token::new(TokenType::FloatValue, Some(0)),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(232_304904)),
-                ),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(0b011)),
-                ),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(0x2AA4)),
-                ),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(0o2434)),
-                ),
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(1e9 as TrcIntInternal)),
-                ),
-                Token::new(TokenType::FloatValue, Some(1)),
-                Token::new(TokenType::FloatValue, Some(2)),
-                Token::new(TokenType::FloatValue, Some(3)),
-                Token::new(TokenType::FloatValue, Some(4)),
-                Token::new(TokenType::FloatValue, Some(5)),
+                Token::Comma,
+                (Token::Comma),
+                (Token::Dot),
+                (Token::Comma),
+                Token::IntValue(convert_int_constval_to_usize(100)),
+                (Token::FloatValue(0)),
+                Token::IntValue(convert_int_constval_to_usize(232_304904)),
+                Token::IntValue(convert_int_constval_to_usize(0b011)),
+                Token::IntValue(convert_int_constval_to_usize(0x2AA4)),
+                Token::IntValue(convert_int_constval_to_usize(0o2434)),
+                (Token::IntValue(convert_int_constval_to_usize(0))),
+                (Token::IntValue(convert_int_constval_to_usize(0))),
+                Token::IntValue(convert_int_constval_to_usize(1e9 as TrcIntInternal)),
+                (Token::FloatValue(1)),
+                (Token::FloatValue(2)),
+                (Token::FloatValue(3)),
+                (Token::FloatValue(4)),
+                (Token::FloatValue(5)),
             ],
         );
         check_pool(
@@ -1097,30 +595,30 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::Colon, None),
-                Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::RightBigBrace, None),
-                Token::new(TokenType::LeftMiddleBrace, None),
-                Token::new(TokenType::RightMiddleBrace, None),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::SelfAdd, None),
-                Token::new(TokenType::SelfMod, None),
-                Token::new(TokenType::SelfExactDiv, None),
-                Token::new(TokenType::ExactDiv, None),
-                Token::new(TokenType::SelfDiv, None),
-                Token::new(TokenType::Power, None),
-                Token::new(TokenType::SelfMul, None),
-                Token::new(TokenType::Mul, None),
-                Token::new(TokenType::Comma, None),
-                Token::new(TokenType::BitRightShift, None),
-                Token::new(TokenType::BitLeftShift, None),
-                Token::new(TokenType::SelfBitRightShift, None),
-                Token::new(TokenType::Or, None),
-                Token::new(TokenType::And, None),
-                Token::new(TokenType::DoubleColon, None),
-                Token::new(TokenType::Store, None),
-                Token::new(TokenType::Colon, None),
+                (Token::Colon),
+                (Token::LeftBigBrace),
+                (Token::RightBigBrace),
+                (Token::LeftMiddleBrace),
+                (Token::RightMiddleBrace),
+                (Token::LeftSmallBrace),
+                (Token::RightSmallBrace),
+                (Token::SelfAdd),
+                (Token::SelfMod),
+                (Token::SelfExactDiv),
+                (Token::ExactDiv),
+                (Token::SelfDiv),
+                (Token::Power),
+                (Token::SelfMul),
+                (Token::Mul),
+                (Token::Comma),
+                (Token::BitRightShift),
+                (Token::BitLeftShift),
+                (Token::SelfBitRightShift),
+                (Token::Or),
+                (Token::And),
+                (Token::DoubleColon),
+                (Token::Store),
+                (Token::Colon),
             ],
         );
     }
@@ -1131,13 +629,13 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::StringValue, Some(0)),
-                Token::new(TokenType::CharValue, Some('s' as usize)),
-                Token::new(TokenType::StringValue, Some(1)),
-                Token::new(TokenType::StringValue, Some(2)),
-                Token::new(TokenType::StringValue, Some(3)),
-                Token::new(TokenType::StringValue, Some(4)),
-                Token::new(TokenType::StringValue, Some(5)),
+                (Token::StringValue(0)),
+                (Token::CharValue('s' as usize)),
+                (Token::StringValue(1)),
+                (Token::StringValue(2)),
+                (Token::StringValue(3)),
+                (Token::StringValue(4)),
+                (Token::StringValue(5)),
             ],
         );
         check_pool(
@@ -1182,55 +680,55 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::Import, None),
-                Token::new(TokenType::StringValue, Some(0)),
-                Token::new(TokenType::Func, None),
-                Token::new(TokenType::ID, Some(0)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::ID, Some(1)),
-                Token::new(TokenType::ID, Some(2)),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::Arrow, None),
-                Token::new(TokenType::ID, Some(3)),
-                Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::If, None),
-                Token::new(TokenType::ID, Some(2)),
-                Token::new(TokenType::Mod, None),
-                Token::new(TokenType::IntValue, Some(2)),
-                Token::new(TokenType::Equal, None),
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(0))),
-                Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::Return, None),
-                Token::new(TokenType::StringValue, Some(1)),
-                Token::new(TokenType::RightBigBrace, None),
-                Token::new(TokenType::Else, None),
-                Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::Return, None),
-                Token::new(TokenType::StringValue, Some(2)),
-                Token::new(TokenType::RightBigBrace, None),
-                Token::new(TokenType::RightBigBrace, None),
-                Token::new(TokenType::Func, None),
-                Token::new(TokenType::ID, Some(4)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::LeftBigBrace, None),
-                Token::new(TokenType::ID, Some(5)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::StringValue, Some(3)),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::ID, Some(6)),
-                Token::new(TokenType::Store, None),
-                Token::new(TokenType::ID, Some(0)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::ID, Some(7)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::ID, Some(5)),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::ID, Some(6)),
-                Token::new(TokenType::RightSmallBrace, None),
-                Token::new(TokenType::RightBigBrace, None),
+                (Token::Import),
+                (Token::StringValue(0)),
+                (Token::Func),
+                (Token::ID(0)),
+                (Token::LeftSmallBrace),
+                (Token::ID(1)),
+                (Token::ID(2)),
+                (Token::RightSmallBrace),
+                (Token::Arrow),
+                (Token::ID(3)),
+                (Token::LeftBigBrace),
+                (Token::If),
+                (Token::ID(2)),
+                (Token::Mod),
+                (Token::IntValue(2)),
+                (Token::Equal),
+                (Token::IntValue(convert_int_constval_to_usize(0))),
+                (Token::LeftBigBrace),
+                (Token::Return),
+                (Token::StringValue(1)),
+                (Token::RightBigBrace),
+                (Token::Else),
+                (Token::LeftBigBrace),
+                (Token::Return),
+                (Token::StringValue(2)),
+                (Token::RightBigBrace),
+                (Token::RightBigBrace),
+                (Token::Func),
+                (Token::ID(4)),
+                (Token::LeftSmallBrace),
+                (Token::RightSmallBrace),
+                (Token::LeftBigBrace),
+                (Token::ID(5)),
+                (Token::LeftSmallBrace),
+                (Token::StringValue(3)),
+                (Token::RightSmallBrace),
+                (Token::ID(6)),
+                (Token::Store),
+                (Token::ID(0)),
+                (Token::LeftSmallBrace),
+                (Token::ID(7)),
+                (Token::LeftSmallBrace),
+                (Token::RightSmallBrace),
+                (Token::RightSmallBrace),
+                (Token::ID(5)),
+                (Token::LeftSmallBrace),
+                (Token::ID(6)),
+                (Token::RightSmallBrace),
+                (Token::RightBigBrace),
             ],
         );
     }
@@ -1241,12 +739,12 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::ID, Some(0)),
-                Token::new(TokenType::ID, Some(1)),
-                Token::new(TokenType::ID, Some(2)),
-                Token::new(TokenType::ID, Some(3)),
-                Token::new(TokenType::ID, Some(4)),
-                Token::new(TokenType::ID, Some(5)),
+                (Token::ID(0)),
+                (Token::ID(1)),
+                (Token::ID(2)),
+                (Token::ID(3)),
+                (Token::ID(4)),
+                (Token::ID(5)),
             ],
         );
         check_pool(
@@ -1268,8 +766,8 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(1))),
-                Token::new(TokenType::IntValue, Some(convert_int_constval_to_usize(23))),
+                (Token::IntValue(convert_int_constval_to_usize(1))),
+                (Token::IntValue(convert_int_constval_to_usize(23))),
             ],
         );
     }
@@ -1280,11 +778,8 @@ func main() {
         check(
             &mut t,
             vec![
-                Token::new(
-                    TokenType::IntValue,
-                    Some(convert_int_constval_to_usize(0xabc)),
-                ),
-                Token::new(TokenType::ID, Some(0)),
+                (Token::IntValue(convert_int_constval_to_usize(0xabc))),
+                (Token::ID(0)),
             ],
         );
         check_pool(vec!["hds".to_string()], &t.const_pool.name_pool);
@@ -1294,15 +789,12 @@ func main() {
     fn test_next_back() {
         gen_test_token_env!(r#":()"#, t);
         let tmp = t.next_token().unwrap();
-        assert_eq!(tmp.tp, TokenType::Colon);
+        assert_eq!(tmp, Token::Colon);
         t.next_back(tmp);
-        assert_eq!(t.next_token().unwrap().tp, TokenType::Colon);
+        assert_eq!(t.next_token().unwrap(), Token::Colon);
         check(
             &mut t,
-            vec![
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::RightSmallBrace, None),
-            ],
+            vec![(Token::LeftSmallBrace), (Token::RightSmallBrace)],
         );
     }
 
@@ -1332,11 +824,7 @@ func main() {
         gen_test_token_env!(r#"true tru false"#, t);
         check(
             &mut t,
-            vec![
-                Token::new(TokenType::BoolValue, Some(1)),
-                Token::new(TokenType::ID, Some(0)),
-                Token::new(TokenType::BoolValue, Some(0)),
-            ],
+            vec![(Token::BoolValue(1)), (Token::ID(0)), (Token::BoolValue(0))],
         )
     }
 
@@ -1346,11 +834,7 @@ func main() {
         gen_test_token_env!(r#":)|"#, t);
         check(
             &mut t,
-            vec![
-                Token::new(TokenType::Colon, None),
-                Token::new(TokenType::LeftSmallBrace, None),
-                Token::new(TokenType::BitAnd, None),
-            ],
+            vec![(Token::Colon), (Token::LeftSmallBrace), (Token::BitAnd)],
         );
     }
 
@@ -1358,13 +842,7 @@ func main() {
     #[should_panic]
     fn test_braces_check1() {
         gen_test_token_env!(r#":("#, t);
-        check(
-            &mut t,
-            vec![
-                Token::new(TokenType::Colon, None),
-                Token::new(TokenType::LeftSmallBrace, None),
-            ],
-        );
+        check(&mut t, vec![(Token::Colon), (Token::LeftSmallBrace)]);
     }
 
     #[test]

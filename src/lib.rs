@@ -1,3 +1,4 @@
+#![feature(let_chains)]
 pub mod base;
 pub mod cfg;
 pub mod compiler;

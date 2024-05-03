@@ -1,7 +1,6 @@
 use super::AstError;
 use super::ModuleUnit;
-use crate::compiler::token::TokenType;
-use crate::compiler::{scope::FuncIdxTy, token::Token};
+use crate::compiler::token::Token;
 use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
 use libcore::*;
 use rust_i18n::t;
@@ -80,18 +79,14 @@ impl ModuleUnit {
 
     /// 解析一个类型名为id
     pub fn lex_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
-        let t = self.get_token_checked(TokenType::ID)?;
-        let ty = match self
-            .self_scope
-            .borrow()
-            .get_type_id_by_token(t.data.unwrap())
-        {
+        let t = self.get_token_checked(Token::ID(0))?;
+        let ty = match self.self_scope.borrow().get_type_id_by_token(t) {
             None => self.try_err(
                 istry,
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[t.data.unwrap()]
+                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[t]
                     ),
                     t!(TYPE_ERROR),
                 ),
@@ -107,7 +102,7 @@ impl ModuleUnit {
     }
 
     /// token不正确，报出一个错误
-    pub fn gen_unexpected_token_error<T>(&mut self, unexpcted: TokenType) -> AstError<T> {
+    pub fn gen_unexpected_token_error<T>(&mut self, unexpcted: Token) -> AstError<T> {
         self.gen_error(ErrorInfo::new(
             t!(UNEXPECTED_TOKEN, "0" = unexpcted),
             t!(SYNTAX_ERROR),
@@ -115,13 +110,25 @@ impl ModuleUnit {
     }
 
     /// 获取一个token并检查该token是否正确
-    pub fn get_token_checked(&mut self, ty: TokenType) -> AstError<Token> {
+    pub fn get_token_checked(&mut self, ty: Token) -> AstError<usize> {
         let t = self.token_lexer.borrow_mut().next_token()?;
-        if t.tp != ty {
-            self.token_lexer.borrow_mut().next_back(t.clone());
-            self.gen_unexpected_token_error(t.tp)?;
+        match (ty, t) {
+            (Token::ID(_), Token::ID(data)) => Ok(data),
+            _ => {
+                self.token_lexer.borrow_mut().next_back(t);
+                self.gen_unexpected_token_error(t)?
+            }
         }
-        Ok(t)
+    }
+
+    pub fn check_next_token(&mut self, ty: Token) -> AstError<()> {
+        let t = self.token_lexer.borrow_mut().next_token()?;
+        if t == ty {
+            Ok(())
+        } else {
+            self.token_lexer.borrow_mut().next_back(t);
+            self.gen_unexpected_token_error(t)
+        }
     }
 
     /// 移除最后的一条指令

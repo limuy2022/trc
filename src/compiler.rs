@@ -12,16 +12,7 @@ use core::panic;
 use libcore::*;
 use logos::Source;
 use rust_i18n::t;
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    fs,
-    io::{self, BufRead},
-    path::PathBuf,
-    process::exit,
-    rc::Rc,
-    vec,
-};
+use std::{cell::RefCell, collections::HashMap, fs, path::PathBuf, process::exit, rc::Rc};
 
 #[derive(Debug, Clone)]
 /// 不同的输入源
@@ -294,7 +285,7 @@ impl Compiler {
 }
 
 mod tests {
-    use super::*;
+    use super::ValuePool;
 
     #[test]
     fn test_value_pool() {

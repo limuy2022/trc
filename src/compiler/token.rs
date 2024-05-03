@@ -3,7 +3,7 @@ use crate::compiler::CompilerImpl;
 use libcore::*;
 use logos::{Lexer, Logos};
 use rust_i18n::t;
-use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, sync::OnceLock};
+use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 fn add_float(lex: &mut Lexer<Token>) -> usize {
     lex.extras.add_float(lex.slice().to_owned())

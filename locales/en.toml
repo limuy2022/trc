@@ -27,6 +27,7 @@ char_error = "char should be the format like 'x'."
 expected_expr = "expected expression"
 return_should_in_function = "return should in function"
 should_in_loop = "%{0} must inside loop"
+cannot_regonize = "token cannot be regonized"
 
 [compiler.symbolerror]
 not_found_sym = "Symbol %{0} not found"

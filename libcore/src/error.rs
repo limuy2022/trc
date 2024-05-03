@@ -43,6 +43,7 @@ pub const SHOULD_IN_LOOP: &str = "compiler.syntaxerror.should_in_loop";
 pub const CANNOT_IMPORT_MODULE_WITHOUT_FILE: &str =
     "compiler.symbolerror.cannot_import_not_in_file";
 pub const MODULE_NOT_FOUND: &str = "compiler.modulenotfounderror.module_not_found";
+pub const CANNOT_RECOGNIZE: &str = "compiler.syntaxerror.cannot_regonize";
 
 pub fn symbol_redefined(name: &str) -> ErrorInfo {
     ErrorInfo::new(t!(SYMBOL_REDEFINED, "0" = name), t!(SYMBOL_ERROR))
@@ -55,10 +56,19 @@ pub fn module_not_found(module_name: &str) -> ErrorInfo {
     )
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ErrorInfo {
     pub message: String,
     error_type: String,
+}
+
+impl Default for ErrorInfo {
+    fn default() -> Self {
+        ErrorInfo {
+            message: CANNOT_RECOGNIZE.to_owned(),
+            error_type: SYNTAX_ERROR.to_owned(),
+        }
+    }
 }
 
 impl ErrorInfo {
@@ -80,6 +90,14 @@ pub trait ErrorContext: Debug + Send + Sync {
 pub struct RuntimeError {
     context: Box<dyn ErrorContext>,
     info: ErrorInfo,
+}
+
+impl PartialEq for RuntimeError {
+    fn eq(&self, other: &Self) -> bool {
+        self.info == other.info
+            && self.context.get_line() == other.context.get_line()
+            && self.context.get_module_name() == other.context.get_module_name()
+    }
 }
 
 impl Error for RuntimeError {}

@@ -1,4 +1,4 @@
-use super::{Context, TokenIo, ValuePool};
+use super::{Context, ValuePool};
 use crate::compiler::CompilerImpl;
 use libcore::*;
 use logos::{Lexer, Logos};
@@ -25,6 +25,7 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
 #[logos(extras = ValuePool)]
 #[logos(skip r"[ \t\r\n\f]+")]
+#[logos(error = ErrorInfo)]
 pub enum Token {
     #[token("->")]
     Arrow,
@@ -334,29 +335,6 @@ macro_rules! check_braces_match {
     }}
 }
 
-fn get_keywords() -> &'static HashMap<String, Token> {
-    static KEYWORDS: OnceLock<HashMap<String, Token>> = OnceLock::new();
-    KEYWORDS.get_or_init(|| {
-        collection_literals::hash![
-            "while".to_string() => Token::While,
-            "for".to_string() => Token::For,
-            "if".to_string() => Token::If,
-            "else".to_string() => Token::Else,
-            "class".to_string() => Token::Class,
-            "func".to_string() => Token::Func,
-            "match".to_string() => Token::Match,
-            "return".to_string() => Token::Return,
-            "import".to_string() => Token::Import,
-            "continue".to_string() => Token::Continue,
-            "break".to_string() => Token::Break,
-            "var".to_string() => Token::Var,
-            "pub".to_string() => Token::Pub,
-            "unsafe".to_string() => Token::Unsafe,
-            "uninit".to_string() => Token::Uninit
-        ]
-    })
-}
-
 impl Iterator for TokenLex {
     type Item = Token;
 
@@ -406,7 +384,7 @@ impl TokenLex {
         }
     }
 
-    pub fn modify_input(&mut self, source: Box<dyn TokenIo<Item = char>>) {
+    pub fn modify_input(&mut self, source: String) {
         self.compiler_data.borrow_mut().input = source;
     }
 
@@ -430,33 +408,6 @@ impl TokenLex {
             let tmp = self.unget_token.pop().unwrap();
             self.compiler_data.borrow_mut().context.set_line(tmp.1);
             return Ok(tmp.0);
-        }
-        let presecnt_lex = self.compiler_data.borrow_mut().input.read();
-        match presecnt_lex {
-            '\0' => {
-                return Ok(Token::EndOfFile);
-            }
-            '\t' | ' ' => {
-                return self.next_token();
-            }
-            '\n' => {
-                self.compiler_data.borrow_mut().context.add_line();
-                return self.next_token();
-            }
-            '#' => {
-                // 注释
-                loop {
-                    let c = self.compiler_data.borrow_mut().input.read();
-                    if c == '\n' {
-                        self.compiler_data.borrow_mut().context.add_line();
-                        return self.next_token();
-                    }
-                    if c == '\0' {
-                        return Ok(Token::EndOfFile);
-                    }
-                }
-            }
-            _ => {}
         }
         todo!()
     }

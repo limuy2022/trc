@@ -1,135 +1,158 @@
 use super::{Context, TokenIo, ValuePool};
-use crate::{cfg::FLOAT_OVER_FLOW_LIMIT, compiler::CompilerImpl};
+use crate::{
+    cfg::FLOAT_OVER_FLOW_LIMIT,
+    compiler::{token, CompilerImpl},
+};
 use libcore::*;
+use logos::{Lexer, Logos, Span};
 use rust_i18n::t;
 use std::{cell::RefCell, collections::HashMap, fmt::Display, rc::Rc, sync::OnceLock};
 
-#[derive(PartialEq, Debug, Clone, Hash, Eq, Copy)]
+#[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
+#[logos(extras = TokenLex)]
+#[logos(skip r"[ \t\r\n\f]+")]
 pub enum TokenType {
-    // ->
+    #[token("->")]
     Arrow,
-    // .
+    #[token(".")]
     Dot,
-    // ,
+    #[token(",")]
     Comma,
-    // {
+    #[token("{")]
     LeftBigBrace,
-    // }
+    #[token("}")]
     RightBigBrace,
-    // [
+    #[token("[")]
     LeftMiddleBrace,
-    // ]
+    #[token("]")]
     RightMiddleBrace,
-    // (
+    #[token("(")]
     LeftSmallBrace,
-    // )
+    #[token(")")]
     RightSmallBrace,
-    // +
+    #[token("+")]
     Add,
-    // -
+    #[token("-")]
     Sub,
-    // *
+    #[token("*")]
     Mul,
-    // /
+    #[token("/")]
     Div,
-    // %
+    #[token("%")]
     Mod,
-    // //
+    #[token("//")]
     ExactDiv,
-    // ~
+    #[token("~")]
     BitNot,
-    // <<
+    #[token("<<")]
     BitLeftShift,
-    // >>
+    #[token(">>")]
     BitRightShift,
-    // &
+    #[token("&")]
     BitAnd,
-    // |
+    #[token("|")]
     BitOr,
-    // ^
+    #[token("^")]
     Xor,
-    // **
+    #[token("**")]
     Power,
-    // +=
+    #[token("+=")]
     SelfAdd,
-    // -=
+    #[token("-=")]
     SelfSub,
-    // *=
+    #[token("*=")]
     SelfMul,
-    // /=
+    #[token("/=")]
     SelfDiv,
-    // //=
+    #[token("//=")]
     SelfExactDiv,
-    // %=
+    #[token("%=")]
     SelfMod,
-    // **=
+    #[token("**=")]
     SelfPower,
-    // <<=
+    #[token("<<=")]
     SelfBitLeftShift,
-    // >>=
+    #[token(">>=")]
     SelfBitRightShift,
-    // &=
+    #[token("&=")]
     SelfBitAnd,
-    // |=
+    #[token("|=")]
     SelfBitOr,
-    // ^=
+    #[token("^=")]
     SelfXor,
+    #[regex("[0-9]+")]
     IntValue,
+    #[regex("[0-9]+\\.[0-9]+")]
     StringValue,
     FloatValue,
     LongIntValue,
     CharValue,
     BoolValue,
-    // ||=
+    #[token("||=")]
     SelfOr,
-    // &&=
+    #[token("&&=")]
     SelfAnd,
-    // =
+    #[token("=")]
     Assign,
-    // :=
+    #[token(":=")]
     Store,
-    // ==
+    #[token("==")]
     Equal,
-    // !=
+    #[token("!=")]
     NotEqual,
-    // >
+    #[token(">")]
     Greater,
-    // <
+    #[token("<")]
     Less,
-    // <=
+    #[token("<=")]
     LessEqual,
-    // >=
+    #[token(">=")]
     GreaterEqual,
-    // !
+    #[token("!")]
     Not,
-    // ||
+    #[token("||")]
     Or,
-    // &&
+    #[token("&&")]
     And,
-    // :
+    #[token(":")]
     Colon,
-    // ;
+    #[token(";")]
     Semicolon,
     ID,
+    #[token("while")]
     While,
+    #[token("for")]
     For,
+    #[token("if")]
     If,
+    #[token("else")]
     Else,
+    #[token("class")]
     Class,
+    #[token("match")]
     Match,
+    #[token("func")]
     Func,
+    #[token("import")]
     Import,
+    #[token("return")]
     Return,
     // 不会被使用到的自反运算符，仅仅当标识重载运算符使用
     SelfNegative,
     EndOfFile,
+    #[token("continue")]
     Continue,
+    #[token("break")]
     Break,
+    #[token("var")]
     Var,
+    #[token("pub")]
     Pub,
-    // ::
+    #[token("::")]
     DoubleColon,
+    #[token("uninit")]
     Uninit,
+    #[token("unsafe")]
     Unsafe,
 }
 

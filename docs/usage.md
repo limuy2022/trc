@@ -40,14 +40,15 @@ The next is the string value. To make you to write strings more easily:
 
 There are also many easape char in the string:
 
-| escape char | meaning                           |
-| :---------- | :-------------------------------- |
-| \t          | tab                               |
-| \n          | new line                          |
-| \\\\        | \|                                |
-| \'          | '                                 |
-| \"          | "                                 |
-| \0          | the tick of the end of the string |
+| escape char | meaning                              |
+| :---------- | :----------------------------------- |
+| \t          | tab                                  |
+| \n          | new line                             |
+| \\\\        | \|                                   |
+| \'          | '                                    |
+| \"          | "                                    |
+| \0          | the tick of the end of the string    |
+| \r          | move cursor to the beginning of line |
 
 If you add `r` or `R` in front of the string.Trc will treat it as a raw string.
 Yes.These rules are from Python.I love its grammar rules

@@ -1,5 +1,5 @@
 use super::{Context, ValuePool};
-use crate::compiler::{token, CompilerImpl};
+use crate::compiler::CompilerImpl;
 use libcore::*;
 use logos::{Lexer, Logos};
 use rust_i18n::t;
@@ -10,7 +10,34 @@ fn add_float(lex: &mut Lexer<Token>) -> usize {
 }
 
 fn add_string(lex: &mut Lexer<Token>) -> usize {
-    lex.extras.add_string(lex.slice().to_owned())
+    // 此处还需要进行字符串转义
+    let origin_str = lex.slice();
+    let mut target_string = String::new();
+    target_string.reserve(origin_str.len());
+    let mut iter = origin_str.chars();
+    while let Some(i) = iter.next() {
+        if i == '\\' {
+            if let Some(j) = iter.next() {
+                match j {
+                    'n' => target_string.push('\n'),
+                    't' => target_string.push('\t'),
+                    'r' => target_string.push('\r'),
+                    '0' => target_string.push('\0'),
+                    '"' => target_string.push('"'),
+                    '\'' => target_string.push('\''),
+                    _ => {
+                        target_string.push('\\');
+                        target_string.push(j)
+                    }
+                }
+            } else {
+                panic!("\\ is the end of the string but the compiler is not find it out.")
+            }
+        } else {
+            target_string.push(i);
+        }
+    }
+    lex.extras.add_string(target_string)
 }
 
 fn add_id(lex: &mut Lexer<Token>) -> usize {
@@ -97,7 +124,7 @@ pub enum Token {
     SelfXor,
     #[regex(r#"[+-]?(0[bB][01]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+|\d+)"#, convert_int)]
     IntValue(usize),
-    #[regex(r#"".*""#, add_string)]
+    #[regex(r#""(.|\\.)*""#, add_string)]
     StringValue(usize),
     #[regex(r#"[-+]?[0-9]+\.?[0-9]+([eE][-+]?[0-9]+)?"#, add_float)]
     FloatValue(usize),
@@ -448,8 +475,7 @@ impl<'a> TokenLex<'a> {
                         || t == Token::RightMiddleBrace
                     {
                         self.check_braces_stack(t.to_brace())?;
-                    }
-                    if t == Token::NewLine {
+                    } else if t == Token::NewLine {
                         self.add_line();
                         continue;
                     }

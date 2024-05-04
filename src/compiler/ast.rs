@@ -38,8 +38,8 @@ impl Cache {
     }
 }
 
-pub struct ModuleUnit {
-    pub token_lexer: Rc<RefCell<TokenLex>>,
+pub struct ModuleUnit<'a> {
+    pub token_lexer: Rc<RefCell<TokenLex<'a>>>,
     pub staticdata: StaticData,
     self_scope: Rc<RefCell<SymScope>>,
     process_info: lexprocess::LexProcess,
@@ -50,7 +50,7 @@ pub struct ModuleUnit {
     modules_dll_dup: HashSet<String>,
     modules_info: HashMap<String, usize>,
     modules_dll: Vec<String>,
-    module_manager: Rc<RefCell<ModuleManager>>,
+    module_manager: Rc<RefCell<ModuleManager<'a>>>,
     compiler_data: Rc<RefCell<CompilerImpl>>,
 }
 
@@ -127,11 +127,11 @@ macro_rules! expr_gen {
     };
 }
 
-impl ModuleUnit {
+impl<'a> ModuleUnit<'a> {
     pub fn new(
-        token_lexer: Rc<RefCell<TokenLex>>,
+        token_lexer: Rc<RefCell<TokenLex<'a>>>,
         compiler_data: Rc<RefCell<CompilerImpl>>,
-        module_manager: Rc<RefCell<ModuleManager>>,
+        module_manager: Rc<RefCell<ModuleManager<'a>>>,
     ) -> Self {
         let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
         let stdlib_dll_name = libloading::library_filename("stdlib");
@@ -141,10 +141,10 @@ impl ModuleUnit {
         // 向token lexer常量池中添加prelude解析数据
         let prelude = stdlib.sub_modules().get("prelude").unwrap();
         for i in prelude.functions() {
-            token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
+            token_lexer.borrow_mut().add_id(i.0.clone());
         }
         for i in prelude.classes() {
-            token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
+            token_lexer.borrow_mut().add_id(i.0.clone());
         }
         // 为root scope添加prelude
         let _optimize = compiler_data.borrow_mut().option.optimize;
@@ -154,7 +154,7 @@ impl ModuleUnit {
             .import_native_module(
                 prelude,
                 stdstorage,
-                &token_lexer.borrow_mut().const_pool,
+                token_lexer.borrow_mut().get_constpool(),
                 func_id_base,
             )
             .expect("Import prelude but failed");
@@ -168,7 +168,8 @@ impl ModuleUnit {
         );
         let mut cache = Cache::new();
         let tmp = token_lexer.clone();
-        let val_pool_ref = &tmp.borrow_mut().const_pool;
+        let tmp = tmp.borrow_mut();
+        let val_pool_ref = &tmp.get_constpool();
         cache.intty_id = root_scope
             .borrow()
             .get_type_id_by_token(val_pool_ref.name_pool[INT])
@@ -237,7 +238,11 @@ impl ModuleUnit {
     expr_gen!(expr, expr1, Token::Or);
 
     pub fn prepare_get_static(&mut self) -> &mut StaticData {
-        self.staticdata.constpool = self.token_lexer.borrow_mut().const_pool.store_val_to_vm();
+        self.staticdata.constpool = self
+            .token_lexer
+            .borrow_mut()
+            .get_constpool_mut()
+            .store_val_to_vm();
         self.staticdata.dll_module_should_loaded.clear();
         swap(
             &mut self.staticdata.dll_module_should_loaded,
@@ -442,7 +447,7 @@ impl ModuleUnit {
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[name_token]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name_token]
                     ),
                     t!(SYMBOL_ERROR),
                 ),
@@ -466,7 +471,7 @@ impl ModuleUnit {
                     ErrorInfo::new(
                         t!(
                             SYMBOL_NOT_FOUND,
-                            "0" = self.token_lexer.borrow_mut().const_pool.id_name[token_data]
+                            "0" = self.token_lexer.borrow_mut().get_constpool().id_name[token_data]
                         ),
                         t!(SYMBOL_ERROR),
                     ),
@@ -519,7 +524,7 @@ impl ModuleUnit {
                                 ErrorInfo::new(
                                     t!(
                                         SYMBOL_NOT_FOUND,
-                                        "0" = self.token_lexer.borrow_mut().const_pool.id_name
+                                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name
                                             [token_data]
                                     ),
                                     t!(SYMBOL_ERROR),
@@ -688,7 +693,7 @@ impl ModuleUnit {
             // 处理通配符
             let t = self.next_token()?;
             if let Token::ID(data) = t
-                && self.token_lexer.borrow_mut().const_pool.id_name[data] == "_"
+                && self.token_lexer.borrow_mut().get_constpool().id_name[data] == "_"
             {
                 is_end = true;
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
@@ -822,7 +827,7 @@ impl ModuleUnit {
             CustomFunction::new(
                 io,
                 argname,
-                self.token_lexer.borrow_mut().const_pool.id_name[funcname].clone(),
+                self.token_lexer.borrow_mut().get_constpool().id_name[funcname].clone(),
             ),
             function_body,
         );
@@ -883,7 +888,7 @@ impl ModuleUnit {
         let name_id = self.insert_sym_with_error(name)?;
         let mut class_obj = CustomType::new(
             name_id,
-            self.token_lexer.borrow_mut().const_pool.id_name[name].clone(),
+            self.token_lexer.borrow_mut().get_constpool().id_name[name].clone(),
         );
         self.get_token_checked(Token::LeftBigBrace)?;
         self.lex_class_item_loop(&mut class_obj)?;
@@ -900,7 +905,7 @@ impl ModuleUnit {
     fn lex_import(&mut self, istry: bool) -> AstError<()> {
         let tok = self.get_token_checked(Token::StringValue(0))?;
         // import的路径
-        let mut path_with_dot = self.token_lexer.borrow_mut().const_pool.id_str[tok].clone();
+        let mut path_with_dot = self.token_lexer.borrow_mut().get_constpool().id_str[tok].clone();
         // 具体文件的路径
         let mut import_file_path = String::new();
         // 是不是dll
@@ -1009,7 +1014,7 @@ impl ModuleUnit {
                             let token_idx: ConstPoolIndexTy = self
                                 .token_lexer
                                 .borrow_mut()
-                                .add_id_token(func_item.get_name());
+                                .add_id(func_item.get_name().to_owned());
                             let func_extern_id =
                                 func_item.buildin_id + self.modules_info[&import_file_path];
                             // println!("{}", func_extern_id);
@@ -1020,7 +1025,7 @@ impl ModuleUnit {
                                 &name,
                                 func_extern_id,
                                 lib_storage,
-                                &self.token_lexer.borrow_mut().const_pool,
+                                self.token_lexer.borrow_mut().get_constpool(),
                             ) {
                                 return self.try_err(istry, e);
                             }
@@ -1028,10 +1033,7 @@ impl ModuleUnit {
                     }
                 }
                 Some(module) => {
-                    let tmp = self
-                        .token_lexer
-                        .borrow_mut()
-                        .add_id_token(&import_item_name);
+                    let tmp = self.token_lexer.borrow_mut().add_id(import_item_name);
                     let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(module);
                     let sub_module = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(
@@ -1043,7 +1045,7 @@ impl ModuleUnit {
                     if let Err(e) = sub_module.borrow_mut().import_native_module(
                         module,
                         lib_storage,
-                        &self.token_lexer.borrow_mut().const_pool,
+                        self.token_lexer.borrow_mut().get_constpool(),
                         self.modules_info[&import_file_path],
                     ) {
                         return self.try_err(istry, e);
@@ -1105,7 +1107,7 @@ impl ModuleUnit {
                 return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[name]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name]
                     ),
                     t!(SYMBOL_ERROR),
                 ))

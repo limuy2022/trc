@@ -6,20 +6,20 @@ use crate::compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module}
 use std::collections::{hash_map::IterMut, HashMap};
 
 /// ast manager
-pub struct ModuleManager {
+pub struct ModuleManager<'a> {
     // 储存模块名字和对应的模块路径的关系
     modules: HashMap<String, String>,
     // 有的模块是本次已经编译过的，在缓存中可以直接找到
-    cache: HashMap<String, ModuleUnit>,
+    cache: HashMap<String, ModuleUnit<'a>>,
     global_custom_function_id: usize,
     global_extern_function_id: usize,
 }
 
-pub struct LinkerIter<'a> {
-    cache_iter: IterMut<'a, String, ModuleUnit>,
+pub struct LinkerIter<'a, 'b> {
+    cache_iter: IterMut<'a, String, ModuleUnit<'b>>,
 }
 
-impl<'a> Iterator for LinkerIter<'a> {
+impl<'a, 'b> Iterator for LinkerIter<'a, 'b> {
     type Item = &'a mut StaticData;
     fn next(&mut self) -> Option<Self::Item> {
         match self.cache_iter.next() {
@@ -29,13 +29,13 @@ impl<'a> Iterator for LinkerIter<'a> {
     }
 }
 
-impl<'a> LinkerIter<'a> {
-    pub fn new(cache_iter: IterMut<'a, String, ModuleUnit>) -> Self {
+impl<'a, 'b> LinkerIter<'a, 'b> {
+    pub fn new(cache_iter: IterMut<'a, String, ModuleUnit<'b>>) -> Self {
         Self { cache_iter }
     }
 }
 
-impl ModuleManager {
+impl<'a> ModuleManager<'a> {
     pub fn new() -> Self {
         Self {
             modules: HashMap::new(),
@@ -45,7 +45,7 @@ impl ModuleManager {
         }
     }
 
-    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit) {
+    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit<'a>) {
         self.cache.insert(path.into(), module);
     }
 
@@ -53,7 +53,7 @@ impl ModuleManager {
         self.modules.insert(name, path);
     }
 
-    pub fn get_module<T>(&mut self, name: &str) -> Option<&ModuleUnit> {
+    pub fn get_module<T>(&mut self, name: &str) -> Option<&'a ModuleUnit> {
         // 查找已经存在的别名
         match self.modules.get(name) {
             None => None::<T>,
@@ -109,7 +109,7 @@ impl ModuleManager {
     }
 }
 
-impl Default for ModuleManager {
+impl Default for ModuleManager<'_> {
     fn default() -> Self {
         Self::new()
     }

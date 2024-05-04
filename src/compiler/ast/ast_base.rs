@@ -6,7 +6,7 @@ use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
 
-impl ModuleUnit {
+impl<'a> ModuleUnit<'a> {
     /// 清除之前编译留下的数据
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();
@@ -74,7 +74,7 @@ impl ModuleUnit {
     pub fn get_type_id(&self, ty_name: &str) -> Option<usize> {
         self.self_scope
             .borrow()
-            .get_type_id_by_token(self.token_lexer.borrow_mut().const_pool.name_pool[ty_name])
+            .get_type_id_by_token(self.token_lexer.borrow_mut().get_constpool().name_pool[ty_name])
     }
 
     /// 解析一个类型名为id
@@ -86,7 +86,7 @@ impl ModuleUnit {
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().const_pool.id_name[t]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[t]
                     ),
                     t!(TYPE_ERROR),
                 ),
@@ -201,10 +201,10 @@ impl ModuleUnit {
     /// 导入模块中的符号
     pub fn import_module_sym(&mut self, lib: &Module) {
         for i in lib.functions() {
-            self.token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
+            self.token_lexer.borrow_mut().add_id(i.0.clone());
         }
         for i in lib.classes() {
-            self.token_lexer.borrow_mut().const_pool.add_id(i.0.clone());
+            self.token_lexer.borrow_mut().add_id(i.0.clone());
         }
     }
 
@@ -215,7 +215,7 @@ impl ModuleUnit {
             None => self.gen_error(ErrorInfo::new(
                 t!(
                     SYMBOL_REDEFINED,
-                    "0" = self.token_lexer.borrow_mut().const_pool.id_name[name]
+                    "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name]
                 ),
                 t!(SYMBOL_ERROR),
             ))?,

@@ -33,7 +33,7 @@ fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
     let idstr = scope
         .token_lexer
         .borrow()
-        .const_pool
+        .get_constpool()
         .get_id(&name.to_string())
         .unwrap();
     let symid = scope

@@ -1,5 +1,5 @@
 use super::{Context, ValuePool};
-use crate::compiler::CompilerImpl;
+use crate::compiler::{token, CompilerImpl};
 use libcore::*;
 use logos::{Lexer, Logos};
 use rust_i18n::t;
@@ -24,7 +24,7 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
 #[logos(extras = ValuePool)]
-#[logos(skip r"[ \t\r\n\f]+")]
+#[logos(skip r"[ \t\r\f]+")]
 #[logos(error = ErrorInfo)]
 pub enum Token {
     #[token("->")]
@@ -159,7 +159,6 @@ pub enum Token {
     Return,
     // 不会被使用到的自反运算符，仅仅当标识重载运算符使用
     SelfNegative,
-    #[token("\0")]
     EndOfFile,
     #[token("continue")]
     Continue,
@@ -175,6 +174,10 @@ pub enum Token {
     Uninit,
     #[token("unsafe")]
     Unsafe,
+    #[token("\n")]
+    NewLine,
+    #[token(r#"#.*?(\n|$)"#)]
+    Comment,
 }
 
 impl Token {
@@ -287,6 +290,8 @@ impl Display for Token {
             Token::DoubleColon => "::",
             Token::Uninit => "uninit",
             Token::Unsafe => "unsafe",
+            Token::NewLine => r#"\n"#,
+            Token::Comment => "Comment",
         };
         write!(f, "{}", res)
     }
@@ -303,12 +308,12 @@ impl BraceRecord {
     }
 }
 
-pub struct TokenLex {
+pub struct TokenLex<'a> {
     compiler_data: Rc<RefCell<CompilerImpl>>,
     braces_check: Vec<BraceRecord>,
     // token和当前行号
     unget_token: Vec<(Token, usize)>,
-    pub const_pool: ValuePool,
+    internal_lexer: Lexer<'a, Token>,
 }
 
 macro_rules! check_braces_match {
@@ -335,7 +340,7 @@ macro_rules! check_braces_match {
     }}
 }
 
-impl Iterator for TokenLex {
+impl Iterator for TokenLex<'_> {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -352,20 +357,19 @@ impl Iterator for TokenLex {
     }
 }
 
-impl TokenLex {
-    pub fn new(compiler_data: Rc<RefCell<CompilerImpl>>) -> TokenLex {
+impl<'a> TokenLex<'a> {
+    pub fn new(compiler_data: Rc<RefCell<CompilerImpl>>) -> TokenLex<'a> {
+        let internal_lexer = Token::lexer_with_extras(
+            unsafe { &(*(compiler_data.borrow().get_source() as *const str)) },
+            ValuePool::default(),
+        );
         TokenLex {
             compiler_data,
             braces_check: Vec::new(),
             unget_token: Vec::new(),
-            const_pool: ValuePool::new(),
+            internal_lexer,
         }
     }
-
-    pub fn add_id_token(&mut self, id_name: &str) -> usize {
-        self.const_pool.add_id(id_name.to_string())
-    }
-
     fn check_braces_stack(&mut self, c: char) -> Result<(), RuntimeError> {
         let top = self.braces_check.pop();
         match top {
@@ -409,7 +413,12 @@ impl TokenLex {
             self.compiler_data.borrow_mut().context.set_line(tmp.1);
             return Ok(tmp.0);
         }
+        loop {}
         todo!()
+    }
+
+    pub fn add_line(&mut self) {
+        self.compiler_data.borrow_mut().context.add_line();
     }
 
     pub fn next_back(&mut self, t: Token) {
@@ -433,6 +442,18 @@ impl TokenLex {
             ));
         }
         Ok(())
+    }
+
+    pub fn add_id(&mut self, id: String) -> usize {
+        self.internal_lexer.extras.add_id(id)
+    }
+
+    pub fn get_constpool(&self) -> &ValuePool {
+        &self.internal_lexer.extras
+    }
+
+    pub fn get_constpool_mut(&mut self) -> &mut ValuePool {
+        &mut self.internal_lexer.extras
     }
 }
 
@@ -532,7 +553,7 @@ mod tests {
         );
         check_pool(
             vec!["123.9", "12", "0.8", "0.0018", "0.017", "198"],
-            &t.const_pool.const_floats,
+            &t.internal_lexer.extras.const_floats,
         );
     }
 
@@ -598,7 +619,7 @@ mod tests {
                 String::from("\n\t"),
                 String::from("ttt\tt"),
             ],
-            &t.const_pool.const_strings,
+            &t.internal_lexer.extras.const_strings,
         );
     }
 
@@ -707,7 +728,7 @@ func main() {
                 String::from("abc天帝"),
                 String::from("t1"),
             ],
-            &t.const_pool.name_pool,
+            &t.internal_lexer.extras.name_pool,
         );
     }
 
@@ -733,7 +754,7 @@ func main() {
                 (Token::ID(0)),
             ],
         );
-        check_pool(vec!["hds".to_string()], &t.const_pool.name_pool);
+        check_pool(vec!["hds".to_string()], &t.internal_lexer.extras.name_pool);
     }
 
     #[test]

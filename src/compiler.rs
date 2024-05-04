@@ -10,7 +10,6 @@ pub use self::{ast::ModuleUnit, manager::ModuleManager, token::TokenLex};
 use crate::cfg;
 use core::panic;
 use libcore::*;
-use logos::Source;
 use rust_i18n::t;
 use std::{cell::RefCell, collections::HashMap, fs, path::PathBuf, process::exit, rc::Rc};
 
@@ -202,6 +201,10 @@ impl CompilerImpl {
     pub fn report_compiler_error<T>(&self, info: ErrorInfo) -> RuntimeResult<T> {
         Err(RuntimeError::new(Box::new(self.context.clone()), info))
     }
+
+    pub fn get_source(&self) -> &str {
+        &self.input
+    }
 }
 
 pub struct Compiler {
@@ -276,7 +279,9 @@ impl Compiler {
             env_manager.borrow_mut().optimize();
         }
         let mut tmp = env_manager.borrow_mut();
-        Ok(tmp.link())
+        let ret = tmp.link();
+        // drop(tmp);
+        Ok(ret)
     }
 
     pub fn get_token_lex(&mut self) -> TokenLex {

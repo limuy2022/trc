@@ -209,6 +209,18 @@ impl Token {
             _ => return None,
         })
     }
+
+    fn to_brace(self) -> char {
+        match self {
+            Token::LeftBigBrace => '{',
+            Token::RightBigBrace => '}',
+            Token::LeftMiddleBrace => '[',
+            Token::RightMiddleBrace => ']',
+            Token::LeftSmallBrace => '(',
+            Token::RightSmallBrace => ')',
+            _ => unreachable!(),
+        }
+    }
 }
 
 pub type ConstPoolIndexTy = usize;
@@ -413,8 +425,39 @@ impl<'a> TokenLex<'a> {
             self.compiler_data.borrow_mut().context.set_line(tmp.1);
             return Ok(tmp.0);
         }
-        loop {}
-        todo!()
+        loop {
+            let token = self.internal_lexer.next();
+            match token {
+                Some(t) => {
+                    let t = match t {
+                        Ok(data) => data,
+                        Err(e) => {
+                            return self.report_error(e);
+                        }
+                    };
+                    if t == Token::LeftBigBrace
+                        || t == Token::LeftSmallBrace
+                        || t == Token::LeftMiddleBrace
+                    {
+                        self.braces_check.push(BraceRecord::new(
+                            t.to_brace(),
+                            self.compiler_data.borrow().context.get_line(),
+                        ));
+                    } else if t == Token::RightBigBrace
+                        || t == Token::RightSmallBrace
+                        || t == Token::RightMiddleBrace
+                    {
+                        self.check_braces_stack(t.to_brace())?;
+                    }
+                    if t == Token::NewLine {
+                        self.add_line();
+                        continue;
+                    }
+                    return Ok(t);
+                }
+                None => return Ok(Token::EndOfFile),
+            }
+        }
     }
 
     pub fn add_line(&mut self) {

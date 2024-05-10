@@ -6,6 +6,7 @@ use rust_i18n::t;
 use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 fn add_float(lex: &mut Lexer<Token>) -> usize {
+    // println!("{}", lex.slice());
     lex.extras.add_float(lex.slice().to_owned())
 }
 
@@ -45,8 +46,21 @@ fn add_id(lex: &mut Lexer<Token>) -> usize {
 }
 
 fn convert_int(lex: &mut Lexer<Token>) -> usize {
-    let val: i64 = lex.slice().parse().unwrap();
-    convert_int_constval_to_usize(val)
+    // println!("{}", lex.slice());
+    let str_tmp = lex.slice().replace("_", "");
+    if let Some(s) = str_tmp.strip_prefix("0x") {
+        let val: i64 = i64::from_str_radix(s, 16).unwrap();
+        convert_int_constval_to_usize(val)
+    } else if let Some(s) = str_tmp.strip_prefix("0b") {
+        let val: i64 = i64::from_str_radix(s, 2).unwrap();
+        convert_int_constval_to_usize(val)
+    } else if let Some(s) = str_tmp.strip_prefix("0o") {
+        let val: i64 = i64::from_str_radix(s, 8).unwrap();
+        convert_int_constval_to_usize(val)
+    } else {
+        let val: i64 = str_tmp.parse().unwrap();
+        convert_int_constval_to_usize(val)
+    }
 }
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
@@ -54,6 +68,8 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
 #[logos(skip r"[ \t\r\f]+")]
 #[logos(error = ErrorInfo)]
 pub enum Token {
+    #[regex(r#"/\*.*\*/"#)]
+    CrossLinesComment,
     #[token("->")]
     Arrow,
     #[token(".")]
@@ -122,11 +138,17 @@ pub enum Token {
     SelfBitOr,
     #[token("^=")]
     SelfXor,
-    #[regex(r#"[+-]?(0[bB][01]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+|\d+)"#, convert_int)]
+    #[regex(
+        r#"[+-]?(0[bB][01_]+|0[oO][0-7_]+|0[xX][0-9a-fA-F_]+|[0-9][0-9_]*)"#,
+        convert_int
+    )]
     IntValue(usize),
     #[regex(r#""(.|\\.)*""#, add_string)]
     StringValue(usize),
-    #[regex(r#"[-+]?[0-9]+\.?[0-9]+([eE][-+]?[0-9]+)?"#, add_float)]
+    #[regex(
+        r#"([-+]?)((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#,
+        add_float
+    )]
     FloatValue(usize),
     LongIntValue,
     #[regex(r#"'[a-zA-Z_0-9]'"#, |lex| lex.slice().chars().next().unwrap() as usize)]
@@ -331,6 +353,7 @@ impl Display for Token {
             Token::Unsafe => "unsafe",
             Token::NewLine => r#"\n"#,
             Token::Comment => "Comment",
+            Token::CrossLinesComment => "CrossLinesComment",
         };
         write!(f, "{}", res)
     }
@@ -478,6 +501,8 @@ impl<'a> TokenLex<'a> {
                     } else if t == Token::NewLine {
                         self.add_line();
                         continue;
+                    } else if t == Token::Comment || t == Token::CrossLinesComment {
+                        continue;
                     }
                     return Ok(t);
                 }
@@ -592,9 +617,10 @@ mod tests {
         
         
         123.9 232_304904
-        0b011
-        0x2aA4
-        0o2434 0 0 1e9 1.2e1 8e-1 18E-4 1.7e-2 1.98e2"#,
+ 0b011
+0x2aA4
+0o2434   0 0   1e9  1.2e1 8e-1 18E-4 1.7e-2 1.98e2
+ "#,
             t
         );
         check(
@@ -612,16 +638,16 @@ mod tests {
                 Token::IntValue(convert_int_constval_to_usize(0o2434)),
                 (Token::IntValue(convert_int_constval_to_usize(0))),
                 (Token::IntValue(convert_int_constval_to_usize(0))),
-                Token::IntValue(convert_int_constval_to_usize(1e9 as TrcIntInternal)),
-                (Token::FloatValue(1)),
+                Token::FloatValue(1),
                 (Token::FloatValue(2)),
                 (Token::FloatValue(3)),
                 (Token::FloatValue(4)),
                 (Token::FloatValue(5)),
+                (Token::FloatValue(6)),
             ],
         );
         check_pool(
-            vec!["123.9", "12", "0.8", "0.0018", "0.017", "198"],
+            vec!["123.9", "1.2e1", "8e-1", "18E-4", "1.7e-2", "1.98e2", "1e9"],
             &t.internal_lexer.extras.const_floats,
         );
     }

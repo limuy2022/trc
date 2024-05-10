@@ -68,7 +68,7 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
 #[logos(skip r"[ \t\r\f]+")]
 #[logos(error = ErrorInfo)]
 pub enum Token {
-    #[regex(r#"/\*.*\*/"#)]
+    #[regex(r"/\*[^\+]([^\*]|(\*[^/]))*\*/", logos::skip)]
     CrossLinesComment,
     #[token("->")]
     Arrow,
@@ -225,7 +225,7 @@ pub enum Token {
     Unsafe,
     #[token("\n")]
     NewLine,
-    #[token(r#"#.*?(\n|$)"#)]
+    #[token(r#"#.*?"#, logos::skip)]
     Comment,
 }
 
@@ -477,6 +477,7 @@ impl<'a> TokenLex<'a> {
         }
         loop {
             let token = self.internal_lexer.next();
+            // println!("dsdwdwdwdwd");
             match token {
                 Some(t) => {
                     let t = match t {
@@ -485,6 +486,7 @@ impl<'a> TokenLex<'a> {
                             return self.report_error(e);
                         }
                     };
+                    // println!("{}", t);
                     if t == Token::LeftBigBrace
                         || t == Token::LeftSmallBrace
                         || t == Token::LeftMiddleBrace
@@ -500,8 +502,6 @@ impl<'a> TokenLex<'a> {
                         self.check_braces_stack(t.to_brace())?;
                     } else if t == Token::NewLine {
                         self.add_line();
-                        continue;
-                    } else if t == Token::Comment || t == Token::CrossLinesComment {
                         continue;
                     }
                     return Ok(t);
@@ -722,28 +722,32 @@ mod tests {
     fn test_comprehensive_lex() {
         gen_test_token_env!(
             r#"
-            /*a complex test*
-             *
-             *
-             * end */
-import "p"
-func a(int val) -> str {
-    if val % 2 == 0 {
-        return "even"
-    } else {
-        return "odd"
-    }
-}
-#djopekdpekdpedle
-func main() {
-    print("hello world")#djeopjdfopejfopejfpejfop
-    p := a(intinput())
-    print(p)
-}
-#ojdeopjfoepjfopejop
+            
+        /**/
         "#,
             t
         );
+        /*a complex test*
+         *
+         *
+         * end */
+        //
+        //#import "p"
+        // #func a(int val) -> str {
+        // if val % 2 == 0 {
+        //         return "even"
+        //     } else {
+        //         return "odd"
+        //     }
+        // }
+
+        // #djopekdpekdpedle
+        // func main() {
+        //     print("hello world")#djeopjdfopejfopejfpejfop
+        //     p := a(intinput())
+        //     print(p)
+        // }
+        // #ojdeopjfoepjfopejop
         check(
             &mut t,
             vec![

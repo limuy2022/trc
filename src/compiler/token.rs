@@ -11,11 +11,19 @@ fn add_float(lex: &mut Lexer<Token>) -> usize {
 }
 
 fn add_string(lex: &mut Lexer<Token>) -> usize {
-    // 此处还需要进行字符串转义
+    // 此处还需要进行字符串
     let origin_str = lex.slice();
     let mut target_string = String::new();
     target_string.reserve(origin_str.len());
     let mut iter = origin_str.chars();
+    if lex.slice().starts_with(r#"""""#)
+        && lex.slice().ends_with(r#"""""#)
+        && lex.slice().len() >= 6
+    {
+        iter.next();
+        iter.next();
+        iter.next();
+    }
     while let Some(i) = iter.next() {
         if i == '\\' {
             if let Some(j) = iter.next() {
@@ -68,7 +76,7 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
 #[logos(skip r"[ \t\r\f]+")]
 #[logos(error = ErrorInfo)]
 pub enum Token {
-    #[regex(r"/\*[^\+]([^\*]|(\*[^/]))*\*/", logos::skip)]
+    #[regex(r"/\*(.|\n)*\*/", logos::skip)]
     CrossLinesComment,
     #[token("->")]
     Arrow,
@@ -143,7 +151,8 @@ pub enum Token {
         convert_int
     )]
     IntValue(usize),
-    #[regex(r#""(.|\\.)*""#, add_string)]
+    #[regex(r#"".*""#, add_string)]
+    #[regex(r#""""(.|\n)*""""#, add_string)]
     StringValue(usize),
     #[regex(
         r#"([-+]?)((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#,
@@ -223,9 +232,9 @@ pub enum Token {
     Uninit,
     #[token("unsafe")]
     Unsafe,
-    #[token("\n")]
+    #[regex(r"\n")]
     NewLine,
-    #[token(r#"#.*?"#, logos::skip)]
+    #[regex(r#"#.*"#, logos::skip)]
     Comment,
 }
 
@@ -483,10 +492,11 @@ impl<'a> TokenLex<'a> {
                     let t = match t {
                         Ok(data) => data,
                         Err(e) => {
+                            println!("{:?}", e);
                             return self.report_error(e);
                         }
                     };
-                    // println!("{}", t);
+                    println!("{}", t);
                     if t == Token::LeftBigBrace
                         || t == Token::LeftSmallBrace
                         || t == Token::LeftMiddleBrace
@@ -568,6 +578,7 @@ mod tests {
         };
     }
 
+    /// check token
     fn check(tokenlex: &mut TokenLex, expected_res: Vec<Token>) {
         for i in expected_res {
             assert_eq!(i, tokenlex.next_token().unwrap());
@@ -598,6 +609,7 @@ mod tests {
         }
     }
 
+    /// 不关心具体的token值,一直解析到文件末尾，可用于检查报错是否正常
     fn check_until_eof(tokenlex: &mut TokenLex) {
         loop {
             let token_tmp = tokenlex.next_token().unwrap();
@@ -608,6 +620,19 @@ mod tests {
         }
         // println!("fuck you ccf");
         tokenlex.check().unwrap();
+    }
+
+    #[test]
+    fn test_comment() {
+        gen_test_token_env!(r#"/**/"#, t);
+        // # comment
+        //         # comment
+        /* comment */
+        /*
+         *dwdwdwd
+         *dwdw
+         */
+        check(&mut t, vec![])
     }
 
     #[test]

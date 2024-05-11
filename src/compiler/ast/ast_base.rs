@@ -79,7 +79,7 @@ impl<'a> ModuleUnit<'a> {
 
     /// 解析一个类型名为id
     pub fn lex_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
-        let t = self.get_token_checked(Token::ID(0))?;
+        let t = self.get_token_checked_with_val(Token::ID(0))?;
         let ty = match self.self_scope.borrow().get_type_id_by_token(t) {
             None => self.try_err(
                 istry,
@@ -109,11 +109,15 @@ impl<'a> ModuleUnit<'a> {
         ))
     }
 
-    /// 获取一个token并检查该token是否正确
-    pub fn get_token_checked(&mut self, ty: Token) -> AstError<usize> {
+    /// 获取一个token并检查该token是否正确，仅仅检查带有值的token类型
+    pub fn get_token_checked_with_val(&mut self, ty: Token) -> AstError<usize> {
         let t = self.token_lexer.borrow_mut().next_token()?;
         match (ty, t) {
             (Token::ID(_), Token::ID(data)) => Ok(data),
+            (Token::IntValue(_), Token::IntValue(data)) => Ok(data),
+            (Token::FloatValue(_), Token::FloatValue(data)) => Ok(data),
+            (Token::StringValue(_), Token::StringValue(data)) => Ok(data),
+            (Token::CharValue(_), Token::CharValue(data)) => Ok(data as usize),
             _ => {
                 self.token_lexer.borrow_mut().next_back(t);
                 self.gen_unexpected_token_error(t)?
@@ -121,7 +125,8 @@ impl<'a> ModuleUnit<'a> {
         }
     }
 
-    pub fn check_next_token(&mut self, ty: Token) -> AstError<()> {
+    /// 获取一个token并检查该token是否正确，仅仅检查不带有值的token类型
+    pub fn get_token_checked(&mut self, ty: Token) -> AstError<()> {
         let t = self.token_lexer.borrow_mut().next_token()?;
         if t == ty {
             Ok(())

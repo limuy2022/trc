@@ -779,7 +779,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     fn def_func(&mut self) -> AstError<()> {
-        let funcname = self.get_token_checked(Token::ID(0))?;
+        let funcname = self.get_token_checked_with_val(Token::ID(0))?;
         let name_id = self.insert_sym_with_error(funcname)?;
         // lex args
         self.get_token_checked(Token::LeftSmallBrace)?;
@@ -793,7 +793,7 @@ impl<'a> ModuleUnit<'a> {
             if t != Token::Comma {
                 self.token_lexer.borrow_mut().next_back(t);
             }
-            let name_id = self.get_token_checked(Token::ID(0))?;
+            let name_id = self.get_token_checked_with_val(Token::ID(0))?;
             argname.push(name_id);
             self.get_token_checked(Token::Colon)?;
             ty_list.push(self.lex_ty(false)?);
@@ -851,7 +851,7 @@ impl<'a> ModuleUnit<'a> {
         match t {
             Token::Var => {
                 // 声明属性
-                let attr_name_tok = self.get_token_checked(Token::ID(0))?;
+                let attr_name_tok = self.get_token_checked_with_val(Token::ID(0))?;
                 let attr_id = self.insert_sym_with_error(attr_name_tok)?;
                 self.get_token_checked(Token::Colon)?;
                 let ty = self.lex_ty(false)?;
@@ -884,7 +884,7 @@ impl<'a> ModuleUnit<'a> {
             self.self_scope.clone(),
         ))));
         self.self_scope.borrow_mut().in_class = true;
-        let name = self.get_token_checked(Token::ID(0))?;
+        let name = self.get_token_checked_with_val(Token::ID(0))?;
         let name_id = self.insert_sym_with_error(name)?;
         let mut class_obj = CustomType::new(
             name_id,
@@ -903,7 +903,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     fn lex_import(&mut self, istry: bool) -> AstError<()> {
-        let tok = self.get_token_checked(Token::StringValue(0))?;
+        let tok = self.get_token_checked_with_val(Token::StringValue(0))?;
         // import的路径
         let mut path_with_dot = self.token_lexer.borrow_mut().get_constpool().id_str[tok].clone();
         // 具体文件的路径

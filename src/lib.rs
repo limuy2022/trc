@@ -48,6 +48,9 @@ make_commands!(Commands, Build {}, Run {}, Dis {
 }, | Tshell {}, Version {}, New {
     #[arg()]
     project_name: String
+    }, Token {
+        #[arg()]
+        files: Vec<String>
     });
 
 shadow_rs::shadow!(build);
@@ -116,6 +119,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         }
         Commands::New { project_name } => {
             tools::new_project(&project_name)?;
+        }
+        Commands::Token { files } => {
+            for i in files {
+                tools::token(&i);
+            }
         }
     };
     Ok(())

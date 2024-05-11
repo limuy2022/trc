@@ -1,9 +1,9 @@
 use super::{Context, ValuePool};
-use crate::compiler::CompilerImpl;
+use crate::compiler::{token, CompilerImpl};
 use libcore::*;
-use logos::{Lexer, Logos};
+use logos::{Lexer, Logos, Skip, Source};
 use rust_i18n::t;
-use std::{cell::RefCell, fmt::Display, rc::Rc};
+use std::{cell::RefCell, fmt::Display, rc::Rc, u8};
 
 fn add_float(lex: &mut Lexer<Token>) -> usize {
     // println!("{}", lex.slice());
@@ -16,11 +16,11 @@ fn add_string(lex: &mut Lexer<Token>) -> usize {
     let mut target_string = String::new();
     target_string.reserve(origin_str.len());
     let mut iter = origin_str.chars();
+    iter.next();
     if lex.slice().starts_with(r#"""""#)
         && lex.slice().ends_with(r#"""""#)
         && lex.slice().len() >= 6
     {
-        iter.next();
         iter.next();
         iter.next();
     }
@@ -46,11 +46,35 @@ fn add_string(lex: &mut Lexer<Token>) -> usize {
             target_string.push(i);
         }
     }
+    target_string.pop();
     lex.extras.add_string(target_string)
 }
 
 fn add_id(lex: &mut Lexer<Token>) -> usize {
     lex.extras.add_id(lex.slice().to_owned())
+}
+
+fn lex_muli_comment(lex: &mut Lexer<Token>) -> Result<usize, ErrorInfo> {
+    let source = lex.remainder();
+    let mut n = 0;
+    let mut lines = 0;
+    loop {
+        match source.slice(n..(n + 1)) {
+            None => return Err(ErrorInfo::new(t!(UNCLODED_COMMENT), t!(SYNTAX_ERROR))),
+            Some(v) => {
+                let c = v.chars().next().unwrap();
+                if c == '\n' {
+                    lines += 1;
+                } else if c == '*' && source.slice((n + 1)..(n + 2)) == Some("/") {
+                    n += 2;
+                    break;
+                }
+                n += 1;
+            }
+        }
+    }
+    lex.bump(n);
+    Ok(lines)
 }
 
 fn convert_int(lex: &mut Lexer<Token>) -> usize {
@@ -71,13 +95,26 @@ fn convert_int(lex: &mut Lexer<Token>) -> usize {
     }
 }
 
+fn convert_char(lex: &mut Lexer<Token>) -> Result<usize, ErrorInfo> {
+    let len = lex.slice().len();
+    if len != 3 {
+        return Err(ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)));
+    }
+    let mut iter = lex.slice().chars();
+    iter.next();
+    Ok(iter.next().unwrap() as usize)
+}
+
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
 #[logos(extras = ValuePool)]
 #[logos(skip r"[ \t\r\f]+")]
 #[logos(error = ErrorInfo)]
 pub enum Token {
-    #[regex(r"/\*(.|\n)*\*/", logos::skip)]
-    CrossLinesComment,
+    // #[regex(r"/\*[^(\*/)\n]*", logos::skip)]
+    #[regex(r"/\*", lex_muli_comment)]
+    CrossLinesComment(usize),
+    #[regex(r"\n")]
+    NewLine,
     #[token("->")]
     Arrow,
     #[token(".")]
@@ -151,8 +188,9 @@ pub enum Token {
         convert_int
     )]
     IntValue(usize),
-    #[regex(r#"".*""#, add_string)]
-    #[regex(r#""""(.|\n)*""""#, add_string)]
+    #[regex(r#""[^"]*""#, add_string)]
+    // #[regex(r#""""(.)*""""#, add_string)]
+    // TODO:MULT
     StringValue(usize),
     #[regex(
         r#"([-+]?)((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#,
@@ -160,7 +198,7 @@ pub enum Token {
     )]
     FloatValue(usize),
     LongIntValue,
-    #[regex(r#"'[a-zA-Z_0-9]'"#, |lex| lex.slice().chars().next().unwrap() as usize)]
+    #[regex(r#"'[^']*'"#, convert_char)]
     CharValue(usize),
     #[token("false", |_| false as usize)]
     #[token("true", |_| true as usize)]
@@ -195,7 +233,7 @@ pub enum Token {
     Colon,
     #[token(";")]
     Semicolon,
-    #[regex(r#"[a-zA-Z_][a-zA-Z_0-9]*"#, add_id)]
+    #[regex(r#"[\p{XID_Start}_]\p{XID_Continue}*"#, add_id)]
     ID(usize),
     #[token("while")]
     While,
@@ -232,9 +270,7 @@ pub enum Token {
     Uninit,
     #[token("unsafe")]
     Unsafe,
-    #[regex(r"\n")]
-    NewLine,
-    #[regex(r#"#.*"#, logos::skip)]
+    #[regex(r"#.*", logos::skip)]
     Comment,
 }
 
@@ -362,7 +398,7 @@ impl Display for Token {
             Token::Unsafe => "unsafe",
             Token::NewLine => r#"\n"#,
             Token::Comment => "Comment",
-            Token::CrossLinesComment => "CrossLinesComment",
+            Token::CrossLinesComment(_) => "CrossLinesComment",
         };
         write!(f, "{}", res)
     }
@@ -486,17 +522,14 @@ impl<'a> TokenLex<'a> {
         }
         loop {
             let token = self.internal_lexer.next();
-            // println!("dsdwdwdwdwd");
             match token {
                 Some(t) => {
                     let t = match t {
                         Ok(data) => data,
                         Err(e) => {
-                            println!("{:?}", e);
                             return self.report_error(e);
                         }
                     };
-                    println!("{}", t);
                     if t == Token::LeftBigBrace
                         || t == Token::LeftSmallBrace
                         || t == Token::LeftMiddleBrace
@@ -511,7 +544,11 @@ impl<'a> TokenLex<'a> {
                     {
                         self.check_braces_stack(t.to_brace())?;
                     } else if t == Token::NewLine {
+                        // println!("fuck you ccf");
                         self.add_line();
+                        continue;
+                    } else if let Token::CrossLinesComment(v) = t {
+                        self.compiler_data.borrow_mut().context.add_line_by(v);
                         continue;
                     }
                     return Ok(t);
@@ -624,14 +661,22 @@ mod tests {
 
     #[test]
     fn test_comment() {
-        gen_test_token_env!(r#"/**/"#, t);
-        // # comment
-        //         # comment
-        /* comment */
+        gen_test_token_env!(
+            r"
+
+        /**/
+# comment
+                # comment
+                #
+/* comment */
         /*
          *dwdwdwd
          *dwdw
          */
+        ",
+            t
+        );
+
         check(&mut t, vec![])
     }
 
@@ -744,35 +789,36 @@ mod tests {
     }
 
     #[test]
-    fn test_comprehensive_lex() {
+    fn test_complex_lex() {
         gen_test_token_env!(
             r#"
             
         /**/
-        "#,
-            t
-        );
-        /*a complex test*
+/*a complex test*
          *
          *
          * end */
-        //
-        //#import "p"
-        // #func a(int val) -> str {
-        // if val % 2 == 0 {
-        //         return "even"
-        //     } else {
-        //         return "odd"
-        //     }
-        // }
 
-        // #djopekdpekdpedle
-        // func main() {
-        //     print("hello world")#djeopjdfopejfopejfpejfop
-        //     p := a(intinput())
-        //     print(p)
-        // }
-        // #ojdeopjfoepjfopejop
+        import "p"
+        func a(int val) -> str {
+        if val % 2 == 0 {
+                return "even"
+            } else {
+                return "odd"
+            }
+        }
+
+        #djopekdpekdpedle
+        func main() {
+            print("hello world")#djeopjdfopejfopejfpejfop
+            p := a(intinput())
+            print(p)
+        }
+        #ojdeopjfoepjfopejop
+        "#,
+            t
+        );
+
         check(
             &mut t,
             vec![
@@ -909,7 +955,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "char")]
+    #[should_panic(expected = "cannot")]
     fn test_wrong_char3() {
         gen_test_token_env!(r#"'"#, t);
         check_until_eof(&mut t);
@@ -949,7 +995,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "string")]
+    #[should_panic(expected = "cannot")]
     fn test_error_str() {
         gen_test_token_env!(r#"print("{}", "pp)"#, t);
         check_until_eof(&mut t);

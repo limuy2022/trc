@@ -80,6 +80,10 @@ impl Context {
         self.line += 1;
     }
 
+    pub fn add_line_by(&mut self, line: usize) {
+        self.line += line;
+    }
+
     pub fn del_line(&mut self) {
         self.line -= 1;
     }

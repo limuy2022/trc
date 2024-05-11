@@ -20,6 +20,7 @@ jobs:
           rustup toolchain install nightly --component miri
           rustup override set nightly
           cargo miri setup
+          rustup default nightly
           setx MIRIFLAGS "-Zmiri-disable-isolation"
       - name: Build
         run: cargo build --all

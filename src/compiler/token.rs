@@ -1,9 +1,9 @@
 use super::{Context, ValuePool};
-use crate::compiler::{token, CompilerImpl};
+use crate::compiler::CompilerImpl;
 use libcore::*;
-use logos::{Lexer, Logos, Skip, Source};
+use logos::{Lexer, Logos, Source};
 use rust_i18n::t;
-use std::{cell::RefCell, fmt::Display, rc::Rc, u8};
+use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 fn add_float(lex: &mut Lexer<Token>) -> usize {
     // println!("{}", lex.slice());
@@ -184,7 +184,7 @@ pub enum Token {
     #[token("^=")]
     SelfXor,
     #[regex(
-        r#"[+-]?(0[bB][01_]+|0[oO][0-7_]+|0[xX][0-9a-fA-F_]+|[0-9][0-9_]*)"#,
+        r#"(0[bB][01_]+|0[oO][0-7_]+|0[xX][0-9a-fA-F_]+|[0-9][0-9_]*)"#,
         convert_int
     )]
     IntValue(usize),
@@ -192,10 +192,7 @@ pub enum Token {
     // #[regex(r#""""(.)*""""#, add_string)]
     // TODO:MULT
     StringValue(usize),
-    #[regex(
-        r#"([-+]?)((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#,
-        add_float
-    )]
+    #[regex(r#"((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#, add_float)]
     FloatValue(usize),
     LongIntValue,
     #[regex(r#"'[^']*'"#, convert_char)]

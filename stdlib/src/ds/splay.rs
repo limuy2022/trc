@@ -1,4 +1,5 @@
- struct Node {
+
+struct Node {
     sons: [usize; 2],
     cnt: usize,
     sz: usize,
@@ -26,8 +27,9 @@ impl Splay {
     }
 
     pub fn maintain(&mut self, id: usize) {
-        self.tree[id].sz =
-            self.tree[self.tree[id].sons[0]].sz + self.tree[self.tree[id].sons[1]].sz + self.tree[id].cnt;
+        self.tree[id].sz = self.tree[self.tree[id].sons[0]].sz
+            + self.tree[self.tree[id].sons[1]].sz
+            + self.tree[id].cnt;
     }
 
     pub fn is_right(&self, id: usize) -> bool {

@@ -55,7 +55,8 @@ impl AcAutomaton {
                 // 正常的ac自动机会将剩余的失配部分也指向失配指针
                 // 但是这个字符集被设计为无限大，可以容纳unicode的ac自动机，所以不能这么做
                 // 会在匹配时顺着向上找失配指针
-                self.states[*val]._fail = if self.states[self.states[u]._fail].next.contains_key(c) {
+                self.states[*val]._fail = if self.states[self.states[u]._fail].next.contains_key(c)
+                {
                     self.states[self.states[u]._fail].next[c]
                 } else {
                     0

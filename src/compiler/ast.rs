@@ -670,7 +670,7 @@ impl<'a> ModuleUnit<'a> {
                 self.get_token_checked(Token::Semicolon)?;
                 // 获取数组元素类型
                 // TODO:在此处加上对于Default的检查
-                let t = self.lex_ty(istry)?;
+                let _t = self.lex_ty(istry)?;
             }
             _ => {
                 self.token_lexer.borrow_mut().next_back(next_token);

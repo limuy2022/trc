@@ -1,4 +1,5 @@
 #![feature(let_chains)]
+#![deny(warnings)]
 pub mod base;
 pub mod cfg;
 pub mod compiler;

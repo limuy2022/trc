@@ -134,7 +134,7 @@ pub enum Opcode {
 }
 
 impl Display for Opcode {
-    #[cfg(not(tarpaulin_include))]
+    #[tarpaulin::skip]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -215,7 +215,7 @@ impl Inst {
 }
 
 impl Display for Inst {
-    #[cfg(not(tarpaulin_include))]
+    #[tarpaulin::skip]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} {} {}", self.opcode, self.operand.0, self.operand.1)
     }

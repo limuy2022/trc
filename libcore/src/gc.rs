@@ -2,12 +2,12 @@
 
 #[derive(Default, Debug)]
 pub struct GcMgr {
-    objs: Vec<*mut ()>,
+    _objs: Vec<*mut ()>,
 }
 
 impl GcMgr {
     pub fn new() -> Self {
-        Self { objs: Vec::new() }
+        Self { _objs: Vec::new() }
     }
 
     pub fn alloc<T>(&mut self, obj: T) -> *mut T {

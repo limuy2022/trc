@@ -24,10 +24,10 @@ pub fn tshell() -> RuntimeResult<()> {
         compiler::CompileOption::new(false, compiler::InputSource::StringInternal),
         "",
     );
-    let ast = compiler.lex()?;
+    let _ast = compiler.lex()?;
     // let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
-    let vm = todo!();
-    let should_exit = false;
+    let _should_exit = false;
+    let _vm = todo!();
     // let mut function_list = vec![];
     // let mut function_defined_num = 0;
     // 'stop_repl: loop {

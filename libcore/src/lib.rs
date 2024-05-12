@@ -1,3 +1,6 @@
+#![deny(warnings)]
+#![feature(register_tool)]
+#![register_tool(tarpaulin)]
 pub mod codegen;
 pub mod dynadata;
 pub mod error;

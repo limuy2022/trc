@@ -1,4 +1,4 @@
-pub struct Node {
+ struct Node {
     sons: [usize; 2],
     cnt: usize,
     sz: usize,
@@ -6,7 +6,7 @@ pub struct Node {
 }
 
 impl Node {
-    fn new() -> Self {
+    fn _new() -> Self {
         Self {
             sons: [0; 2],
             sz: 0,
@@ -21,16 +21,16 @@ pub struct Splay {
 }
 
 impl Splay {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { tree: vec![] }
     }
 
-    fn maintain(&mut self, id: usize) {
+    pub fn maintain(&mut self, id: usize) {
         self.tree[id].sz =
-            self.tree[self.tree[id].sons[0]].sz + self.tree[self.tree[id].sons[1]].sz;
+            self.tree[self.tree[id].sons[0]].sz + self.tree[self.tree[id].sons[1]].sz + self.tree[id].cnt;
     }
 
-    fn is_right(&self, id: usize) -> bool {
+    pub fn is_right(&self, id: usize) -> bool {
         id == self.tree[self.tree[id].fa].sons[1]
     }
 }

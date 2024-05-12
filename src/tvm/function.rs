@@ -24,9 +24,9 @@ impl Frame {
         unsafe { self.get_addr(addr).copy_from(src, n) }
     }
 
-    pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
-        unsafe { *(self.var_table_addr.byte_offset(addr as isize) as *const Byte as *const T) }
-    }
+    // pub unsafe fn get_var<T: Copy + 'static>(&self, addr: usize) -> T {
+    //     unsafe { *(self.var_table_addr.byte_offset(addr as isize) as *const Byte as *const T) }
+    // }
 
     pub fn get_addr(&self, addr: usize) -> *mut Byte {
         unsafe { self.var_table_addr.byte_offset(addr as isize) }

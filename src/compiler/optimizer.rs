@@ -1,7 +1,7 @@
 use crate::compiler::ModuleUnit;
 
 /// 优化模块
-pub fn optimize_module(module: &mut ModuleUnit) {
+pub fn optimize_module(_module: &mut ModuleUnit) {
     todo!()
 }
 

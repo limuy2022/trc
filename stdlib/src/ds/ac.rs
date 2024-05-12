@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 pub struct State {
-    fail: usize,
+    _fail: usize,
     next: HashMap<char, usize>,
     show_times: usize,
 }
@@ -11,7 +11,7 @@ pub struct State {
 impl State {
     fn new() -> Self {
         Self {
-            fail: 0,
+            _fail: 0,
             next: HashMap::new(),
             show_times: 0,
         }
@@ -23,13 +23,13 @@ pub struct AcAutomaton {
 }
 
 impl AcAutomaton {
-    fn new() -> AcAutomaton {
+    pub fn new() -> AcAutomaton {
         AcAutomaton {
             states: vec![State::new()],
         }
     }
 
-    fn add_string(&mut self, addstring: &str) {
+    pub fn add_string(&mut self, addstring: &str) {
         let mut u = 0;
         for i in addstring.chars() {
             if !self.states[u].next.contains_key(&i) {
@@ -43,7 +43,7 @@ impl AcAutomaton {
     }
 
     // TODO this function use clone to build fail,it should be improved
-    fn build_fail(&mut self) {
+    pub fn build_fail(&mut self) {
         let mut q: Vec<usize> = Vec::new();
         for i in self.states.first().unwrap().next.values() {
             q.push(*i);
@@ -55,8 +55,8 @@ impl AcAutomaton {
                 // 正常的ac自动机会将剩余的失配部分也指向失配指针
                 // 但是这个字符集被设计为无限大，可以容纳unicode的ac自动机，所以不能这么做
                 // 会在匹配时顺着向上找失配指针
-                self.states[*val].fail = if self.states[self.states[u].fail].next.contains_key(c) {
-                    self.states[self.states[u].fail].next[c]
+                self.states[*val]._fail = if self.states[self.states[u]._fail].next.contains_key(c) {
+                    self.states[self.states[u]._fail].next[c]
                 } else {
                     0
                 };
@@ -66,9 +66,9 @@ impl AcAutomaton {
     }
 
     /// use search function to add your string
-    fn search(&self, _pattern: &str, _id: u32) {}
+    pub fn search(&self, _pattern: &str, _id: u32) {}
 
-    fn get_ans(&self) -> HashMap<u32, usize> {
+    pub fn get_ans(&self) -> HashMap<u32, usize> {
         HashMap::new()
     }
 }
@@ -78,6 +78,6 @@ mod tests {
     use super::*;
     #[test]
     fn ac_automaton1() {
-        let ac = AcAutomaton::new();
+        let _ac = AcAutomaton::new();
     }
 }

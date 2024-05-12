@@ -1,3 +1,5 @@
+#![deny(warnings)]
+
 use collection_literals::collection;
 use derive::{def_module, def_module_export, trc_class, trc_method};
 pub use libcore;

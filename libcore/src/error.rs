@@ -106,7 +106,7 @@ impl Display for RuntimeError {
     /// report error in vm or compiler
     /// we will translate the error type to gettextrs
     /// but you should translate the error messgae by caller
-    #[cfg(not(tarpaulin_include))]
+    #[tarpaulin::skip]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // for lightfakeerror
         debug_assert!(!self.info.error_type.is_empty());

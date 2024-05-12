@@ -293,6 +293,7 @@ impl Compiler {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::ValuePool;
 

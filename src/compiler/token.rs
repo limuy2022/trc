@@ -519,7 +519,7 @@ impl<'a> TokenLex<'a> {
         }
         loop {
             let token = self.internal_lexer.next();
-            match token {
+            return match token {
                 Some(t) => {
                     let t = match t {
                         Ok(data) => data,
@@ -548,10 +548,10 @@ impl<'a> TokenLex<'a> {
                         self.compiler_data.borrow_mut().context.add_line_by(v);
                         continue;
                     }
-                    return Ok(t);
+                    Ok(t)
                 }
-                None => return Ok(Token::EndOfFile),
-            }
+                None => Ok(Token::EndOfFile),
+            };
         }
     }
 
@@ -694,23 +694,23 @@ mod tests {
             &mut t,
             vec![
                 Token::Comma,
-                (Token::Comma),
-                (Token::Dot),
-                (Token::Comma),
+                Token::Comma,
+                Token::Dot,
+                Token::Comma,
                 Token::IntValue(convert_int_constval_to_usize(100)),
-                (Token::FloatValue(0)),
+                Token::FloatValue(0),
                 Token::IntValue(convert_int_constval_to_usize(232_304904)),
                 Token::IntValue(convert_int_constval_to_usize(0b011)),
                 Token::IntValue(convert_int_constval_to_usize(0x2AA4)),
                 Token::IntValue(convert_int_constval_to_usize(0o2434)),
-                (Token::IntValue(convert_int_constval_to_usize(0))),
-                (Token::IntValue(convert_int_constval_to_usize(0))),
+                Token::IntValue(convert_int_constval_to_usize(0)),
+                Token::IntValue(convert_int_constval_to_usize(0)),
                 Token::FloatValue(1),
-                (Token::FloatValue(2)),
-                (Token::FloatValue(3)),
-                (Token::FloatValue(4)),
-                (Token::FloatValue(5)),
-                (Token::FloatValue(6)),
+                Token::FloatValue(2),
+                Token::FloatValue(3),
+                Token::FloatValue(4),
+                Token::FloatValue(5),
+                Token::FloatValue(6),
             ],
         );
         check_pool(
@@ -729,30 +729,30 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::Colon),
-                (Token::LeftBigBrace),
-                (Token::RightBigBrace),
-                (Token::LeftMiddleBrace),
-                (Token::RightMiddleBrace),
-                (Token::LeftSmallBrace),
-                (Token::RightSmallBrace),
-                (Token::SelfAdd),
-                (Token::SelfMod),
-                (Token::SelfExactDiv),
-                (Token::ExactDiv),
-                (Token::SelfDiv),
-                (Token::Power),
-                (Token::SelfMul),
-                (Token::Mul),
-                (Token::Comma),
-                (Token::BitRightShift),
-                (Token::BitLeftShift),
-                (Token::SelfBitRightShift),
-                (Token::Or),
-                (Token::And),
-                (Token::DoubleColon),
-                (Token::Store),
-                (Token::Colon),
+                Token::Colon,
+                Token::LeftBigBrace,
+                Token::RightBigBrace,
+                Token::LeftMiddleBrace,
+                Token::RightMiddleBrace,
+                Token::LeftSmallBrace,
+                Token::RightSmallBrace,
+                Token::SelfAdd,
+                Token::SelfMod,
+                Token::SelfExactDiv,
+                Token::ExactDiv,
+                Token::SelfDiv,
+                Token::Power,
+                Token::SelfMul,
+                Token::Mul,
+                Token::Comma,
+                Token::BitRightShift,
+                Token::BitLeftShift,
+                Token::SelfBitRightShift,
+                Token::Or,
+                Token::And,
+                Token::DoubleColon,
+                Token::Store,
+                Token::Colon,
             ],
         );
     }
@@ -763,13 +763,13 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::StringValue(0)),
-                (Token::CharValue('s' as usize)),
-                (Token::StringValue(1)),
-                (Token::StringValue(2)),
-                (Token::StringValue(3)),
-                (Token::StringValue(4)),
-                (Token::StringValue(5)),
+                Token::StringValue(0),
+                Token::CharValue('s' as usize),
+                Token::StringValue(1),
+                Token::StringValue(2),
+                Token::StringValue(3),
+                Token::StringValue(4),
+                Token::StringValue(5),
             ],
         );
         check_pool(
@@ -819,55 +819,55 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::Import),
-                (Token::StringValue(0)),
-                (Token::Func),
-                (Token::ID(0)),
-                (Token::LeftSmallBrace),
-                (Token::ID(1)),
-                (Token::ID(2)),
-                (Token::RightSmallBrace),
-                (Token::Arrow),
-                (Token::ID(3)),
-                (Token::LeftBigBrace),
-                (Token::If),
-                (Token::ID(2)),
-                (Token::Mod),
-                (Token::IntValue(2)),
-                (Token::Equal),
-                (Token::IntValue(convert_int_constval_to_usize(0))),
-                (Token::LeftBigBrace),
-                (Token::Return),
-                (Token::StringValue(1)),
-                (Token::RightBigBrace),
-                (Token::Else),
-                (Token::LeftBigBrace),
-                (Token::Return),
-                (Token::StringValue(2)),
-                (Token::RightBigBrace),
-                (Token::RightBigBrace),
-                (Token::Func),
-                (Token::ID(4)),
-                (Token::LeftSmallBrace),
-                (Token::RightSmallBrace),
-                (Token::LeftBigBrace),
-                (Token::ID(5)),
-                (Token::LeftSmallBrace),
-                (Token::StringValue(3)),
-                (Token::RightSmallBrace),
-                (Token::ID(6)),
-                (Token::Store),
-                (Token::ID(0)),
-                (Token::LeftSmallBrace),
-                (Token::ID(7)),
-                (Token::LeftSmallBrace),
-                (Token::RightSmallBrace),
-                (Token::RightSmallBrace),
-                (Token::ID(5)),
-                (Token::LeftSmallBrace),
-                (Token::ID(6)),
-                (Token::RightSmallBrace),
-                (Token::RightBigBrace),
+                Token::Import,
+                Token::StringValue(0),
+                Token::Func,
+                Token::ID(0),
+                Token::LeftSmallBrace,
+                Token::ID(1),
+                Token::ID(2),
+                Token::RightSmallBrace,
+                Token::Arrow,
+                Token::ID(3),
+                Token::LeftBigBrace,
+                Token::If,
+                Token::ID(2),
+                Token::Mod,
+                Token::IntValue(2),
+                Token::Equal,
+                Token::IntValue(convert_int_constval_to_usize(0)),
+                Token::LeftBigBrace,
+                Token::Return,
+                Token::StringValue(1),
+                Token::RightBigBrace,
+                Token::Else,
+                Token::LeftBigBrace,
+                Token::Return,
+                Token::StringValue(2),
+                Token::RightBigBrace,
+                Token::RightBigBrace,
+                Token::Func,
+                Token::ID(4),
+                Token::LeftSmallBrace,
+                Token::RightSmallBrace,
+                Token::LeftBigBrace,
+                Token::ID(5),
+                Token::LeftSmallBrace,
+                Token::StringValue(3),
+                Token::RightSmallBrace,
+                Token::ID(6),
+                Token::Store,
+                Token::ID(0),
+                Token::LeftSmallBrace,
+                Token::ID(7),
+                Token::LeftSmallBrace,
+                Token::RightSmallBrace,
+                Token::RightSmallBrace,
+                Token::ID(5),
+                Token::LeftSmallBrace,
+                Token::ID(6),
+                Token::RightSmallBrace,
+                Token::RightBigBrace,
             ],
         );
     }
@@ -878,12 +878,12 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::ID(0)),
-                (Token::ID(1)),
-                (Token::ID(2)),
-                (Token::ID(3)),
-                (Token::ID(4)),
-                (Token::ID(5)),
+                Token::ID(0),
+                Token::ID(1),
+                Token::ID(2),
+                Token::ID(3),
+                Token::ID(4),
+                Token::ID(5),
             ],
         );
         check_pool(
@@ -905,8 +905,8 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::IntValue(convert_int_constval_to_usize(1))),
-                (Token::IntValue(convert_int_constval_to_usize(23))),
+                Token::IntValue(convert_int_constval_to_usize(1)),
+                Token::IntValue(convert_int_constval_to_usize(23)),
             ],
         );
     }
@@ -917,8 +917,8 @@ mod tests {
         check(
             &mut t,
             vec![
-                (Token::IntValue(convert_int_constval_to_usize(0xabc))),
-                (Token::ID(0)),
+                Token::IntValue(convert_int_constval_to_usize(0xabc)),
+                Token::ID(0),
             ],
         );
         check_pool(vec!["hds".to_string()], &t.internal_lexer.extras.name_pool);
@@ -931,10 +931,7 @@ mod tests {
         assert_eq!(tmp, Token::Colon);
         t.next_back(tmp);
         assert_eq!(t.next_token().unwrap(), Token::Colon);
-        check(
-            &mut t,
-            vec![(Token::LeftSmallBrace), (Token::RightSmallBrace)],
-        );
+        check(&mut t, vec![Token::LeftSmallBrace, Token::RightSmallBrace]);
     }
 
     #[test]
@@ -963,7 +960,7 @@ mod tests {
         gen_test_token_env!(r#"true tru false"#, t);
         check(
             &mut t,
-            vec![(Token::BoolValue(1)), (Token::ID(0)), (Token::BoolValue(0))],
+            vec![Token::BoolValue(1), Token::ID(0), Token::BoolValue(0)],
         )
     }
 
@@ -973,7 +970,7 @@ mod tests {
         gen_test_token_env!(r#":)|"#, t);
         check(
             &mut t,
-            vec![(Token::Colon), (Token::LeftSmallBrace), (Token::BitAnd)],
+            vec![Token::Colon, Token::LeftSmallBrace, Token::BitAnd],
         );
     }
 
@@ -981,7 +978,7 @@ mod tests {
     #[should_panic]
     fn test_braces_check1() {
         gen_test_token_env!(r#":("#, t);
-        check(&mut t, vec![(Token::Colon), (Token::LeftSmallBrace)]);
+        check(&mut t, vec![Token::Colon, Token::LeftSmallBrace]);
     }
 
     #[test]

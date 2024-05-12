@@ -69,10 +69,10 @@ pub fn test_run_examples() {
 
 #[test]
 pub fn test_compile_examples() {
-    let mut cmd = Command::cargo_bin("trc").unwrap();
+    let cmd = Command::cargo_bin("trc").unwrap();
 }
 
 #[test]
 pub fn test_wrong_code() {
-    let mut cmd = Command::cargo_bin("trc").unwrap();
+    let cmd = Command::cargo_bin("trc").unwrap();
 }

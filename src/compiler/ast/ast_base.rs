@@ -117,7 +117,7 @@ impl<'a> ModuleUnit<'a> {
             (Token::IntValue(_), Token::IntValue(data)) => Ok(data),
             (Token::FloatValue(_), Token::FloatValue(data)) => Ok(data),
             (Token::StringValue(_), Token::StringValue(data)) => Ok(data),
-            (Token::CharValue(_), Token::CharValue(data)) => Ok(data as usize),
+            (Token::CharValue(_), Token::CharValue(data)) => Ok(data),
             _ => {
                 self.token_lexer.borrow_mut().next_back(t);
                 self.gen_unexpected_token_error(t)?

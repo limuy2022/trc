@@ -1,7 +1,5 @@
-use core::panic;
-use std::{collections::HashMap, mem::size_of, sync::OnceLock};
-
 use crate::gc::GcMgr;
+use std::{mem::size_of, sync::OnceLock};
 
 pub type Byte = u8;
 
@@ -22,7 +20,7 @@ pub struct DynaData {
     size_used: Vec<usize>,
     #[cfg(debug_assertions)]
     // 起始地址到终点地址的映射
-    mapped_var: HashMap<usize, usize>,
+    mapped_var: std::collections::HashMap<usize, usize>,
 }
 
 impl DynaData {

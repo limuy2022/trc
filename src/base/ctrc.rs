@@ -1,6 +1,6 @@
 //! generate ctrc file
 //! ctrc file is trc's compiled object
-//! can be loaded and runned by vm without compiling
+//! can be loaded and ran by vm without compiling
 
 use anyhow::bail;
 use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData, ARG_WRONG};

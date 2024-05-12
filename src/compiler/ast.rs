@@ -902,7 +902,7 @@ impl<'a> ModuleUnit<'a> {
         Ok(())
     }
 
-    fn lex_import(&mut self, istry: bool) -> AstError<()> {
+    fn lex_import_module(&mut self, istry: bool) -> AstError<()> {
         let tok = self.get_token_checked_with_val(Token::StringValue(0))?;
         // import的路径
         let mut path_with_dot = self.token_lexer.borrow_mut().get_constpool().id_str[tok].clone();
@@ -921,6 +921,7 @@ impl<'a> ModuleUnit<'a> {
             match tmp.option.inputsource.clone() {
                 InputSource::File(now_module_path) => {
                     let path = PathBuf::from(path_with_dot.replace('.', "/"));
+                    // 标识路径，但还没有做修改
                     let mut now_module_path = now_module_path;
                     now_module_path.pop();
                     now_module_path = now_module_path.join(path.clone());
@@ -946,6 +947,7 @@ impl<'a> ModuleUnit<'a> {
                     } else {
                         // 不是dll，尝试判断trc文件
                         let file_name_trc = format!("{}{}", file_name.to_str().unwrap(), ".trc");
+                        // println!("{}", file_name_trc);
                         now_module_path.set_file_name(file_name_trc);
                         // now_module_path.ex
                         if now_module_path.exists() {
@@ -1275,7 +1277,7 @@ impl<'a> ModuleUnit<'a> {
                 return Ok(());
             }
             Token::Import => {
-                self.lex_import(false)?;
+                self.lex_import_module(false)?;
                 return Ok(());
             }
             Token::Match => {

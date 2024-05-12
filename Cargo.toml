@@ -17,7 +17,6 @@ clap = { version = "4.5", features = ["derive"] }
 colored = "2.1"
 downcast-rs = "1.2"
 num-bigint = "0.4"
-# llvm-sys = "170.0.1"
 derive = { path = "./derive" }
 libloading = "0.8"
 sys-locale = "0.3"
@@ -33,6 +32,7 @@ rust-i18n = "3.0.1"
 anyhow = "1.0"
 num_enum = "0.7.2"
 logos = "0.14.0"
+num-traits = "0.2"
 
 [build-dependencies]
 shadow-rs = "0"

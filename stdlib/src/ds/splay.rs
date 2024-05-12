@@ -1,4 +1,3 @@
-
 struct Node {
     sons: [usize; 2],
     cnt: usize,
@@ -34,6 +33,12 @@ impl Splay {
 
     pub fn is_right(&self, id: usize) -> bool {
         id == self.tree[self.tree[id].fa].sons[1]
+    }
+}
+
+impl Default for Splay {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

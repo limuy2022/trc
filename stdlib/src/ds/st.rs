@@ -5,3 +5,9 @@ impl StTable {
         Self {}
     }
 }
+
+impl Default for StTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}

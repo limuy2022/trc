@@ -27,7 +27,8 @@ pub fn tshell() -> RuntimeResult<()> {
     let _ast = compiler.lex()?;
     // let mut vm = unsafe { Vm::new(&*(ast.prepare_get_static() as *const StaticData)) };
     let _should_exit = false;
-    let _vm = todo!();
+    let _vm = 0;
+    todo!()
     // let mut function_list = vec![];
     // let mut function_defined_num = 0;
     // 'stop_repl: loop {

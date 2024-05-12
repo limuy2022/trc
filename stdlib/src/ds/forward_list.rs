@@ -15,3 +15,9 @@ impl ForwardList {
         self.size() == 0
     }
 }
+
+impl Default for ForwardList {
+    fn default() -> Self {
+        Self::new()
+    }
+}

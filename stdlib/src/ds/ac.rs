@@ -32,7 +32,8 @@ impl AcAutomaton {
     pub fn add_string(&mut self, addstring: &str) {
         let mut u = 0;
         for i in addstring.chars() {
-            if !self.states[u].next.contains_key(&i) {
+            let condit = !self.states[u].next.contains_key(&i);
+            if condit {
                 self.states.push(State::new());
                 let new_node_id = self.states.len() - 1;
                 self.states[u].next.insert(i, new_node_id);
@@ -48,8 +49,7 @@ impl AcAutomaton {
         for i in self.states.first().unwrap().next.values() {
             q.push(*i);
         }
-        while !q.is_empty() {
-            let u = q.pop().unwrap();
+        while let Some(u) = q.pop() {
             for (c, val) in &self.states[u].next.clone() {
                 // 在这里需要向上找到失配指针
                 // 正常的ac自动机会将剩余的失配部分也指向失配指针
@@ -71,6 +71,12 @@ impl AcAutomaton {
 
     pub fn get_ans(&self) -> HashMap<u32, usize> {
         HashMap::new()
+    }
+}
+
+impl Default for AcAutomaton {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

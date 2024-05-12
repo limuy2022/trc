@@ -5,3 +5,9 @@ impl HashMap {
         HashMap {}
     }
 }
+
+impl Default for HashMap {
+    fn default() -> Self {
+        Self::new()
+    }
+}

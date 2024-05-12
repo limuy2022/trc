@@ -1,0 +1,7 @@
+pub func helloworld() {
+  println("hello world")
+}
+
+pub func add(a:int, b:int) int {
+  return a + b
+}

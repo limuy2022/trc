@@ -44,7 +44,7 @@ pub struct ModuleUnit<'a> {
     self_scope: Rc<RefCell<SymScope>>,
     process_info: lexprocess::LexProcess,
     cache: Cache,
-    // record if the fisrt func is defined
+    // record if the first func is defined
     first_func: bool,
     // 对哈希表去重，并且记录每个dll的函数起始索引
     modules_dll_dup: HashSet<String>,

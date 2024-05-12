@@ -1,0 +1,4 @@
+import "submodeuls.submodule"
+submodule::helloworld()
+import "submodeuls.submodule.add"
+println("{}", add(2, 1))

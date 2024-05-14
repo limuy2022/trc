@@ -42,6 +42,10 @@ impl<'a, 'b> LinkerIter<'a, 'b> {
     }
 }
 
+pub enum AddModuleError {
+    ModuleSourceNotFound,
+}
+
 impl<'a> ModuleManager<'a> {
     pub fn new() -> Self {
         Self {
@@ -52,15 +56,25 @@ impl<'a> ModuleManager<'a> {
         }
     }
 
-    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit<'a>) -> bool {
+    pub fn add_module(
+        &mut self,
+        path: impl Into<String>,
+        module: ModuleUnit<'a>,
+    ) -> Result<(), AddModuleError> {
         let path = path.into();
+        let source_file = PathBuf::from(path.clone());
+        let source_file_time;
+        if !source_file.exists() {
+            return Err(AddModuleError::ModuleSourceNotFound);
+        }
+        source_file_time = utils::get_modified_time(&source_file);
         let mut ctrc_path = PathBuf::from(cfg::BUILD_DIR_NAME).join(path.clone());
         ctrc_path.set_extension("ctrc");
         if ctrc_path.exists() {
             let time_ctrc = utils::get_modified_time(&ctrc_path);
         }
         self.cache.insert(path, module);
-        true
+        Ok(())
     }
 
     pub fn add_specific_module(&mut self, name: String, path: String) {

@@ -41,7 +41,7 @@ impl Cache {
 pub struct ModuleUnit<'a> {
     pub token_lexer: Rc<RefCell<TokenLex<'a>>>,
     pub staticdata: StaticData,
-    self_scope: Rc<RefCell<SymScope>>,
+    pub self_scope: Rc<RefCell<SymScope>>,
     process_info: lexprocess::LexProcess,
     cache: Cache,
     // record if the first func is defined
@@ -819,7 +819,6 @@ impl<'a> ModuleUnit<'a> {
                 cnt += 1;
             }
         }
-        // self.self_scope = tmp.clone();
         let function_id = self.module_manager.borrow_mut().alloc_custom_function_id();
         self.self_scope.borrow_mut().add_custom_function(
             name_id,
@@ -947,10 +946,10 @@ impl<'a> ModuleUnit<'a> {
                     } else {
                         // 不是dll，尝试判断trc文件
                         let file_name_trc = format!("{}{}", file_name.to_str().unwrap(), ".trc");
-                        // println!("{}", file_name_trc);
                         now_module_path.set_file_name(file_name_trc);
-                        // now_module_path.ex
+                        // println!("{}", now_module_path.display());
                         if now_module_path.exists() {
+
                             // 创建新的compiler来编译模块
                             // self.self_scope.as_any().borrow_mut().import_module();
                         } else {

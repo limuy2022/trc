@@ -2,8 +2,15 @@
 
 use libcore::StaticData;
 
-use crate::compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module};
-use std::collections::{hash_map::IterMut, HashMap};
+use crate::{
+    base::utils,
+    cfg,
+    compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module},
+};
+use std::{
+    collections::{hash_map::IterMut, HashMap},
+    path::PathBuf,
+};
 
 /// ast manager
 pub struct ModuleManager<'a> {
@@ -45,8 +52,15 @@ impl<'a> ModuleManager<'a> {
         }
     }
 
-    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit<'a>) {
-        self.cache.insert(path.into(), module);
+    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit<'a>) -> bool {
+        let path = path.into();
+        let mut ctrc_path = PathBuf::from(cfg::BUILD_DIR_NAME).join(path.clone());
+        ctrc_path.set_extension("ctrc");
+        if ctrc_path.exists() {
+            let time_ctrc = utils::get_modified_time(&ctrc_path);
+        }
+        self.cache.insert(path, module);
+        true
     }
 
     pub fn add_specific_module(&mut self, name: String, path: String) {

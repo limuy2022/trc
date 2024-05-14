@@ -1,4 +1,4 @@
-use std::ops::DivAssign;
+use std::{ops::DivAssign, path::Path};
 
 pub fn get_bit_num<T: PartialEq<i64> + DivAssign<i64>>(mut val: T) -> usize {
     if val == 0 {
@@ -46,4 +46,14 @@ pub fn get_next_check_char(
         }
         return Some(c);
     }
+}
+
+pub fn get_modified_time<P: AsRef<Path>>(path: P) -> Option<std::time::SystemTime> {
+    if let Ok(metadata) = std::fs::metadata(path) {
+        match metadata.modified() {
+            Ok(modified) => return Some(modified),
+            Err(_) => return None,
+        }
+    }
+    None
 }

@@ -1363,7 +1363,6 @@ dependencies = [
  "libloading",
  "logos",
  "num-bigint",
- "num-traits",
  "num_enum",
  "paste",
  "rand",

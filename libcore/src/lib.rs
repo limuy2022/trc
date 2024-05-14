@@ -1,4 +1,3 @@
-#![deny(warnings)]
 #![feature(register_tool)]
 #![register_tool(tarpaulin)]
 pub mod codegen;

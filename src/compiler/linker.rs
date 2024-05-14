@@ -81,8 +81,8 @@ mod test {
         let mut data2 = StaticData::new();
         data2.dll_module_should_loaded = vec!["test.dll2".to_string(), "test.dll".to_string()];
         data2.inst = vec![Inst::new_single(Opcode::LoadInt, 3)];
-        let mut datas = vec![data1, data2];
-        let data = link(datas.iter_mut());
+        let mut data = vec![data1, data2];
+        let data = link(data.iter_mut());
         assert_eq!(
             HashSet::<String>::from_iter(data.dll_module_should_loaded.into_iter()),
             HashSet::from_iter(vec!["test.dll2".to_string(), "test.dll".to_string()].into_iter())

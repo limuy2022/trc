@@ -39,6 +39,7 @@ impl InputSource {
 }
 
 /// 编译器的参数控制
+#[derive(Debug, Clone)]
 pub struct CompileOption {
     pub optimize: bool,
     pub inputsource: InputSource,
@@ -194,7 +195,6 @@ impl ValuePool {
 }
 
 pub struct CompilerImpl {
-    // to support read from stdin and file
     input: String,
     option: CompileOption,
     context: Context,
@@ -211,6 +211,7 @@ impl CompilerImpl {
     }
 }
 
+/// 编译器外部接口
 pub struct Compiler {
     pub compiler_impl: Rc<RefCell<CompilerImpl>>,
 }
@@ -247,6 +248,7 @@ impl Compiler {
         }
     }
 
+    /// 构造一个输入源为字符串的编译器
     pub fn new_string_compiler(option: CompileOption, source: impl Into<String>) -> Self {
         Compiler {
             compiler_impl: Rc::new(RefCell::new(CompilerImpl {

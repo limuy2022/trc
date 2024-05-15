@@ -5,11 +5,13 @@ use libcore::StaticData;
 use crate::{
     base::utils,
     cfg,
-    compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module},
+    compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module, Compiler, CompilerImpl},
 };
 use std::{
+    cell::RefCell,
     collections::{hash_map::IterMut, HashMap},
     path::PathBuf,
+    rc::Rc,
 };
 
 /// ast manager
@@ -56,25 +58,39 @@ impl<'a> ModuleManager<'a> {
         }
     }
 
-    pub fn add_module(
+    pub fn load_module(
         &mut self,
         path: impl Into<String>,
-        module: ModuleUnit<'a>,
+        // module: ModuleUnit<'a>,
+        father: Rc<RefCell<CompilerImpl>>,
     ) -> Result<(), AddModuleError> {
         let path = path.into();
         let source_file = PathBuf::from(path.clone());
-        let source_file_time;
         if !source_file.exists() {
             return Err(AddModuleError::ModuleSourceNotFound);
         }
-        source_file_time = utils::get_modified_time(&source_file);
+        let source_file_time = utils::get_modified_time(&source_file);
         let mut ctrc_path = PathBuf::from(cfg::BUILD_DIR_NAME).join(path.clone());
         ctrc_path.set_extension("ctrc");
+        // 检查是否已经编译过
         if ctrc_path.exists() {
+            // 检查编译时间
             let time_ctrc = utils::get_modified_time(&ctrc_path);
+            // 编译时间大于源文件时间，说明已经编译过
+            if time_ctrc > source_file_time {
+                return Ok(());
+            }
         }
-        self.cache.insert(path, module);
+        // 开始编译源文件
+        let mut submodule_option = father.borrow().option.clone();
+        submodule_option.file_save = ctrc_path;
+        let compiler = Compiler::new(submodule_option);
+        // self.cache.insert(path, module);
         Ok(())
+    }
+
+    pub fn add_module(&mut self, path: impl Into<String>, module: ModuleUnit<'a>) {
+        self.cache.insert(path.into(), module);
     }
 
     pub fn add_specific_module(&mut self, name: String, path: String) {

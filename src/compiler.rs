@@ -41,8 +41,11 @@ impl InputSource {
 /// 编译器的参数控制
 #[derive(Debug, Clone)]
 pub struct CompileOption {
+    /// 是否开启优化
     pub optimize: bool,
+    /// 输入源
     pub inputsource: InputSource,
+    /// ctrc文件保存地址
     pub file_save: PathBuf,
 }
 

@@ -23,11 +23,11 @@ use std::{
 
 #[derive(Default)]
 struct Cache {
-    pub(crate) intty_id: TyIdxTy,
-    pub(crate) floatty_id: TyIdxTy,
-    pub(crate) charty_id: TyIdxTy,
-    pub(crate) boolty_id: TyIdxTy,
-    pub(crate) strty_id: TyIdxTy,
+    pub(crate) intty_id: ClassIdxId,
+    pub(crate) floatty_id: ClassIdxId,
+    pub(crate) charty_id: ClassIdxId,
+    pub(crate) boolty_id: ClassIdxId,
+    pub(crate) strty_id: ClassIdxId,
 }
 
 impl Cache {
@@ -64,7 +64,7 @@ macro_rules! tmp_expe_function_gen {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     // 读取IOType检查
-                    let func_obj = self.self_scope.borrow().get_class_by_class_id(extend).expect(&format!("Class {} not found", extend));
+                    let func_obj = self.self_scope.borrow().get_class_by_class_id(ClassIdxId(extend)).expect(&format!("Class {} not found", extend));
                     let io_check = func_obj.get_override_func(match $accepted_token.convert_to_override() {
                         Some(v) => v,
                         None => {
@@ -501,9 +501,9 @@ impl<'a> ModuleUnit<'a> {
                         self.try_err(istry, msg)?
                     }
                     if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
-                        self.add_bycode(Opcode::CallNative, obj.buildin_id as Opidx);
+                        self.add_bycode(Opcode::CallNative, *(obj.buildin_id) as Opidx);
                     } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
-                        self.add_bycode(Opcode::CallCustom, obj.custom_id as Opidx);
+                        self.add_bycode(Opcode::CallCustom, *obj.custom_id as Opidx);
                     }
                     // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
                     match func_obj.get_io().return_type {

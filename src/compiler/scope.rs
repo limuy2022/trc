@@ -2,7 +2,9 @@ use super::{
     token::{ConstPoolIndexTy, Token},
     ValuePool,
 };
+use crate::impl_newtype_int;
 use libcore::*;
+use num_enum::Default;
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -31,7 +33,7 @@ impl CustomFunction {
             io,
             args_names,
             name: name.into(),
-            custom_id: 0,
+            custom_id: FuncBodyTy::default(),
         }
     }
 
@@ -116,9 +118,9 @@ impl ClassInterface for CustomType {
     }
 }
 
-pub type ClassIdxId = usize;
-pub type VarIdxTy = ScopeAllocIdTy;
-pub type FuncIdxTy = ScopeAllocIdTy;
+impl_newtype_int!(ClassIdxId, usize);
+impl_newtype_int!(VarIdxTy, usize);
+impl_newtype_int!(FuncIdxTy, usize);
 pub type FuncBodyTy = Vec<(Token, usize)>;
 
 #[derive(Clone, Debug, Copy)]
@@ -151,9 +153,9 @@ impl RootInfo {
         self.types_custom_store.get(&id).cloned()
     }
 
-    fn alloc_type_id(&mut self) -> Result<ScopeAllocIdTy, ScopeError> {
+    fn alloc_type_id(&mut self) -> Result<ClassIdxId, ScopeError> {
         let ret = self.types_id;
-        self.types_id += 1;
+        *self.types_id += 1;
         Ok(ret)
     }
 

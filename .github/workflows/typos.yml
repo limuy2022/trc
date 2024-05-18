@@ -1,4 +1,4 @@
-name: Rust
+name: Typos
 
 on:
   push:
@@ -6,12 +6,10 @@ on:
   pull_request:
     branches: ["master", "dev"]
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
-  build:
+  Typos:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: crate-ci/typos@v0.21.0
+      - name: typos-action
+        uses: crate-ci/typos@latest

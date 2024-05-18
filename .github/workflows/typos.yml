@@ -12,4 +12,4 @@ jobs:
 
     steps:
       - name: typos-action
-        uses: crate-ci/typos
+        uses: crate-ci/typos@v1.21.0

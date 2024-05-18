@@ -6,12 +6,18 @@ pub mod error;
 pub mod gc;
 pub mod libbasic;
 pub mod types;
+pub mod utils;
 
 pub use codegen::*;
 pub use dynadata::*;
 pub use error::*;
 pub use libbasic::*;
 pub use types::*;
+
+pub use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 pub const GET_LIB_FUNC_NAME: &str = "get_lib";
 pub const GET_STORAGE_FUNC_NAME: &str = "get_storage";

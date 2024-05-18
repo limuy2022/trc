@@ -9,6 +9,7 @@ downcast-rs = "1"
 libcore = { path = "../libcore" }
 collection_literals = "1"
 rust-i18n = "3"
+mimalloc = "0.1"
 
 [lib]
 name = "stdlib"

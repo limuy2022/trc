@@ -1,4 +1,5 @@
 use super::AstError;
+use super::ClassIdxId;
 use super::ModuleUnit;
 use crate::compiler::token::Token;
 use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
@@ -25,7 +26,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 获取对应类型在栈中的真实大小（内存对齐后）
-    pub fn get_ty_sz(&self, id: TyIdxTy) -> usize {
+    pub fn get_ty_sz(&self, id:ClassIdxId ) -> usize {
         match self.convert_id_to_vm_ty(id) {
             VmStackType::Int => intsz!(),
             VmStackType::Float => floatsz!(),
@@ -39,7 +40,7 @@ impl<'a> ModuleUnit<'a> {
     /// 将栈中的基本类型转换成Scope中的类型
     /// # Panic
     /// 如果不是基本类型，将会直接panic
-    pub fn convert_vm_ty_to_id(&self, ty: VmStackType) -> TyIdxTy {
+    pub fn convert_vm_ty_to_id(&self, ty: VmStackType) -> ClassIdxId {
         match ty {
             VmStackType::Int => self.cache.intty_id,
             VmStackType::Float => self.cache.floatty_id,
@@ -51,7 +52,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// make sure code safe,by using match instead of if
-    pub fn convert_id_to_vm_ty(&self, ty: TyIdxTy) -> VmStackType {
+    pub fn convert_id_to_vm_ty(&self, ty: ClassIdxId) -> VmStackType {
         if ty == self.cache.intty_id {
             return VmStackType::Int;
         }
@@ -71,14 +72,14 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 该函数通过类型的名字得到对应的Scope中的id
-    pub fn get_type_id(&self, ty_name: &str) -> Option<usize> {
+    pub fn get_type_id(&self, ty_name: &str) -> Option<ClassIdxId> {
         self.self_scope
             .borrow()
             .get_type_id_by_token(self.token_lexer.borrow_mut().get_constpool().name_pool[ty_name])
     }
 
     /// 解析一个类型名为id
-    pub fn lex_ty(&mut self, istry: bool) -> AstError<TyIdxTy> {
+    pub fn lex_ty(&mut self, istry: bool) -> AstError<ClassIdxId> {
         let t = self.get_token_checked_with_val(Token::ID(0))?;
         let ty = match self.self_scope.borrow().get_type_id_by_token(t) {
             None => self.try_err(
@@ -228,7 +229,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     // 生成EqWithoutPop指令
-    pub fn eq_without_pop(&self, ty: ScopeAllocIdTy) -> Opcode {
+    pub fn eq_without_pop(&self, ty: ClassIdxId) -> Opcode {
         match self.convert_id_to_vm_ty(ty) {
             VmStackType::Int => Opcode::EqIntWithoutPop,
             VmStackType::Float => Opcode::EqFloatWithoutPop,

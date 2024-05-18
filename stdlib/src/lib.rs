@@ -2,7 +2,11 @@ use collection_literals::collection;
 use derive::{def_module, def_module_export, trc_class, trc_method};
 pub use libcore;
 use libcore::libbasic::*;
+use mimalloc::MiMalloc;
 use std::collections::HashMap;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 pub mod algo;
 pub mod ds;

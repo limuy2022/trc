@@ -1,12 +1,11 @@
 //! ast的控制者，总管一个编译过程中的数据
 
-use libcore::StaticData;
-
 use crate::{
-    base::utils,
     cfg,
     compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module, Compiler, CompilerImpl},
 };
+use libcore::utils;
+use libcore::StaticData;
 use std::{
     cell::RefCell,
     collections::{hash_map::IterMut, HashMap},

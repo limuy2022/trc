@@ -2,7 +2,6 @@ use super::{
     token::{ConstPoolIndexTy, Token},
     ValuePool,
 };
-use crate::impl_newtype_int;
 use libcore::*;
 use num_enum::Default;
 use std::{
@@ -33,7 +32,7 @@ impl CustomFunction {
             io,
             args_names,
             name: name.into(),
-            custom_id: FuncBodyTy::default(),
+            custom_id: FuncIdxTy::default(),
         }
     }
 
@@ -53,7 +52,7 @@ impl FunctionInterface for CustomFunction {
         &mut self.io
     }
 
-    fn get_func_id(&self) -> usize {
+    fn get_func_id(&self) -> FuncIdxTy {
         self.custom_id
     }
 }
@@ -118,9 +117,6 @@ impl ClassInterface for CustomType {
     }
 }
 
-impl_newtype_int!(ClassIdxId, usize);
-impl_newtype_int!(VarIdxTy, usize);
-impl_newtype_int!(FuncIdxTy, usize);
 pub type FuncBodyTy = Vec<(Token, usize)>;
 
 #[derive(Clone, Debug, Copy)]
@@ -432,7 +428,7 @@ impl SymScope {
         mut f: RustFunction,
         tokenid: usize,
         fname: &str,
-        extern_function_id: usize,
+        extern_function_id: FuncIdxTy,
         storage: &ModuleStorage,
         pool: &ValuePool,
     ) -> Result<(), ErrorInfo> {

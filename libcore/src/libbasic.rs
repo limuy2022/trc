@@ -12,6 +12,11 @@ pub type RustlibFunc = fn(&mut DynaData) -> ErrorInfoResult<()>;
 
 pub type ScopeAllocIdTy = usize;
 pub type TypeAllowNull = Option<TyIdxTy>;
+// 定义函数的索引类型
+crate::impl_newtype_int!(FuncIdxTy, usize);
+crate::impl_newtype_int!(ClassIdxId, usize);
+crate::impl_newtype_int!(VarIdxTy, usize);
+
 pub type TyIdxTy = ScopeAllocIdTy;
 type ConstPoolIndexTy = usize;
 
@@ -19,7 +24,7 @@ type ConstPoolIndexTy = usize;
 pub struct IOType {
     // 如果有这个参数，代表在函数末尾是可变参数
     pub var_params: bool,
-    pub argvs_type: Vec<usize>,
+    pub argvs_type: Argvs,
     pub return_type: TypeAllowNull,
 }
 
@@ -51,11 +56,12 @@ pub enum OverrideOperations {
 }
 
 pub type ArgsNameTy = Vec<ConstPoolIndexTy>;
+pub type Argvs = Vec<ClassIdxId>;
 
 #[derive(Clone, Debug)]
 pub struct RustFunction {
     pub name: String,
-    pub buildin_id: usize,
+    pub buildin_id: FuncIdxTy,
     pub ptr: RustlibFunc,
     pub io: IOType,
 }
@@ -77,7 +83,11 @@ pub enum ArguError {
 }
 
 impl IOType {
-    pub fn new(argvs_type: Vec<usize>, return_type: TypeAllowNull, var_params: bool) -> IOType {
+    pub fn new(
+        argvs_type: Vec<ClassIdxId>,
+        return_type: TypeAllowNull,
+        var_params: bool,
+    ) -> IOType {
         IOType {
             argvs_type,
             return_type,
@@ -85,7 +95,7 @@ impl IOType {
         }
     }
 
-    pub fn check_argvs(&self, argvs: Vec<usize>) -> Result<(), ArguError> {
+    pub fn check_argvs(&self, argvs: Argvs) -> Result<(), ArguError> {
         if argvs.len() != self.argvs_type.len() {
             return Err(ArguError::NumNotMatch(ArgumentError::new(
                 self.argvs_type.len(),
@@ -98,8 +108,8 @@ impl IOType {
             // }
             if self.argvs_type[i.0] != *i.1 {
                 return Err(ArguError::TypeNotMatch(ArgumentError::new(
-                    self.argvs_type[i.0],
-                    *i.1,
+                    *self.argvs_type[i.0],
+                    **i.1,
                 )));
             }
         }
@@ -111,7 +121,7 @@ pub trait FunctionInterface: Downcast + Debug {
     fn get_io(&self) -> &IOType;
     fn get_name(&self) -> &str;
     fn get_io_mut(&mut self) -> &mut IOType;
-    fn get_func_id(&self) -> usize;
+    fn get_func_id(&self) -> FuncIdxTy;
 }
 
 impl_downcast!(FunctionInterface);
@@ -147,7 +157,7 @@ impl FunctionInterface for RustFunction {
         &mut self.io
     }
 
-    fn get_func_id(&self) -> usize {
+    fn get_func_id(&self) -> FuncIdxTy {
         self.buildin_id
     }
 }
@@ -255,9 +265,9 @@ impl ModuleStorage {
         }
     }
 
-    pub fn add_func(&mut self, f: RustlibFunc) -> usize {
+    pub fn add_func(&mut self, f: RustlibFunc) -> FuncIdxTy {
         self.func_table.push(f);
-        self.func_table.len() - 1
+        FuncIdxTy(self.func_table.len() - 1)
     }
 
     /// 获取类的个数

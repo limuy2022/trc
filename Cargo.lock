@@ -615,6 +615,7 @@ dependencies = [
  "colored",
  "derive",
  "downcast-rs",
+ "mimalloc",
  "num_enum",
  "paste",
  "rust-i18n",
@@ -640,6 +641,16 @@ checksum = "0c2a198fb6b0eada2a8df47933734e6d35d350665a33a3593d7164fa52c75c19"
 dependencies = [
  "cfg-if",
  "windows-targets 0.52.5",
+]
+
+[[package]]
+name = "libmimalloc-sys"
+version = "0.1.37"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81eb4061c0582dedea1cbc7aff2240300dd6982e0239d1c99e65c1dbf4a30ba7"
+dependencies = [
+ "cc",
+ "libc",
 ]
 
 [[package]]
@@ -720,6 +731,15 @@ name = "memchr"
 version = "2.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
+
+[[package]]
+name = "mimalloc"
+version = "0.1.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f41a2280ded0da56c8cf898babb86e8f10651a34adcfff190ae9a1159c6908d"
+dependencies = [
+ "libmimalloc-sys",
+]
 
 [[package]]
 name = "nibble_vec"
@@ -1190,6 +1210,7 @@ dependencies = [
  "derive",
  "downcast-rs",
  "libcore",
+ "mimalloc",
  "rust-i18n",
 ]
 
@@ -1362,6 +1383,7 @@ dependencies = [
  "libcore",
  "libloading",
  "logos",
+ "mimalloc",
  "num-bigint",
  "num_enum",
  "paste",

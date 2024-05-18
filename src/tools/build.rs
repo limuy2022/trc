@@ -1,4 +1,5 @@
-use crate::{base::utils::check_path_type, cfg, compiler};
+use crate::{cfg, compiler};
+use libcore::utils::check_path_type;
 use rust_i18n::t;
 use std::{path::PathBuf, process::exit};
 

@@ -26,7 +26,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 获取对应类型在栈中的真实大小（内存对齐后）
-    pub fn get_ty_sz(&self, id:ClassIdxId ) -> usize {
+    pub fn get_ty_sz(&self, id: ClassIdxId) -> usize {
         match self.convert_id_to_vm_ty(id) {
             VmStackType::Int => intsz!(),
             VmStackType::Float => floatsz!(),
@@ -103,9 +103,9 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// token不正确，报出一个错误
-    pub fn gen_unexpected_token_error<T>(&mut self, unexpcted: Token) -> AstError<T> {
+    pub fn gen_unexpected_token_error<T>(&mut self, unexpected: Token) -> AstError<T> {
         self.gen_error(ErrorInfo::new(
-            t!(UNEXPECTED_TOKEN, "0" = unexpcted),
+            t!(UNEXPECTED_TOKEN, "0" = unexpected),
             t!(SYNTAX_ERROR),
         ))
     }

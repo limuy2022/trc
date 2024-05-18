@@ -6,7 +6,7 @@ use std::fmt::{Debug, Display};
 pub const SYNTAX_ERROR: &str = "compiler.SyntaxError";
 pub const OPERATOR_ERROR: &str = "compiler.OperatorError";
 pub const VM_ERROR: &str = "compiler.VmError";
-pub const ZERO_DIVSION_ERROR: &str = "compiler.ZeroDivisionError";
+pub const ZERO_DIVISION_ERROR: &str = "compiler.ZeroDivisionError";
 pub const NUMBER_OVER_FLOW: &str = "compiler.NumberOverFlowError";
 pub const SYMBOL_ERROR: &str = "compiler.SymbolError";
 pub const TYPE_ERROR: &str = "compiler.TypeError";
@@ -18,7 +18,7 @@ pub const STRING_WITHOUT_END: &str = "compiler.syntaxerror.str_error";
 pub const CHAR_FORMAT: &str = "compiler.syntaxerror.char_error";
 pub const EXPECTED_EXPR: &str = "compiler.syntaxerror.expected_expr";
 pub const UNMATCHED_BRACE: &str = "compiler.syntaxerror.unmatched";
-pub const OPERATOR_IS_NOT_SUPPORT: &str = "compiler.typerror.operator_unsupport";
+pub const OPERATOR_IS_NOT_SUPPORT: &str = "compiler.typerror.operator_unsupported";
 pub const VM_DATA_NUMBER: &str = "vm.vmerror.data_num_error";
 pub const VM_FRAME_EMPTY: &str = "vm.vmerror.stack_frame_empty";
 pub const ZERO_DIV: &str = "vm.zerodivisionerror.zerodiv";
@@ -105,7 +105,7 @@ impl Error for RuntimeError {}
 impl Display for RuntimeError {
     /// report error in vm or compiler
     /// we will translate the error type to gettextrs
-    /// but you should translate the error messgae by caller
+    /// but you should translate the error message by caller
     #[tarpaulin::skip]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // for lightfakeerror

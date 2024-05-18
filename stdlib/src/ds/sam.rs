@@ -42,7 +42,7 @@ impl Sam {
         }
     }
 
-    pub fn extend_internel(s: &mut Sam, c: char) {
+    pub fn extend_internal(s: &mut Sam, c: char) {
         // 后缀自动机最后一个节点
         let mut p = s.last;
         // 新节点，创造是因为包括最后一个字符串之后一定生成了一个新的等价类，也就是整个字符串，而它的长度一定等于上一个节点的长度加一
@@ -99,7 +99,7 @@ impl Default for Sam {
 impl Sam {
     #[trc_function(method = true)]
     pub fn extend(s: Sam, c: TrcChar) {
-        Self::extend_internel(s, c._value);
+        Self::extend_internal(s, c._value);
     }
 }
 
@@ -122,7 +122,7 @@ mod tests {
     fn test_sam_easy() {
         let mut sam = Sam::new();
         for c in "abab".chars() {
-            Sam::extend_internel(&mut sam, c);
+            Sam::extend_internal(&mut sam, c);
         }
         assert_eq!(sam._states.len(), 5);
     }
@@ -131,7 +131,7 @@ mod tests {
     fn test_sam_easy2() {
         let mut sam = Sam::new();
         for c in "aabaa".chars() {
-            Sam::extend_internel(&mut sam, c);
+            Sam::extend_internal(&mut sam, c);
         }
         assert_eq!(sam._states.len(), 6);
     }
@@ -141,7 +141,7 @@ mod tests {
         let mut sam = Sam::new();
         let str1 = "jdoasjdbasdhasjhdsjashdjsahshdhajdhsajkhdajshdsjadsjgfajshdasjfgjashdasjkdhudhwuidhsahsjkdhjadzxbjxbcnnxmbfdhbgsdahjkshdjbasjvahfghghgasjkdhasjdbdkhvfadhvfahdasjkhdasjkgdasjkbjkbchkdfgjhkasdghasjkdhasjdbfasjkgaskjdhadkjfgashk";
         for c in str1.chars() {
-            Sam::extend_internel(&mut sam, c);
+            Sam::extend_internal(&mut sam, c);
         }
         assert_eq!(sam._states.len(), 334);
     }

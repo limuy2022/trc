@@ -53,7 +53,7 @@ pub fn exact_div_int(a: TrcIntInternal, b: TrcIntInternal) -> Result<TrcIntInter
     if b == 0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),
-            t!(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIVISION_ERROR),
         ));
     }
     Ok(a / b)
@@ -63,7 +63,7 @@ pub fn div_int(a: i64, b: i64) -> Result<f64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),
-            t!(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIVISION_ERROR),
         ));
     }
     Ok(a as f64 / b as f64)
@@ -73,7 +73,7 @@ pub fn mod_int(a: i64, b: i64) -> Result<i64, ErrorInfo> {
     if b == 0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),
-            t!(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIVISION_ERROR),
         ));
     }
     Ok(a % b)

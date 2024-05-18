@@ -131,12 +131,12 @@ pub trait ClassInterface: Downcast + Sync + Send + Debug + Display {
 
     fn has_attr(&self, attrname: usize) -> bool;
 
-    fn get_id(&self) -> usize;
+    fn get_id(&self) -> ClassIdxId;
 
     fn get_name(&self) -> &str;
 
     fn is_any(&self) -> bool {
-        self.get_id() == 0
+        *self.get_id() == 0
     }
 
     fn get_override_func(&self, oper_token: OverrideOperations) -> Option<&OverrideWrapper>;
@@ -179,7 +179,7 @@ pub struct RustClass {
     pub members: HashMap<String, String>,
     pub functions: HashMap<String, RustFunction>,
     pub overrides: HashMap<OverrideOperations, OverrideWrapper>,
-    pub id: usize,
+    pub id: ClassIdxId,
     pub name: &'static str,
     pub id_to_var: HashMap<ConstPoolIndexTy, TyIdxTy>,
 }
@@ -192,12 +192,12 @@ impl RustClass {
         functions: Option<HashMap<String, RustFunction>>,
         overrides: Option<HashMap<OverrideOperations, OverrideWrapper>>,
         storage: &mut ModuleStorage,
-    ) -> usize {
+    ) -> ClassIdxId {
         let ret = RustClass {
             members,
             functions: functions.unwrap_or_default(),
             overrides: overrides.unwrap_or_default(),
-            id: storage.class_table.len(),
+            id: ClassIdxId(storage.class_table.len()),
             name,
             ..Default::default()
         };
@@ -227,7 +227,7 @@ impl ClassInterface for RustClass {
         self.id_to_var.contains_key(&attrname)
     }
 
-    fn get_id(&self) -> usize {
+    fn get_id(&self) -> ClassIdxId {
         self.id
     }
 
@@ -275,9 +275,10 @@ impl ModuleStorage {
         self.class_table.len()
     }
 
-    pub fn add_class(&mut self, c: RustClass) -> usize {
+    /// 添加类,获取新添加类的ID
+    pub fn add_class(&mut self, c: RustClass) -> ClassIdxId {
         self.class_table.push(c);
-        self.class_table.len() - 1
+        ClassIdxId(self.class_table.len() - 1)
     }
 
     pub fn access_func(&self, id: usize) -> RustlibFunc {

@@ -47,7 +47,7 @@ pub fn div_float(a: f64, b: f64) -> Result<f64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),
-            t!(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIVISION_ERROR),
         ));
     }
     Ok(a / b)
@@ -57,7 +57,7 @@ pub fn exact_div_float(a: f64, b: f64) -> Result<i64, ErrorInfo> {
     if b == 0.0 {
         return Err(ErrorInfo::new(
             t!(ZERO_DIV, "0" = a),
-            t!(ZERO_DIVSION_ERROR),
+            t!(ZERO_DIVISION_ERROR),
         ));
     }
     Ok((a / b).floor() as i64)

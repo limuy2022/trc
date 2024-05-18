@@ -1,5 +1,5 @@
 [tshell]
-welcome = "Welcome to tshell.Type help() to get more infomation"
+welcome = "Welcome to tshell.Type help() to get more information"
 
 [common]
 cannot_open_file = "Cannot open %{filename}"
@@ -46,7 +46,7 @@ void_argu = "argument cannot be 'void'"
 unclosed_format = "unmatched {"
 
 [compiler.typerror]
-operator_unsupport = "operator %{0} is not supported for type %{1}"
+operator_unsupported = "operator %{0} is not supported for type %{1}"
 type_not_same = "Type %{0} and %{1} are not the same"
 if_while_accept_bool = "if/while accept only bool type"
 return_type = "function return type should be %{0}, but given %{1}"

@@ -162,7 +162,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
     // 因为很可能某个函数的参数就是标准库中的某个类型，所以我们需要先将类型导入到class_table中
     let ret = quote!(#input
         impl #name {
-            pub fn init_info(storage: Option<&mut ModuleStorage>) -> libcore::ClassIdxTy {
+            pub fn init_info(storage: Option<&mut ModuleStorage>) -> ClassIdxId {
                 use std::collections::hash_map::HashMap;
                 static CLASS_ID: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
                 *CLASS_ID.get_or_init(|| {

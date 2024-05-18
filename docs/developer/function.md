@@ -12,7 +12,7 @@ The order you read is opposite to the order you define.
 
 You can define an interface class and use it to define your class.
 
-by this way,we call the fuction by read the vtable.
+by this way,we call the function by read the vtable.
 
 We will store the functions in a table,no matter what is the kind of your function.
 

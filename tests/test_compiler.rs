@@ -51,19 +51,19 @@ fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
         .buildin_id as Opidx
 }
 
-const SEPCIAL_FUNC_ID: Opidx = ARG_WRONG;
+const SPECIAL_FUNC_ID: Opidx = ARG_WRONG;
 
-fn opcode_assert_eq(expect: Vec<Inst>, acual: Vec<Inst>) {
-    for (counter, (i, j)) in expect.iter().zip(acual.iter()).enumerate() {
+fn opcode_assert_eq(expect: Vec<Inst>, actual: Vec<Inst>) {
+    for (counter, (i, j)) in expect.iter().zip(actual.iter()).enumerate() {
         assert_eq!(
             i.opcode,
             j.opcode,
             "\nnum {}, expected:{:?}\nactual:{:?}",
             counter + 1,
             expect,
-            acual
+            actual
         );
-        if i.opcode == Opcode::CallNative && j.operand.0 == SEPCIAL_FUNC_ID {
+        if i.opcode == Opcode::CallNative && j.operand.0 == SPECIAL_FUNC_ID {
             continue;
         }
         assert_eq!(
@@ -72,7 +72,7 @@ fn opcode_assert_eq(expect: Vec<Inst>, acual: Vec<Inst>) {
             "\nnum {}, expected:{:?}\nactual:{:?}",
             counter + 1,
             expect,
-            acual
+            actual
         );
     }
 }
@@ -637,7 +637,7 @@ print("{}", math::sin(9.8))
         vec![
             Inst::new_single(Opcode::LoadString, 1),
             Inst::new_single(Opcode::LoadFloat, 0),
-            Inst::new_single(Opcode::CallNative, SEPCIAL_FUNC_ID),
+            Inst::new_single(Opcode::CallNative, SPECIAL_FUNC_ID),
             Inst::new_single(Opcode::MoveFloat, 0),
             Inst::new_single(Opcode::LoadInt, 1),
             Inst::new_single(Opcode::CallNative, fid),

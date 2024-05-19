@@ -194,7 +194,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
                 storage.access_class_mut(Self::export_info()).name = name;
             }
 
-            pub fn export_info() -> usize {
+            pub fn export_info() -> ClassIdxId {
                 Self::init_info(None)
             }
         }

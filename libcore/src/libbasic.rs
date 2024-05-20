@@ -281,20 +281,20 @@ impl ModuleStorage {
         ClassIdxId(self.class_table.len() - 1)
     }
 
-    pub fn access_func(&self, id: usize) -> RustlibFunc {
-        self.func_table[id]
+    pub fn access_func(&self, id: FuncIdxTy) -> RustlibFunc {
+        self.func_table[*id]
     }
 
-    pub fn access_class(&self, id: usize) -> &RustClass {
-        &self.class_table[id]
+    pub fn access_class(&self, id: FuncIdxTy) -> &RustClass {
+        &self.class_table[*id]
     }
 
     pub fn func_table(&self) -> &[RustlibFunc] {
         &self.func_table
     }
 
-    pub fn access_class_mut(&mut self, idx: usize) -> &mut RustClass {
-        &mut self.class_table[idx]
+    pub fn access_class_mut(&mut self, idx: ClassIdxId) -> &mut RustClass {
+        &mut self.class_table[*idx]
     }
 }
 
@@ -315,6 +315,8 @@ impl RustFunction {
     }
 }
 
+pub type Classes = HashMap<String, ClassIdxId>;
+
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Module {
@@ -323,7 +325,7 @@ pub struct Module {
     functions: Vec<(String, RustFunction)>,
     name_map_index: HashMap<String, usize>,
     // class name 和class id
-    classes: HashMap<String, usize>,
+    classes: Classes,
     consts: HashMap<String, String>,
 }
 
@@ -332,7 +334,7 @@ impl Module {
         name: impl Into<String>,
         sub_modules: HashMap<String, Module>,
         functions: Vec<(String, RustFunction)>,
-        classes: HashMap<String, usize>,
+        classes: Classes,
         consts: HashMap<String, String>,
     ) -> Module {
         let mut ret = Module {

@@ -16,6 +16,7 @@ use rust_i18n::t;
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
+    iter::Cloned,
     mem::swap,
     path::PathBuf,
     rc::Rc,
@@ -44,11 +45,12 @@ pub struct ModuleUnit<'a> {
     pub self_scope: Rc<RefCell<SymScope>>,
     process_info: lexprocess::LexProcess,
     cache: Cache,
-    // record if the first func is defined
+    /// record if the first func is defined
     first_func: bool,
-    // 对哈希表去重，并且记录每个dll的函数起始索引
+    /// 对哈希表去重，并且记录每个dll的函数起始索引
     modules_dll_dup: HashSet<String>,
     modules_info: HashMap<String, usize>,
+    /// 引用的dll
     modules_dll: Vec<String>,
     module_manager: Rc<RefCell<ModuleManager<'a>>>,
     compiler_data: Rc<RefCell<CompilerImpl>>,
@@ -58,13 +60,13 @@ type AstError<T> = RuntimeResult<T>;
 
 macro_rules! tmp_expe_function_gen {
     ($tmpfuncname:ident, $next_item_func:ident, $($accepted_token:path),*) => {
-        fn $tmpfuncname(&mut self, istry: bool, extend: usize) -> AstError<()> {
+        fn $tmpfuncname(&mut self, istry: bool, extend: ClassIdxId) -> AstError<()> {
             let next_sym = self.token_lexer.borrow_mut().next_token()?;
             match next_sym {
                 $($accepted_token => {
                     self.$next_item_func(istry)?;
                     // 读取IOType检查
-                    let func_obj = self.self_scope.borrow().get_class_by_class_id(ClassIdxId(extend)).expect(&format!("Class {} not found", extend));
+                    let func_obj = self.self_scope.borrow().get_class_by_class_id(extend).expect(&format!("Class {} not found", *extend));
                     let io_check = func_obj.get_override_func(match $accepted_token.convert_to_override() {
                         Some(v) => v,
                         None => {
@@ -373,7 +375,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 解析出函数参数
-    fn opt_args(&mut self, lex_func_obj: &Rc<dyn FunctionInterface>) -> AstError<Vec<usize>> {
+    fn opt_args(&mut self, lex_func_obj: &Rc<dyn FunctionInterface>) -> AstError<Vec<ClassIdxId>> {
         let mut ret = vec![];
         let mut var_params_num = 0;
         let io_tmp = lex_func_obj.get_io();
@@ -426,7 +428,7 @@ impl<'a> ModuleUnit<'a> {
         }
     }
 
-    fn load_var_opcode(&mut self, ty: TyIdxTy) -> (Opcode, usize) {
+    fn load_var_opcode(&mut self, ty: ClassIdxId) -> (Opcode, usize) {
         let ret_opcode = if self.process_info.is_global {
             Opcode::LoadGlobalVar
         } else {
@@ -682,7 +684,7 @@ impl<'a> ModuleUnit<'a> {
 
     fn lex_case(
         &mut self,
-        expected_ty: ScopeAllocIdTy,
+        expected_ty: ClassIdxId,
         mut add_expr_addr: impl FnMut(usize),
         mut add_case_final_addr: impl FnMut(usize),
     ) -> AstError<bool> {
@@ -784,7 +786,7 @@ impl<'a> ModuleUnit<'a> {
         // lex args
         self.get_token_checked(Token::LeftSmallBrace)?;
         let mut argname: ArgsNameTy = vec![];
-        let mut ty_list: Vec<TyIdxTy> = vec![];
+        let mut ty_list: Vec<ClassIdxId> = vec![];
         loop {
             let t = self.next_token()?;
             if t == Token::RightSmallBrace {
@@ -885,8 +887,9 @@ impl<'a> ModuleUnit<'a> {
         self.self_scope.borrow_mut().in_class = true;
         let name = self.get_token_checked_with_val(Token::ID(0))?;
         let name_id = self.insert_sym_with_error(name)?;
+        // FIXME:BUG!CLASS ID SHOULD BE ALLOCATED
         let mut class_obj = CustomType::new(
-            name_id,
+            ClassIdxId(name_id),
             self.token_lexer.borrow_mut().get_constpool().id_name[name].clone(),
         );
         self.get_token_checked(Token::LeftBigBrace)?;

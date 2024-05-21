@@ -63,7 +63,7 @@ pub struct CustomType {
     funcs: Vec<CustomFunction>,
     pub name: ClassIdxId,
     pub origin_name: String,
-    pub id_to_attr: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
+    pub id_to_attr: HashMap<ConstPoolIndexTy, ClassIdxId>,
 }
 
 impl Display for CustomType {
@@ -81,7 +81,7 @@ impl CustomType {
         }
     }
 
-    pub fn add_attr(&mut self, attrname: ScopeAllocIdTy, attrty: TyIdxTy) -> Option<TyIdxTy> {
+    pub fn add_attr(&mut self, attrname: ScopeAllocIdTy, attrty: ClassIdxId) -> Option<ClassIdxId> {
         self.id_to_attr.insert(attrname, attrty)
     }
 
@@ -121,7 +121,7 @@ pub type FuncBodyTy = Vec<(Token, usize)>;
 
 #[derive(Clone, Debug, Copy)]
 pub struct VarInfo {
-    pub ty: TyIdxTy,
+    pub ty: ClassIdxId,
     pub var_idx: usize,
     pub addr: usize,
 }

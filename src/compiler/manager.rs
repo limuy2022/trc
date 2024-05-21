@@ -4,8 +4,8 @@ use crate::{
     cfg,
     compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module, Compiler, CompilerImpl},
 };
-use libcore::utils;
 use libcore::StaticData;
+use libcore::{utils, FuncIdxTy};
 use std::{
     cell::RefCell,
     collections::{hash_map::IterMut, HashMap},
@@ -112,16 +112,16 @@ impl<'a> ModuleManager<'a> {
         // 对应模块不存在，返回None
     }
 
-    pub fn alloc_custom_function_id(&mut self) -> usize {
+    pub fn alloc_custom_function_id(&mut self) -> FuncIdxTy {
         let ret = self.global_custom_function_id;
         self.global_custom_function_id += 1;
-        ret
+        FuncIdxTy(ret)
     }
 
-    pub fn alloc_extern_function_id(&mut self) -> usize {
+    pub fn alloc_extern_function_id(&mut self) -> FuncIdxTy {
         let ret = self.global_extern_function_id;
         self.global_extern_function_id += 1;
-        ret
+        FuncIdxTy(ret)
     }
 
     /// 执行优化

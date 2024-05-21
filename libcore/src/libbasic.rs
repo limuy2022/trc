@@ -11,7 +11,7 @@ use super::{codegen::Opcode, error::*};
 pub type RustlibFunc = fn(&mut DynaData) -> ErrorInfoResult<()>;
 
 pub type ScopeAllocIdTy = usize;
-pub type TypeAllowNull = Option<TyIdxTy>;
+pub type TypeAllowNull = Option<ClassIdxId>;
 // 定义函数的索引类型
 crate::impl_newtype_int!(FuncIdxTy, usize);
 crate::impl_newtype_int!(ClassIdxId, usize);
@@ -285,7 +285,7 @@ impl ModuleStorage {
         self.func_table[*id]
     }
 
-    pub fn access_class(&self, id: FuncIdxTy) -> &RustClass {
+    pub fn access_class(&self, id: ClassIdxId) -> &RustClass {
         &self.class_table[*id]
     }
 
@@ -393,7 +393,7 @@ impl Module {
         &self.functions
     }
 
-    pub fn classes(&self) -> &HashMap<String, usize> {
+    pub fn classes(&self) -> &Classes {
         &self.classes
     }
 

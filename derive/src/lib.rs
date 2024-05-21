@@ -164,7 +164,7 @@ pub fn trc_class(_: TokenStream, input: TokenStream) -> TokenStream {
         impl #name {
             pub fn init_info(storage: Option<&mut ModuleStorage>) -> ClassIdxId {
                 use std::collections::hash_map::HashMap;
-                static CLASS_ID: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+                static CLASS_ID: std::sync::OnceLock<ClassIdxId> = std::sync::OnceLock::new();
                 *CLASS_ID.get_or_init(|| {
                     let mut members = HashMap::new();
                     #(

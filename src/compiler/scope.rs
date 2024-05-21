@@ -61,7 +61,7 @@ impl FunctionInterface for CustomFunction {
 #[derive(Clone, Debug, Default)]
 pub struct CustomType {
     funcs: Vec<CustomFunction>,
-    pub name: usize,
+    pub name: ClassIdxId,
     pub origin_name: String,
     pub id_to_attr: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
 }
@@ -73,7 +73,7 @@ impl Display for CustomType {
 }
 
 impl CustomType {
-    pub fn new(name: usize, origin_name: impl Into<String>) -> Self {
+    pub fn new(name: ClassIdxId, origin_name: impl Into<String>) -> Self {
         Self {
             name,
             origin_name: origin_name.into(),
@@ -104,7 +104,7 @@ impl ClassInterface for CustomType {
         self.id_to_attr.contains_key(&attrname)
     }
 
-    fn get_id(&self) -> usize {
+    fn get_id(&self) -> ClassIdxId {
         self.name
     }
 
@@ -340,7 +340,7 @@ impl SymScope {
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);
-            self.add_extern_func(idx, prev_func_base + fobj.buildin_id, fobj);
+            self.add_extern_func(idx, FuncIdxTy(prev_func_base + *fobj.buildin_id), fobj);
         }
         Ok(())
     }
@@ -496,7 +496,7 @@ impl SymScope {
         }
     }
 
-    fn alloc_type_id(&mut self, idx: ScopeAllocIdTy) -> Result<ScopeAllocIdTy, ScopeError> {
+    fn alloc_type_id(&mut self, idx: ScopeAllocIdTy) -> Result<ClassIdxId, ScopeError> {
         let ret = match &mut self.prev_scope {
             RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().alloc_type_id(idx),
             RootOnlyInfo::Root(data) => data.alloc_type_id(),

@@ -195,10 +195,19 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 通过Scope中的ID获取类型名
-    pub fn get_ty_name(&mut self, type_name: TyIdxTy) -> String {
+    pub fn get_ty_name(&mut self, type_name: ScopeAllocIdTy) -> String {
         self.self_scope
             .borrow()
             .get_class(type_name)
+            .unwrap()
+            .get_name()
+            .to_string()
+    }
+
+    pub fn get_ty_name_by_class_id(&mut self, type_name: ClassIdxId) -> String {
+        self.self_scope
+            .borrow()
+            .get_class_by_class_id(type_name)
             .unwrap()
             .get_name()
             .to_string()

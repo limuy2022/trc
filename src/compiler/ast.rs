@@ -16,7 +16,6 @@ use rust_i18n::t;
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
-    iter::Cloned,
     mem::swap,
     path::PathBuf,
     rc::Rc,
@@ -49,6 +48,7 @@ pub struct ModuleUnit<'a> {
     first_func: bool,
     /// 对哈希表去重，并且记录每个dll的函数起始索引
     modules_dll_dup: HashSet<String>,
+    /// 每个模块的函数起始点
     modules_info: HashMap<String, usize>,
     /// 引用的dll
     modules_dll: Vec<String>,
@@ -1019,8 +1019,9 @@ impl<'a> ModuleUnit<'a> {
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id(func_item.get_name().to_owned());
-                            let func_extern_id =
-                                func_item.buildin_id + self.modules_info[&import_file_path];
+                            let func_extern_id = FuncIdxTy(
+                                *func_item.buildin_id + self.modules_info[&import_file_path],
+                            );
                             // println!("{}", func_extern_id);
                             let name = func_item.get_name().to_owned();
                             if let Err(e) = self.self_scope.borrow_mut().import_extern_func(
@@ -1063,7 +1064,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 生成修改变量的指令
-    fn modify_var(&mut self, varty: TyIdxTy, var_addr: usize, is_global: bool) {
+    fn modify_var(&mut self, varty: ClassIdxId, var_addr: usize, is_global: bool) {
         let objsz = self.get_ty_sz(varty);
         if !is_global {
             self.add_double_bycode(Opcode::StoreLocal, var_addr as Opidx, objsz as Opidx);
@@ -1236,8 +1237,8 @@ impl<'a> ModuleUnit<'a> {
                         self.expr(true)?;
                         let actual_ty = self.process_info.pop_last_ty().unwrap();
                         if ty != actual_ty {
-                            let s1 = self.get_ty_name(ty);
-                            let s2 = self.get_ty_name(actual_ty);
+                            let s1 = self.get_ty_name_by_class_id(ty);
+                            let s2 = self.get_ty_name_by_class_id(actual_ty);
                             return self.gen_error(ErrorInfo::new(
                                 t!(RETURN_TYPE_ERROR, "0" = s1, "1" = s2),
                                 t!(TYPE_ERROR),
@@ -1247,7 +1248,7 @@ impl<'a> ModuleUnit<'a> {
                     None => {
                         if self.expr(true).is_ok() {
                             let actual_ty = self.process_info.pop_last_ty().unwrap();
-                            let name = self.get_ty_name(actual_ty);
+                            let name = self.get_ty_name_by_class_id(actual_ty);
                             return self.gen_error(ErrorInfo::new(
                                 t!(RETURN_TYPE_ERROR, "0" = "void", "1" = name),
                                 t!(TYPE_ERROR),

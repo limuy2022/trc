@@ -41,7 +41,7 @@ fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
         .borrow()
         .get_sym(idstr)
         .expect("sym not found");
-    scope
+    *scope
         .get_scope()
         .borrow()
         .get_function(symid)

@@ -3,7 +3,6 @@ use super::{
     ValuePool,
 };
 use libcore::*;
-use num_enum::Default;
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -127,7 +126,7 @@ pub struct VarInfo {
 }
 
 impl VarInfo {
-    pub fn new(ty: TyIdxTy, var_idx: usize, addr: usize) -> Self {
+    pub fn new(ty: ClassIdxId, var_idx: usize, addr: usize) -> Self {
         Self { ty, var_idx, addr }
     }
 }
@@ -440,14 +439,19 @@ impl SymScope {
     }
 
     /// 返回变量的索引和内存地址
-    pub fn add_var(&mut self, id: ScopeAllocIdTy, ty: TyIdxTy, var_sz: usize) -> (VarIdxTy, usize) {
+    pub fn add_var(
+        &mut self,
+        id: ScopeAllocIdTy,
+        ty: ClassIdxId,
+        var_sz: usize,
+    ) -> (VarIdxTy, usize) {
         let ret_addr = self.var_sz;
         self.vars
             .insert(id, VarInfo::new(ty, self.vars_id, ret_addr));
         let ret = self.vars_id;
         self.vars_id += 1;
         self.var_sz += var_sz;
-        (ret, ret_addr)
+        (VarIdxTy(ret), ret_addr)
     }
 
     pub fn get_var_table_sz(&self) -> usize {

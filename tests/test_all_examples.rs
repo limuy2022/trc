@@ -1,8 +1,8 @@
 //! this test all examples files and check them output
 
 use assert_cmd::Command;
+use libcore::utils::get_next_check_char;
 use std::fs::read_to_string;
-use trc::base::utils::get_next_check_char;
 
 /// 检查迭代器是否剩下的所有字符都满足某个条件
 fn check_whether_end(iter: &mut impl Iterator<Item = char>, condit: impl Fn(char) -> bool) -> bool {

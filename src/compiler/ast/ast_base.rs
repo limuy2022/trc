@@ -195,7 +195,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 通过Scope中的ID获取类型名
-    pub fn get_ty_name(&mut self, type_name: ScopeAllocIdTy) -> String {
+    pub fn get_ty_name(&mut self, type_name: ScopeAllocId) -> String {
         self.self_scope
             .borrow()
             .get_class(type_name)
@@ -224,7 +224,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 添加一个符号，在符号冲突的时候报出错误
-    pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocIdTy> {
+    pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocId> {
         match self.self_scope.borrow_mut().insert_sym(name) {
             Some(v) => Ok(v),
             None => self.gen_error(ErrorInfo::new(

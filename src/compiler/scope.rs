@@ -15,7 +15,7 @@ use std::{
 pub struct CustomFunction {
     io: IOType,
     pub args_names: ArgsNameTy,
-    pub custom_id: FuncIdxTy,
+    pub custom_id: FuncIdx,
     name: String,
 }
 
@@ -31,7 +31,7 @@ impl CustomFunction {
             io,
             args_names,
             name: name.into(),
-            custom_id: FuncIdxTy::default(),
+            custom_id: FuncIdx::default(),
         }
     }
 
@@ -51,7 +51,7 @@ impl FunctionInterface for CustomFunction {
         &mut self.io
     }
 
-    fn get_func_id(&self) -> FuncIdxTy {
+    fn get_func_id(&self) -> FuncIdx {
         self.custom_id
     }
 }
@@ -80,7 +80,7 @@ impl CustomType {
         }
     }
 
-    pub fn add_attr(&mut self, attrname: ScopeAllocIdTy, attrty: ClassIdxId) -> Option<ClassIdxId> {
+    pub fn add_attr(&mut self, attrname: ScopeAllocId, attrty: ClassIdxId) -> Option<ClassIdxId> {
         self.id_to_attr.insert(attrname, attrty)
     }
 
@@ -197,20 +197,20 @@ pub struct SymScope {
     // 父作用域
     pub prev_scope: RootOnlyInfo<Rc<RefCell<SymScope>>>,
     // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
-    sym_map: HashMap<ConstPoolIndexTy, ScopeAllocIdTy>,
+    sym_map: HashMap<ConstPoolIndexTy, ScopeAllocId>,
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
-    scope_sym_id: ScopeAllocIdTy,
+    scope_sym_id: ScopeAllocId,
     // ID到class id的映射
-    types: HashMap<ScopeAllocIdTy, ClassIdxId>,
+    types: HashMap<ScopeAllocId, ClassIdxId>,
     // ID到函数的映射
-    funcs: HashMap<ScopeAllocIdTy, Rc<dyn FunctionInterface>>,
+    funcs: HashMap<ScopeAllocId, Rc<dyn FunctionInterface>>,
     // id到变量类型的映射
-    vars: HashMap<ScopeAllocIdTy, VarInfo>,
+    vars: HashMap<ScopeAllocId, VarInfo>,
     // 由token id到模块的映射
     // modules: HashMap<ScopeAllocIdTy, &'static Stdlib>,
-    vars_id: ScopeAllocIdTy,
+    vars_id: ScopeAllocId,
     // 作用域暂时储存的函数token
-    pub funcs_temp_store: Vec<(ScopeAllocIdTy, Vec<(Token, usize)>)>,
+    pub funcs_temp_store: Vec<(ScopeAllocId, Vec<(Token, usize)>)>,
     // 计算当前需要最少多大的空间来保存变量
     pub var_sz: usize,
     // 保存当前环境下的function io，global环境无
@@ -222,7 +222,7 @@ pub struct SymScope {
     pub in_loop: bool,
     pub in_class: bool,
     pub is_pub: bool,
-    imported_modules: HashMap<ScopeAllocIdTy, Rc<RefCell<SymScope>>>,
+    imported_modules: HashMap<ScopeAllocId, Rc<RefCell<SymScope>>>,
     root_scope: Option<Weak<RefCell<SymScope>>>,
 }
 
@@ -256,8 +256,8 @@ impl SymScope {
 
     pub fn add_custom_function(
         &mut self,
-        id: ScopeAllocIdTy,
-        function_id: FuncIdxTy,
+        id: ScopeAllocId,
+        function_id: FuncIdx,
         mut f: CustomFunction,
         body: Vec<(Token, usize)>,
     ) {
@@ -270,14 +270,14 @@ impl SymScope {
         &mut self,
         sym_name: ConstPoolIndexTy,
         str_name: &str,
-    ) -> Result<ScopeAllocIdTy, ErrorInfo> {
+    ) -> Result<ScopeAllocId, ErrorInfo> {
         match self.insert_sym(sym_name) {
             Some(v) => Ok(v),
             None => Err(symbol_redefined(str_name)),
         }
     }
 
-    pub fn add_imported_module(&mut self, id: ScopeAllocIdTy, son_modules: Rc<RefCell<SymScope>>) {
+    pub fn add_imported_module(&mut self, id: ScopeAllocId, son_modules: Rc<RefCell<SymScope>>) {
         self.imported_modules.insert(id, son_modules);
     }
 
@@ -339,12 +339,12 @@ impl SymScope {
             // 在将类型全部添加进去之后，需要重新改写函数和类的输入和输出参数
             let mut fobj = i.1.clone();
             self.fix_func(fobj.get_io_mut(), libstorage, const_pool);
-            self.add_extern_func(idx, FuncIdxTy(prev_func_base + *fobj.buildin_id), fobj);
+            self.add_extern_func(idx, FuncIdx(prev_func_base + *fobj.buildin_id), fobj);
         }
         Ok(())
     }
 
-    pub fn get_module(&self, id: ScopeAllocIdTy) -> Option<Rc<RefCell<SymScope>>> {
+    pub fn get_module(&self, id: ScopeAllocId) -> Option<Rc<RefCell<SymScope>>> {
         let t = self.imported_modules.get(&id);
         match t {
             None => match self.prev_scope {
@@ -355,7 +355,7 @@ impl SymScope {
         }
     }
 
-    pub fn get_function(&self, id: ScopeAllocIdTy) -> Option<Rc<dyn FunctionInterface>> {
+    pub fn get_function(&self, id: ScopeAllocId) -> Option<Rc<dyn FunctionInterface>> {
         match self.funcs.get(&id) {
             Some(f) => Some(f.clone()),
             None => match self.prev_scope {
@@ -392,7 +392,7 @@ impl SymScope {
     }
 
     /// 返回变量的类型，索引和内存地址
-    pub fn get_var(&self, id: ScopeAllocIdTy) -> Option<VarInfo> {
+    pub fn get_var(&self, id: ScopeAllocId) -> Option<VarInfo> {
         match self.vars.get(&id) {
             Some(v) => Some(*v),
             None => match self.prev_scope {
@@ -413,11 +413,11 @@ impl SymScope {
         }
     }
 
-    fn add_func(&mut self, id: ScopeAllocIdTy, f: Rc<dyn FunctionInterface>) {
+    fn add_func(&mut self, id: ScopeAllocId, f: Rc<dyn FunctionInterface>) {
         self.funcs.insert(id, f);
     }
 
-    fn add_extern_func(&mut self, id: ScopeAllocIdTy, function_id: FuncIdxTy, mut f: RustFunction) {
+    fn add_extern_func(&mut self, id: ScopeAllocId, function_id: FuncIdx, mut f: RustFunction) {
         f.buildin_id = function_id;
         self.add_func(id, Rc::new(f))
     }
@@ -427,7 +427,7 @@ impl SymScope {
         mut f: RustFunction,
         tokenid: usize,
         fname: &str,
-        extern_function_id: FuncIdxTy,
+        extern_function_id: FuncIdx,
         storage: &ModuleStorage,
         pool: &ValuePool,
     ) -> Result<(), ErrorInfo> {
@@ -439,26 +439,21 @@ impl SymScope {
     }
 
     /// 返回变量的索引和内存地址
-    pub fn add_var(
-        &mut self,
-        id: ScopeAllocIdTy,
-        ty: ClassIdxId,
-        var_sz: usize,
-    ) -> (VarIdxTy, usize) {
+    pub fn add_var(&mut self, id: ScopeAllocId, ty: ClassIdxId, var_sz: usize) -> (VarIdx, usize) {
         let ret_addr = self.var_sz;
         self.vars
             .insert(id, VarInfo::new(ty, self.vars_id, ret_addr));
         let ret = self.vars_id;
         self.vars_id += 1;
         self.var_sz += var_sz;
-        (VarIdxTy(ret), ret_addr)
+        (VarIdx(ret), ret_addr)
     }
 
     pub fn get_var_table_sz(&self) -> usize {
         self.var_sz
     }
 
-    pub fn get_type_id(&self, id: ScopeAllocIdTy) -> Option<ClassIdxId> {
+    pub fn get_type_id(&self, id: ScopeAllocId) -> Option<ClassIdxId> {
         match self.types.get(&id) {
             None => match self.prev_scope {
                 RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_type_id(id),
@@ -489,7 +484,7 @@ impl SymScope {
         }
     }
 
-    pub fn get_class(&self, classid_idx: ScopeAllocIdTy) -> Option<Rc<dyn ClassInterface>> {
+    pub fn get_class(&self, classid_idx: ScopeAllocId) -> Option<Rc<dyn ClassInterface>> {
         let t = self.types.get(&classid_idx);
         match t {
             Some(t) => self.get_class_by_class_id(*t),
@@ -500,7 +495,7 @@ impl SymScope {
         }
     }
 
-    fn alloc_type_id(&mut self, idx: ScopeAllocIdTy) -> Result<ClassIdxId, ScopeError> {
+    fn alloc_type_id(&mut self, idx: ScopeAllocId) -> Result<ClassIdxId, ScopeError> {
         let ret = match &mut self.prev_scope {
             RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().alloc_type_id(idx),
             RootOnlyInfo::Root(data) => data.alloc_type_id(),
@@ -518,7 +513,7 @@ impl SymScope {
 
     pub fn add_type(
         &mut self,
-        idx: ScopeAllocIdTy,
+        idx: ScopeAllocId,
         obj: Rc<dyn ClassInterface>,
     ) -> Result<ClassIdxId, ScopeError> {
         let ret = self.alloc_type_id(idx)?;

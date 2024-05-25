@@ -439,7 +439,7 @@ impl<'a> ModuleUnit<'a> {
 
     fn load_var(
         &mut self,
-        idx: ScopeAllocIdTy,
+        idx: ScopeAllocId,
         name_token: ConstPoolIndexTy,
         istry: bool,
     ) -> AstError<()> {
@@ -1019,7 +1019,7 @@ impl<'a> ModuleUnit<'a> {
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id(func_item.get_name().to_owned());
-                            let func_extern_id = FuncIdxTy(
+                            let func_extern_id = FuncIdx(
                                 *func_item.buildin_id + self.modules_info[&import_file_path],
                             );
                             // println!("{}", func_extern_id);
@@ -1039,7 +1039,7 @@ impl<'a> ModuleUnit<'a> {
                 }
                 Some(module) => {
                     let tmp = self.token_lexer.borrow_mut().add_id(import_item_name);
-                    let module_sym_idx: ScopeAllocIdTy = self.insert_sym_with_error(tmp)?;
+                    let module_sym_idx: ScopeAllocId = self.insert_sym_with_error(tmp)?;
                     self.import_module_sym(module);
                     let sub_module = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Prev(
                         self.self_scope.clone(),

@@ -10,14 +10,13 @@ use super::{codegen::Opcode, error::*};
 
 pub type RustlibFunc = fn(&mut DynaData) -> ErrorInfoResult<()>;
 
-pub type ScopeAllocIdTy = usize;
+pub type ScopeAllocId = usize;
 pub type TypeAllowNull = Option<ClassIdxId>;
 // 定义函数的索引类型
-crate::impl_newtype_int!(FuncIdxTy, usize);
+crate::impl_newtype_int!(FuncIdx, usize);
 crate::impl_newtype_int!(ClassIdxId, usize);
-crate::impl_newtype_int!(VarIdxTy, usize);
+crate::impl_newtype_int!(VarIdx, usize);
 
-pub type TyIdxTy = ScopeAllocIdTy;
 type ConstPoolIndexTy = usize;
 
 #[derive(Clone, Debug)]
@@ -61,7 +60,7 @@ pub type Argvs = Vec<ClassIdxId>;
 #[derive(Clone, Debug)]
 pub struct RustFunction {
     pub name: String,
-    pub buildin_id: FuncIdxTy,
+    pub buildin_id: FuncIdx,
     pub ptr: RustlibFunc,
     pub io: IOType,
 }
@@ -121,7 +120,7 @@ pub trait FunctionInterface: Downcast + Debug {
     fn get_io(&self) -> &IOType;
     fn get_name(&self) -> &str;
     fn get_io_mut(&mut self) -> &mut IOType;
-    fn get_func_id(&self) -> FuncIdxTy;
+    fn get_func_id(&self) -> FuncIdx;
 }
 
 impl_downcast!(FunctionInterface);
@@ -157,7 +156,7 @@ impl FunctionInterface for RustFunction {
         &mut self.io
     }
 
-    fn get_func_id(&self) -> FuncIdxTy {
+    fn get_func_id(&self) -> FuncIdx {
         self.buildin_id
     }
 }
@@ -176,12 +175,17 @@ impl OverrideWrapper {
 
 #[derive(Debug, Clone, Default)]
 pub struct RustClass {
-    pub members: HashMap<String, String>,
+    /// 成员变量
+    pub attribute_members: HashMap<String, String>,
+    /// 成员函数
     pub functions: HashMap<String, RustFunction>,
+    /// 重载函数
     pub overrides: HashMap<OverrideOperations, OverrideWrapper>,
+    /// 类ID
     pub id: ClassIdxId,
+    /// 类名
     pub name: &'static str,
-    pub id_to_var: HashMap<ConstPoolIndexTy, TyIdxTy>,
+    pub id_to_var: HashMap<ConstPoolIndexTy, ClassIdxId>,
 }
 
 /// 约定，0号id是any类型
@@ -194,7 +198,7 @@ impl RustClass {
         storage: &mut ModuleStorage,
     ) -> ClassIdxId {
         let ret = RustClass {
-            members,
+            attribute_members: members,
             functions: functions.unwrap_or_default(),
             overrides: overrides.unwrap_or_default(),
             id: ClassIdxId(storage.class_table.len()),
@@ -209,7 +213,7 @@ impl RustClass {
     }
 
     pub fn add_attr(&mut self, name: impl Into<String>, ty: String) {
-        self.members.insert(name.into(), ty);
+        self.attribute_members.insert(name.into(), ty);
     }
 }
 
@@ -265,9 +269,9 @@ impl ModuleStorage {
         }
     }
 
-    pub fn add_func(&mut self, f: RustlibFunc) -> FuncIdxTy {
+    pub fn add_func(&mut self, f: RustlibFunc) -> FuncIdx {
         self.func_table.push(f);
-        FuncIdxTy(self.func_table.len() - 1)
+        FuncIdx(self.func_table.len() - 1)
     }
 
     /// 获取类的个数
@@ -281,7 +285,7 @@ impl ModuleStorage {
         ClassIdxId(self.class_table.len() - 1)
     }
 
-    pub fn access_func(&self, id: FuncIdxTy) -> RustlibFunc {
+    pub fn access_func(&self, id: FuncIdx) -> RustlibFunc {
         self.func_table[*id]
     }
 

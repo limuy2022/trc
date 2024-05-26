@@ -59,7 +59,7 @@ pub struct CustomType {
     funcs: Vec<CustomFunction>,
     pub name: ClassIdxId,
     pub origin_name: String,
-    pub id_to_attr: HashMap<ConstPoolIndex, ClassIdxId>,
+    pub id_to_attr: HashMap<ConstPoolData, ClassIdxId>,
 }
 
 impl Display for CustomType {
@@ -77,7 +77,7 @@ impl CustomType {
         }
     }
 
-    pub fn add_attr(&mut self, attrname: ConstPoolIndex, attrty: ClassIdxId) -> Option<ClassIdxId> {
+    pub fn add_attr(&mut self, attrname: ConstPoolData, attrty: ClassIdxId) -> Option<ClassIdxId> {
         self.id_to_attr.insert(attrname, attrty)
     }
 
@@ -96,7 +96,7 @@ impl ClassInterface for CustomType {
         None
     }
 
-    fn has_attr(&self, attrname: ConstPoolIndex) -> bool {
+    fn has_attr(&self, attrname: ConstPoolData) -> bool {
         self.id_to_attr.contains_key(&attrname)
     }
 
@@ -194,7 +194,7 @@ pub struct SymScope {
     // 父作用域
     pub prev_scope: RootOnlyInfo<Rc<RefCell<SymScope>>>,
     // 管理符号之间的映射,由token在name pool中的id映射到符号表中的id
-    sym_map: HashMap<ConstPoolIndex, ScopeAllocId>,
+    sym_map: HashMap<ConstPoolData, ScopeAllocId>,
     // 当前作用域要分配的下一个ID,也就是当前作用域的最大id+1
     scope_sym_id: ScopeAllocId,
     // ID到class id的映射
@@ -265,7 +265,7 @@ impl SymScope {
 
     pub fn insert_sym_with_error(
         &mut self,
-        sym_name: ConstPoolIndex,
+        sym_name: ConstPoolData,
         str_name: &str,
     ) -> Result<ScopeAllocId, ErrorInfo> {
         match self.insert_sym(sym_name) {
@@ -362,7 +362,7 @@ impl SymScope {
         }
     }
 
-    pub fn has_sym(&self, id: ConstPoolIndex) -> bool {
+    pub fn has_sym(&self, id: ConstPoolData) -> bool {
         if self.sym_map.contains_key(&id) {
             return true;
         }
@@ -378,7 +378,7 @@ impl SymScope {
         ret
     }
 
-    pub fn insert_sym(&mut self, id: ConstPoolIndex) -> Option<usize> {
+    pub fn insert_sym(&mut self, id: ConstPoolData) -> Option<usize> {
         let t = self.sym_map.insert(id, self.scope_sym_id);
         self.scope_sym_id += 1;
         // 先前不能存在
@@ -399,7 +399,7 @@ impl SymScope {
         }
     }
 
-    pub fn get_sym(&self, id: ConstPoolIndex) -> Option<usize> {
+    pub fn get_sym(&self, id: ConstPoolData) -> Option<usize> {
         let t = self.sym_map.get(&id);
         match t {
             None => match self.prev_scope {
@@ -422,7 +422,7 @@ impl SymScope {
     pub fn import_extern_func(
         &mut self,
         mut f: RustFunction,
-        tokenid: ConstPoolIndex,
+        tokenid: ConstPoolData,
         fname: &str,
         extern_function_id: FuncIdx,
         storage: &ModuleStorage,
@@ -518,7 +518,7 @@ impl SymScope {
         Ok(ret)
     }
 
-    pub fn get_type_id_by_token(&self, ty_name: ConstPoolIndex) -> Option<ClassIdxId> {
+    pub fn get_type_id_by_token(&self, ty_name: ConstPoolData) -> Option<ClassIdxId> {
         let ty_idx_id = self.get_sym(ty_name).unwrap();
         self.get_type_id(ty_idx_id)
     }
@@ -556,11 +556,11 @@ mod tests {
     #[test]
     fn test_scope() {
         let root_scope = Rc::new(RefCell::new(SymScope::new(SymScopePrev::Root)));
-        root_scope.borrow_mut().insert_sym(ConstPoolIndex(1));
+        root_scope.borrow_mut().insert_sym(ConstPoolData(1));
         let mut son_scope = SymScope::new(SymScopePrev::Prev(root_scope.clone()));
-        son_scope.insert_sym(ConstPoolIndex(2));
-        assert_eq!(son_scope.get_sym(ConstPoolIndex(2)), Some(1));
+        son_scope.insert_sym(ConstPoolData(2));
+        assert_eq!(son_scope.get_sym(ConstPoolData(2)), Some(1));
         drop(son_scope);
-        assert_eq!(root_scope.borrow().get_sym(ConstPoolIndex(1)), Some(0));
+        assert_eq!(root_scope.borrow().get_sym(ConstPoolData(1)), Some(0));
     }
 }

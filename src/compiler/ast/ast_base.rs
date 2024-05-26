@@ -112,7 +112,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 获取一个token并检查该token是否正确，仅仅检查带有值的token类型
-    pub fn get_token_checked_with_val(&mut self, ty: Token) -> AstError<ConstPoolIndex> {
+    pub fn get_token_checked_with_val(&mut self, ty: Token) -> AstError<ConstPoolData> {
         let t = self.token_lexer.borrow_mut().next_token()?;
         match (ty, t) {
             (Token::ID(_), Token::ID(data)) => Ok(data),
@@ -225,7 +225,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 添加一个符号，在符号冲突的时候报出错误
-    pub fn insert_sym_with_error(&mut self, name: ConstPoolIndex) -> AstError<ScopeAllocId> {
+    pub fn insert_sym_with_error(&mut self, name: ConstPoolData) -> AstError<ScopeAllocId> {
         match self.self_scope.borrow_mut().insert_sym(name) {
             Some(v) => Ok(v),
             None => self.gen_error(ErrorInfo::new(

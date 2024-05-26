@@ -107,7 +107,7 @@ impl CompileOption {
     }
 }
 
-type Pool<T> = HashMap<T, ConstPoolIndex>;
+type Pool<T> = HashMap<T, ConstPoolData>;
 
 #[derive(Default)]
 /// 管理常量池添加删除
@@ -124,30 +124,30 @@ pub struct ValuePool {
 macro_rules! gen_single_getter_setter {
     ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty)) => {
         paste::paste! {
-        pub fn [<add_ $func_name>](&mut self, val: $type) -> ConstPoolIndex {
+        pub fn [<add_ $func_name>](&mut self, val: $type) -> ConstPoolData {
             let len_tmp = self.$const_pool.len();
-            let ret = *self.$const_pool.entry(val.clone()).or_insert(ConstPoolIndex(len_tmp));
+            let ret = *self.$const_pool.entry(val.clone()).or_insert(ConstPoolData(len_tmp));
             if len_tmp != self.$const_pool.len() {
                 self.$id_pool.push(val);
             }
             ret
         }
-        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<ConstPoolIndex> {
+        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<ConstPoolData> {
             self.$const_pool.get(val).copied()
         }
         }
     };
     ($func_name:ident => ($const_pool:ident, $id_pool:ident, $type:ty, $convert_func: ident)) => {
         paste::paste! {
-        pub fn [<add_ $func_name>](&mut self, val: $type) -> ConstPoolIndex {
+        pub fn [<add_ $func_name>](&mut self, val: $type) -> ConstPoolData {
             let len_tmp = self.$const_pool.len();
-            let ret = *self.$const_pool.entry(val.clone()).or_insert(ConstPoolIndex(len_tmp));
+            let ret = *self.$const_pool.entry(val.clone()).or_insert(ConstPoolData(len_tmp));
             if len_tmp != self.$const_pool.len() {
                 self.$id_pool.push($convert_func(val));
             }
             ret
         }
-        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<ConstPoolIndex> {
+        pub fn [<get_ $func_name>](&self, val: &$type) -> Option<ConstPoolData> {
             self.$const_pool.get(val).copied()
         }
         }
@@ -305,12 +305,12 @@ mod tests {
     #[test]
     fn test_value_pool() {
         let mut pool = ValuePool::new();
-        assert_eq!(pool.add_float("9.0".to_owned()), ConstPoolIndex(0));
-        assert_eq!(pool.add_float("9.0".to_owned()), ConstPoolIndex(0));
-        assert_eq!(pool.add_float("9.5".to_owned()), ConstPoolIndex(1));
-        assert_eq!(pool.add_string(String::from("value")), ConstPoolIndex(0));
-        assert_eq!(pool.add_string(String::from("value")), ConstPoolIndex(0));
-        assert_eq!(pool.add_string(String::from("vale")), ConstPoolIndex(1));
+        assert_eq!(pool.add_float("9.0".to_owned()), ConstPoolData(0));
+        assert_eq!(pool.add_float("9.0".to_owned()), ConstPoolData(0));
+        assert_eq!(pool.add_float("9.5".to_owned()), ConstPoolData(1));
+        assert_eq!(pool.add_string(String::from("value")), ConstPoolData(0));
+        assert_eq!(pool.add_string(String::from("value")), ConstPoolData(0));
+        assert_eq!(pool.add_string(String::from("vale")), ConstPoolData(1));
         assert!((pool.id_float[0] - 9.0).abs() < 0.00001);
         assert_eq!(pool.id_str[1], "vale");
     }

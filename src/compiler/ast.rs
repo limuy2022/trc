@@ -440,7 +440,7 @@ impl<'a> ModuleUnit<'a> {
     fn load_var(
         &mut self,
         idx: ScopeAllocId,
-        name_token: ConstPoolIndex,
+        name_token: ConstPoolData,
         istry: bool,
     ) -> AstError<()> {
         let var = match self.self_scope.borrow().get_var(idx) {
@@ -1017,7 +1017,7 @@ impl<'a> ModuleUnit<'a> {
                             // println!("{}", import_item_name);
                             let func_item = now.functions()[func_item].1.clone();
                             // println!("{}", func_item.get_name());
-                            let token_idx: ConstPoolIndex = self
+                            let token_idx: ConstPoolData = self
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id(func_item.get_name().to_owned());
@@ -1076,7 +1076,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 生成新建变量的指令
-    fn new_var(&mut self, name: ConstPoolIndex, varty: ClassIdxId) -> AstError<()> {
+    fn new_var(&mut self, name: ConstPoolData, varty: ClassIdxId) -> AstError<()> {
         let sym_idx = self.insert_sym_with_error(name)?;
         let (_var_sym, var_addr) =
             self.self_scope
@@ -1088,7 +1088,7 @@ impl<'a> ModuleUnit<'a> {
         Ok(())
     }
 
-    fn store_var(&mut self, name: ConstPoolIndex) -> RuntimeResult<()> {
+    fn store_var(&mut self, name: ConstPoolData) -> RuntimeResult<()> {
         self.expr(false)?;
         let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,

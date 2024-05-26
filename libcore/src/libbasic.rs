@@ -16,7 +16,7 @@ pub type TypeAllowNull = Option<ClassIdxId>;
 crate::impl_newtype_int!(FuncIdx, usize);
 crate::impl_newtype_int!(ClassIdxId, usize);
 crate::impl_newtype_int!(VarIdx, usize);
-crate::impl_newtype_int!(ConstPoolIndex, usize);
+crate::impl_newtype_int!(ConstPoolData, usize);
 
 #[derive(Clone, Debug)]
 pub struct IOType {
@@ -53,7 +53,7 @@ pub enum OverrideOperations {
     Power,
 }
 
-pub type ArgsNameTy = Vec<ConstPoolIndex>;
+pub type ArgsNameTy = Vec<ConstPoolData>;
 pub type Argvs = Vec<ClassIdxId>;
 
 #[derive(Clone, Debug)]
@@ -127,7 +127,7 @@ impl_downcast!(FunctionInterface);
 pub trait ClassInterface: Downcast + Sync + Send + Debug + Display {
     fn has_func(&self, funcname: &str) -> Option<Box<dyn FunctionInterface>>;
 
-    fn has_attr(&self, attrname: ConstPoolIndex) -> bool;
+    fn has_attr(&self, attrname: ConstPoolData) -> bool;
 
     fn get_id(&self) -> ClassIdxId;
 
@@ -184,7 +184,7 @@ pub struct RustClass {
     pub id: ClassIdxId,
     /// 类名
     pub name: &'static str,
-    pub id_to_var: HashMap<ConstPoolIndex, ClassIdxId>,
+    pub id_to_var: HashMap<ConstPoolData, ClassIdxId>,
 }
 
 /// 约定，0号id是any类型
@@ -226,7 +226,7 @@ impl ClassInterface for RustClass {
         None
     }
 
-    fn has_attr(&self, attrname: ConstPoolIndex) -> bool {
+    fn has_attr(&self, attrname: ConstPoolData) -> bool {
         self.id_to_var.contains_key(&attrname)
     }
 

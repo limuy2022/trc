@@ -5,14 +5,14 @@ use logos::{Lexer, Logos, Source};
 use rust_i18n::t;
 use std::{cell::RefCell, fmt::Display, rc::Rc};
 
-fn add_float(lex: &mut Lexer<Token>) -> ConstPoolIndex {
+fn add_float(lex: &mut Lexer<Token>) -> ConstPoolData {
     // println!("{}", lex.slice());
     lex.extras.add_float(lex.slice().to_owned())
 }
 
-pub const CONST_IDX_PLACEHOLDER: ConstPoolIndex = ConstPoolIndex(0);
+pub const CONST_IDX_PLACEHOLDER: ConstPoolData = ConstPoolData(0);
 
-fn add_string(lex: &mut Lexer<Token>) -> ConstPoolIndex {
+fn add_string(lex: &mut Lexer<Token>) -> ConstPoolData {
     // 此处还需要进行字符串
     let origin_str = lex.slice();
     let mut target_string = String::new();
@@ -52,7 +52,7 @@ fn add_string(lex: &mut Lexer<Token>) -> ConstPoolIndex {
     lex.extras.add_string(target_string)
 }
 
-fn add_id(lex: &mut Lexer<Token>) -> ConstPoolIndex {
+fn add_id(lex: &mut Lexer<Token>) -> ConstPoolData {
     lex.extras.add_id(lex.slice().to_owned())
 }
 
@@ -79,10 +79,10 @@ fn lex_muli_comment(lex: &mut Lexer<Token>) -> Result<usize, ErrorInfo> {
     Ok(lines)
 }
 
-fn convert_int(lex: &mut Lexer<Token>) -> ConstPoolIndex {
+fn convert_int(lex: &mut Lexer<Token>) -> ConstPoolData {
     // println!("{}", lex.slice());
     let str_tmp = lex.slice().replace("_", "");
-    ConstPoolIndex(if let Some(s) = str_tmp.strip_prefix("0x") {
+    ConstPoolData(if let Some(s) = str_tmp.strip_prefix("0x") {
         let val: i64 = i64::from_str_radix(s, 16).unwrap();
         convert_int_constval_to_usize(val)
     } else if let Some(s) = str_tmp.strip_prefix("0b") {
@@ -97,14 +97,14 @@ fn convert_int(lex: &mut Lexer<Token>) -> ConstPoolIndex {
     })
 }
 
-fn convert_char(lex: &mut Lexer<Token>) -> Result<ConstPoolIndex, ErrorInfo> {
+fn convert_char(lex: &mut Lexer<Token>) -> Result<ConstPoolData, ErrorInfo> {
     let len = lex.slice().len();
     if len != 3 {
         return Err(ErrorInfo::new(t!(CHAR_FORMAT), t!(SYNTAX_ERROR)));
     }
     let mut iter = lex.slice().chars();
     iter.next();
-    Ok(ConstPoolIndex(iter.next().unwrap() as usize))
+    Ok(ConstPoolData(iter.next().unwrap() as usize))
 }
 
 #[derive(PartialEq, Debug, Clone, Hash, Eq, Copy, Logos)]
@@ -189,19 +189,19 @@ pub enum Token {
         r#"(0[bB][01_]+|0[oO][0-7_]+|0[xX][0-9a-fA-F_]+|[0-9][0-9_]*)"#,
         convert_int
     )]
-    IntValue(ConstPoolIndex),
+    IntValue(ConstPoolData),
     #[regex(r#""[^"]*""#, add_string)]
     // #[regex(r#""""(.)*""""#, add_string)]
     // TODO:MULT
-    StringValue(ConstPoolIndex),
+    StringValue(ConstPoolData),
     #[regex(r#"((\d+)\.(\d+))|(((\d+)|(\d+\.\d+))[eE][-+]?\d+)?"#, add_float)]
-    FloatValue(ConstPoolIndex),
+    FloatValue(ConstPoolData),
     LongIntValue,
     #[regex(r#"'[^']*'"#, convert_char)]
-    CharValue(ConstPoolIndex),
-    #[token("false", |_| ConstPoolIndex(false as usize))]
-    #[token("true", |_| ConstPoolIndex(true as usize))]
-    BoolValue(ConstPoolIndex),
+    CharValue(ConstPoolData),
+    #[token("false", |_| ConstPoolData(false as usize))]
+    #[token("true", |_| ConstPoolData(true as usize))]
+    BoolValue(ConstPoolData),
     #[token("||=")]
     SelfOr,
     #[token("&&=")]
@@ -233,7 +233,7 @@ pub enum Token {
     #[token(";")]
     Semicolon,
     #[regex(r#"[\p{XID_Start}_]\p{XID_Continue}*"#, add_id)]
-    ID(ConstPoolIndex),
+    ID(ConstPoolData),
     #[token("while")]
     While,
     #[token("for")]
@@ -582,7 +582,7 @@ impl<'a> TokenLex<'a> {
         Ok(())
     }
 
-    pub fn add_id(&mut self, id: String) -> ConstPoolIndex {
+    pub fn add_id(&mut self, id: String) -> ConstPoolData {
         self.internal_lexer.extras.add_id(id)
     }
 
@@ -697,20 +697,20 @@ mod tests {
                 Token::Comma,
                 Token::Dot,
                 Token::Comma,
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(100))),
-                Token::FloatValue(ConstPoolIndex(0)),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(232_304904))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0b011))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0x2AA4))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0o2434))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0))),
-                Token::FloatValue(ConstPoolIndex(1)),
-                Token::FloatValue(ConstPoolIndex(2)),
-                Token::FloatValue(ConstPoolIndex(3)),
-                Token::FloatValue(ConstPoolIndex(4)),
-                Token::FloatValue(ConstPoolIndex(5)),
-                Token::FloatValue(ConstPoolIndex(6)),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(100))),
+                Token::FloatValue(ConstPoolData(0)),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(232_304904))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0b011))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0x2AA4))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0o2434))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0))),
+                Token::FloatValue(ConstPoolData(1)),
+                Token::FloatValue(ConstPoolData(2)),
+                Token::FloatValue(ConstPoolData(3)),
+                Token::FloatValue(ConstPoolData(4)),
+                Token::FloatValue(ConstPoolData(5)),
+                Token::FloatValue(ConstPoolData(6)),
             ],
         );
         check_pool(
@@ -763,13 +763,13 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::StringValue(ConstPoolIndex(0)),
-                Token::CharValue(ConstPoolIndex('s' as usize)),
-                Token::StringValue(ConstPoolIndex(1)),
-                Token::StringValue(ConstPoolIndex(2)),
-                Token::StringValue(ConstPoolIndex(3)),
-                Token::StringValue(ConstPoolIndex(4)),
-                Token::StringValue(ConstPoolIndex(5)),
+                Token::StringValue(ConstPoolData(0)),
+                Token::CharValue(ConstPoolData('s' as usize)),
+                Token::StringValue(ConstPoolData(1)),
+                Token::StringValue(ConstPoolData(2)),
+                Token::StringValue(ConstPoolData(3)),
+                Token::StringValue(ConstPoolData(4)),
+                Token::StringValue(ConstPoolData(5)),
             ],
         );
         check_pool(
@@ -820,52 +820,52 @@ mod tests {
             &mut t,
             vec![
                 Token::Import,
-                Token::StringValue(ConstPoolIndex(0)),
+                Token::StringValue(ConstPoolData(0)),
                 Token::Func,
-                Token::ID(ConstPoolIndex(0)),
+                Token::ID(ConstPoolData(0)),
                 Token::LeftSmallBrace,
-                Token::ID(ConstPoolIndex(1)),
-                Token::ID(ConstPoolIndex(2)),
+                Token::ID(ConstPoolData(1)),
+                Token::ID(ConstPoolData(2)),
                 Token::RightSmallBrace,
                 Token::Arrow,
-                Token::ID(ConstPoolIndex(3)),
+                Token::ID(ConstPoolData(3)),
                 Token::LeftBigBrace,
                 Token::If,
-                Token::ID(ConstPoolIndex(2)),
+                Token::ID(ConstPoolData(2)),
                 Token::Mod,
-                Token::IntValue(ConstPoolIndex(2)),
+                Token::IntValue(ConstPoolData(2)),
                 Token::Equal,
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0))),
                 Token::LeftBigBrace,
                 Token::Return,
-                Token::StringValue(ConstPoolIndex(1)),
+                Token::StringValue(ConstPoolData(1)),
                 Token::RightBigBrace,
                 Token::Else,
                 Token::LeftBigBrace,
                 Token::Return,
-                Token::StringValue(ConstPoolIndex(2)),
+                Token::StringValue(ConstPoolData(2)),
                 Token::RightBigBrace,
                 Token::RightBigBrace,
                 Token::Func,
-                Token::ID(ConstPoolIndex(4)),
+                Token::ID(ConstPoolData(4)),
                 Token::LeftSmallBrace,
                 Token::RightSmallBrace,
                 Token::LeftBigBrace,
-                Token::ID(ConstPoolIndex(5)),
+                Token::ID(ConstPoolData(5)),
                 Token::LeftSmallBrace,
-                Token::StringValue(ConstPoolIndex(3)),
+                Token::StringValue(ConstPoolData(3)),
                 Token::RightSmallBrace,
-                Token::ID(ConstPoolIndex(6)),
+                Token::ID(ConstPoolData(6)),
                 Token::Store,
-                Token::ID(ConstPoolIndex(0)),
+                Token::ID(ConstPoolData(0)),
                 Token::LeftSmallBrace,
-                Token::ID(ConstPoolIndex(7)),
+                Token::ID(ConstPoolData(7)),
                 Token::LeftSmallBrace,
                 Token::RightSmallBrace,
                 Token::RightSmallBrace,
-                Token::ID(ConstPoolIndex(5)),
+                Token::ID(ConstPoolData(5)),
                 Token::LeftSmallBrace,
-                Token::ID(ConstPoolIndex(6)),
+                Token::ID(ConstPoolData(6)),
                 Token::RightSmallBrace,
                 Token::RightBigBrace,
             ],
@@ -878,12 +878,12 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::ID(ConstPoolIndex(0)),
-                Token::ID(ConstPoolIndex(1)),
-                Token::ID(ConstPoolIndex(2)),
-                Token::ID(ConstPoolIndex(3)),
-                Token::ID(ConstPoolIndex(4)),
-                Token::ID(ConstPoolIndex(5)),
+                Token::ID(ConstPoolData(0)),
+                Token::ID(ConstPoolData(1)),
+                Token::ID(ConstPoolData(2)),
+                Token::ID(ConstPoolData(3)),
+                Token::ID(ConstPoolData(4)),
+                Token::ID(ConstPoolData(5)),
             ],
         );
         check_pool(
@@ -905,8 +905,8 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(1))),
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(23))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(1))),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(23))),
             ],
         );
     }
@@ -917,8 +917,8 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::IntValue(ConstPoolIndex(convert_int_constval_to_usize(0xabc))),
-                Token::ID(ConstPoolIndex(0)),
+                Token::IntValue(ConstPoolData(convert_int_constval_to_usize(0xabc))),
+                Token::ID(ConstPoolData(0)),
             ],
         );
         check_pool(vec!["hds".to_string()], &t.internal_lexer.extras.name_pool);
@@ -961,9 +961,9 @@ mod tests {
         check(
             &mut t,
             vec![
-                Token::BoolValue(ConstPoolIndex(1)),
-                Token::ID(ConstPoolIndex(0)),
-                Token::BoolValue(ConstPoolIndex(0)),
+                Token::BoolValue(ConstPoolData(1)),
+                Token::ID(ConstPoolData(0)),
+                Token::BoolValue(ConstPoolData(0)),
             ],
         )
     }

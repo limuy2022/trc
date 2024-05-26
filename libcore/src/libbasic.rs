@@ -10,13 +10,13 @@ use super::{codegen::Opcode, error::*};
 
 pub type RustlibFunc = fn(&mut DynaData) -> ErrorInfoResult<()>;
 
-pub type ScopeAllocId = usize;
 pub type TypeAllowNull = Option<ClassIdxId>;
 // 定义函数的索引类型
 crate::impl_newtype_int!(FuncIdx, usize);
 crate::impl_newtype_int!(ClassIdxId, usize);
 crate::impl_newtype_int!(VarIdx, usize);
 crate::impl_newtype_int!(ConstPoolData, usize);
+crate::impl_newtype_int!(ScopeAllocId, usize);
 
 #[derive(Clone, Debug)]
 pub struct IOType {

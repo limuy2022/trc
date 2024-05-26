@@ -118,12 +118,13 @@ pub type FuncBodyTy = Vec<(Token, usize)>;
 #[derive(Clone, Debug, Copy)]
 pub struct VarInfo {
     pub ty: ClassIdxId,
-    pub var_idx: usize,
+    // FIXME:using ScopeAllocId,BUT IN ast.rs using it access id_name,should use token type
+    pub var_idx: ScopeAllocId,
     pub addr: usize,
 }
 
 impl VarInfo {
-    pub fn new(ty: ClassIdxId, var_idx: usize, addr: usize) -> Self {
+    pub fn new(ty: ClassIdxId, var_idx: ScopeAllocId, addr: usize) -> Self {
         Self { ty, var_idx, addr }
     }
 }
@@ -372,18 +373,18 @@ impl SymScope {
         }
     }
 
-    pub fn new_id(&mut self) -> usize {
+    pub fn new_id(&mut self) -> ScopeAllocId {
         let ret = self.scope_sym_id;
-        self.scope_sym_id += 1;
+        *self.scope_sym_id += 1;
         ret
     }
 
-    pub fn insert_sym(&mut self, id: ConstPoolData) -> Option<usize> {
+    pub fn insert_sym(&mut self, id: ConstPoolData) -> Option<ScopeAllocId> {
         let t = self.sym_map.insert(id, self.scope_sym_id);
-        self.scope_sym_id += 1;
+        *self.scope_sym_id += 1;
         // 先前不能存在
         match t {
-            None => Some(self.scope_sym_id - 1),
+            None => Some(ScopeAllocId(*self.scope_sym_id - 1)),
             Some(_) => None,
         }
     }
@@ -399,7 +400,7 @@ impl SymScope {
         }
     }
 
-    pub fn get_sym(&self, id: ConstPoolData) -> Option<usize> {
+    pub fn get_sym(&self, id: ConstPoolData) -> Option<ScopeAllocId> {
         let t = self.sym_map.get(&id);
         match t {
             None => match self.prev_scope {
@@ -441,9 +442,9 @@ impl SymScope {
         self.vars
             .insert(id, VarInfo::new(ty, self.vars_id, ret_addr));
         let ret = self.vars_id;
-        self.vars_id += 1;
+        *self.vars_id += 1;
         self.var_sz += var_sz;
-        (VarIdx(ret), ret_addr)
+        (VarIdx(*ret), ret_addr)
     }
 
     pub fn get_var_table_sz(&self) -> usize {
@@ -460,12 +461,12 @@ impl SymScope {
         }
     }
 
-    pub fn get_scope_last_idx(&self) -> usize {
+    pub fn get_scope_last_idx(&self) -> ScopeAllocId {
         self.scope_sym_id
     }
 
     pub fn get_var_table_len(&self) -> usize {
-        self.vars_id
+        *self.vars_id
     }
 
     pub fn get_class_by_class_id(&self, classid: ClassIdxId) -> Option<Rc<dyn ClassInterface>> {
@@ -559,8 +560,11 @@ mod tests {
         root_scope.borrow_mut().insert_sym(ConstPoolData(1));
         let mut son_scope = SymScope::new(SymScopePrev::Prev(root_scope.clone()));
         son_scope.insert_sym(ConstPoolData(2));
-        assert_eq!(son_scope.get_sym(ConstPoolData(2)), Some(1));
+        assert_eq!(son_scope.get_sym(ConstPoolData(2)), Some(ScopeAllocId(1)));
         drop(son_scope);
-        assert_eq!(root_scope.borrow().get_sym(ConstPoolData(1)), Some(0));
+        assert_eq!(
+            root_scope.borrow().get_sym(ConstPoolData(1)),
+            Some(ScopeAllocId(0))
+        );
     }
 }

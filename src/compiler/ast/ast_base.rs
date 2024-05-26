@@ -183,8 +183,8 @@ impl<'a> ModuleUnit<'a> {
             ArguError::TypeNotMatch(ArgumentError { expected, actual }) => ErrorInfo::new(
                 t!(
                     EXPECT_TYPE,
-                    "0" = self.get_ty_name(expected),
-                    "1" = self.get_ty_name(actual)
+                    "0" = self.get_ty_name(ScopeAllocId(expected)),
+                    "1" = self.get_ty_name(ScopeAllocId(actual))
                 ),
                 t!(ARGUMENT_ERROR),
             ),

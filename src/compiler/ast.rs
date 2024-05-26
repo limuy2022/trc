@@ -891,7 +891,7 @@ impl<'a> ModuleUnit<'a> {
         let name_id = self.insert_sym_with_error(name)?;
         // FIXME:BUG!CLASS ID SHOULD BE ALLOCATED
         let mut class_obj = CustomType::new(
-            ClassIdxId(name_id),
+            ClassIdxId(*name_id),
             self.token_lexer.borrow_mut().get_constpool().id_name[*name].clone(),
         );
         self.get_token_checked(Token::LeftBigBrace)?;
@@ -1114,7 +1114,7 @@ impl<'a> ModuleUnit<'a> {
                 return self.gen_error(ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[*name]
                     ),
                     t!(SYMBOL_ERROR),
                 ))
@@ -1335,7 +1335,11 @@ impl<'a> ModuleUnit<'a> {
 
     /// # Return
     /// 返回函数的首地址
-    fn lex_function(&mut self, funcid: usize, body: &FuncBodyTy) -> RuntimeResult<(usize, usize)> {
+    fn lex_function(
+        &mut self,
+        funcid: ScopeAllocId,
+        body: &FuncBodyTy,
+    ) -> RuntimeResult<(usize, usize)> {
         if !self.first_func {
             // 如果不是第一个函数，在末尾加上结束主程序的指令
             // println!("run here.Inst num is {}", self.staticdata.inst.len());

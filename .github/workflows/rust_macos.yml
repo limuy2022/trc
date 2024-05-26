@@ -1,4 +1,4 @@
-name: Rust
+name: RustMacos
 
 on:
   push:

@@ -29,13 +29,13 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
             let mut added = j.clone();
             match j.opcode {
                 Opcode::LoadString => {
-                    added.operand.0 = value_pool
+                    added.operand.0 = *value_pool
                         .get_string(&i.constpool.stringpool[added.operand.0 as usize])
                         .unwrap() as Opidx
                 }
                 Opcode::LoadFloat => {
                     // TODO:improve the performance
-                    added.operand.0 = value_pool
+                    added.operand.0 = *value_pool
                         .get_float(&i.constpool.floatpool[added.operand.0 as usize].to_string())
                         .unwrap() as Opidx
                 }

@@ -1,14 +1,14 @@
 mod ast_base;
 mod lexprocess;
 
-use super::{
-    scope::*,
-    token::{ConstPoolIndexTy, Token},
-    InputSource, TokenLex,
-};
+use super::{scope::*, token::Token, InputSource, TokenLex};
 use crate::{
     base::dll::load_module_storage,
-    compiler::{manager::ModuleManager, token::Token::RightBigBrace, CompilerImpl},
+    compiler::{
+        manager::ModuleManager,
+        token::{Token::RightBigBrace, CONST_IDX_PLACEHOLDER},
+        CompilerImpl,
+    },
 };
 use collection_literals::collection;
 use libcore::*;
@@ -440,7 +440,7 @@ impl<'a> ModuleUnit<'a> {
     fn load_var(
         &mut self,
         idx: ScopeAllocId,
-        name_token: ConstPoolIndexTy,
+        name_token: ConstPoolIndex,
         istry: bool,
     ) -> AstError<()> {
         let var = match self.self_scope.borrow().get_var(idx) {
@@ -449,7 +449,7 @@ impl<'a> ModuleUnit<'a> {
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name_token]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[*name_token]
                     ),
                     t!(SYMBOL_ERROR),
                 ),
@@ -473,7 +473,8 @@ impl<'a> ModuleUnit<'a> {
                     ErrorInfo::new(
                         t!(
                             SYMBOL_NOT_FOUND,
-                            "0" = self.token_lexer.borrow_mut().get_constpool().id_name[token_data]
+                            "0" =
+                                self.token_lexer.borrow_mut().get_constpool().id_name[*token_data]
                         ),
                         t!(SYMBOL_ERROR),
                     ),
@@ -527,7 +528,7 @@ impl<'a> ModuleUnit<'a> {
                                     t!(
                                         SYMBOL_NOT_FOUND,
                                         "0" = self.token_lexer.borrow_mut().get_constpool().id_name
-                                            [token_data]
+                                            [*token_data]
                                     ),
                                     t!(SYMBOL_ERROR),
                                 ),
@@ -568,23 +569,23 @@ impl<'a> ModuleUnit<'a> {
         let t = self.next_token()?;
         match t {
             Token::IntValue(data) => {
-                self.add_bycode(Opcode::LoadInt, data as Opidx);
+                self.add_bycode(Opcode::LoadInt, *data as Opidx);
                 self.process_info.new_type(self.cache.intty_id);
             }
             Token::FloatValue(data) => {
-                self.add_bycode(Opcode::LoadFloat, data as Opidx);
+                self.add_bycode(Opcode::LoadFloat, *data as Opidx);
                 self.process_info.new_type(self.cache.floatty_id);
             }
             Token::StringValue(data) => {
-                self.add_bycode(Opcode::LoadString, data as Opidx);
+                self.add_bycode(Opcode::LoadString, *data as Opidx);
                 self.process_info.new_type(self.cache.strty_id);
             }
             Token::CharValue(data) => {
-                self.add_bycode(Opcode::LoadChar, data as Opidx);
+                self.add_bycode(Opcode::LoadChar, *data as Opidx);
                 self.process_info.new_type(self.cache.charty_id);
             }
             Token::BoolValue(data) => {
-                self.add_bycode(Opcode::LoadBool, data as Opidx);
+                self.add_bycode(Opcode::LoadBool, *data as Opidx);
                 self.process_info.new_type(self.cache.boolty_id);
             }
             _ => {
@@ -695,7 +696,7 @@ impl<'a> ModuleUnit<'a> {
             // 处理通配符
             let t = self.next_token()?;
             if let Token::ID(data) = t
-                && self.token_lexer.borrow_mut().get_constpool().id_name[data] == "_"
+                && self.token_lexer.borrow_mut().get_constpool().id_name[*data] == "_"
             {
                 is_end = true;
                 self.add_bycode(Opcode::Jump, ARG_WRONG);
@@ -781,7 +782,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     fn def_func(&mut self) -> AstError<()> {
-        let funcname = self.get_token_checked_with_val(Token::ID(0))?;
+        let funcname = self.get_token_checked_with_val(Token::ID(CONST_IDX_PLACEHOLDER))?;
         let name_id = self.insert_sym_with_error(funcname)?;
         // lex args
         self.get_token_checked(Token::LeftSmallBrace)?;
@@ -795,7 +796,7 @@ impl<'a> ModuleUnit<'a> {
             if t != Token::Comma {
                 self.token_lexer.borrow_mut().next_back(t);
             }
-            let name_id = self.get_token_checked_with_val(Token::ID(0))?;
+            let name_id = self.get_token_checked_with_val(Token::ID(CONST_IDX_PLACEHOLDER))?;
             argname.push(name_id);
             self.get_token_checked(Token::Colon)?;
             ty_list.push(self.lex_ty(false)?);
@@ -828,7 +829,7 @@ impl<'a> ModuleUnit<'a> {
             CustomFunction::new(
                 io,
                 argname,
-                self.token_lexer.borrow_mut().get_constpool().id_name[funcname].clone(),
+                self.token_lexer.borrow_mut().get_constpool().id_name[*funcname].clone(),
             ),
             function_body,
         );
@@ -852,11 +853,12 @@ impl<'a> ModuleUnit<'a> {
         match t {
             Token::Var => {
                 // 声明属性
-                let attr_name_tok = self.get_token_checked_with_val(Token::ID(0))?;
-                let attr_id = self.insert_sym_with_error(attr_name_tok)?;
+                let attr_name_tok =
+                    self.get_token_checked_with_val(Token::ID(CONST_IDX_PLACEHOLDER))?;
+                let _attr_id = self.insert_sym_with_error(attr_name_tok)?;
                 self.get_token_checked(Token::Colon)?;
                 let ty = self.lex_ty(false)?;
-                class_obj.add_attr(attr_id, ty);
+                class_obj.add_attr(attr_name_tok, ty);
             }
             Token::Pub => {
                 let mut is_in_pub = true;
@@ -885,12 +887,12 @@ impl<'a> ModuleUnit<'a> {
             self.self_scope.clone(),
         ))));
         self.self_scope.borrow_mut().in_class = true;
-        let name = self.get_token_checked_with_val(Token::ID(0))?;
+        let name = self.get_token_checked_with_val(Token::ID(CONST_IDX_PLACEHOLDER))?;
         let name_id = self.insert_sym_with_error(name)?;
         // FIXME:BUG!CLASS ID SHOULD BE ALLOCATED
         let mut class_obj = CustomType::new(
             ClassIdxId(name_id),
-            self.token_lexer.borrow_mut().get_constpool().id_name[name].clone(),
+            self.token_lexer.borrow_mut().get_constpool().id_name[*name].clone(),
         );
         self.get_token_checked(Token::LeftBigBrace)?;
         self.lex_class_item_loop(&mut class_obj)?;
@@ -905,9 +907,9 @@ impl<'a> ModuleUnit<'a> {
     }
 
     fn lex_import_module(&mut self, istry: bool) -> AstError<()> {
-        let tok = self.get_token_checked_with_val(Token::StringValue(0))?;
+        let tok = self.get_token_checked_with_val(Token::StringValue(CONST_IDX_PLACEHOLDER))?;
         // import的路径
-        let mut path_with_dot = self.token_lexer.borrow_mut().get_constpool().id_str[tok].clone();
+        let mut path_with_dot = self.token_lexer.borrow_mut().get_constpool().id_str[*tok].clone();
         // 具体文件的路径
         let mut import_file_path = String::new();
         // 是不是dll
@@ -1015,7 +1017,7 @@ impl<'a> ModuleUnit<'a> {
                             // println!("{}", import_item_name);
                             let func_item = now.functions()[func_item].1.clone();
                             // println!("{}", func_item.get_name());
-                            let token_idx: ConstPoolIndexTy = self
+                            let token_idx: ConstPoolIndex = self
                                 .token_lexer
                                 .borrow_mut()
                                 .add_id(func_item.get_name().to_owned());
@@ -1074,7 +1076,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 生成新建变量的指令
-    fn new_var(&mut self, name: ConstPoolIndexTy, varty: ClassIdxId) -> AstError<()> {
+    fn new_var(&mut self, name: ConstPoolIndex, varty: ClassIdxId) -> AstError<()> {
         let sym_idx = self.insert_sym_with_error(name)?;
         let (_var_sym, var_addr) =
             self.self_scope
@@ -1086,7 +1088,7 @@ impl<'a> ModuleUnit<'a> {
         Ok(())
     }
 
-    fn store_var(&mut self, name: usize) -> RuntimeResult<()> {
+    fn store_var(&mut self, name: ConstPoolIndex) -> RuntimeResult<()> {
         self.expr(false)?;
         let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
@@ -1098,7 +1100,7 @@ impl<'a> ModuleUnit<'a> {
         Ok(())
     }
 
-    fn assign_var(&mut self, name: usize) -> RuntimeResult<()> {
+    fn assign_var(&mut self, name: ScopeAllocId) -> RuntimeResult<()> {
         self.expr(false)?;
         let var_type = match self.process_info.pop_last_ty() {
             Some(v) => v,
@@ -1291,7 +1293,20 @@ impl<'a> ModuleUnit<'a> {
                 let tt = self.next_token()?;
                 match tt {
                     Token::Assign => {
-                        self.assign_var(name)?;
+                        let var_id = match self.self_scope.borrow().get_sym(name) {
+                            Some(v) => v,
+                            None => {
+                                return self.gen_error(ErrorInfo::new(
+                                    t!(
+                                        SYMBOL_NOT_FOUND,
+                                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name
+                                            [*name]
+                                    ),
+                                    t!(SYMBOL_ERROR),
+                                ))
+                            }
+                        };
+                        self.assign_var(var_id)?;
                         return Ok(());
                     }
                     Token::Store => {

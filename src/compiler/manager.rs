@@ -83,7 +83,7 @@ impl<'a> ModuleManager<'a> {
         // 开始编译源文件
         let mut submodule_option = father.borrow().option.clone();
         submodule_option.file_save = ctrc_path;
-        let compiler = Compiler::new(submodule_option);
+        let _compiler = Compiler::new(submodule_option);
         // self.cache.insert(path, module);
         Ok(())
     }

@@ -47,11 +47,38 @@ fn check_examples_eq(expected: &str, actual: &str) -> Result<(), String> {
 pub fn test_run_examples() {
     // 遍历整个examples目录
     let mut panic_flag = false;
+    let skip_list: Vec<String> = match read_to_string("examples/skip_test") {
+        Err(_) => vec![],
+        Ok(s) => {
+            let mut ret = vec![];
+            for i in s.split("\n") {
+                ret.push(i.to_owned());
+            }
+            ret
+        }
+    };
     for entry in std::fs::read_dir("examples").unwrap() {
         let path = entry.unwrap().path();
-        if path.is_file() {
+        if path.is_file()
+            && match path.extension() {
+                Some(ext) => ext == "trc",
+                None => false,
+            }
+        {
             let mut cmd = Command::cargo_bin("trc").unwrap();
             // 获取标准答案
+            // 判断skip test
+            let tmp = path.file_name().unwrap().to_str().unwrap();
+            let mut skip_flag = false;
+            for i in &skip_list {
+                if tmp.contains(i) {
+                    skip_flag = true;
+                    break;
+                }
+            }
+            if skip_flag {
+                continue;
+            }
             let mut ans_path = path.clone();
             ans_path.pop();
             ans_path.push("expected_result");

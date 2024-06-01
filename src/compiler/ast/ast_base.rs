@@ -1,8 +1,9 @@
 use super::AstError;
 use super::ClassIdxId;
 use super::ModuleUnit;
+use crate::compiler::scope::SymScope;
 use crate::compiler::token::Token;
-use crate::compiler::{scope::SymScope, token::ConstPoolIndexTy};
+use crate::compiler::token::CONST_IDX_PLACEHOLDER;
 use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
@@ -80,14 +81,14 @@ impl<'a> ModuleUnit<'a> {
 
     /// 解析一个类型名为id
     pub fn lex_ty(&mut self, istry: bool) -> AstError<ClassIdxId> {
-        let t = self.get_token_checked_with_val(Token::ID(0))?;
+        let t = self.get_token_checked_with_val(Token::ID(CONST_IDX_PLACEHOLDER))?;
         let ty = match self.self_scope.borrow().get_type_id_by_token(t) {
             None => self.try_err(
                 istry,
                 ErrorInfo::new(
                     t!(
                         SYMBOL_NOT_FOUND,
-                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[t]
+                        "0" = self.token_lexer.borrow_mut().get_constpool().id_name[*t]
                     ),
                     t!(TYPE_ERROR),
                 ),
@@ -111,7 +112,7 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 获取一个token并检查该token是否正确，仅仅检查带有值的token类型
-    pub fn get_token_checked_with_val(&mut self, ty: Token) -> AstError<usize> {
+    pub fn get_token_checked_with_val(&mut self, ty: Token) -> AstError<ConstPoolData> {
         let t = self.token_lexer.borrow_mut().next_token()?;
         match (ty, t) {
             (Token::ID(_), Token::ID(data)) => Ok(data),
@@ -182,8 +183,8 @@ impl<'a> ModuleUnit<'a> {
             ArguError::TypeNotMatch(ArgumentError { expected, actual }) => ErrorInfo::new(
                 t!(
                     EXPECT_TYPE,
-                    "0" = self.get_ty_name(expected),
-                    "1" = self.get_ty_name(actual)
+                    "0" = self.get_ty_name(ScopeAllocId(expected)),
+                    "1" = self.get_ty_name(ScopeAllocId(actual))
                 ),
                 t!(ARGUMENT_ERROR),
             ),
@@ -224,13 +225,13 @@ impl<'a> ModuleUnit<'a> {
     }
 
     /// 添加一个符号，在符号冲突的时候报出错误
-    pub fn insert_sym_with_error(&mut self, name: ConstPoolIndexTy) -> AstError<ScopeAllocId> {
+    pub fn insert_sym_with_error(&mut self, name: ConstPoolData) -> AstError<ScopeAllocId> {
         match self.self_scope.borrow_mut().insert_sym(name) {
             Some(v) => Ok(v),
             None => self.gen_error(ErrorInfo::new(
                 t!(
                     SYMBOL_REDEFINED,
-                    "0" = self.token_lexer.borrow_mut().get_constpool().id_name[name]
+                    "0" = self.token_lexer.borrow_mut().get_constpool().id_name[*name]
                 ),
                 t!(SYMBOL_ERROR),
             ))?,

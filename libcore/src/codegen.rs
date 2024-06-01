@@ -188,9 +188,10 @@ impl ConstPool {
     }
 }
 
-pub type Opidx = u64;
-pub const NO_ARG: Opidx = 0;
-pub const ARG_WRONG: Opidx = Opidx::MAX;
+// pub type Opidx = u64;
+crate::impl_newtype_int!(Opidx, u64);
+pub const NO_ARG: Opidx = Opidx(0);
+pub const ARG_WRONG: Opidx = Opidx(u64::MAX);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Inst {
@@ -217,7 +218,7 @@ impl Inst {
 impl Display for Inst {
     #[tarpaulin::skip]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {} {}", self.opcode, self.operand.0, self.operand.1)
+        write!(f, "{} {} {}", self.opcode, *self.operand.0, *self.operand.1)
     }
 }
 
@@ -261,7 +262,7 @@ impl StaticData {
 
     #[inline]
     pub fn get_last_opcode_id(&self) -> Opidx {
-        self.inst.len() as Opidx - 1
+        Opidx(self.inst.len() as u64 - 1)
     }
 
     #[inline]

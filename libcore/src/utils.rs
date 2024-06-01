@@ -82,11 +82,6 @@ macro_rules! impl_newtype {
 #[macro_export]
 macro_rules! impl_newtype_int {
     ($name:ident, $type:ty) => {
-        $crate::impl_newtype!($name, $type, #[derive(Clone, Debug, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]);
-        impl Default for $name {
-            fn default() -> Self {
-                Self(Default::default())
-            }
-        }
+        $crate::impl_newtype!($name, $type, #[derive(Clone, Debug, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]);
     };
 }

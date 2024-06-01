@@ -1,6 +1,7 @@
 //! this test all examples files and check them output
 
 use assert_cmd::Command;
+use core::panic;
 use libcore::utils::get_next_check_char;
 use std::fs::read_to_string;
 
@@ -52,11 +53,16 @@ pub fn test_run_examples() {
         Ok(s) => {
             let mut ret = vec![];
             for i in s.split("\n") {
-                ret.push(i.to_owned());
+                let tmp = i.trim();
+                if tmp.is_empty() {
+                    continue;
+                }
+                ret.push(tmp.to_owned());
             }
             ret
         }
     };
+    // panic!("x{}x", skip_list[0]);
     for entry in std::fs::read_dir("examples").unwrap() {
         let path = entry.unwrap().path();
         if path.is_file()

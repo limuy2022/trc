@@ -29,19 +29,24 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
             let mut added = j.clone();
             match j.opcode {
                 Opcode::LoadString => {
-                    added.operand.0 = *value_pool
-                        .get_string(&i.constpool.stringpool[added.operand.0 as usize])
-                        .unwrap() as Opidx
+                    let idx: usize = added.operand.0.into();
+                    added.operand.0 = Opidx(
+                        *value_pool.get_string(&i.constpool.stringpool[idx]).unwrap()
+                            as OpidxInternal,
+                    )
                 }
                 Opcode::LoadFloat => {
                     // TODO:improve the performance
-                    added.operand.0 = *value_pool
-                        .get_float(&i.constpool.floatpool[added.operand.0 as usize].to_string())
-                        .unwrap() as Opidx
+                    let idx: usize = added.operand.0.into();
+                    added.operand.0 = Opidx(
+                        *value_pool
+                            .get_float(&i.constpool.floatpool[idx].to_string())
+                            .unwrap() as OpidxInternal,
+                    )
                 }
                 Opcode::LoadBigInt => { /* TODO:bigint */ }
                 Opcode::CallCustom => {
-                    added.operand.0 += data.funcs_pos.len() as Opidx;
+                    *added.operand.0 += data.funcs_pos.len() as OpidxInternal;
                 }
                 _ => {}
             }
@@ -51,7 +56,7 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
                     function_expected_pos = iter_of_function.next();
                     let mut added = pos.clone();
                     // 该项指令还没有加入，所以是next
-                    added.func_addr = data.get_next_opcode_id() as usize;
+                    added.func_addr = data.get_next_opcode_id().into();
                     func_record_tmp.push(added);
                 }
             }
@@ -77,10 +82,10 @@ mod test {
         // TODO:add pool test
         let mut data1 = StaticData::new();
         data1.dll_module_should_loaded = vec!["test.dll".to_string()];
-        data1.inst = vec![Inst::new_single(Opcode::LoadInt, 1)];
+        data1.inst = vec![Inst::new_single(Opcode::LoadInt, Opidx(1))];
         let mut data2 = StaticData::new();
         data2.dll_module_should_loaded = vec!["test.dll2".to_string(), "test.dll".to_string()];
-        data2.inst = vec![Inst::new_single(Opcode::LoadInt, 3)];
+        data2.inst = vec![Inst::new_single(Opcode::LoadInt, Opidx(3))];
         let mut data = vec![data1, data2];
         let data = link(data.iter_mut());
         assert_eq!(
@@ -90,8 +95,8 @@ mod test {
         assert_eq!(
             data.inst,
             vec![
-                Inst::new_single(Opcode::LoadInt, 1),
-                Inst::new_single(Opcode::LoadInt, 3),
+                Inst::new_single(Opcode::LoadInt, Opidx(1)),
+                Inst::new_single(Opcode::LoadInt, Opidx(3)),
             ]
         );
     }

@@ -189,7 +189,15 @@ impl ConstPool {
 }
 
 // pub type Opidx = u64;
-crate::impl_newtype_int!(Opidx, u64);
+pub type OpidxInternal = u64;
+crate::impl_newtype_int!(Opidx, OpidxInternal);
+
+impl From<Opidx> for usize {
+    fn from(val: Opidx) -> Self {
+        val.0 as usize
+    }
+}
+
 pub const NO_ARG: Opidx = Opidx(0);
 pub const ARG_WRONG: Opidx = Opidx(u64::MAX);
 
@@ -267,7 +275,7 @@ impl StaticData {
 
     #[inline]
     pub fn get_next_opcode_id(&self) -> Opidx {
-        self.inst.len() as Opidx
+        Opidx(self.inst.len() as u64)
     }
 
     #[inline]

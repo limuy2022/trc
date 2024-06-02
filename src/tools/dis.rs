@@ -28,36 +28,32 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
             if i.1.operand.1 == ARG_WRONG {
                 println!(
                     "Inst::new_single(Opcode::{}, {}),",
-                    i.1.opcode, i.1.operand.0
+                    i.1.opcode, *i.1.operand.0
                 );
             } else {
                 println!(
                     "Inst::new_double(Opcode::{}, {}, {}),",
-                    i.1.opcode, i.1.operand.0, i.1.operand.1
+                    i.1.opcode, *i.1.operand.0, *i.1.operand.1
                 );
             }
         } else {
             print!("{}:{}", i.0, i.1.opcode);
             if i.1.operand.1 == ARG_WRONG {
-                print!(" {}", i.1.operand.0);
+                print!(" {}", *i.1.operand.0);
             } else {
-                print!(" {} {}", i.1.operand.0, i.1.operand.1);
+                print!(" {} {}", *i.1.operand.0, *i.1.operand.1);
             }
             match i.1.opcode {
                 Opcode::LoadInt => {
                     print!("({})", unsafe { convert_to_int_constval(i.1.operand.0) })
                 }
                 Opcode::LoadString => {
-                    print!(
-                        "({})",
-                        static_data.constpool.stringpool[i.1.operand.0 as usize]
-                    )
+                    let idx: usize = i.1.operand.0.into();
+                    print!("({})", static_data.constpool.stringpool[idx])
                 }
                 Opcode::LoadFloat => {
-                    print!(
-                        "({})",
-                        static_data.constpool.floatpool[i.1.operand.0 as usize]
-                    )
+                    let idx: usize = i.1.operand.0.into();
+                    print!("({})", static_data.constpool.floatpool[idx])
                 }
                 _ => {}
             }

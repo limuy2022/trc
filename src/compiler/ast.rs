@@ -272,7 +272,8 @@ impl<'a> ModuleUnit<'a> {
         self.lex_until(RightBigBrace)?;
         self.add_bycode(Opcode::Jump, condit_id);
         let opcode_after_while = self.staticdata.get_next_opcode_id();
-        self.staticdata.inst[jump_false_id as usize].operand.0 = opcode_after_while;
+        let idx: usize = jump_false_id.into();
+        self.staticdata.inst[idx].operand.0 = opcode_after_while;
         let mut break_record = vec![];
         swap(
             &mut break_record,
@@ -344,7 +345,8 @@ impl<'a> ModuleUnit<'a> {
         // 跳转到条件判断语句
         self.add_bycode(Opcode::Jump, conid_id);
         let next_opcode_after_for = self.staticdata.get_next_opcode_id();
-        self.staticdata.inst[jump_false_id as usize].operand.0 = next_opcode_after_for;
+        let idx: usize = jump_false_id.into();
+        self.staticdata.inst[idx].operand.0 = next_opcode_after_for;
         // 开始处理所有的break
         let mut break_record = vec![];
         swap(
@@ -384,7 +386,7 @@ impl<'a> ModuleUnit<'a> {
             match nextt {
                 Token::RightSmallBrace => {
                     if io_tmp.var_params {
-                        self.add_var_params_bycode(var_params_num);
+                        self.add_var_params_bycode(Opidx(var_params_num as OpidxInternal));
                     }
                     self.token_lexer.borrow_mut().next_back(nextt);
                     return Ok(ret);
@@ -457,7 +459,11 @@ impl<'a> ModuleUnit<'a> {
             Some(v) => v,
         };
         let tmp = self.load_var_opcode(var.ty);
-        self.add_double_bycode(tmp.0, var.addr as Opidx, tmp.1 as Opidx);
+        self.add_double_bycode(
+            tmp.0,
+            Opidx(var.addr as OpidxInternal),
+            Opidx(tmp.1 as OpidxInternal),
+        );
         self.process_info.new_type(var.ty);
         Ok(())
     }
@@ -504,9 +510,12 @@ impl<'a> ModuleUnit<'a> {
                         self.try_err(istry, msg)?
                     }
                     if let Some(obj) = func_obj.downcast_ref::<RustFunction>() {
-                        self.add_bycode(Opcode::CallNative, *(obj.buildin_id) as Opidx);
+                        self.add_bycode(
+                            Opcode::CallNative,
+                            Opidx(*(obj.buildin_id) as OpidxInternal),
+                        );
                     } else if let Some(obj) = func_obj.downcast_ref::<CustomFunction>() {
-                        self.add_bycode(Opcode::CallCustom, *obj.custom_id as Opidx);
+                        self.add_bycode(Opcode::CallCustom, Opidx(*obj.custom_id as OpidxInternal));
                     }
                     // println!("{:?} {}", func_obj.get_io().return_type, self.cache.intty_id);
                     match func_obj.get_io().return_type {
@@ -569,23 +578,23 @@ impl<'a> ModuleUnit<'a> {
         let t = self.next_token()?;
         match t {
             Token::IntValue(data) => {
-                self.add_bycode(Opcode::LoadInt, *data as Opidx);
+                self.add_bycode(Opcode::LoadInt, Opidx(*data as OpidxInternal));
                 self.process_info.new_type(self.cache.intty_id);
             }
             Token::FloatValue(data) => {
-                self.add_bycode(Opcode::LoadFloat, *data as Opidx);
+                self.add_bycode(Opcode::LoadFloat, Opidx(*data as OpidxInternal));
                 self.process_info.new_type(self.cache.floatty_id);
             }
             Token::StringValue(data) => {
-                self.add_bycode(Opcode::LoadString, *data as Opidx);
+                self.add_bycode(Opcode::LoadString, Opidx(*data as OpidxInternal));
                 self.process_info.new_type(self.cache.strty_id);
             }
             Token::CharValue(data) => {
-                self.add_bycode(Opcode::LoadChar, *data as Opidx);
+                self.add_bycode(Opcode::LoadChar, Opidx(*data as OpidxInternal));
                 self.process_info.new_type(self.cache.charty_id);
             }
             Token::BoolValue(data) => {
-                self.add_bycode(Opcode::LoadBool, *data as Opidx);
+                self.add_bycode(Opcode::LoadBool, Opidx(*data as OpidxInternal));
                 self.process_info.new_type(self.cache.boolty_id);
             }
             _ => {
@@ -730,15 +739,16 @@ impl<'a> ModuleUnit<'a> {
         }
         // 这个是跳转到下一个case的
         self.add_bycode(Opcode::Jump, ARG_WRONG);
-        add_expr_addr(self.staticdata.get_last_opcode_id() as usize);
+        add_expr_addr(self.staticdata.get_last_opcode_id().into());
         for i in &jump_into_case {
-            self.staticdata.inst[*i as usize].operand.0 = self.staticdata.get_next_opcode_id();
+            let idx: usize = (*i).into();
+            self.staticdata.inst[idx].operand.0 = self.staticdata.get_next_opcode_id();
         }
         self.get_token_checked(Token::LeftBigBrace)?;
         self.lex_until(RightBigBrace)?;
         // 最后还需要跳转指令
         self.add_bycode(Opcode::Jump, ARG_WRONG);
-        add_case_final_addr(self.staticdata.get_last_opcode_id() as usize);
+        add_case_final_addr(self.staticdata.get_last_opcode_id().into());
         Ok(is_end)
     }
 
@@ -1069,9 +1079,17 @@ impl<'a> ModuleUnit<'a> {
     fn modify_var(&mut self, varty: ClassIdxId, var_addr: usize, is_global: bool) {
         let objsz = self.get_ty_sz(varty);
         if !is_global {
-            self.add_double_bycode(Opcode::StoreLocal, var_addr as Opidx, objsz as Opidx);
+            self.add_double_bycode(
+                Opcode::StoreLocal,
+                Opidx(var_addr as OpidxInternal),
+                Opidx(objsz as OpidxInternal),
+            );
         } else {
-            self.add_double_bycode(Opcode::StoreGlobal, var_addr as Opidx, objsz as Opidx);
+            self.add_double_bycode(
+                Opcode::StoreGlobal,
+                Opidx(var_addr as OpidxInternal),
+                Opidx(objsz as OpidxInternal),
+            );
         }
     }
 
@@ -1183,12 +1201,13 @@ impl<'a> ModuleUnit<'a> {
             // 小优化，最后一个分支不需要跳转出去
             save_jump_opcode_idx.pop();
             self.del_opcode().unwrap();
-            self.staticdata.inst[op_idx].operand.0 -= 1;
+            *self.staticdata.inst[op_idx].operand.0 -= 1;
             self.token_lexer.borrow_mut().next_back(t);
             break;
         }
         for i in save_jump_opcode_idx {
-            self.staticdata.inst[i as usize].operand.0 = self.staticdata.get_next_opcode_id();
+            let idx: usize = i.into();
+            self.staticdata.inst[idx].operand.0 = self.staticdata.get_next_opcode_id();
         }
         Ok(())
     }
@@ -1207,7 +1226,7 @@ impl<'a> ModuleUnit<'a> {
                 self.self_scope
                     .borrow_mut()
                     .for_continue
-                    .push(self.staticdata.get_last_opcode_id() as usize);
+                    .push(self.staticdata.get_last_opcode_id().into());
                 return Ok(());
             }
             Token::Break => {
@@ -1221,7 +1240,7 @@ impl<'a> ModuleUnit<'a> {
                 self.self_scope
                     .borrow_mut()
                     .for_break
-                    .push(self.staticdata.get_last_opcode_id() as usize);
+                    .push(self.staticdata.get_last_opcode_id().into());
                 return Ok(());
             }
             Token::Return => {
@@ -1395,7 +1414,7 @@ impl<'a> ModuleUnit<'a> {
         self.generate_func_in_scope()?;
         let mem_sz = self.self_scope.borrow().get_var_table_sz();
         self.self_scope = tmp.clone();
-        Ok((begin_inst_idx as usize, mem_sz))
+        Ok((begin_inst_idx.into(), mem_sz))
     }
 
     fn generate_func_in_scope(&mut self) -> AstError<()> {

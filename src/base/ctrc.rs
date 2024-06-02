@@ -95,9 +95,9 @@ fn load_bytecodes<T: Read>(f: &mut BufReader<T>, data: &mut StaticData) -> anyho
         // println!("opnums:{}", opnums);
         let inst = if opnums > 0 {
             (
-                read_integer!(f, Opidx),
+                Opidx(read_integer!(f, LenSize)),
                 if opnums > 1 {
-                    read_integer!(f, Opidx)
+                    Opidx(read_integer!(f, LenSize))
                 } else {
                     ARG_WRONG
                 },
@@ -296,9 +296,9 @@ mod tests {
         static_data.line_table = vec![0, 1, 2, 3];
         static_data.funcs_pos = vec![FuncStorage::new(0, 0), FuncStorage::new(1, 1)];
         static_data.inst = vec![
-            Inst::new_single(Opcode::LoadInt, 1),
-            Inst::new_single(Opcode::LoadInt, 2),
-            Inst::new_single(Opcode::LoadFloat, 2),
+            Inst::new_single(Opcode::LoadInt, Opidx(1)),
+            Inst::new_single(Opcode::LoadInt, Opidx(2)),
+            Inst::new_single(Opcode::LoadFloat, Opidx(2)),
         ];
         static_data.dll_module_should_loaded = vec!["hello".to_string(), "world".to_string()];
         static_data.global_sym_table_sz = 2;
@@ -322,9 +322,9 @@ mod tests {
         assert_eq!(
             static_data.inst,
             vec![
-                Inst::new_single(Opcode::LoadInt, 1),
-                Inst::new_single(Opcode::LoadInt, 2),
-                Inst::new_single(Opcode::LoadFloat, 2)
+                Inst::new_single(Opcode::LoadInt, Opidx(1)),
+                Inst::new_single(Opcode::LoadInt, Opidx(2)),
+                Inst::new_single(Opcode::LoadFloat, Opidx(2))
             ]
         );
     }

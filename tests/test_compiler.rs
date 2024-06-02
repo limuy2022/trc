@@ -26,7 +26,7 @@ macro_rules! gen_test_env {
 
 /// 前面有int_nums个int时的首地址
 fn get_offset(int_nums: usize) -> Opidx {
-    (size_of::<i64>() * int_nums) as Opidx
+    Opidx((size_of::<i64>() * int_nums) as OpidxInternal)
 }
 
 fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
@@ -41,14 +41,16 @@ fn get_func_id(scope: &mut ModuleUnit, name: &str) -> Opidx {
         .borrow()
         .get_sym(idstr)
         .expect("sym not found");
-    *scope
-        .get_scope()
-        .borrow()
-        .get_function(symid)
-        .unwrap()
-        .downcast_rc::<RustFunction>()
-        .unwrap()
-        .buildin_id as Opidx
+    Opidx(
+        *scope
+            .get_scope()
+            .borrow()
+            .get_function(symid)
+            .unwrap()
+            .downcast_rc::<RustFunction>()
+            .unwrap()
+            .buildin_id as OpidxInternal,
+    )
 }
 
 const SPECIAL_FUNC_ID: Opidx = ARG_WRONG;

@@ -22,3 +22,6 @@ tmp/
 
 # 单元测试中的临时输出文件
 *.out
+
+# the docs book
+book/

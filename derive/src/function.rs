@@ -1,7 +1,7 @@
 use quote::ToTokens;
 use syn::{
-    parse_str, punctuated, token::Comma, FnArg, PatType, ReturnType, Signature, Stmt, Type,
-    TypePath,
+    FnArg, PatType, ReturnType, Signature, Stmt, Type, TypePath, parse_str, punctuated,
+    token::Comma,
 };
 
 pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, syn::Expr) {

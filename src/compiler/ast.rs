@@ -1,13 +1,13 @@
 mod ast_base;
 mod lexprocess;
 
-use super::{scope::*, token::Token, InputSource, TokenLex};
+use super::{InputSource, TokenLex, scope::*, token::Token};
 use crate::{
     base::dll::load_module_storage,
     compiler::{
-        manager::ModuleManager,
-        token::{Token::RightBigBrace, CONST_IDX_PLACEHOLDER},
         CompilerImpl,
+        manager::ModuleManager,
+        token::{CONST_IDX_PLACEHOLDER, Token::RightBigBrace},
     },
 };
 use collection_literals::collection;
@@ -812,10 +812,7 @@ impl<'a> ModuleUnit<'a> {
             ty_list.push(self.lex_ty(false)?);
         }
         // 返回值解析
-        let return_ty = match self.lex_ty(true) {
-            Err(_) => None,
-            Ok(ty) => Some(ty),
-        };
+        let return_ty = self.lex_ty(true).ok();
         let io = IOType::new(ty_list, return_ty, false);
         self.get_token_checked(Token::LeftBigBrace)?;
         let mut function_body = vec![];
@@ -942,7 +939,7 @@ impl<'a> ModuleUnit<'a> {
                     let tmp = now_module_path.clone();
                     let file_name = match tmp.file_name() {
                         None => {
-                            return self.try_err(istry, module_not_found(path.to_str().unwrap()))
+                            return self.try_err(istry, module_not_found(path.to_str().unwrap()));
                         }
                         Some(v) => v,
                     };
@@ -1135,7 +1132,7 @@ impl<'a> ModuleUnit<'a> {
                         "0" = self.token_lexer.borrow_mut().get_constpool().id_name[*name]
                     ),
                     t!(SYMBOL_ERROR),
-                ))
+                ));
             }
         };
         if var.ty != var_type {
@@ -1322,7 +1319,7 @@ impl<'a> ModuleUnit<'a> {
                                             [*name]
                                     ),
                                     t!(SYMBOL_ERROR),
-                                ))
+                                ));
                             }
                         };
                         self.assign_var(var_id)?;

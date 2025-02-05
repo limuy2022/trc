@@ -1,5 +1,5 @@
 use core::panic;
-use proc_macro::{token_stream::IntoIter, TokenStream, TokenTree};
+use proc_macro::{TokenStream, TokenTree, token_stream::IntoIter};
 use quote::quote;
 
 use crate::function;

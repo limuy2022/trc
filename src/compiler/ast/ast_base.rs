@@ -2,13 +2,13 @@ use super::AstError;
 use super::ClassIdxId;
 use super::ModuleUnit;
 use crate::compiler::scope::SymScope;
-use crate::compiler::token::Token;
 use crate::compiler::token::CONST_IDX_PLACEHOLDER;
+use crate::compiler::token::Token;
 use libcore::*;
 use rust_i18n::t;
 use std::{cell::RefCell, rc::Rc};
 
-impl<'a> ModuleUnit<'a> {
+impl ModuleUnit<'_> {
     /// 清除之前编译留下的数据
     pub fn clear_inst(&mut self) {
         self.staticdata.inst.clear();

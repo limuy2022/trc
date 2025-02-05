@@ -186,7 +186,7 @@ impl<'a> Vm<'a> {
                         return self.convert_err_info(Err(ErrorInfo::new(
                             t!(VM_FRAME_EMPTY),
                             t!(VM_ERROR),
-                        )))
+                        )));
                     }
                     Some(v) => v,
                 };

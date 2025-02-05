@@ -1,4 +1,4 @@
-use crate::compiler::{token::Token, ValuePool};
+use crate::compiler::{ValuePool, token::Token};
 use logos::Logos;
 use std::fs::read_to_string;
 

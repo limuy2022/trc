@@ -2,13 +2,13 @@
 
 use crate::{
     cfg,
-    compiler::{ast::ModuleUnit, linker::link, optimizer::optimize_module, Compiler, CompilerImpl},
+    compiler::{Compiler, CompilerImpl, ast::ModuleUnit, linker::link, optimizer::optimize_module},
 };
 use libcore::StaticData;
-use libcore::{utils, FuncIdx};
+use libcore::{FuncIdx, utils};
 use std::{
     cell::RefCell,
-    collections::{hash_map::IterMut, HashMap},
+    collections::{HashMap, hash_map::IterMut},
     path::PathBuf,
     rc::Rc,
 };
@@ -27,7 +27,7 @@ pub struct LinkerIter<'a, 'b> {
     cache_iter: IterMut<'a, String, ModuleUnit<'b>>,
 }
 
-impl<'a, 'b> Iterator for LinkerIter<'a, 'b> {
+impl<'a> Iterator for LinkerIter<'a, '_> {
     type Item = &'a mut StaticData;
     fn next(&mut self) -> Option<Self::Item> {
         match self.cache_iter.next() {

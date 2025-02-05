@@ -7,7 +7,7 @@ use crate::{
 use colored::*;
 use libcore::*;
 use rust_i18n::t;
-use rustyline::{config::Configurer, history::FileHistory, Editor};
+use rustyline::{Editor, config::Configurer, history::FileHistory};
 
 pub fn tshell() -> RuntimeResult<()> {
     println!("{}\n", t!("tshell.welcome").bold());

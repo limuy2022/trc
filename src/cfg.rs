@@ -18,11 +18,13 @@ pub fn get_history_file() -> &'static Option<PathBuf> {
         };
         config_file.push("trc");
         config_file.push(".trc_history");
-        debug_assert!(config_file
-            .as_os_str()
-            .to_str()
-            .unwrap()
-            .ends_with("/trc/.trc_history"));
+        debug_assert!(
+            config_file
+                .as_os_str()
+                .to_str()
+                .unwrap()
+                .ends_with("/trc/.trc_history")
+        );
         Some(config_file)
     })
 }

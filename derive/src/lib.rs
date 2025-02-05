@@ -1,10 +1,10 @@
 use def_module::check_next_iter;
 use function::process_function_def;
 use proc_macro::{TokenStream, TokenTree};
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::ImplItem;
 use syn::{
-    parse_macro_input, parse_str, Expr, Ident, ItemFn, ItemImpl, ItemStruct, Stmt, Type, Visibility,
+    Expr, Ident, ItemFn, ItemImpl, ItemStruct, Stmt, Type, Visibility, parse_macro_input, parse_str,
 };
 
 mod def_module;
@@ -263,12 +263,12 @@ pub fn def_module_export(_t: TokenStream) -> TokenStream {
             (RETURN_VAL.get().unwrap(), stro)
         }
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn get_lib() -> &'static libcore::Module {
             import_lib().0
         }
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn get_storage() -> &'static libcore::ModuleStorage {
             import_lib().1
         }

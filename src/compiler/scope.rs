@@ -1,4 +1,4 @@
-use super::{token::Token, ValuePool};
+use super::{ValuePool, token::Token};
 use libcore::*;
 use std::{
     cell::RefCell,
@@ -475,9 +475,7 @@ impl SymScope {
         // }
         // self.types_custom_store.get(&classid).cloned()
         match &self.prev_scope {
-            RootOnlyInfo::NonRoot(ref prev_scope) => {
-                prev_scope.borrow().get_class_by_class_id(classid)
-            }
+            RootOnlyInfo::NonRoot(prev_scope) => prev_scope.borrow().get_class_by_class_id(classid),
             RootOnlyInfo::Root(data) => data.get_class_by_class_id(classid),
         }
     }
@@ -495,7 +493,9 @@ impl SymScope {
 
     fn alloc_type_id(&mut self, idx: ScopeAllocId) -> Result<ClassIdxId, ScopeError> {
         let ret = match &mut self.prev_scope {
-            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().alloc_type_id(idx),
+            &mut RootOnlyInfo::NonRoot(ref prev_scope) => {
+                prev_scope.borrow_mut().alloc_type_id(idx)
+            }
             RootOnlyInfo::Root(data) => data.alloc_type_id(),
         }?;
         self.types.insert(idx, ret);
@@ -504,7 +504,9 @@ impl SymScope {
 
     fn insert_type(&mut self, id: ClassIdxId, f: Rc<dyn ClassInterface>) -> Result<(), ScopeError> {
         match &mut self.prev_scope {
-            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow_mut().insert_type(id, f),
+            &mut RootOnlyInfo::NonRoot(ref prev_scope) => {
+                prev_scope.borrow_mut().insert_type(id, f)
+            }
             RootOnlyInfo::Root(data) => data.insert_type(id, f),
         }
     }
@@ -532,7 +534,7 @@ impl SymScope {
         addid: impl Fn(usize),
     ) {
         match &mut self.prev_scope {
-            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope
+            &mut RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope
                 .borrow_mut()
                 .add_imported_native_dll(dll_name, lib, storage, addid),
             RootOnlyInfo::Root(data) => {
@@ -544,7 +546,7 @@ impl SymScope {
 
     pub fn get_dll(&self, name: &str) -> Option<Rc<libloading::Library>> {
         match &self.prev_scope {
-            RootOnlyInfo::NonRoot(ref prev_scope) => prev_scope.borrow().get_dll(name),
+            RootOnlyInfo::NonRoot(prev_scope) => prev_scope.borrow().get_dll(name),
             RootOnlyInfo::Root(data) => data.imported_native.get(name).map(|v| (*v).clone()),
         }
     }

@@ -3,7 +3,7 @@
 //! can be loaded and ran by vm without compiling
 
 use anyhow::bail;
-use libcore::{FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData, ARG_WRONG};
+use libcore::{ARG_WRONG, FuncStorage, Inst, Opcode, OpcodeTy, Opidx, StaticData};
 use std::{
     io::{BufReader, BufWriter, Read, Write},
     mem::size_of,

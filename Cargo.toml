@@ -1,37 +1,41 @@
-cargo-features = ["edition2024", "profile-rustflags"]
+cargo-features = ["profile-rustflags"]
 [package]
 name = "trc"
-version = "0.0.1"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
 authors = ["limuy"]
 description = "a easy-learn programming language"
 homepage = "https://github.com/limuy2022/trc"
 repository = "https://github.com/limuy2022/trc"
 license = "GPL 3.0"
 
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8"
+rand = "0.9"
 clap = { version = "4.5", features = ["derive"] }
-colored = "2.1"
-downcast-rs = "1.2"
+colored = "3"
+downcast-rs = "2"
 num-bigint = "0.4"
 derive = { path = "./derive" }
 libloading = "0.8"
 sys-locale = "0.3"
-rustyline = { version = "14.0", features = ["with-file-history"] }
+rustyline = { version = "15", features = ["with-file-history"] }
 suffix_array = "0.5.0"
 paste = "1"
 shadow-rs = "0"
 libcore = { path = "./libcore" }
 collection_literals = "1"
-thiserror = "1"
-dirs = "5"
+thiserror = "2"
+dirs = "6"
 rust-i18n = "3.0.1"
 anyhow = "1.0"
 num_enum = "0.7.2"
-logos = "0.14.0"
+logos = "0.15"
 mimalloc = "0.1"
 
 [build-dependencies]

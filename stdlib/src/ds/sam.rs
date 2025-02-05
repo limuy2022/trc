@@ -1,8 +1,8 @@
 use collection_literals::collection;
 use derive::{trc_class, trc_function, trc_method};
 use libcore::libbasic::*;
-use libcore::types::trcchar::TrcChar;
 use libcore::types::TrcObj;
+use libcore::types::trcchar::TrcChar;
 use std::collections::HashMap;
 use std::fmt::Display;
 

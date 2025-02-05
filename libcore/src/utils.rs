@@ -37,10 +37,7 @@ pub fn get_next_check_char(
     mut check: impl FnMut(char) -> bool,
 ) -> Option<char> {
     loop {
-        let c = match iter.next() {
-            Some(c) => c,
-            None => return None,
-        };
+        let c = iter.next()?;
         if check(c) {
             continue;
         }

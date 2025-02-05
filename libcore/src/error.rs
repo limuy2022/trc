@@ -43,7 +43,7 @@ pub const SHOULD_IN_LOOP: &str = "compiler.syntaxerror.should_in_loop";
 pub const CANNOT_IMPORT_MODULE_WITHOUT_FILE: &str =
     "compiler.symbolerror.cannot_import_not_in_file";
 pub const MODULE_NOT_FOUND: &str = "compiler.modulenotfounderror.module_not_found";
-pub const CANNOT_RECOGNIZE: &str = "compiler.syntaxerror.cannot_regonize";
+pub const CANNOT_RECOGNIZE: &str = "compiler.syntaxerror.cannot_recognize";
 
 pub fn symbol_redefined(name: &str) -> ErrorInfo {
     ErrorInfo::new(t!(SYMBOL_REDEFINED, "0" = name), t!(SYMBOL_ERROR))

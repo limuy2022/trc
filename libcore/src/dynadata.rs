@@ -162,7 +162,7 @@ impl DynaData {
         #[cfg(debug_assertions)]
         {
             match self.mapped_var.get(&addr) {
-                None => panic!("not found var address: {}", addr),
+                None => panic!("not found var address: {addr}"),
                 Some(sz) => {
                     debug_assert_eq!(*sz, addr + size_of::<T>() - 1);
                 }

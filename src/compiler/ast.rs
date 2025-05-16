@@ -986,7 +986,7 @@ impl<'a> ModuleUnit<'a> {
                 if c == '.' {
                     break;
                 }
-                import_item_name = format!("{}{}", c, import_item_name);
+                import_item_name = format!("{c}{import_item_name}");
             }
             let mut items = path_with_dot.split('.');
             let dll_lib = self

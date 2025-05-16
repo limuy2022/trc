@@ -251,7 +251,7 @@ pub fn load_from_reader_without_magic(f: &mut BufReader<impl Read>) -> anyhow::R
     load_symbol_table(f, &mut data)?;
     load_bytecodes(f, &mut data)?;
     for i in &data.inst {
-        eprintln!("{:?}", i);
+        eprintln!("{i:?}");
     }
     load_const_pool(f, &mut data)?;
     load_function_info(f, &mut data)?;

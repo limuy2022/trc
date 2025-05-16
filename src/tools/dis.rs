@@ -6,7 +6,7 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
     let file = match std::fs::File::open(opt.inputsource.get_path()) {
         Ok(file) => file,
         Err(e) => {
-            println!("open file error: {}", e);
+            println!("open file error: {e}");
             return Ok(());
         }
     };
@@ -20,7 +20,7 @@ pub fn dis(opt: crate::compiler::CompileOption, rustcode: bool) -> anyhow::Resul
     // let static_data = ast.prepare_get_static();
     println!("deps modules(The order is significant):");
     for i in &static_data.dll_module_should_loaded {
-        println!("{}", i);
+        println!("{i}");
     }
     println!("\nInst:");
     for i in static_data.inst.iter().enumerate() {

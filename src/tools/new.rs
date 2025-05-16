@@ -5,11 +5,11 @@ pub fn new_project(name: &str) -> anyhow::Result<()> {
     // 新建项目，名为name
     std::fs::create_dir_all(name)?;
     // 新建src文件夹
-    std::fs::create_dir_all(format!("{}/src", name))?;
+    std::fs::create_dir_all(format!("{name}/src"))?;
     // 新建main.trc
     std::fs::write(format!("{}/{}", name, cfg::MAIN_FILE), "")?;
     // 新建.gitignore
-    std::fs::write(format!("{}/.gitignore", name), "trcbuild/")?;
+    std::fs::write(format!("{name}/.gitignore"), "trcbuild/")?;
     // 尝试git init
     let output = std::process::Command::new("git")
         .args(["init"])

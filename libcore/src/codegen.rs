@@ -136,7 +136,7 @@ pub enum Opcode {
 impl Display for Opcode {
     #[tarpaulin::skip]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -299,7 +299,7 @@ pub fn convert_int_constval_to_oparg(v: TrcIntInternal) -> Opidx {
 }
 
 pub fn convert_int_constval_to_usize(v: TrcIntInternal) -> usize {
-    unsafe { std::mem::transmute::<TrcIntInternal, usize>(v) }
+    v as usize
 }
 
 pub fn convert_usize_to_oparg(v: usize) -> Opidx {

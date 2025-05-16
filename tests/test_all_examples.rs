@@ -29,16 +29,16 @@ fn check_examples_eq(expected: &str, actual: &str) -> Result<(), String> {
         let a = get_next_check_char(&mut iter1, checker);
         let b = get_next_check_char(&mut iter2, checker);
         if a != b {
-            return Err(format!("expected: {}, actual: {}", expected, actual));
+            return Err(format!("expected: {expected}, actual: {actual}"));
         }
         if a.is_none() && b.is_none() {
             break;
         }
         if a.is_none() && !check_whether_end(&mut iter2, checker_end) {
-            return Err(format!("expected: {}, actual: {}", expected, actual));
+            return Err(format!("expected: {expected}, actual: {actual}"));
         }
         if b.is_none() && !check_whether_end(&mut iter1, checker_end) {
-            return Err(format!("expected: {}, actual: {}", expected, actual));
+            return Err(format!("expected: {expected}, actual: {actual}"));
         }
     }
     Ok(())

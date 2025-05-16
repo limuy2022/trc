@@ -51,14 +51,14 @@ pub fn link<'a>(data_iter: impl Iterator<Item = &'a mut StaticData>) -> StaticDa
                 _ => {}
             }
             // 如果位于函数定义点，修正对应的函数定义点
-            if let Some(pos) = function_expected_pos {
-                if inst_ori_id == pos.func_addr {
-                    function_expected_pos = iter_of_function.next();
-                    let mut added = pos.clone();
-                    // 该项指令还没有加入，所以是next
-                    added.func_addr = data.get_next_opcode_id().into();
-                    func_record_tmp.push(added);
-                }
+            if let Some(pos) = function_expected_pos
+                && inst_ori_id == pos.func_addr
+            {
+                function_expected_pos = iter_of_function.next();
+                let mut added = pos.clone();
+                // 该项指令还没有加入，所以是next
+                added.func_addr = data.get_next_opcode_id().into();
+                func_record_tmp.push(added);
             }
             data.inst.push(added);
         }

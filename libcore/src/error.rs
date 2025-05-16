@@ -120,7 +120,7 @@ impl Display for RuntimeError {
             self.info.error_type.clone().red(),
             self.info.message.red()
         );
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 

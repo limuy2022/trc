@@ -397,7 +397,7 @@ impl Display for Token {
             Token::Comment => "Comment",
             Token::CrossLinesComment(_) => "CrossLinesComment",
         };
-        write!(f, "{}", res)
+        write!(f, "{res}")
     }
 }
 
@@ -635,10 +635,7 @@ mod tests {
         for i in &testpool {
             assert!(
                 pool_be_checked.contains_key(i),
-                "{} not in pool.{:?} is expected pool\n{:?} is checked pool",
-                i,
-                testpool,
-                pool_be_checked
+                "{i} not in pool.{testpool:?} is expected pool\n{pool_be_checked:?} is checked pool"
             );
         }
     }
@@ -647,7 +644,7 @@ mod tests {
     fn check_until_eof(tokenlex: &mut TokenLex) {
         loop {
             let token_tmp = tokenlex.next_token().unwrap();
-            println!("{:?}", token_tmp);
+            println!("{token_tmp:?}");
             if token_tmp == Token::EndOfFile {
                 break;
             }

@@ -33,10 +33,10 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                     check_next_iter(&mut attr_iter, "=");
                     let bol = attr_iter.next().unwrap().to_string();
                     if bol == "true" {
-                        function_path = parse_str(&format!("Self::{}", name)).unwrap();
+                        function_path = parse_str(&format!("Self::{name}")).unwrap();
                     } else if bol == "false" {
                     } else {
-                        panic!("expected true or false, not {}", bol);
+                        panic!("expected true or false, not {bol}");
                     }
                 } else if ident_name == "var_params" {
                     check_next_iter(&mut attr_iter, "=");
@@ -64,10 +64,10 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                         new_stmts = var_lex_tmp;
                     } else if bol == "false" {
                     } else {
-                        panic!("expected true or false, not {}", bol);
+                        panic!("expected true or false, not {bol}");
                     }
                 } else {
-                    panic!("unexpected:{}", ident_name);
+                    panic!("unexpected:{ident_name}");
                 }
             }
             TokenTree::Punct(sym) => {
@@ -76,7 +76,7 @@ pub fn trc_function(attr: TokenStream, input: TokenStream) -> TokenStream {
                 }
             }
             _ => {
-                panic!("unexpected:{}", i);
+                panic!("unexpected:{i}");
             }
         }
     }

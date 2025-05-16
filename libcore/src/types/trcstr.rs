@@ -17,7 +17,7 @@ pub struct TrcStr {
 }
 
 fn cat_string(a: &String, b: &String) -> String {
-    format!("{}{}", a, b)
+    format!("{a}{b}")
 }
 
 #[trc_method]

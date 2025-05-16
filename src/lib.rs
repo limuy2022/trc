@@ -67,7 +67,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 )) {
                     Ok(_) => {}
                     Err(c) => {
-                        eprintln!("{}", c);
+                        eprintln!("{c}");
                     }
                 };
             }
@@ -83,7 +83,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 )) {
                     Ok(_) => {}
                     Err(c) => {
-                        eprintln!("{}", c);
+                        eprintln!("{c}");
                     }
                 }
             }
@@ -103,7 +103,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 ) {
                     Ok(_) => {}
                     Err(c) => {
-                        eprintln!("{}", c);
+                        eprintln!("{c}");
                     }
                 }
             }

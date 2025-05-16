@@ -59,8 +59,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("AnyType").unwrap());
                     new_stmts.push(
                         parse_str::<Stmt>(&format!(
-                            r#"let mut {} = dydata.pop_data::<*mut dyn TrcObj>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<*mut dyn TrcObj>();"#
                         ))
                         .unwrap(),
                     );
@@ -68,8 +67,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("libcore::TrcStr").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<libcore::TrcStrInternal>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<libcore::TrcStrInternal>();"#
                         ))
                         .unwrap(),
                     );
@@ -77,8 +75,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("libcore::TrcInt").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<libcore::TrcIntInternal>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<libcore::TrcIntInternal>();"#
                         ))
                         .unwrap(),
                     );
@@ -86,8 +83,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("libcore::TrcBool").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<bool>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<bool>();"#
                         ))
                         .unwrap(),
                     );
@@ -95,8 +91,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("libcore::TrcChar").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<libcore::TrcCharInternal>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<libcore::TrcCharInternal>();"#
                         ))
                         .unwrap(),
                     );
@@ -104,8 +99,7 @@ pub fn process_function_def(sig: &mut Signature) -> (Vec<Stmt>, Vec<TypePath>, s
                     args_type_required.push(parse_str("libcore::TrcFloat").unwrap());
                     new_stmts.push(
                         parse_str(&format!(
-                            r#"let mut {} = dydata.pop_data::<libcore::TrcFloatInternal>();"#,
-                            arg_name
+                            r#"let mut {arg_name} = dydata.pop_data::<libcore::TrcFloatInternal>();"#
                         ))
                         .unwrap(),
                     );

@@ -1,0 +1,25 @@
+{
+  "name": "trc",
+  "displayName": "trc",
+  "description": "VSCode support of trc language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "trc",
+      "aliases": ["trc", "trc"],
+      "extensions": [".trc"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "trc",
+      "scopeName": "",
+      "path": "./syntaxes/trc.tmLanguage.json"
+    }]
+  }
+}

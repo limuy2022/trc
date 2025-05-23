@@ -4,3 +4,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+lsp-types = "0.97.0"
+tokio = { version = "1.45.0", features = ["macros", "rt-multi-thread"] }
+anyhow = "1.0.98"
